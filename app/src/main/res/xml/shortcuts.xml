@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="favorites"
+        android:enabled="true"
+        android:icon="@drawable/baseline_favorite_24"
+        android:shortcutShortLabel="@string/favorites"
+        android:shortcutLongLabel="@string/favorites">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="younesbouhouche.musicplayer"
+            android:targetClass="younesbouhouche.musicplayer.MainActivity">
+            <extra
+                android:name="type"
+                android:value="favorites" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="mostPlayed"
+        android:enabled="true"
+        android:icon="@drawable/baseline_trending_up_24"
+        android:shortcutShortLabel="@string/most_played"
+        android:shortcutLongLabel="@string/most_played">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="younesbouhouche.musicplayer"
+            android:targetClass="younesbouhouche.musicplayer.MainActivity">
+            <extra
+                android:name="type"
+                android:value="mostPlayed" />
+        </intent>
+    </shortcut>
+</shortcuts>
