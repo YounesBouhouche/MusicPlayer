@@ -7,7 +7,6 @@ import younesbouhouche.musicplayer.MusicCard
 import younesbouhouche.musicplayer.SortEvent
 import younesbouhouche.musicplayer.UiEvent
 import younesbouhouche.musicplayer.states.SortState
-import younesbouhouche.musicplayer.states.UiState
 import younesbouhouche.musicplayer.ui.components.LazyColumnWithSortBar
 import younesbouhouche.musicplayer.ui.components.MusicCardLazyItem
 
@@ -26,7 +25,10 @@ fun Library(
         onSortEvent = onSortEvent
     ) {
         items(files, { it.id }) {
-            MusicCardLazyItem(file = it, onLongClick = { onUiEvent(UiEvent.ShowBottomSheet(it)) }) {
+            MusicCardLazyItem(
+                file = it,
+                onLongClick = { onUiEvent(UiEvent.ShowBottomSheet(it)) }
+            ) {
                 play(files.indexOf(it))
             }
         }

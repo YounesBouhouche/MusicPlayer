@@ -36,6 +36,7 @@ fun NavigationScreen(
     val filesSorted by mainVM.filesSorted.collectAsState()
     val recentlyAdded by mainVM.recentlyAdded.collectAsState()
     val sortState by mainVM.sortState.collectAsState()
+    val mostPlayedArtists by mainVM.mostPlayedArtists.collectAsState()
 
     val albumsSorted by mainVM.albumsSorted.collectAsState()
     val albumsSortState by mainVM.albumsSortState.collectAsState()
@@ -67,7 +68,14 @@ fun NavigationScreen(
         modifier = modifier.fillMaxSize()
     ) {
         composable<NavRoutes.Home> {
-            Home(navController::navigate)
+            Home(
+                navController::navigate,
+                {
+                    mainVM.setListFiles(mainVM.getArtistFiles(it))
+                    navController.navigate(NavRoutes.ListScreen(it))
+                },
+                mostPlayedArtists
+            )
         }
         composable<NavRoutes.Albums> {
             Albums(

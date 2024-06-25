@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -126,8 +125,6 @@ class MainVM @Inject constructor(
     private var initialized = false
 
     private val _files = MutableStateFlow(emptyList<MusicCard>())
-    private val files = _files
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
     private val _playlists = dao.getPlaylist()
     val playlists = _playlists.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
@@ -207,6 +204,20 @@ class MainVM @Inject constructor(
                 timestamps[it.path]!!
             }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyMap())
+
+    val _mostPlayedArtists = combine(_files, _timestamps) { files, timestamps ->
+        // get most played artists
+        files
+            .groupBy { it.artist }
+            .filter { it.key != "<unknown>" }
+            .map { (artist, files) ->
+                artist to files.sumOf { file -> timestamps[file.path]?.size ?: 0 }
+            }
+            .sortedByDescending { it.second }
+            .map { it.first }
+    }
+    val mostPlayedArtists = _mostPlayedArtists
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
     val listScreenFiles = combine(_listScreenFiles, _listScreenSortState) { listScreenFiles, sortState ->
         if (sortState.ascending)
@@ -320,6 +331,9 @@ class MainVM @Inject constructor(
 
     fun getArtist(file: MusicCard): Pair<String, List<MusicCard>>
             = file.artist to (_artists.value[file.artist] ?: emptyList())
+
+    fun getArtistFiles(artist: String): List<MusicCard>
+            = _artists.value[artist] ?: emptyList()
 
     fun setGranted(startupIntent: StartupIntent = StartupIntent.None) {
         viewModelScope.launch {
