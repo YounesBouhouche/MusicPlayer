@@ -116,31 +116,33 @@ fun Home(
                     contentPadding = PaddingValues(16.dp),
                     preferredItemWidth = 200.dp
                 ) {
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f)
-                            .background(MaterialTheme.colorScheme.surfaceContainer, rememberMaskShape(CircleShape))
-                            .clip(rememberMaskShape(CircleShape))
-                            .clipToBounds()
-                            .alpha(carouselItemInfo.size / carouselItemInfo.maxSize)
-                            .clickable { navigateToArtist(artists[it]) }
-                    ) {
-                        Icon(
-                            Icons.Default.Person,
-                            null,
+                    artists.getOrNull(it)?.let {
+                        Box(
                             Modifier
-                                .size(120.dp)
-                                .align(Alignment.Center),
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            artists[it],
-                            Modifier.fillMaxWidth().padding(16.dp).align(Alignment.BottomCenter),
-                            overflow = TextOverflow.Ellipsis,
-                            textAlign = TextAlign.Center,
-                            maxLines = 1
-                        )
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                                .background(MaterialTheme.colorScheme.surfaceContainer, rememberMaskShape(CircleShape))
+                                .clip(rememberMaskShape(CircleShape))
+                                .clipToBounds()
+                                .alpha(carouselItemInfo.size / carouselItemInfo.maxSize)
+                                .clickable { navigateToArtist(it) }
+                        ) {
+                            Icon(
+                                Icons.Default.Person,
+                                null,
+                                Modifier
+                                    .size(120.dp)
+                                    .align(Alignment.Center),
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                it,
+                                Modifier.fillMaxWidth().padding(16.dp).align(Alignment.BottomCenter),
+                                overflow = TextOverflow.Ellipsis,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1
+                            )
+                        }
                     }
                 }
             }
