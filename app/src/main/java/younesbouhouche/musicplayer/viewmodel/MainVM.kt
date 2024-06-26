@@ -97,6 +97,7 @@ class MainVM @Inject constructor(
     db: AppDatabase
 ): ViewModel() {
     private val dao = db.dao
+    private var startupIntent: StartupIntent = StartupIntent.None
 
     private val _timestamps = dao.getGroupedTimestamps().map { timestamp ->
         timestamp.filter { Files.exists(Path(it.key)) }
@@ -205,7 +206,7 @@ class MainVM @Inject constructor(
             }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyMap())
 
-    val _mostPlayedArtists = combine(_files, _timestamps) { files, timestamps ->
+    private val _mostPlayedArtists = combine(_files, _timestamps) { files, timestamps ->
         // get most played artists
         files
             .groupBy { it.artist }
@@ -335,10 +336,11 @@ class MainVM @Inject constructor(
     fun getArtistFiles(artist: String): List<MusicCard>
             = _artists.value[artist] ?: emptyList()
 
-    fun setGranted(startupIntent: StartupIntent = StartupIntent.None) {
+    fun setGranted(intent: StartupIntent = StartupIntent.None) {
         viewModelScope.launch {
             _granted.value = true
-            if (!initialized) loadFiles(startupIntent)
+            if (!initialized) loadFiles()
+            startupIntent = intent
         }
     }
 
@@ -574,7 +576,7 @@ class MainVM @Inject constructor(
         onListsSortEvent(event, _playlistsSortState)
     }
 
-    private suspend fun loadFiles(startupIntent: StartupIntent = StartupIntent.None) {
+    private suspend fun loadFiles() {
         _files.value = emptyList()
         _albums.value = emptyMap()
         _artists.value = emptyMap()
@@ -630,35 +632,10 @@ class MainVM @Inject constructor(
         }
         _albums.value = list.groupBy { it.album }
         _artists.value = list.groupBy { it.artist }
+        _files.value = list
+        _loading.value = false
         getThumbnails(list) {
             _files.value = list
-            _loading.value = false
-            when (startupIntent) {
-                StartupIntent.PlayFavorites ->
-                    viewModelScope.launch {
-                        val favorites = dao.suspendGetFavorites()
-                        onPlayerEvent(PlayerEvent.Play(list.filter { favorites.contains(it.path) }))
-                    }
-                StartupIntent.PlayMostPlayed ->
-                    viewModelScope.launch {
-                        val timestamps = dao.suspendGetTimestamps()
-                        val mostPlayed = timestamps.toList().sortedByDescending { it.times.size }.map { it.path }
-                        onPlayerEvent(PlayerEvent.Play(list.filter { mostPlayed.contains(it.path) }))
-                    }
-                is StartupIntent.PlayPlaylist ->
-                    viewModelScope.launch {
-                        val p =
-                            playlists.value
-                                .firstOrNull { it.id == startupIntent.id }
-                                ?.items
-                                ?.mapNotNull { item -> list.firstOrNull { item == it.path } }
-                        println(p)
-                        p?.let {
-                            onPlayerEvent(PlayerEvent.Play(it))
-                        }
-                    }
-                else -> {}
-            }
         }
     }
 
@@ -763,6 +740,32 @@ class MainVM @Inject constructor(
                         else onPlayerEvent(PlayerEvent.Stop)
                 }
             })
+            when (startupIntent) {
+                StartupIntent.PlayFavorites ->
+                    viewModelScope.launch {
+                        val favorites = dao.suspendGetFavorites()
+                        onPlayerEvent(PlayerEvent.Play(_files.value.filter { favorites.contains(it.path) }))
+                    }
+                StartupIntent.PlayMostPlayed ->
+                    viewModelScope.launch {
+                        val timestamps = dao.suspendGetTimestamps()
+                        val mostPlayed = timestamps.toList().sortedByDescending { it.times.size }.map { it.path }
+                        onPlayerEvent(PlayerEvent.Play(_files.value.filter { mostPlayed.contains(it.path) }))
+                    }
+                is StartupIntent.PlayPlaylist ->
+                    viewModelScope.launch {
+                        val p =
+                            playlists.value
+                                .firstOrNull { it.id == (startupIntent as StartupIntent.PlayPlaylist).id }
+                                ?.items
+                                ?.mapNotNull { item -> _files.value.firstOrNull { item == it.path } }
+                        println(p)
+                        p?.let {
+                            onPlayerEvent(PlayerEvent.Play(it))
+                        }
+                    }
+                else -> {}
+            }
         }, ContextCompat.getMainExecutor(context))
     }
 
