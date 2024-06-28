@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconToggleButton

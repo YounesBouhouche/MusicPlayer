@@ -2,6 +2,7 @@ package younesbouhouche.musicplayer.states
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Title
@@ -16,7 +17,8 @@ data class SortState(
 enum class SortType(val label: String, val icon: ImageVector) {
     Title("Title", Icons.Default.Title),
     Filename("File name", Icons.AutoMirrored.Default.InsertDriveFile),
-    Duration("Duration", Icons.Default.Timer)
+    Duration("Duration", Icons.Default.Timer),
+    Date("Date Modified", Icons.Default.CalendarMonth),
 }
 
 data class PlaylistSortState(

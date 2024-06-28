@@ -5,19 +5,20 @@ hiltCompiler = "1.2.0"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.2"
 activityCompose = "1.9.0"
 composeBom = "2024.06.00"
 material-icons-extended = "1.6.8"
-material3 = "1.3.0-beta03"
+material3 = "1.3.0-beta04"
 jaudiotagger = "3.0.1"
 ksp = "2.0.0-1.0.22"
 material3AdaptiveNavigationSuite = "1.0.0-alpha07"
 media3Exoplayer = "1.3.1"
 retrofit = "2.11.0"
-navigation-compose = "2.8.0-beta03"
+navigation-compose = "2.8.0-beta04"
+crowdin-sdk = "1.10.0"
 serialization = "1.7.0"
 sh-reorderable = "2.1.1"
 media3Session = "1.3.1"
@@ -33,6 +34,7 @@ converterGson = "2.11.0"
 androidx-material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite", version.ref = "material3AdaptiveNavigationSuite" }
 androidx-material3-adaptive-navigation-suite-android = { module = "androidx.compose.material3:material3-adaptive-navigation-suite-android", version.ref = "material3AdaptiveNavigationSuite" }
 androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3Exoplayer" }
+crowdin-sdk = { module = "com.github.crowdin.mobile-sdk-android:sdk", version.ref = "crowdin-sdk" }
 sh-reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "sh-reorderable" }
 androidx-media3-exoplayer-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = "media3Exoplayer" }
 androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3Exoplayer" }

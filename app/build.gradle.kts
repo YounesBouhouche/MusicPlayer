@@ -77,6 +77,10 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.retrofit)
     implementation(libs.jaudiotagger)
+//    implementation(libs.crowdin.sdk)
+//    implementation("com.github.crowdin.mobile-sdk-android:sdk:1.9.2") {
+//        exclude("com.google.code.gson", "gson")
+//    }
     implementation(libs.converter.gson)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.media3.session)

@@ -2,7 +2,11 @@ package younesbouhouche.musicplayer.ui.components
 
 import android.os.Build
 import android.view.HapticFeedbackConstants
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -33,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.ReorderableLazyListState
-import soup.compose.material.motion.MaterialSharedAxisZ
 import younesbouhouche.musicplayer.MusicCard
 import younesbouhouche.musicplayer.timeString
 
@@ -116,9 +119,10 @@ fun LazyItemScope.MusicCardLazyItem(
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {}
 ) {
-    MaterialSharedAxisZ(
+    AnimatedContent(
         targetState = reorderableState,
-        forward = true,
+        transitionSpec = { fadeIn() togetherWith fadeOut() },
+        label = "",
         modifier = Modifier.animateItem()) {
         if (it == null)
             MusicCardItem(

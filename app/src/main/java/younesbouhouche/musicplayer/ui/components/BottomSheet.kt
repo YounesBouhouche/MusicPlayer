@@ -220,27 +220,40 @@ fun ItemBottomSheet(
                         )
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             SuggestionChip(
+                                modifier = Modifier.fillMaxWidth().weight(1f),
                                 onClick = {
                                     navigateToArtist()
                                     onDismissRequest()
                                 },
                                 label = {
-                                    Text(text = artist, style = MaterialTheme.typography.labelMedium)
+                                    Text(
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        text = artist,
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
                                 },
                                 icon = {
                                     Icon(
                                         Icons.Default.Person,
                                         null,
-                                        Modifier.size(16.dp))
+                                        Modifier.size(16.dp)
+                                    )
                                 }
                             )
                             SuggestionChip(
+                                modifier = Modifier.fillMaxWidth().weight(1f),
                                 onClick = {
                                     navigateToAlbum()
                                     onDismissRequest()
                                 },
                                 label = {
-                                    Text(text = album, style = MaterialTheme.typography.labelMedium)
+                                    Text(
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        text = album,
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
                                 },
                                 icon = {
                                     Icon(

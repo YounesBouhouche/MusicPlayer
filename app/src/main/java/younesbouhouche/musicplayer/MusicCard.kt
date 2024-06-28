@@ -2,12 +2,12 @@ package younesbouhouche.musicplayer
 
 import android.graphics.Bitmap
 import android.net.Uri
-import kotlinx.coroutines.flow.Flow
+import androidx.compose.runtime.Immutable
 import kotlinx.coroutines.flow.StateFlow
-import younesbouhouche.musicplayer.room.Timestamp
 import younesbouhouche.musicplayer.states.MusicMetadata
 import java.time.LocalDateTime
 
+@Immutable
 data class MusicCard(
     val contentUri: Uri,
     val id: Long,

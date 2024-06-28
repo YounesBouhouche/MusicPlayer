@@ -130,15 +130,15 @@ class MainVM @Inject constructor(
     private val _playlists = dao.getPlaylist()
     val playlists = _playlists.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    private val _nowPlaying = MutableStateFlow(emptyList<MusicCard>())
-    val queue = _nowPlaying
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+    private val _nowPlaying = MutableStateFlow(emptyList<Long>())
+    val queue = combine(_files, _nowPlaying) { files, nowPlaying ->
+        nowPlaying.mapNotNull { item -> files.firstOrNull { it.id == item } }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
     private val _listScreenFiles = MutableStateFlow(emptyList<MusicCard>())
 
     private val _albums = MutableStateFlow(emptyMap<String, List<MusicCard>>())
     private val _artists = MutableStateFlow(emptyMap<String, List<MusicCard>>())
-
 
     private val _searchState = MutableStateFlow(SearchState())
     val searchState = combine(_searchState, _files) { state, files ->
@@ -177,7 +177,7 @@ class MainVM @Inject constructor(
             .asSequence()
             .map { it to timestamps[it.path]?.maxOrNull() }
             .filter { it.second != null }
-            //.sortedByDescending { it.second!! }
+            //.sortedByDescending { it.second }
             .map { it.first }
             .toList()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
@@ -188,12 +188,14 @@ class MainVM @Inject constructor(
                 SortType.Title -> files.sortedBy { it.title }
                 SortType.Filename -> files.sortedBy { it.path }
                 SortType.Duration -> files.sortedBy { it.duration }
+                SortType.Date -> files.sortedBy { it.date }
             }
         else
             when(sortState.sortType) {
                 SortType.Title -> files.sortedByDescending { it.title }
                 SortType.Filename -> files.sortedByDescending { it.path }
                 SortType.Duration -> files.sortedByDescending { it.duration }
+                SortType.Date -> files.sortedByDescending { it.date }
             }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
@@ -226,12 +228,14 @@ class MainVM @Inject constructor(
                 SortType.Title -> listScreenFiles.sortedBy { it.title }
                 SortType.Filename -> listScreenFiles.sortedBy { it.path }
                 SortType.Duration -> listScreenFiles.sortedBy { it.duration }
+                SortType.Date -> listScreenFiles.sortedBy { it.date }
             }
         else
             when(sortState.sortType) {
                 SortType.Title -> listScreenFiles.sortedByDescending { it.title }
                 SortType.Filename -> listScreenFiles.sortedByDescending { it.path }
                 SortType.Duration -> listScreenFiles.sortedByDescending { it.duration }
+                SortType.Date -> listScreenFiles.sortedByDescending { it.date }
             }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
@@ -245,12 +249,14 @@ class MainVM @Inject constructor(
                 SortType.Title -> listScreenFiles.sortedBy { it.title }
                 SortType.Filename -> listScreenFiles.sortedBy { it.path }
                 SortType.Duration -> listScreenFiles.sortedBy { it.duration }
+                SortType.Date -> listScreenFiles.sortedBy { it.date }
             }
         else
             when(sortState.sortType) {
                 SortType.Title -> listScreenFiles.sortedByDescending { it.title }
                 SortType.Filename -> listScreenFiles.sortedByDescending { it.path }
                 SortType.Duration -> listScreenFiles.sortedByDescending { it.duration }
+                SortType.Date -> listScreenFiles.sortedByDescending { it.date }
             }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
@@ -716,7 +722,7 @@ class MainVM @Inject constructor(
                     _playerState.update { it.copy(index = player.currentMediaItemIndex) }
                     viewModelScope.launch {
                         try {
-                            val files = _nowPlaying.value
+                            val files = queue.value
                             dao.upsertTimestamp(
                                 Timestamp(
                                     files[player.currentMediaItemIndex].path,
@@ -845,15 +851,17 @@ class MainVM @Inject constructor(
 
             is PlayerEvent.Remove -> {
                 player.removeMediaItem(event.index)
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     _nowPlaying.update {
-                        it.toMutableList().apply { removeAt(event.index) }
+                        it.toMutableList().apply {
+                            removeAt(event.index)
+                        }
                     }
                 }
             }
             is PlayerEvent.Swap -> {
                 player.moveMediaItem(event.from, event.to)
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     _nowPlaying.update {
                         it.toMutableList().apply {
                             add(event.to, removeAt(event.from))
@@ -906,16 +914,17 @@ class MainVM @Inject constructor(
                     return
                 }
                 event.items
-                    .map { _nowPlaying.value.indexOf(it) }
+                    .map { _nowPlaying.value.indexOf(it.id) }
                     .filter { it >= 0 }
                     .forEach { player.removeMediaItem(it) }
                 player.addMediaItems(
                     player.currentMediaItemIndex + 1, event.items.toMediaItems()
                 )
+                val items = event.items.map { item -> item.id }
                 _nowPlaying.update {
                     it.toMutableList().apply {
-                        removeAll(event.items)
-                        addAll(player.currentMediaItemIndex + 1, event.items)
+                        removeAll(items)
+                        addAll(player.currentMediaItemIndex + 1, items)
                     }
                 }
                 _playerState.update { it.copy(index = player.currentMediaItemIndex) }
@@ -926,10 +935,10 @@ class MainVM @Inject constructor(
                     return
                 }
                 val list = event.items.filter { item ->
-                    !_nowPlaying.value.contains(item)
+                    !_nowPlaying.value.contains(item.id)
                 }
                 _nowPlaying.update {
-                    it.toMutableList().apply { addAll(list) }
+                    it.toMutableList().apply { addAll(list.map { item -> item.id }) }
                 }
                 player.addMediaItems(list.toMediaItems())
             }
@@ -1115,8 +1124,8 @@ class MainVM @Inject constructor(
             if (index != _playerState.value.index) seek(index, time)
             return
         }
-        viewModelScope.launch {
-            _nowPlaying.update { list }
+        viewModelScope.launch(Dispatchers.IO) {
+            _nowPlaying.value = list.map { it.id }
         }
         player.setMediaItems(list.toMediaItems())
         player.seekTo(index, time)

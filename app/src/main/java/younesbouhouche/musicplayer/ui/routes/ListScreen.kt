@@ -18,6 +18,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.style.TextOverflow
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
 import younesbouhouche.musicplayer.MusicCard
@@ -44,7 +45,13 @@ fun ListScreen(
     Scaffold(
         topBar = {
             LargeTopAppBar(
-                title = { Text(title) },
+                title = {
+                    Text(
+                        text = title,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                        },
                 navigationIcon = {
                     IconButton(onClick = navigateUp) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, null)
@@ -87,7 +94,8 @@ fun ListScreen(
                 state = state,
                 leadingContent = {},
                 searchBarSpace = false,
-                contentPadding = paddingValues,) {
+                contentPadding = paddingValues
+            ) {
                 items(files, { it.id }) {
                     MusicCardLazyItem(
                         file = it,
