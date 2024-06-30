@@ -81,6 +81,7 @@ fun Artists(
                         supporting = "${it.items.size} items",
                         cover = it.cover?.asImageBitmap(),
                         alternative = Icons.Default.AccountCircle,
+                        modifier = Modifier.animateItem(),
                         trailingContent = {
                             IconButton(onClick = { onPlayerEvent(PlayerEvent.PlayIds(it.items))  }) {
                                 Icon(Icons.Outlined.PlayArrow, null)

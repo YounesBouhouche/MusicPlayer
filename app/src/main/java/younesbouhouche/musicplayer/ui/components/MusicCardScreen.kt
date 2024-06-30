@@ -123,13 +123,14 @@ fun LazyItemScope.LazyMusicCardScreen(
         targetState = reorderableState,
         transitionSpec = { fadeIn() togetherWith fadeOut() },
         label = "",
-        modifier = Modifier.animateItem()) {
+        modifier = modifier.animateItem()
+    ) {
         if (it == null)
             MusicCardScreen(
                 file = file,
                 onClick = onClick,
                 onLongClick = onLongClick,
-                modifier = modifier
+                modifier = Modifier
             )
         else
             ReorderableItem(

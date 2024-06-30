@@ -104,6 +104,7 @@ fun Playlists(
                             supporting = "${it.items.size} items",
                             cover = null,
                             alternative = Icons.AutoMirrored.Default.PlaylistPlay,
+                            modifier = Modifier.animateItem(),
                             trailingContent = {
                                 IconButton(onClick = { onPlayerEvent(PlayerEvent.PlayPaths(it.items.toList()))  }) {
                                     Icon(Icons.Outlined.PlayArrow, null)

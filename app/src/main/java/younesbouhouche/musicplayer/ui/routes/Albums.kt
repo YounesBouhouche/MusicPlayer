@@ -81,6 +81,7 @@ fun Albums(
                         supporting = "${it.items.size} items",
                         cover = it.cover?.asImageBitmap(),
                         alternative = Icons.Default.Album,
+                        modifier = Modifier.animateItem(),
                         trailingContent = {
                             IconButton(onClick = { onPlayerEvent(PlayerEvent.PlayIds(it.items))  }) {
                                 Icon(Icons.Outlined.PlayArrow, null)

@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
@@ -416,6 +417,7 @@ fun ListBottomSheet(
     state: SheetState,
     shareFiles: () -> Unit = {}
 ) {
+    val isMusicCard = alternative == Icons.Default.MusicNote
     BottomSheet(
         open = open,
         state = state,
@@ -452,7 +454,10 @@ fun ListBottomSheet(
                     Modifier
                         .size(80.dp)
                         .padding(8.dp)
-                        .clip(MaterialTheme.shapes.medium)
+                        .clip(
+                            if (isMusicCard) MaterialTheme.shapes.medium
+                            else CircleShape
+                        )
                         .clipToBounds(),
                     contentAlignment = Alignment.Center
                 ) {
