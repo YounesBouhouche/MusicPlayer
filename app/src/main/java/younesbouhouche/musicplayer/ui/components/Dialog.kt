@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import younesbouhouche.musicplayer.ui.isCompact
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +36,6 @@ fun Dialog(
     centerTitle: Boolean = false,
     cancelListener: (() -> Unit)? = null,
     cancelText: String = "Cancel",
-    isCompact: Boolean = true,
     okListener: (() -> Unit)? = null,
     neutral: @Composable (() -> Unit)? = null,
     content: @Composable (ColumnScope.() -> Unit)

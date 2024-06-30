@@ -19,14 +19,15 @@ import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -44,18 +45,18 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.window.core.layout.WindowWidthSizeClass
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.events.FilesEvent
 import younesbouhouche.musicplayer.MainActivity
-import younesbouhouche.musicplayer.models.NavRoutes
+import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.events.FilesEvent
 import younesbouhouche.musicplayer.events.PlayerEvent
 import younesbouhouche.musicplayer.events.PlaylistEvent
-import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.events.UiEvent
+import younesbouhouche.musicplayer.models.NavRoutes
 import younesbouhouche.musicplayer.states.PlayState
 import younesbouhouche.musicplayer.states.PlaylistViewState
 import younesbouhouche.musicplayer.states.ViewState
@@ -67,9 +68,9 @@ import younesbouhouche.musicplayer.ui.dialogs.MetadataDialog
 import younesbouhouche.musicplayer.ui.dialogs.NewPlaylistDialog
 import younesbouhouche.musicplayer.ui.dialogs.SpeedDialog
 import younesbouhouche.musicplayer.ui.dialogs.TimerDialog
+import younesbouhouche.musicplayer.ui.leftEdgeWidth
 import younesbouhouche.musicplayer.ui.navBarHeight
 import younesbouhouche.musicplayer.viewmodel.MainVM
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -94,8 +95,10 @@ fun AppScreen(
     val density = LocalDensity.current
     val playlist by mainVM.bottomSheetPlaylist.collectAsState()
     val playlistFiles by mainVM.bottomSheetPlaylistFiles.collectAsState()
+    val isCompact =
+        currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
     val offset = with (density) {
-        height - ((if (isParent) 160.dp else 80.dp) + navBarHeight).roundToPx()
+        height - ((if (isParent and isCompact) 160.dp else 80.dp) + navBarHeight).roundToPx()
     }
     val playlistOffset = with (density) {
         height - (72.dp + navBarHeight).roundToPx()
@@ -127,7 +130,10 @@ fun AppScreen(
     ) {
         AnchoredDraggableState(
             initialValue = PlaylistViewState.COLLAPSED,
-            anchors = DraggableAnchors { },
+            anchors = DraggableAnchors {
+                PlaylistViewState.COLLAPSED at playlistOffset.toFloat()
+                PlaylistViewState.EXPANDED at 0f
+                                       },
             snapAnimationSpec = tween(),
             decayAnimationSpec = splineBasedDecay(density),
             positionalThreshold = { it * .5f },
@@ -177,9 +183,11 @@ fun AppScreen(
             PlaylistViewState.COLLAPSED -> playlistState.progress(PlaylistViewState.COLLAPSED, PlaylistViewState.EXPANDED)
             PlaylistViewState.EXPANDED -> 1f - playlistState.progress(PlaylistViewState.EXPANDED, PlaylistViewState.COLLAPSED)
         }
-    val bottomPadding = (if (isParent) (80.dp + navBarHeight) else 0.dp)
+    val startPadding = if (isCompact) 0.dp else 80.dp + leftEdgeWidth
+    val bottomPadding = if (isCompact and isParent) (80.dp + navBarHeight) else if (!isCompact) navBarHeight else 0.dp
     val playerPadding = (if (isPlaying) 74.dp else 0.dp)
     val pullToRefreshState = rememberPullToRefreshState()
+    val cutout = if (younesbouhouche.musicplayer.ui.isCompact) Modifier else Modifier.displayCutoutPadding()
     AnimatedContent(targetState = granted, label = "") { isGranted ->
         if (isGranted)
             Surface(modifier = Modifier
@@ -197,16 +205,21 @@ fun AppScreen(
                     NavigationScreen(
                         navController,
                         mainVM,
-                        Modifier.padding(bottom = bottomPadding + playerPadding)
+                        Modifier.padding(
+                            bottom = bottomPadding + playerPadding,
+                            start = startPadding
+                        ).then(cutout)
                     )
                     AnimatedVisibility(
                         visible = isParent,
                         enter = slideInVertically { -it },
-                        exit = slideOutVertically { -it }
+                        exit = slideOutVertically { -it },
+                        modifier = Modifier.padding(start = startPadding).then(cutout)
                     ) {
                         SearchScreen(searchState, loading, mainVM::onSearchEvent)
                     }
                     PlayerScreen(
+                        Modifier.padding(start = startPadding),
                         queue,
                         playerState,
                         uiState,
@@ -217,27 +230,17 @@ fun AppScreen(
                         mainVM::onPlayerEvent,
                         mainVM::onUiEvent
                     )
-                    AnimatedVisibility(
+                    NavBar(
                         visible = isParent and (!searchState.expanded),
-                        enter = slideInVertically { it },
-                        exit = slideOutVertically { it },
-                        modifier = Modifier.align(Alignment.BottomStart)
+                        progress = progress,
+                        state = navigationState
                     ) {
-                        NavBar(Modifier.offset {
-                            IntOffset(
-                                0,
-                                ((80 + navBarHeight.roundToPx()) * progress)
-                                    .roundToInt().dp
-                                    .roundToPx()
-                            )
-                        }, navigationState) {
-                            navController.navigate(it) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
+                        navController.navigate(it) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
                             }
+                            launchSingleTop = true
+                            restoreState = true
                         }
                     }
                 }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,7 +25,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
@@ -44,9 +43,9 @@ import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
 import younesbouhouche.musicplayer.events.ListsSortEvent
 import younesbouhouche.musicplayer.events.PlayerEvent
-import younesbouhouche.musicplayer.models.Playlist
 import younesbouhouche.musicplayer.events.UiEvent
 import younesbouhouche.musicplayer.isScrollingUp
+import younesbouhouche.musicplayer.models.Playlist
 import younesbouhouche.musicplayer.states.ListSortState
 import younesbouhouche.musicplayer.ui.components.LazyVerticalGridWithSortBar
 import younesbouhouche.musicplayer.ui.components.MyListItem
@@ -69,29 +68,16 @@ fun Playlists(
     LaunchedEffect(key1 = sortState.colsCount.count) {
         if (sortState.colsCount.count > 1) gridCount = sortState.colsCount.count
     }
-    Scaffold(
-        Modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        floatingActionButton = {
-            AnimatedVisibility(
-                visible = state.isScrollingUp(),
-                enter = materialSharedAxisZIn(true),
-                exit = materialSharedAxisZOut(true)
-            ) {
-                FloatingActionButton(onClick = { onUiEvent(UiEvent.ShowNewPlaylistDialog) }) {
-                    Icon(Icons.Default.Add, null)
-                }
-            }
-        }) { paddingValues ->
+    Box(modifier.fillMaxSize()) {
         AnimatedContent(
-            modifier = Modifier.padding(paddingValues),
+            modifier = Modifier.fillMaxSize(),
             targetState = sortState.colsCount.count == 1,
             label = "",
             transitionSpec = { materialSharedAxisZIn(true) togetherWith materialSharedAxisZOut(true) },
         ) { singleItem ->
             if (singleItem)
                 LazyVerticalGridWithSortBar(
-                    modifier = modifier,
+                    modifier = Modifier,
                     columns = GridCells.Fixed(1),
                     sortState = sortState,
                     onSortEvent = onPlaylistsSortEvent
@@ -118,7 +104,7 @@ fun Playlists(
                 }
             else
                 LazyVerticalGridWithSortBar(
-                    modifier = modifier,
+                    modifier = Modifier,
                     columns = GridCells.Fixed(gridCount),
                     sortState = sortState,
                     onSortEvent = onPlaylistsSortEvent
@@ -160,6 +146,16 @@ fun Playlists(
                         }
                     }
                 }
+        }
+        AnimatedVisibility(
+            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
+            visible = state.isScrollingUp(),
+            enter = materialSharedAxisZIn(true),
+            exit = materialSharedAxisZOut(true)
+        ) {
+            FloatingActionButton(onClick = { onUiEvent(UiEvent.ShowNewPlaylistDialog) }) {
+                Icon(Icons.Default.Add, null)
+            }
         }
     }
 }

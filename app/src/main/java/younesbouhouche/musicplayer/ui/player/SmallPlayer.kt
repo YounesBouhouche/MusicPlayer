@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,11 +33,12 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.models.MusicCard
 import younesbouhouche.musicplayer.events.PlayerEvent
+import younesbouhouche.musicplayer.models.MusicCard
 import younesbouhouche.musicplayer.states.PlayState
 import younesbouhouche.musicplayer.states.PlayerState
 import younesbouhouche.musicplayer.timeString
+import younesbouhouche.musicplayer.ui.isCompact
 
 @Composable
 fun SmallPlayer(
@@ -45,7 +47,8 @@ fun SmallPlayer(
     onPlayerEvent: (PlayerEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier.height(80.dp).fillMaxWidth()) {
+    val cutout = if (isCompact) Modifier else Modifier.displayCutoutPadding()
+    Box(modifier.height(80.dp).fillMaxWidth().then(cutout)) {
         Column(Modifier.fillMaxSize()) {
             Row(
                 Modifier

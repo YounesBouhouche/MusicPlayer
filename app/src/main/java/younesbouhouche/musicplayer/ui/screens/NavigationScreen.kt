@@ -146,7 +146,7 @@ fun NavigationScreen(
                     }
                 },
                 { mainVM.onUiEvent(UiEvent.ShowPlaylistBottomSheet(it)) },
-                modifier,
+                Modifier,
                 playlistsSortState,
                 mainVM::onPlayerEvent,
                 mainVM::onUiEvent,

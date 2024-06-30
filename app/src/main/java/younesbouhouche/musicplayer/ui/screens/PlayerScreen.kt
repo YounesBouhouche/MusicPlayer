@@ -32,6 +32,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PlayerScreen(
+    modifier: Modifier = Modifier,
     queue: List<MusicCard>,
     playerState: PlayerState,
     uiState: UiState,
@@ -45,7 +46,7 @@ fun PlayerScreen(
     val shape = MaterialTheme.shapes.large.copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize)
     val offset = if (dragState.offset.isNaN()) 0 else dragState.offset.roundToInt()
     Box(
-        Modifier
+        modifier
             .fillMaxSize()
             .offset {
                 IntOffset(0, offset)

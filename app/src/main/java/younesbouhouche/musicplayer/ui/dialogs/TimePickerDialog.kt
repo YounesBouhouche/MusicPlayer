@@ -30,7 +30,6 @@ import younesbouhouche.musicplayer.ui.components.Dialog
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerDialog(
-    isCompact: Boolean = true,
     initialTimer: TimerType.Time,
     visible: Boolean,
     onDismissRequest: () -> Unit,
@@ -39,7 +38,6 @@ fun TimePickerDialog(
     var input by remember { mutableStateOf(false) }
     val timePickerState = rememberTimePickerState(initialTimer.hour, initialTimer.min)
     Dialog(
-        isCompact = isCompact,
         visible = visible,
         title = "Pick Time",
         onDismissRequest = onDismissRequest,
