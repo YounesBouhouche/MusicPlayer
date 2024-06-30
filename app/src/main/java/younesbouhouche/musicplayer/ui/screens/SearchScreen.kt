@@ -28,10 +28,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
-import younesbouhouche.musicplayer.SearchEvent
+import younesbouhouche.musicplayer.events.SearchEvent
 import younesbouhouche.musicplayer.settings.SettingsActivity
 import younesbouhouche.musicplayer.states.SearchState
-import younesbouhouche.musicplayer.ui.components.MusicCardLazyItem
+import younesbouhouche.musicplayer.ui.components.LazyMusicCardScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,7 +79,7 @@ fun SearchScreen(
         ) {
             LazyColumn(Modifier.fillMaxSize()) {
                 items(state.result, { it.id }) {
-                    MusicCardLazyItem(file = it)
+                    LazyMusicCardScreen(file = it)
                 }
             }
         }

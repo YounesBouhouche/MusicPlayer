@@ -38,25 +38,26 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.internal.Util.EMPTY_BYTE_ARRAY
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
-import younesbouhouche.musicplayer.FilesEvent
-import younesbouhouche.musicplayer.FilesEvent.AddFile
-import younesbouhouche.musicplayer.FilesEvent.LoadFiles
-import younesbouhouche.musicplayer.FilesEvent.RemoveFile
-import younesbouhouche.musicplayer.ListsSortEvent
-import younesbouhouche.musicplayer.MusicCard
-import younesbouhouche.musicplayer.PlayerEvent
-import younesbouhouche.musicplayer.Playlist
-import younesbouhouche.musicplayer.PlaylistEvent
-import younesbouhouche.musicplayer.PlaylistSortEvent
-import younesbouhouche.musicplayer.SearchEvent
-import younesbouhouche.musicplayer.SortEvent
-import younesbouhouche.musicplayer.TimerType
-import younesbouhouche.musicplayer.UiEvent
+import younesbouhouche.musicplayer.events.FilesEvent
+import younesbouhouche.musicplayer.events.FilesEvent.AddFile
+import younesbouhouche.musicplayer.events.FilesEvent.LoadFiles
+import younesbouhouche.musicplayer.events.FilesEvent.RemoveFile
+import younesbouhouche.musicplayer.events.ListsSortEvent
 import younesbouhouche.musicplayer.events.MetadataEvent
+import younesbouhouche.musicplayer.events.PlayerEvent
+import younesbouhouche.musicplayer.events.PlaylistEvent
+import younesbouhouche.musicplayer.events.PlaylistSortEvent
+import younesbouhouche.musicplayer.events.SearchEvent
+import younesbouhouche.musicplayer.events.SortEvent
+import younesbouhouche.musicplayer.events.TimerType
+import younesbouhouche.musicplayer.events.UiEvent
 import younesbouhouche.musicplayer.getMimeType
+import younesbouhouche.musicplayer.models.Album
+import younesbouhouche.musicplayer.models.Artist
+import younesbouhouche.musicplayer.models.MusicCard
+import younesbouhouche.musicplayer.models.Playlist
 import younesbouhouche.musicplayer.room.AppDatabase
 import younesbouhouche.musicplayer.room.ItemData
 import younesbouhouche.musicplayer.room.Timestamp
@@ -72,7 +73,7 @@ import younesbouhouche.musicplayer.states.PlaylistViewState
 import younesbouhouche.musicplayer.states.SearchState
 import younesbouhouche.musicplayer.states.SortState
 import younesbouhouche.musicplayer.states.SortType
-import younesbouhouche.musicplayer.states.StartupIntent
+import younesbouhouche.musicplayer.states.StartupEvent
 import younesbouhouche.musicplayer.states.UiState
 import younesbouhouche.musicplayer.states.ViewState
 import younesbouhouche.musicplayer.toMediaItems
@@ -97,7 +98,7 @@ class MainVM @Inject constructor(
     db: AppDatabase
 ): ViewModel() {
     private val dao = db.dao
-    private var startupIntent: StartupIntent = StartupIntent.None
+    private var startupEvent: StartupEvent = StartupEvent.None
 
     private val _timestamps = dao.getGroupedTimestamps().map { timestamp ->
         timestamp.filter { Files.exists(Path(it.key)) }
@@ -127,6 +128,8 @@ class MainVM @Inject constructor(
 
     private val _files = MutableStateFlow(emptyList<MusicCard>())
 
+    private fun List<Long>.toMusicCards() = mapNotNull { id -> _files.value.firstOrNull { it.id == id } }
+
     private val _playlists = dao.getPlaylist()
     val playlists = _playlists.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
@@ -137,8 +140,8 @@ class MainVM @Inject constructor(
 
     private val _listScreenFiles = MutableStateFlow(emptyList<MusicCard>())
 
-    private val _albums = MutableStateFlow(emptyMap<String, List<MusicCard>>())
-    private val _artists = MutableStateFlow(emptyMap<String, List<MusicCard>>())
+    private val _albums = MutableStateFlow(emptyList<Album>())
+    private val _artists = MutableStateFlow(emptyList<Artist>())
 
     private val _searchState = MutableStateFlow(SearchState())
     val searchState = combine(_searchState, _files) { state, files ->
@@ -208,13 +211,12 @@ class MainVM @Inject constructor(
             }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyMap())
 
-    private val _mostPlayedArtists = combine(_files, _timestamps) { files, timestamps ->
+    private val _mostPlayedArtists = combine(_artists, _timestamps) { artists, timestamps ->
         // get most played artists
-        files
-            .groupBy { it.artist }
-            .filter { it.key != "<unknown>" }
-            .map { (artist, files) ->
-                artist to files.sumOf { file -> timestamps[file.path]?.size ?: 0 }
+        artists
+            .filter { it.name != "<unknown>" }
+            .map { artist ->
+                artist to artist.items.toMusicCards().sumOf { item -> timestamps[item.path]?.size ?: 0 }
             }
             .sortedByDescending { it.second }
             .map { it.first }
@@ -263,26 +265,26 @@ class MainVM @Inject constructor(
     val albumsSorted = combine(_albums, _albumsSortState) { albums, sortState ->
         if (sortState.ascending)
             when(sortState.sortType) {
-                ListsSortType.Name -> albums.toList().sortedBy { it.first }
-                ListsSortType.Count -> albums.toList().sortedBy { it.second.size }
+                ListsSortType.Name -> albums.toList().sortedBy { it.title }
+                ListsSortType.Count -> albums.toList().sortedBy { it.items.size }
             }
         else
             when(sortState.sortType) {
-                ListsSortType.Name -> albums.toList().sortedByDescending { it.first }
-                ListsSortType.Count -> albums.toList().sortedByDescending { it.second.size }
+                ListsSortType.Name -> albums.toList().sortedByDescending { it.title }
+                ListsSortType.Count -> albums.toList().sortedByDescending { it.items.size }
             }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
     val artistsSorted = combine(_artists, _artistsSortState) { artists, sortState ->
         if (sortState.ascending)
             when(sortState.sortType) {
-                ListsSortType.Name -> artists.toList().sortedBy { it.first }
-                ListsSortType.Count -> artists.toList().sortedBy { it.second.size }
+                ListsSortType.Name -> artists.toList().sortedBy { it.name }
+                ListsSortType.Count -> artists.toList().sortedBy { it.items.size }
             }
         else
             when(sortState.sortType) {
-                ListsSortType.Name -> artists.toList().sortedByDescending { it.first }
-                ListsSortType.Count -> artists.toList().sortedByDescending { it.second.size }
+                ListsSortType.Name -> artists.toList().sortedByDescending { it.name }
+                ListsSortType.Count -> artists.toList().sortedByDescending { it.items.size }
             }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
@@ -333,20 +335,15 @@ class MainVM @Inject constructor(
         playlists.getOrNull(index)?.items?.mapNotNull { item -> files.firstOrNull { it.path == item } } ?: emptyList()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    fun getAlbum(file: MusicCard): Pair<String, List<MusicCard>>
-        = file.album to (_albums.value[file.album] ?: emptyList())
+    fun getAlbum(file: MusicCard): Album? = _albums.value.firstOrNull { it.title == file.album }
 
-    fun getArtist(file: MusicCard): Pair<String, List<MusicCard>>
-            = file.artist to (_artists.value[file.artist] ?: emptyList())
+    fun getArtist(file: MusicCard): Artist? = _artists.value.firstOrNull { it.name == file.artist }
 
-    fun getArtistFiles(artist: String): List<MusicCard>
-            = _artists.value[artist] ?: emptyList()
-
-    fun setGranted(intent: StartupIntent = StartupIntent.None) {
+    fun setGranted(intent: StartupEvent = StartupEvent.None) {
         viewModelScope.launch {
             _granted.value = true
             if (!initialized) loadFiles()
-            startupIntent = intent
+            startupEvent = intent
         }
     }
 
@@ -505,8 +502,8 @@ class MainVM @Inject constructor(
         _playlistIndex.value = index
     }
 
-    fun setListFiles(list: List<MusicCard>) {
-        _listScreenFiles.value = list
+    fun setListFiles(list: List<Long>) {
+        _listScreenFiles.value = list.mapNotNull { id -> _files.value.firstOrNull { it.id == id } }
     }
 
     private fun onListsSortEvent(event: ListsSortEvent, state: MutableStateFlow<ListSortState>) {
@@ -584,8 +581,8 @@ class MainVM @Inject constructor(
 
     private suspend fun loadFiles() {
         _files.value = emptyList()
-        _albums.value = emptyMap()
-        _artists.value = emptyMap()
+        _albums.value = emptyList()
+        _artists.value = emptyList()
         _loading.value = true
         val list = mutableListOf<MusicCard>()
         withContext(Dispatchers.IO) {
@@ -615,29 +612,47 @@ class MainVM @Inject constructor(
                         id
                     )
                     list.add(
-                        MusicCard(
-                            contentUri,
-                            id,
-                            title,
-                            null,
-                            EMPTY_BYTE_ARRAY,
-                            artist,
-                            albumId,
-                            album,
-                            path,
-                            LocalDateTime.ofInstant(Instant.ofEpochMilli(date), TimeZone.getDefault().toZoneId()),
-                            duration,
-                            isFavorite(path),
-                            getTimestamps(path)
-                        )
+                        MusicCard
+                            .Builder()
+                            .setContentUri(contentUri)
+                            .setId(id)
+                            .setTitle(title)
+                            .setArtist(artist)
+                            .setAlbum(album)
+                            .setAlbumId(albumId)
+                            .setPath(path)
+                            .setDate(
+                                LocalDateTime
+                                    .ofInstant(
+                                        Instant.ofEpochMilli(date),
+                                        TimeZone.getDefault().toZoneId()
+                                    )
+                            )
+                            .setDuration(duration)
+                            .setFavorite(isFavorite(path))
+                            .setTimestamps(getTimestamps(path))
+                            .build()
                     )
                 }
                 crs.close()
                 initialized = true
             }
         }
-        _albums.value = list.groupBy { it.album }
-        _artists.value = list.groupBy { it.artist }
+        _albums.value = list.groupBy { it.album }.map { album ->
+            Album(
+                title = album.key,
+                items = album.value.map { it.id },
+                cover = null
+            )
+        }
+        // do the same thing for _artists
+        _artists.value = list.groupBy { it.artist }.map { artist ->
+            Artist(
+                name = artist.key,
+                items = artist.value.map { it.id },
+                cover = null
+            )
+        }
         _files.value = list
         _loading.value = false
         getThumbnails(list) {
@@ -656,13 +671,26 @@ class MainVM @Inject constructor(
                                 BitmapFactory.decodeByteArray(embeddedPicture, 0, embeddedPicture!!.size)!! to embeddedPicture!!
                             else null
                         } catch (e: Exception) {
-                            e.printStackTrace()
                             null
                         }
                     }
                     list[index].apply {
-                        cover = result?.first
-                        coverByteArray = result?.second ?: EMPTY_BYTE_ARRAY
+                        result?.let { r ->
+                            cover = r.first
+                            coverByteArray = r.second
+                            _albums.update { list ->
+                                list.toMutableList().apply {
+                                    if (firstOrNull { it.title == file.album }?.cover == null)
+                                        firstOrNull { it.title == file.album }?.cover = r.first
+                                }.toList()
+                            }
+                            _artists.update { list ->
+                                list.toMutableList().apply {
+                                    if (firstOrNull { it.name == file.artist }?.cover == null)
+                                        firstOrNull { it.name == file.artist }?.cover = r.first
+                                }.toList()
+                            }
+                        }
                     }
                 }
             }
@@ -676,7 +704,7 @@ class MainVM @Inject constructor(
     init {
         val sessionToken =
             SessionToken(context, ComponentName(context, MediaPlayerService::class.java))
-        context.startService(Intent(context, MediaSessionService::class.java))
+        context.startForegroundService(Intent(context, MediaSessionService::class.java))
         controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
         controllerFuture.addListener({
             player = controllerFuture.get()
@@ -746,23 +774,23 @@ class MainVM @Inject constructor(
                         else onPlayerEvent(PlayerEvent.Stop)
                 }
             })
-            when (startupIntent) {
-                StartupIntent.PlayFavorites ->
+            when (startupEvent) {
+                StartupEvent.PlayFavorites ->
                     viewModelScope.launch {
                         val favorites = dao.suspendGetFavorites()
                         onPlayerEvent(PlayerEvent.Play(_files.value.filter { favorites.contains(it.path) }))
                     }
-                StartupIntent.PlayMostPlayed ->
+                StartupEvent.PlayMostPlayed ->
                     viewModelScope.launch {
                         val timestamps = dao.suspendGetTimestamps()
                         val mostPlayed = timestamps.toList().sortedByDescending { it.times.size }.map { it.path }
                         onPlayerEvent(PlayerEvent.Play(_files.value.filter { mostPlayed.contains(it.path) }))
                     }
-                is StartupIntent.PlayPlaylist ->
+                is StartupEvent.PlayPlaylist ->
                     viewModelScope.launch {
                         val p =
                             playlists.value
-                                .firstOrNull { it.id == (startupIntent as StartupIntent.PlayPlaylist).id }
+                                .firstOrNull { it.id == (startupEvent as StartupEvent.PlayPlaylist).id }
                                 ?.items
                                 ?.mapNotNull { item -> _files.value.firstOrNull { item == it.path } }
                         println(p)
@@ -828,6 +856,11 @@ class MainVM @Inject constructor(
             is PlayerEvent.PlayPaths ->
                 play(
                     event.items.mapNotNull { item -> _files.value.firstOrNull { it.path == item } },
+                    event.index
+                )
+            is PlayerEvent.PlayIds ->
+                play(
+                    event.items.mapNotNull { item -> _files.value.firstOrNull { it.id == item } },
                     event.index
                 )
             PlayerEvent.Previous -> player.seekToPrevious()
@@ -981,9 +1014,10 @@ class MainVM @Inject constructor(
             }
             is UiEvent.ShowListBottomSheet -> _uiState.update {
                 it.copy(
-                    listBottomSheetList = event.list,
+                    listBottomSheetList = event.list.toMusicCards(),
                     listBottomSheetTitle = event.title,
                     listBottomSheetText = event.text,
+                    listBottomSheetImage = event.image,
                     listBottomSheetIcon = event.icon,
                     listBottomSheetVisible = true
                 )

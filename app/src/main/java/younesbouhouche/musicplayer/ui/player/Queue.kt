@@ -52,10 +52,10 @@ import androidx.compose.ui.zIndex
 import androidx.media3.common.Player
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import younesbouhouche.musicplayer.MusicCard
-import younesbouhouche.musicplayer.PlayerEvent
-import younesbouhouche.musicplayer.TimerType
-import younesbouhouche.musicplayer.UiEvent
+import younesbouhouche.musicplayer.models.MusicCard
+import younesbouhouche.musicplayer.events.PlayerEvent
+import younesbouhouche.musicplayer.events.TimerType
+import younesbouhouche.musicplayer.events.UiEvent
 import younesbouhouche.musicplayer.states.PlayerState
 import younesbouhouche.musicplayer.timeString
 import younesbouhouche.musicplayer.timerString

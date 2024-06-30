@@ -3,12 +3,12 @@ package younesbouhouche.musicplayer.ui.routes
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import younesbouhouche.musicplayer.MusicCard
-import younesbouhouche.musicplayer.SortEvent
-import younesbouhouche.musicplayer.UiEvent
+import younesbouhouche.musicplayer.models.MusicCard
+import younesbouhouche.musicplayer.events.SortEvent
+import younesbouhouche.musicplayer.events.UiEvent
 import younesbouhouche.musicplayer.states.SortState
 import younesbouhouche.musicplayer.ui.components.LazyColumnWithSortBar
-import younesbouhouche.musicplayer.ui.components.MusicCardLazyItem
+import younesbouhouche.musicplayer.ui.components.LazyMusicCardScreen
 
 @Composable
 fun Library(
@@ -25,7 +25,7 @@ fun Library(
         onSortEvent = onSortEvent
     ) {
         items(files, { it.id }) {
-            MusicCardLazyItem(
+            LazyMusicCardScreen(
                 file = it,
                 onLongClick = { onUiEvent(UiEvent.ShowBottomSheet(it)) }
             ) {

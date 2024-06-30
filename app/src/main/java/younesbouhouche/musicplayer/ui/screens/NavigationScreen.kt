@@ -14,10 +14,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import soup.compose.material.motion.animation.materialFadeThroughIn
 import soup.compose.material.motion.animation.materialFadeThroughOut
-import younesbouhouche.musicplayer.NavRoutes
-import younesbouhouche.musicplayer.PlayerEvent
-import younesbouhouche.musicplayer.PlaylistEvent
-import younesbouhouche.musicplayer.UiEvent
+import younesbouhouche.musicplayer.models.NavRoutes
+import younesbouhouche.musicplayer.events.PlayerEvent
+import younesbouhouche.musicplayer.events.PlaylistEvent
+import younesbouhouche.musicplayer.events.UiEvent
 import younesbouhouche.musicplayer.ui.routes.Albums
 import younesbouhouche.musicplayer.ui.routes.Artists
 import younesbouhouche.musicplayer.ui.routes.Home
@@ -71,8 +71,8 @@ fun NavigationScreen(
             Home(
                 navController::navigate,
                 {
-                    mainVM.setListFiles(mainVM.getArtistFiles(it))
-                    navController.navigate(NavRoutes.ListScreen(it))
+                    mainVM.setListFiles(it.items)
+                    navController.navigate(NavRoutes.ListScreen(it.name))
                 },
                 mostPlayedArtists
             )
@@ -81,15 +81,16 @@ fun NavigationScreen(
             Albums(
                 albumsSorted,
                 {
-                    mainVM.setListFiles(it.second)
-                    navController.navigate(NavRoutes.ListScreen(it.first))
+                    mainVM.setListFiles(it.items)
+                    navController.navigate(NavRoutes.ListScreen(it.title))
                 },
                 {
                     mainVM.onUiEvent(
                         UiEvent.ShowListBottomSheet(
-                            it.second,
-                            it.first,
-                            "${it.second.size} item(s)",
+                            it.items,
+                            it.title,
+                            "${it.items.size} item(s)",
+                            it.cover,
                             Icons.Default.Album
                         )
                     )
@@ -104,15 +105,16 @@ fun NavigationScreen(
             Artists(
                 artistsSorted,
                 {
-                    mainVM.setListFiles(it.second)
-                    navController.navigate(NavRoutes.ListScreen(it.first))
+                    mainVM.setListFiles(it.items)
+                    navController.navigate(NavRoutes.ListScreen(it.name))
                 },
                 {
                     mainVM.onUiEvent(
                         UiEvent.ShowListBottomSheet(
-                            it.second,
-                            it.first,
-                            "${it.second.size} item(s)",
+                            it.items,
+                            it.name,
+                            "${it.items.size} item(s)",
+                            it.cover,
                             Icons.Default.AccountCircle
                         )
                     )

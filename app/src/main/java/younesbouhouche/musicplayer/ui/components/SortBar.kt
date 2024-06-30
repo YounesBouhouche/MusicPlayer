@@ -23,9 +23,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.ListsSortEvent
-import younesbouhouche.musicplayer.PlaylistSortEvent
-import younesbouhouche.musicplayer.SortEvent
+import younesbouhouche.musicplayer.events.ListsSortEvent
+import younesbouhouche.musicplayer.events.PlaylistSortEvent
+import younesbouhouche.musicplayer.events.SortEvent
 import younesbouhouche.musicplayer.states.ColsCount
 import younesbouhouche.musicplayer.states.ListSortState
 import younesbouhouche.musicplayer.states.ListsSortType

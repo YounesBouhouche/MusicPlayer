@@ -17,9 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.Playlist
-import younesbouhouche.musicplayer.PlaylistSortEvent
-import younesbouhouche.musicplayer.SortEvent
+import younesbouhouche.musicplayer.events.PlaylistSortEvent
+import younesbouhouche.musicplayer.events.SortEvent
 import younesbouhouche.musicplayer.states.PlaylistSortState
 import younesbouhouche.musicplayer.states.SortState
 import younesbouhouche.musicplayer.ui.statusBarHeight

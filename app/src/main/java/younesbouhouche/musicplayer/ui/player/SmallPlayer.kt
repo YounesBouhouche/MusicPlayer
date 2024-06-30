@@ -2,7 +2,6 @@ package younesbouhouche.musicplayer.ui.player
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,8 +32,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.MusicCard
-import younesbouhouche.musicplayer.PlayerEvent
+import younesbouhouche.musicplayer.models.MusicCard
+import younesbouhouche.musicplayer.events.PlayerEvent
 import younesbouhouche.musicplayer.states.PlayState
 import younesbouhouche.musicplayer.states.PlayerState
 import younesbouhouche.musicplayer.timeString

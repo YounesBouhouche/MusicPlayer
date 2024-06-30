@@ -16,7 +16,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import younesbouhouche.musicplayer.states.StartupIntent
+import younesbouhouche.musicplayer.models.Routes
+import younesbouhouche.musicplayer.states.StartupEvent
 import younesbouhouche.musicplayer.ui.screens.AppScreen
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 import younesbouhouche.musicplayer.viewmodel.MainVM
@@ -33,11 +34,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val isGranted = ContextCompat
             .checkSelfPermission(this@MainActivity, permission) == PackageManager.PERMISSION_GRANTED
-        val startupIntent = when (intent.getStringExtra("type")) {
-            "favorites" -> StartupIntent.PlayFavorites
-            "mostPlayed" -> StartupIntent.PlayMostPlayed
-            "playlist" -> StartupIntent.PlayPlaylist(intent.getIntExtra("id", -1))
-            else -> StartupIntent.None
+        val startupEvent = when (intent.getStringExtra("type")) {
+            "favorites" -> StartupEvent.PlayFavorites
+            "mostPlayed" -> StartupEvent.PlayMostPlayed
+            "playlist" -> StartupEvent.PlayPlaylist(intent.getIntExtra("id", -1))
+            else -> StartupEvent.None
         }
         enableEdgeToEdge()
         setContent {
@@ -53,7 +54,7 @@ class MainActivity : ComponentActivity() {
             val launcher = rememberLauncherForActivityResult(
                 ActivityResultContracts.RequestPermission()
             ) { isGranted: Boolean ->
-                if (isGranted) mainVM.setGranted(startupIntent)
+                if (isGranted) mainVM.setGranted(startupEvent)
             }
             LaunchedEffect(key1 = currentRoute) {
                 Routes
@@ -64,7 +65,7 @@ class MainActivity : ComponentActivity() {
                     }
             }
             LaunchedEffect(Unit) {
-                if (isGranted) mainVM.setGranted(startupIntent)
+                if (isGranted) mainVM.setGranted(startupEvent)
             }
             AppTheme {
                 AppScreen(
@@ -72,7 +73,7 @@ class MainActivity : ComponentActivity() {
                     {
                         when (PackageManager.PERMISSION_GRANTED) {
                             ContextCompat.checkSelfPermission(this, permission) ->
-                                mainVM.setGranted(startupIntent)
+                                mainVM.setGranted(startupEvent)
                             else -> launcher.launch(permission)
                         }
                     },

@@ -1,11 +1,12 @@
 package younesbouhouche.musicplayer.states
 
+import android.graphics.Bitmap
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.media3.common.Player
-import younesbouhouche.musicplayer.MusicCard
-import younesbouhouche.musicplayer.TimerType
+import younesbouhouche.musicplayer.models.MusicCard
+import younesbouhouche.musicplayer.events.TimerType
 
 data class PlayerState(
     val index: Int = -1,
@@ -24,6 +25,7 @@ data class UiState(
     val listBottomSheetList: List<MusicCard>? = null,
     val listBottomSheetTitle: String = "",
     val listBottomSheetText: String = "",
+    val listBottomSheetImage: Bitmap? = null,
     val listBottomSheetIcon: ImageVector = Icons.AutoMirrored.Default.PlaylistPlay,
     val listBottomSheetVisible: Boolean = false,
     val playlistBottomSheetVisible: Boolean = false,

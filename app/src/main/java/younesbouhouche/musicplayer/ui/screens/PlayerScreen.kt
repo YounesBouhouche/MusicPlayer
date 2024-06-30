@@ -18,9 +18,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.IntOffset
-import younesbouhouche.musicplayer.MusicCard
-import younesbouhouche.musicplayer.PlayerEvent
-import younesbouhouche.musicplayer.UiEvent
+import younesbouhouche.musicplayer.models.MusicCard
+import younesbouhouche.musicplayer.events.PlayerEvent
+import younesbouhouche.musicplayer.events.UiEvent
 import younesbouhouche.musicplayer.states.PlayerState
 import younesbouhouche.musicplayer.states.PlaylistViewState
 import younesbouhouche.musicplayer.states.UiState

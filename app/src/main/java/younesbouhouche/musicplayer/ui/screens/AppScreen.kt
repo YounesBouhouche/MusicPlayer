@@ -49,13 +49,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.FilesEvent
+import younesbouhouche.musicplayer.events.FilesEvent
 import younesbouhouche.musicplayer.MainActivity
-import younesbouhouche.musicplayer.NavRoutes
-import younesbouhouche.musicplayer.PlayerEvent
-import younesbouhouche.musicplayer.PlaylistEvent
+import younesbouhouche.musicplayer.models.NavRoutes
+import younesbouhouche.musicplayer.events.PlayerEvent
+import younesbouhouche.musicplayer.events.PlaylistEvent
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.UiEvent
+import younesbouhouche.musicplayer.events.UiEvent
 import younesbouhouche.musicplayer.states.PlayState
 import younesbouhouche.musicplayer.states.PlaylistViewState
 import younesbouhouche.musicplayer.states.ViewState
@@ -266,15 +266,15 @@ fun AppScreen(
             onPlayerEvent = mainVM::onPlayerEvent,
             onUiEvent = mainVM::onUiEvent,
             navigateToAlbum = {
-                with(mainVM.getAlbum(this)) {
-                    mainVM.setListFiles(second)
-                    navController.navigate(NavRoutes.ListScreen(first))
+                mainVM.getAlbum(this)?.let {
+                    mainVM.setListFiles(it.items)
+                    navController.navigate(NavRoutes.ListScreen(it.title))
                 }
             },
             navigateToArtist = {
-                with(mainVM.getArtist(this)) {
-                    mainVM.setListFiles(second)
-                    navController.navigate(NavRoutes.ListScreen(first))
+                mainVM.getArtist(this)?.let {
+                    mainVM.setListFiles(it.items)
+                    navController.navigate(NavRoutes.ListScreen(it.name))
                 }
             },
             shareFile = {
@@ -298,6 +298,7 @@ fun AppScreen(
             onUiEvent = mainVM::onUiEvent,
             title = uiState.listBottomSheetTitle,
             text = uiState.listBottomSheetText,
+            cover = uiState.listBottomSheetImage,
             alternative = uiState.listBottomSheetIcon,
             state = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             shareFiles = {

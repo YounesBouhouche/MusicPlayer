@@ -19,5 +19,5 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
--keep public class younesbouhouche.musicplayer.NavRoutes
--keep public class younesbouhouche.musicplayer.NavRoutes$*
+-keep public class younesbouhouche.musicplayer.models.NavRoutes
+-keep public class younesbouhouche.musicplayer.models.NavRoutes$*

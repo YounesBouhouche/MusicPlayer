@@ -6,8 +6,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import younesbouhouche.musicplayer.NavRoutes
-import younesbouhouche.musicplayer.Routes
+import younesbouhouche.musicplayer.models.NavRoutes
+import younesbouhouche.musicplayer.models.Routes
 
 @Composable
 fun NavBar(

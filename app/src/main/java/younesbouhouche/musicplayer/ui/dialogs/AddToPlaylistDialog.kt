@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.Playlist
+import younesbouhouche.musicplayer.models.Playlist
 import younesbouhouche.musicplayer.settings.settingsRadioItems
 import younesbouhouche.musicplayer.ui.components.Dialog
 

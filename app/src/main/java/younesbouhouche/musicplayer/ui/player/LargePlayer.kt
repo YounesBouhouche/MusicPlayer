@@ -78,9 +78,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.launch
 import soup.compose.material.motion.MaterialSharedAxisZ
-import younesbouhouche.musicplayer.MusicCard
-import younesbouhouche.musicplayer.PlayerEvent
-import younesbouhouche.musicplayer.UiEvent
+import younesbouhouche.musicplayer.models.MusicCard
+import younesbouhouche.musicplayer.events.PlayerEvent
+import younesbouhouche.musicplayer.events.UiEvent
 import younesbouhouche.musicplayer.states.PlayState
 import younesbouhouche.musicplayer.states.PlayerState
 import younesbouhouche.musicplayer.states.PlaylistViewState

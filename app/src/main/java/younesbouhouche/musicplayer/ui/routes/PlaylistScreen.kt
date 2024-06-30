@@ -28,8 +28,8 @@ import kotlinx.coroutines.launch
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
-import younesbouhouche.musicplayer.MusicCard
-import younesbouhouche.musicplayer.PlaylistSortEvent
+import younesbouhouche.musicplayer.models.MusicCard
+import younesbouhouche.musicplayer.events.PlaylistSortEvent
 import younesbouhouche.musicplayer.isScrollingUp
 import younesbouhouche.musicplayer.states.PlaylistSortState
 import younesbouhouche.musicplayer.states.PlaylistSortType

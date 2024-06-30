@@ -25,7 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.TimerType
+import younesbouhouche.musicplayer.events.TimerType
 import younesbouhouche.musicplayer.timeString
 import younesbouhouche.musicplayer.ui.components.Dialog
 import younesbouhouche.musicplayer.ui.components.RadioContainer

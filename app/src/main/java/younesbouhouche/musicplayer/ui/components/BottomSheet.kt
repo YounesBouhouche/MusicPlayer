@@ -63,9 +63,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.MusicCard
-import younesbouhouche.musicplayer.PlayerEvent
-import younesbouhouche.musicplayer.UiEvent
+import younesbouhouche.musicplayer.models.MusicCard
+import younesbouhouche.musicplayer.events.PlayerEvent
+import younesbouhouche.musicplayer.events.UiEvent
 import younesbouhouche.musicplayer.ui.navBarHeight
 
 data class BottomSheetButton(val text: String, val icon: ImageVector, val active: Boolean = false, val onClick: () -> Unit) {

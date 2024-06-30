@@ -14,9 +14,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Density
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
+import younesbouhouche.musicplayer.models.MusicCard
 import java.math.RoundingMode
 import java.util.Locale
 import kotlin.math.abs
@@ -47,7 +45,7 @@ fun Float.round(scale: Int): String = this.scale(scale).toBigDecimal().setScale(
 @Composable
 fun Int.toDp() = with (LocalDensity.current) { this@toDp.toDp() }
 
-fun Int.toDp(density: Density) = with (density) { this@toDp.toDp() }
+//fun Int.toDp(density: Density) = with (density) { this@toDp.toDp() }
 
 fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this
@@ -81,19 +79,13 @@ fun LazyListState.isScrollingUp(): Boolean {
     }.value
 }
 
-fun MusicCard.toMediaItem() = MediaItem
-    .Builder()
-    .setUri(contentUri)
-    .setMediaId("$id")
-    .setMediaMetadata(
-        MediaMetadata.Builder()
-            .setTitle(title)
-            .setArtist(artist)
-            .setAlbumTitle(album)
-            .setAlbumArtist(artist)
-            .setArtworkData(coverByteArray, MediaMetadata.PICTURE_TYPE_MEDIA)
-            .build()
-    )
-    .build()
-
 fun List<MusicCard>.toMediaItems() = map { it.toMediaItem() }
+
+fun (Pair<String, String>).containEachOther() =
+    first.contains(second) or second.contains(first)
+
+fun MusicCard.search(query: String) =
+    (title to query).containEachOther() or
+            (path to query).containEachOther() or
+            (album to query).containEachOther() or
+            (artist to query).containEachOther()

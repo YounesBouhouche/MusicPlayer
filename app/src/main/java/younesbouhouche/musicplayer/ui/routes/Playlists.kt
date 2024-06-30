@@ -19,10 +19,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -44,10 +42,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
-import younesbouhouche.musicplayer.ListsSortEvent
-import younesbouhouche.musicplayer.PlayerEvent
-import younesbouhouche.musicplayer.Playlist
-import younesbouhouche.musicplayer.UiEvent
+import younesbouhouche.musicplayer.events.ListsSortEvent
+import younesbouhouche.musicplayer.events.PlayerEvent
+import younesbouhouche.musicplayer.models.Playlist
+import younesbouhouche.musicplayer.events.UiEvent
 import younesbouhouche.musicplayer.isScrollingUp
 import younesbouhouche.musicplayer.states.ListSortState
 import younesbouhouche.musicplayer.ui.components.LazyVerticalGridWithSortBar

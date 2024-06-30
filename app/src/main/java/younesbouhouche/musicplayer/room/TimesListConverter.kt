@@ -3,7 +3,6 @@ package younesbouhouche.musicplayer.room
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import younesbouhouche.musicplayer.Playlist
 import java.time.LocalDateTime
 
 class TimesListConverter {

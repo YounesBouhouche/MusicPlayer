@@ -225,7 +225,7 @@ class AboutActivity : AppCompatActivity() {
                                                     )
                                                     putExtra(
                                                         Intent.EXTRA_SUBJECT,
-                                                        "Feedback about Marks Calculator app"
+                                                        "Feedback about Music Player app"
                                                     )
                                                     putExtra(
                                                         Intent.EXTRA_TEXT,

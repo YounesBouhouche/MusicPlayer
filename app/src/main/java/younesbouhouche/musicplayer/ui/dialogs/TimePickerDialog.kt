@@ -24,7 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.TimerType
+import younesbouhouche.musicplayer.events.TimerType
 import younesbouhouche.musicplayer.ui.components.Dialog
 
 @OptIn(ExperimentalMaterial3Api::class)

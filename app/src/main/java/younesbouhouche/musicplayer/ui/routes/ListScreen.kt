@@ -21,13 +21,13 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
-import younesbouhouche.musicplayer.MusicCard
-import younesbouhouche.musicplayer.SortEvent
+import younesbouhouche.musicplayer.models.MusicCard
+import younesbouhouche.musicplayer.events.SortEvent
 import younesbouhouche.musicplayer.isScrollingUp
 import younesbouhouche.musicplayer.states.SortState
 import younesbouhouche.musicplayer.ui.components.LazyColumnWithHeader
 import younesbouhouche.musicplayer.ui.components.LazyColumnWithSortBar
-import younesbouhouche.musicplayer.ui.components.MusicCardLazyItem
+import younesbouhouche.musicplayer.ui.components.LazyMusicCardScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +81,7 @@ fun ListScreen(
                 searchBarSpace = false,
                 contentPadding = paddingValues) {
                 items(files, { it.id }) {
-                    MusicCardLazyItem(
+                    LazyMusicCardScreen(
                         file = it,
                         onLongClick = { onLongClick(files.indexOf(it)) }
                     ) {
@@ -97,7 +97,7 @@ fun ListScreen(
                 contentPadding = paddingValues
             ) {
                 items(files, { it.id }) {
-                    MusicCardLazyItem(
+                    LazyMusicCardScreen(
                         file = it,
                         onLongClick = { onLongClick(files.indexOf(it)) }
                     ) {

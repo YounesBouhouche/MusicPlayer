@@ -6,9 +6,7 @@ import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import retrofit2.http.GET
-import younesbouhouche.musicplayer.Playlist
-import java.time.LocalDateTime
+import younesbouhouche.musicplayer.models.Playlist
 
 @Dao
 interface AppDao {

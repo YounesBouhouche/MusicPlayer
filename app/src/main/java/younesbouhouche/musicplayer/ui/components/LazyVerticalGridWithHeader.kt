@@ -18,7 +18,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.ListsSortEvent
+import younesbouhouche.musicplayer.events.ListsSortEvent
 import younesbouhouche.musicplayer.states.ListSortState
 import younesbouhouche.musicplayer.ui.statusBarHeight
 
