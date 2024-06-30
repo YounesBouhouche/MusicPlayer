@@ -74,6 +74,17 @@ fun NavigationScreen(
                     mainVM.setListFiles(it.items)
                     navController.navigate(NavRoutes.ListScreen(it.name))
                 },
+                {
+                    mainVM.onUiEvent(
+                        UiEvent.ShowListBottomSheet(
+                            it.items,
+                            it.name,
+                            "${it.items.size} item(s)",
+                            it.cover,
+                            Icons.Default.AccountCircle
+                        )
+                    )
+                },
                 mostPlayedArtists
             )
         }

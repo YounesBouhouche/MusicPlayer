@@ -119,33 +119,27 @@ fun LazyItemScope.LazyMusicCardScreen(
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {}
 ) {
-    AnimatedContent(
-        targetState = reorderableState,
-        transitionSpec = { fadeIn() togetherWith fadeOut() },
-        label = "",
-        modifier = modifier.animateItem()
-    ) {
-        if (it == null)
+    if (reorderableState == null)
+        MusicCardScreen(
+            file = file,
+            background = background,
+            onClick = onClick,
+            onLongClick = onLongClick,
+            modifier = modifier.animateItem()
+        )
+    else
+        ReorderableItem(
+            state = reorderableState,
+            key = file.id,
+            modifier = modifier.animateItem()
+        ) {
             MusicCardScreen(
                 file = file,
+                background = background,
                 onClick = onClick,
                 onLongClick = onLongClick,
-                modifier = Modifier
             )
-        else
-            ReorderableItem(
-                state = it,
-                key = file.id,
-                modifier = Modifier
-            ) {
-                MusicCardScreen(
-                    file = file,
-                    background = background,
-                    onClick = onClick,
-                    onLongClick = onLongClick
-                )
-            }
-    }
+        }
 }
 
 @Composable

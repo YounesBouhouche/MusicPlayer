@@ -1,9 +1,11 @@
 package younesbouhouche.musicplayer.ui.routes
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,11 +50,12 @@ import younesbouhouche.musicplayer.models.Artist
 import younesbouhouche.musicplayer.models.NavRoutes
 import younesbouhouche.musicplayer.ui.components.LazyColumnWithHeader
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun Home(
     navigate: (NavRoutes) -> Unit,
     navigateToArtist: (Artist) -> Unit,
+    showArtistBottomSheet: (Artist) -> Unit,
     artists: List<Artist>,
     modifier: Modifier = Modifier
 ) {
@@ -145,7 +148,11 @@ fun Home(
                                         )
                                         .clip(rememberMaskShape(CircleShape))
                                         .clipToBounds()
-                                        .clickable { navigateToArtist(it) },
+                                        .combinedClickable(
+                                            onLongClick = {
+                                                showArtistBottomSheet(it)
+                                            }
+                                        ) { navigateToArtist(it) },
                                     contentAlignment = Alignment.Center
                                 ) {
                                     if (bitmap == null)
