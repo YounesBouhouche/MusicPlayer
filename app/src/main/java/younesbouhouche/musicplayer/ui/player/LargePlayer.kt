@@ -1,7 +1,9 @@
 package younesbouhouche.musicplayer.ui.player
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -11,6 +13,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.Orientation
@@ -32,18 +35,25 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.outlined.SkipNext
 import androidx.compose.material.icons.outlined.SkipPrevious
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -64,10 +74,13 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
@@ -81,6 +94,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.launch
+import org.jaudiotagger.audio.AudioFileIO
+import org.jaudiotagger.tag.FieldKey
 import soup.compose.material.motion.MaterialSharedAxisZ
 import younesbouhouche.musicplayer.events.PlayerEvent
 import younesbouhouche.musicplayer.events.UiEvent
@@ -92,6 +107,7 @@ import younesbouhouche.musicplayer.timeString
 import younesbouhouche.musicplayer.toDp
 import younesbouhouche.musicplayer.ui.isCompact
 import younesbouhouche.musicplayer.ui.navBarHeight
+import java.io.File
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
@@ -103,6 +119,7 @@ fun LargePlayer(
     playerState: PlayerState,
     onPlayerEvent: (PlayerEvent) -> Unit,
     lyrics: Boolean,
+    syncing: Boolean,
     onUiEvent: (UiEvent) -> Unit,
     playlistState: AnchoredDraggableState<PlaylistViewState>,
     playlistProgress: Float,
@@ -146,10 +163,16 @@ fun LargePlayer(
             Column(m.statusBarsPadding(), verticalArrangement = Arrangement.Center) {
                 Pager(
                     lyrics,
+                    syncing,
                     pagerState,
                     queue,
+                    playerState.index,
+                    playerState.time,
                     onPlayerEvent,
-                    Modifier.fillMaxWidth().aspectRatio(1f)
+                    onUiEvent,
+                    Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
                 )
                 Spacer(Modifier.height(8.dp))
                 Controls(
@@ -164,10 +187,17 @@ fun LargePlayer(
             Row(m.statusBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
                 Pager(
                     lyrics,
+                    syncing,
                     pagerState,
                     queue,
+                    playerState.index,
+                    playerState.time,
                     onPlayerEvent,
-                    Modifier.fillMaxSize().weight(1f).aspectRatio(1f, true)
+                    onUiEvent,
+                    Modifier
+                        .fillMaxSize()
+                        .weight(1f)
+                        .aspectRatio(1f, true)
                 )
                 VerticalDivider(Modifier.fillMaxHeight())
                 Controls(
@@ -206,14 +236,32 @@ fun LargePlayer(
 @Composable
 fun Pager(
     lyrics: Boolean,
+    syncing: Boolean,
     pagerState: PagerState,
     queue: List<MusicCard>,
+    index: Int,
+    time: Long,
     onPlayerEvent: (PlayerEvent) -> Unit,
+    onUiEvent: (UiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val lyricsLineRegex = Regex("^(\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})])\\s\\w*")
+    val lyricsRegex = Regex("\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})]")
+    val lyricsText = rememberSaveable(index) {
+        AudioFileIO.read(File(queue[index].path)).tag.getFirst(FieldKey.LYRICS)
+    }
+    val lyricsLines = lyricsText
+        .split("\n")
+        .filter { it.isNotBlank() }
+        .sortedBy {
+            lyricsRegex.find(it)?.value?.removeSurrounding("[", "]")?.toMs() ?: 0
+        }
+    val synced = lyricsLines.any { !it.matches(lyricsLineRegex) }
+    val scope = rememberCoroutineScope()
     AnimatedContent(
         targetState = lyrics, label = "",
-        modifier = modifier,
+        modifier = modifier.padding(bottom = 8.dp),
+        contentAlignment = Alignment.Center,
         transitionSpec = {
             if (targetState > initialState)
                 slideInHorizontally { it } + fadeIn() togetherWith
@@ -222,14 +270,112 @@ fun Pager(
                 slideInHorizontally { -it } + fadeIn() togetherWith
                         slideOutHorizontally { it } + fadeOut()
         }) { l ->
-        if (l)
-            Box(Modifier.fillMaxSize()) {
+        if (l) {
+            if (lyricsText.isEmpty())
                 Text(
-                    text = "Will be supported soon",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.align(Alignment.Center)
+                    text = "No lyrics available",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.fillMaxSize(),
+                    textAlign = TextAlign.Center
                 )
+            else if (synced) {
+                val lyricsPagerState = rememberPagerState(0) { lyricsLines.size }
+                val isDragged by lyricsPagerState.interactionSource.collectIsDraggedAsState()
+                var isScrolledByUser by remember { mutableStateOf(false) }
+                LaunchedEffect(lyricsPagerState) {
+                    snapshotFlow { lyricsPagerState.isScrollInProgress }.collect { isScrolling ->
+                        if (isScrolledByUser && !isScrolling) onUiEvent(UiEvent.DisableSyncing)
+                        isScrolledByUser = isScrolling && isDragged
+                    }
+                }
+                val segments =
+                    lyricsLines.map {
+                        lyricsRegex
+                            .find(it)
+                            ?.value
+                            ?.removeSurrounding("[", "]")
+                            ?.toMs() ?: 0
+                    }
+                LaunchedEffect(key1 = Unit) {
+                    println("Segments: $segments")
+                }
+                LaunchedEffect(key1 = time) {
+                    if (syncing)
+                        lyricsPagerState.animateScrollToPage(getIndex(segments, time))
+                }
+                Column(
+                    Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    VerticalPager(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f),
+                        pageSize = PageSize.Fixed(100.dp),
+                        state = lyricsPagerState,
+                    ) { page ->
+                        val line = lyricsLines[page]
+                        val pageOffset = (
+                                (lyricsPagerState.currentPage - page) + lyricsPagerState
+                                    .currentPageOffsetFraction
+                                ).absoluteValue
+                        val scale by
+                            animateFloatAsState(
+                                if (syncing)
+                                    lerp(
+                                        0.5f,
+                                        1f,
+                                        1f - pageOffset.coerceIn(0f, 1f)
+                                    )
+                                else 1f,
+                                label = ""
+                            )
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .scale(scale)
+                                .alpha(scale)
+                                .clickable {
+                                    scope.launch {
+                                        onPlayerEvent(PlayerEvent.SeekTime(segments[page]))
+                                        onUiEvent(UiEvent.EnableSyncing)
+                                    }
+                                }) {
+                            Text(
+                                text = if (line.length > 11) line.substring(11) else line,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.align(Alignment.Center),
+                                style = MaterialTheme.typography.headlineLarge,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                    AnimatedVisibility(visible = !syncing) {
+                        Button(onClick = { onUiEvent(UiEvent.EnableSyncing) }) {
+                            Icon(Icons.Default.Timer, null)
+                            Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+                            Text("Sync to current time")
+                        }
+                    }
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = lyricsText,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
+        }
         else
             HorizontalPager(
                 state = pagerState,
@@ -473,3 +619,23 @@ fun Controls(
         }
     }
 }
+
+fun String.toMs(): Long =
+    if (matches(Regex("\\d{2}:\\d{2}:\\d{2}([.:])\\d{2}")))
+        (((substring(0, 2).toLongOrNull() ?: 0) * 3600
+                + (substring(3, 5).toLongOrNull() ?: 0) * 60
+                + (substring(6, 8).toLongOrNull() ?: 0)) * 1000
+                + (substring(9, 11).toLongOrNull() ?: 0))
+    else if (matches(Regex("\\d{2}:\\d{2}([.:])\\d{2}")))
+        (((substring(0, 2).toLongOrNull() ?: 0) * 60
+                + (substring(3, 5).toLongOrNull() ?: 0)) * 1000
+                + (substring(6, 8).toLongOrNull() ?: 0))
+    else 0
+
+fun getIndex(list: List<Long>, time: Long): Int =
+    when {
+        list.isEmpty() -> -1
+        (list.count() == 1) or (list.first() >= time) -> 0
+        (list[1] >= time) and (list[0] <= time) -> 0
+        else -> 1 + getIndex(list - list.first(), time)
+    }

@@ -2,28 +2,15 @@ package younesbouhouche.musicplayer.ui.routes
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,11 +18,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
@@ -44,9 +27,9 @@ import younesbouhouche.musicplayer.events.PlayerEvent
 import younesbouhouche.musicplayer.models.Artist
 import younesbouhouche.musicplayer.states.ListSortState
 import younesbouhouche.musicplayer.ui.components.LazyVerticalGridWithSortBar
+import younesbouhouche.musicplayer.ui.components.MyCard
 import younesbouhouche.musicplayer.ui.components.MyListItem
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Artists(
     artists: List<Artist>,
@@ -98,52 +81,19 @@ fun Artists(
                 modifier = modifier,
                 columns = GridCells.Fixed(gridCount),
                 sortState = sortState,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 onSortEvent = onArtistsSortEvent
             ) {
                 items(artists.toList(), { it.name }) {
-                    Box(
-                        Modifier
-                            .animateItem()
-                            .fillMaxWidth()
-                            .clip(MaterialTheme.shapes.extraLarge)
-                            .clipToBounds()
-                            .combinedClickable(
-                                onClick = { onClick(it) },
-                                onLongClick = { onLongClick(it) }
-                            )
-                            .aspectRatio(1f)
-                            .padding(8.dp)) {
-                        Column(Modifier.fillMaxSize().padding(4.dp)) {
-                            AnimatedContent(
-                                targetState = it.cover,
-                                label = "",
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .weight(1f)) {
-                                if (it == null)
-                                    Icon(
-                                        Icons.Default.AccountCircle,
-                                        null,
-                                        Modifier.fillMaxSize()
-                                    )
-                                else
-                                    Image(
-                                        bitmap = it.asImageBitmap(),
-                                        contentDescription = null,
-                                        modifier = Modifier.fillMaxSize().clip(CircleShape).clipToBounds()
-                                    )
-                            }
-                            Spacer(Modifier.height(2.dp))
-                            Text(
-                                it.name,
-                                Modifier.fillMaxWidth(),
-                                style = MaterialTheme.typography.bodyMedium,
-                                textAlign = TextAlign.Center,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
+                    MyCard(
+                        modifier = Modifier.animateItem(),
+                        text = it.name,
+                        cover = it.cover,
+                        alternative = Icons.Default.AccountCircle,
+                        onClick = { onClick(it) },
+                        onLongClick = { onLongClick(it) }
+                    )
                 }
             }
     }

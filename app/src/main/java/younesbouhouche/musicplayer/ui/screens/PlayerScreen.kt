@@ -70,6 +70,7 @@ fun PlayerScreen(
                 playerState,
                 onPlayerEvent,
                 uiState.lyricsVisible,
+                uiState.syncing,
                 onUiEvent,
                 playlistDragState,
                 playlistProgress,

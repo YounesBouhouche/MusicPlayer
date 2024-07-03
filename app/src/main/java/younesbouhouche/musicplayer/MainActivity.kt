@@ -43,6 +43,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val mainVM = hiltViewModel<MainVM>()
+            val playerState by mainVM.playerState.collectAsState()
             val granted by mainVM.granted.collectAsState()
             val navController = rememberNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -55,6 +56,9 @@ class MainActivity : ComponentActivity() {
                 ActivityResultContracts.RequestPermission()
             ) { isGranted: Boolean ->
                 if (isGranted) mainVM.setGranted(startupEvent)
+            }
+            LaunchedEffect(key1 = Unit) {
+                println("ViewModel PlayState: ${playerState.playState}")
             }
             LaunchedEffect(key1 = currentRoute) {
                 Routes

@@ -20,27 +20,29 @@ data class MusicCard(
     var artist: String,
     var albumId: Long,
     var album: String,
+    var lyrics: String,
     var path: String,
     var date: LocalDateTime,
     var duration: Long,
     var favorite: StateFlow<Boolean>,
     var timestamps: StateFlow<List<LocalDateTime>>,
 )  {
-    class Builder(card: MusicCard? = null) {
+    @Suppress("unused")
+    class Builder {
         private var contentUri: Uri = Uri.EMPTY
-        private var id: Long = 0
+        private var id: Long = -1
         private var title: String = ""
         private var cover: Bitmap? = null
         private var coverByteArray: ByteArray = byteArrayOf()
         private var artist: String = ""
-        private var albumId: Long = 0
+        private var albumId: Long = -1
         private var album: String = ""
+        private var lyrics: String = ""
         private var path: String = ""
         private var date: LocalDateTime = LocalDateTime.now()
-        private var duration: Long = 0
+        private var duration: Long = -1
         private var favorite: StateFlow<Boolean> = MutableStateFlow(false)
         private var timestamps: StateFlow<List<LocalDateTime>> = MutableStateFlow(emptyList())
-
         fun setContentUri(contentUri: Uri) = apply { this.contentUri = contentUri }
         fun setId(id: Long) = apply { this.id = id }
         fun setTitle(title: String) = apply { this.title = title }
@@ -49,45 +51,28 @@ data class MusicCard(
         fun setArtist(artist: String) = apply { this.artist = artist }
         fun setAlbumId(albumId: Long) = apply { this.albumId = albumId }
         fun setAlbum(album: String) = apply { this.album = album }
+        fun setLyrics(lyrics: String) = apply { this.lyrics = lyrics }
         fun setPath(path: String) = apply { this.path = path }
         fun setDate(date: LocalDateTime) = apply { this.date = date }
         fun setDuration(duration: Long) = apply { this.duration = duration }
         fun setFavorite(favorite: StateFlow<Boolean>) = apply { this.favorite = favorite }
         fun setTimestamps(timestamps: StateFlow<List<LocalDateTime>>) = apply { this.timestamps = timestamps }
-
         fun build() = MusicCard(
-            contentUri = contentUri,
-            id = id,
-            title = title,
-            cover = cover,
-            coverByteArray = coverByteArray,
-            artist = artist,
-            albumId = albumId,
-            album = album,
-            path = path,
-            date = date,
-            duration = duration,
-            favorite = favorite,
-            timestamps = timestamps
+            contentUri,
+            id,
+            title,
+            cover,
+            coverByteArray,
+            artist,
+            albumId,
+            album,
+            lyrics,
+            path,
+            date,
+            duration,
+            favorite,
+            timestamps
         )
-
-        init {
-            card?.let {
-                contentUri = it.contentUri
-                id = it.id
-                title = it.title
-                cover = it.cover
-                coverByteArray = it.coverByteArray
-                artist = it.artist
-                albumId = it.albumId
-                album = it.album
-                path = it.path
-                date = it.date
-                duration = it.duration
-                favorite = it.favorite
-                timestamps = it.timestamps
-            }
-        }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -107,6 +92,9 @@ data class MusicCard(
         if (path != other.path) return false
         if (date != other.date) return false
         if (duration != other.duration) return false
+        if (favorite != other.favorite) return false
+        if (timestamps != other.timestamps) return false
+        if (lyrics != other.lyrics) return false
 
         return true
     }
@@ -123,6 +111,8 @@ data class MusicCard(
         result = 31 * result + path.hashCode()
         result = 31 * result + date.hashCode()
         result = 31 * result + duration.hashCode()
+        result = 31 * result + favorite.hashCode()
+        result = 31 * result + timestamps.hashCode()
         return result
     }
     fun toMetadata() = MusicMetadata(

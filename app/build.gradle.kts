@@ -81,6 +81,8 @@ dependencies {
 //    implementation("com.github.crowdin.mobile-sdk-android:sdk:1.9.2") {
 //        exclude("com.google.code.gson", "gson")
 //    }
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
     implementation(libs.converter.gson)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.media3.session)

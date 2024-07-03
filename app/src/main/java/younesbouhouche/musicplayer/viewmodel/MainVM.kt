@@ -1063,6 +1063,12 @@ class MainVM @Inject constructor(
             UiEvent.ToggleLyrics -> _uiState.update {
                 it.copy(lyricsVisible = !it.lyricsVisible)
             }
+            UiEvent.DisableSyncing -> _uiState.update {
+                it.copy(syncing = false)
+            }
+            UiEvent.EnableSyncing -> _uiState.update {
+                it.copy(syncing = true)
+            }
         }
     }
 

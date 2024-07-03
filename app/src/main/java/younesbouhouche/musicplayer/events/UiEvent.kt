@@ -37,4 +37,6 @@ sealed interface UiEvent {
     data class ShowMetadataDialog(val metadata: MusicMetadata): UiEvent
     data object HideMetadataDialog: UiEvent
     data object ToggleLyrics: UiEvent
+    data object EnableSyncing: UiEvent
+    data object DisableSyncing: UiEvent
 }
