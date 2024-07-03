@@ -585,85 +585,85 @@ class MainVM @Inject constructor(
         _artists.value = emptyList()
         _loading.value = true
         val list = mutableListOf<MusicCard>()
-        withContext(Dispatchers.IO) {
-            val cursor = context.contentResolver.query(
-                collection, projection, selection, null, sortOrder
-            )
-            cursor?.use { crs ->
-                val idColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
-                val durationColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
-                val titleColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
-                val artistColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
-                val albumIdColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
-                val albumColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
-                val pathColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
-                val dateColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
-                while (crs.moveToNext()) {
-                    val id = crs.getLong(idColumn)
-                    val duration = crs.getLong(durationColumn)
-                    val title = crs.getString(titleColumn)
-                    val artist = crs.getString(artistColumn)
-                    val albumId = crs.getLong(albumIdColumn)
-                    val album = crs.getString(albumColumn)
-                    val path = crs.getString(pathColumn)
-                    val date = crs.getLong(dateColumn)
-                    val contentUri: Uri = ContentUris.withAppendedId(
-                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        id
-                    )
-                    list.add(
-                        MusicCard
-                            .Builder()
-                            .setContentUri(contentUri)
-                            .setId(id)
-                            .setTitle(title)
-                            .setArtist(artist)
-                            .setAlbum(album)
-                            .setAlbumId(albumId)
-                            .setPath(path)
-                            .setDate(
-                                LocalDateTime
-                                    .ofInstant(
-                                        Instant.ofEpochMilli(date),
-                                        TimeZone.getDefault().toZoneId()
-                                    )
-                            )
-                            .setDuration(duration)
-                            .setFavorite(isFavorite(path))
-                            .setTimestamps(getTimestamps(path))
-                            .build()
-                    )
-                }
-                crs.close()
-                initialized = true
-            }
-        }
-        _albums.value = list.groupBy { it.album }.map { album ->
-            Album(
-                title = album.key,
-                items = album.value.map { it.id },
-                cover = null
-            )
-        }
-        // do the same thing for _artists
-        _artists.value = list.groupBy { it.artist }.map { artist ->
-            Artist(
-                name = artist.key,
-                items = artist.value.map { it.id },
-                cover = null
-            )
-        }
-        _files.value = list
-        _loading.value = false
-        getThumbnails(list) {
-            _files.value = list
-        }
-    }
-
-    private fun getThumbnails(list: MutableList<MusicCard>, callback: () -> Unit) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                val cursor = context.contentResolver.query(
+                    collection, projection, selection, null, sortOrder
+                )
+                cursor?.use { crs ->
+                    val idColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+                    val durationColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+                    val titleColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+                    val artistColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+                    val albumIdColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+                    val albumColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+                    val pathColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+                    val dateColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
+                    while (crs.moveToNext()) {
+                        val id = crs.getLong(idColumn)
+                        val duration = crs.getLong(durationColumn)
+                        val title = crs.getString(titleColumn)
+                        val artist = crs.getString(artistColumn)
+                        val albumId = crs.getLong(albumIdColumn)
+                        val album = crs.getString(albumColumn)
+                        val path = crs.getString(pathColumn)
+                        val date = crs.getLong(dateColumn)
+                        val contentUri: Uri = ContentUris.withAppendedId(
+                            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                            id
+                        )
+                        list.add(
+                            MusicCard
+                                .Builder()
+                                .setContentUri(contentUri)
+                                .setId(id)
+                                .setTitle(title)
+                                .setArtist(artist)
+                                .setAlbum(album)
+                                .setAlbumId(albumId)
+                                .setPath(path)
+                                .setDate(
+                                    LocalDateTime
+                                        .ofInstant(
+                                            Instant.ofEpochMilli(date),
+                                            TimeZone.getDefault().toZoneId()
+                                        )
+                                )
+                                .setDuration(duration)
+                                .setFavorite(isFavorite(path))
+                                .setTimestamps(getTimestamps(path))
+                                .build()
+                        )
+                    }
+                    crs.close()
+                    initialized = true
+                }
+            }
+            _albums.value = list.groupBy { it.album }.map { album ->
+                Album(
+                    title = album.key,
+                    items = album.value.map { it.id },
+                    cover = null
+                )
+            }
+            // do the same thing for _artists
+            _artists.value = list.groupBy { it.artist }.map { artist ->
+                Artist(
+                    name = artist.key,
+                    items = artist.value.map { it.id },
+                    cover = null
+                )
+            }
+            _files.value = list
+            _loading.value = false
+            withContext(Dispatchers.IO) {
                 list.forEachIndexed { index, file ->
+                    file.lyrics = try {
+                        AudioFileIO.read(File(file.path)).tag.getFirst(FieldKey.LYRICS)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        ""
+                    }
                     val result = with(MediaMetadataRetriever()) {
                         try {
                             setDataSource(context, file.contentUri)
@@ -693,8 +693,8 @@ class MainVM @Inject constructor(
                         }
                     }
                 }
+                _files.value = list
             }
-            callback()
         }
     }
 

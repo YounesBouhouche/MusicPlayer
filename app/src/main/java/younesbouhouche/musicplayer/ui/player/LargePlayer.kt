@@ -36,10 +36,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -75,7 +76,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -94,8 +94,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.launch
-import org.jaudiotagger.audio.AudioFileIO
-import org.jaudiotagger.tag.FieldKey
 import soup.compose.material.motion.MaterialSharedAxisZ
 import younesbouhouche.musicplayer.events.PlayerEvent
 import younesbouhouche.musicplayer.events.UiEvent
@@ -107,7 +105,6 @@ import younesbouhouche.musicplayer.timeString
 import younesbouhouche.musicplayer.toDp
 import younesbouhouche.musicplayer.ui.isCompact
 import younesbouhouche.musicplayer.ui.navBarHeight
-import java.io.File
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
@@ -245,18 +242,26 @@ fun Pager(
     onUiEvent: (UiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val lyricsLineRegex = Regex("^(\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})])\\s\\w*")
+    val lyricsLineRegex = Regex("^(\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})])\\s[\\w\\s]*")
     val lyricsRegex = Regex("\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})]")
-    val lyricsText = rememberSaveable(index) {
-        AudioFileIO.read(File(queue[index].path)).tag.getFirst(FieldKey.LYRICS)
-    }
+    var currentLine by remember { mutableIntStateOf(0) }
+    val lyricsText = queue[index].lyrics
     val lyricsLines = lyricsText
         .split("\n")
         .filter { it.isNotBlank() }
         .sortedBy {
             lyricsRegex.find(it)?.value?.removeSurrounding("[", "]")?.toMs() ?: 0
         }
-    val synced = lyricsLines.any { !it.matches(lyricsLineRegex) }
+    val synced = lyricsLines.any { it.matches(lyricsLineRegex) }
+    val lyricsListState = rememberLazyListState()
+    val isDragged by lyricsListState.interactionSource.collectIsDraggedAsState()
+    LaunchedEffect(currentLine, syncing) {
+        if (syncing)
+            lyricsListState.animateScrollToItem(currentLine)
+    }
+    LaunchedEffect(key1 = isDragged) {
+        if (isDragged) onUiEvent(UiEvent.DisableSyncing)
+    }
     val scope = rememberCoroutineScope()
     AnimatedContent(
         targetState = lyrics, label = "",
@@ -280,15 +285,6 @@ fun Pager(
                     textAlign = TextAlign.Center
                 )
             else if (synced) {
-                val lyricsPagerState = rememberPagerState(0) { lyricsLines.size }
-                val isDragged by lyricsPagerState.interactionSource.collectIsDraggedAsState()
-                var isScrolledByUser by remember { mutableStateOf(false) }
-                LaunchedEffect(lyricsPagerState) {
-                    snapshotFlow { lyricsPagerState.isScrollInProgress }.collect { isScrolling ->
-                        if (isScrolledByUser && !isScrolling) onUiEvent(UiEvent.DisableSyncing)
-                        isScrolledByUser = isScrolling && isDragged
-                    }
-                }
                 val segments =
                     lyricsLines.map {
                         lyricsRegex
@@ -297,59 +293,45 @@ fun Pager(
                             ?.removeSurrounding("[", "]")
                             ?.toMs() ?: 0
                     }
-                LaunchedEffect(key1 = Unit) {
-                    println("Segments: $segments")
-                }
                 LaunchedEffect(key1 = time) {
-                    if (syncing)
-                        lyricsPagerState.animateScrollToPage(getIndex(segments, time))
+                    if (syncing) currentLine = getIndex(segments, time)
                 }
                 Column(
                     Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    VerticalPager(
-                        modifier = Modifier
+                    LazyColumn(
+                        Modifier
                             .fillMaxSize()
-                            .weight(1f),
-                        pageSize = PageSize.Fixed(100.dp),
-                        state = lyricsPagerState,
-                    ) { page ->
-                        val line = lyricsLines[page]
-                        val pageOffset = (
-                                (lyricsPagerState.currentPage - page) + lyricsPagerState
-                                    .currentPageOffsetFraction
-                                ).absoluteValue
-                        val scale by
-                            animateFloatAsState(
-                                if (syncing)
-                                    lerp(
-                                        0.5f,
-                                        1f,
-                                        1f - pageOffset.coerceIn(0f, 1f)
-                                    )
-                                else 1f,
+                            .weight(1f), state = lyricsListState) {
+                        itemsIndexed(lyricsLines) { index, line ->
+                            val scale by animateFloatAsState(
+                                if ((!syncing) or (index == currentLine)) 1f
+                                else 0.5f,
                                 label = ""
                             )
-                        Box(
-                            Modifier
-                                .fillMaxSize()
-                                .scale(scale)
-                                .alpha(scale)
-                                .clickable {
-                                    scope.launch {
-                                        onPlayerEvent(PlayerEvent.SeekTime(segments[page]))
-                                        onUiEvent(UiEvent.EnableSyncing)
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .alpha(scale)
+                                    .clickable {
+                                        scope.launch {
+                                            onPlayerEvent(PlayerEvent.SeekTime(segments[index]))
+                                            onUiEvent(UiEvent.EnableSyncing)
+                                        }
                                     }
-                                }) {
-                            Text(
-                                text = if (line.length > 11) line.substring(11) else line,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.align(Alignment.Center),
-                                style = MaterialTheme.typography.headlineLarge,
-                                textAlign = TextAlign.Center
-                            )
+                            ) {
+                                Text(
+                                    text = line.removeLeadingTime(),
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(32.dp),
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    textAlign = TextAlign.Start
+                                )
+                            }
                         }
                     }
                     AnimatedVisibility(visible = !syncing) {
@@ -413,7 +395,7 @@ fun Pager(
                                 )
                                 .combinedClickable(
                                     onDoubleClick = {
-
+                                        onPlayerEvent(PlayerEvent.SetFavorite(path))
                                     }
                                 ) {},
                             contentAlignment = Alignment.Center
@@ -620,6 +602,13 @@ fun Controls(
     }
 }
 
+fun String.removeLeadingTime(): String
+    = when {
+        matches(Regex("^(\\[(\\d{2}:\\d{2}:\\d{2}([.:])\\d{2})])\\s(\\w|\\s)*")) and (length >= 11) -> removeRange(0..11)
+        matches(Regex("^(\\[(\\d{2}:\\d{2}([.:])\\d{2})])\\s(\\w|\\s)*")) and (length >= 9) -> removeRange(0..9)
+        else -> this
+    }.trimStart()
+
 fun String.toMs(): Long =
     if (matches(Regex("\\d{2}:\\d{2}:\\d{2}([.:])\\d{2}")))
         (((substring(0, 2).toLongOrNull() ?: 0) * 3600
@@ -636,6 +625,6 @@ fun getIndex(list: List<Long>, time: Long): Int =
     when {
         list.isEmpty() -> -1
         (list.count() == 1) or (list.first() >= time) -> 0
-        (list[1] >= time) and (list[0] <= time) -> 0
+        (list[1] > time) and (list[0] <= time) -> 0
         else -> 1 + getIndex(list - list.first(), time)
     }
