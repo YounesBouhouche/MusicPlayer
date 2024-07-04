@@ -89,3 +89,22 @@ fun MusicCard.search(query: String) =
             (path to query).containEachOther() or
             (album to query).containEachOther() or
             (artist to query).containEachOther()
+
+fun String.removeLeadingTime(): String
+        = when {
+    matches(Regex("^(\\[(\\d{2}:\\d{2}:\\d{2}([.:])\\d{2})])\\s(\\w|\\s)*")) and (length >= 12) -> removeRange(0..11)
+    matches(Regex("^(\\[(\\d{2}:\\d{2}([.:])\\d{2})])\\s(\\w|\\s)*")) and (length >= 10) -> removeRange(0..9)
+    else -> this
+}.trimStart()
+
+fun String.toMs(): Long =
+    if (matches(Regex("\\d{2}:\\d{2}:\\d{2}([.:])\\d{2}")))
+        (((substring(0, 2).toLongOrNull() ?: 0) * 3600
+                + (substring(3, 5).toLongOrNull() ?: 0) * 60
+                + (substring(6, 8).toLongOrNull() ?: 0)) * 1000
+                + (substring(9, 11).toLongOrNull() ?: 0))
+    else if (matches(Regex("\\d{2}:\\d{2}([.:])\\d{2}")))
+        (((substring(0, 2).toLongOrNull() ?: 0) * 60
+                + (substring(3, 5).toLongOrNull() ?: 0)) * 1000
+                + (substring(6, 8).toLongOrNull() ?: 0))
+    else 0

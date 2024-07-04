@@ -361,7 +361,7 @@ class MainVM @Inject constructor(
             }
             SearchEvent.Collapse -> {
                 _searchState.update {
-                    it.copy(expanded = false)
+                    it.copy(expanded = false, query = "")
                 }
             }
             SearchEvent.Expand -> {

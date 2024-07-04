@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -90,7 +91,8 @@ fun SearchScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = SearchBarDefaults.InputFieldHeight)
-                .align(Alignment.BottomCenter)) {
+                .align(Alignment.BottomCenter)
+                .imePadding()) {
             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
     }

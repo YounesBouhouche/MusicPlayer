@@ -98,11 +98,13 @@ import soup.compose.material.motion.MaterialSharedAxisZ
 import younesbouhouche.musicplayer.events.PlayerEvent
 import younesbouhouche.musicplayer.events.UiEvent
 import younesbouhouche.musicplayer.models.MusicCard
+import younesbouhouche.musicplayer.removeLeadingTime
 import younesbouhouche.musicplayer.states.PlayState
 import younesbouhouche.musicplayer.states.PlayerState
 import younesbouhouche.musicplayer.states.PlaylistViewState
 import younesbouhouche.musicplayer.timeString
 import younesbouhouche.musicplayer.toDp
+import younesbouhouche.musicplayer.toMs
 import younesbouhouche.musicplayer.ui.isCompact
 import younesbouhouche.musicplayer.ui.navBarHeight
 import kotlin.math.absoluteValue
@@ -281,7 +283,7 @@ fun Pager(
                     text = "No lyrics available",
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
             else if (synced) {
@@ -601,25 +603,6 @@ fun Controls(
         }
     }
 }
-
-fun String.removeLeadingTime(): String
-    = when {
-        matches(Regex("^(\\[(\\d{2}:\\d{2}:\\d{2}([.:])\\d{2})])\\s(\\w|\\s)*")) and (length >= 11) -> removeRange(0..11)
-        matches(Regex("^(\\[(\\d{2}:\\d{2}([.:])\\d{2})])\\s(\\w|\\s)*")) and (length >= 9) -> removeRange(0..9)
-        else -> this
-    }.trimStart()
-
-fun String.toMs(): Long =
-    if (matches(Regex("\\d{2}:\\d{2}:\\d{2}([.:])\\d{2}")))
-        (((substring(0, 2).toLongOrNull() ?: 0) * 3600
-                + (substring(3, 5).toLongOrNull() ?: 0) * 60
-                + (substring(6, 8).toLongOrNull() ?: 0)) * 1000
-                + (substring(9, 11).toLongOrNull() ?: 0))
-    else if (matches(Regex("\\d{2}:\\d{2}([.:])\\d{2}")))
-        (((substring(0, 2).toLongOrNull() ?: 0) * 60
-                + (substring(3, 5).toLongOrNull() ?: 0)) * 1000
-                + (substring(6, 8).toLongOrNull() ?: 0))
-    else 0
 
 fun getIndex(list: List<Long>, time: Long): Int =
     when {

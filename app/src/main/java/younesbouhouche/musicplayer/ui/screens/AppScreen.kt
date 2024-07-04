@@ -98,7 +98,7 @@ fun AppScreen(
     val isCompact =
         currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
     val offset = with (density) {
-        height - ((if (isParent and isCompact) 160.dp else 80.dp) + navBarHeight).roundToPx()
+        height - ((if (isParent and isCompact and !searchState.expanded) 160.dp else 80.dp) + navBarHeight).roundToPx()
     }
     val playlistOffset = with (density) {
         height - (72.dp + navBarHeight).roundToPx()
