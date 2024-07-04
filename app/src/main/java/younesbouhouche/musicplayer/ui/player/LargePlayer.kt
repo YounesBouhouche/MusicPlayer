@@ -3,7 +3,11 @@ package younesbouhouche.musicplayer.ui.player
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -43,6 +47,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -135,6 +140,7 @@ fun LargePlayer(
     }
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
     var isScrolledByUser by remember { mutableStateOf(false) }
+    val playing = playerState.playState == PlayState.PLAYING
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.isScrollInProgress }.collect { isScrolling ->
             if (isScrolledByUser && !isScrolling)
@@ -163,6 +169,7 @@ fun LargePlayer(
                 Pager(
                     lyrics,
                     syncing,
+                    playing,
                     pagerState,
                     queue,
                     playerState.index,
@@ -187,6 +194,7 @@ fun LargePlayer(
                 Pager(
                     lyrics,
                     syncing,
+                    playing,
                     pagerState,
                     queue,
                     playerState.index,
@@ -236,6 +244,7 @@ fun LargePlayer(
 fun Pager(
     lyrics: Boolean,
     syncing: Boolean,
+    playing: Boolean,
     pagerState: PagerState,
     queue: List<MusicCard>,
     index: Int,
@@ -257,6 +266,20 @@ fun Pager(
     val synced = lyricsLines.any { it.matches(lyricsLineRegex) }
     val lyricsListState = rememberLazyListState()
     val isDragged by lyricsListState.interactionSource.collectIsDraggedAsState()
+    val transition = rememberInfiniteTransition(label = "Playing animation")
+    val animatedScale by transition.animateFloat(
+        initialValue = 0.9f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(5000),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "Scale animation"
+    )
+    val diskScale by animateFloatAsState(
+        targetValue = if (playing) animatedScale else 1f,
+        label = ""
+    )
     LaunchedEffect(currentLine, syncing) {
         if (syncing)
             lyricsListState.animateScrollToItem(currentLine)
@@ -387,14 +410,9 @@ fun Pager(
                         Box(
                             Modifier
                                 .fillMaxSize()
-                                .padding(24.dp)
+                                .padding(12.dp)
                                 .align(Alignment.Center)
-                                .clip(RoundedCornerShape(100))
-                                .clipToBounds()
-                                .background(
-                                    MaterialTheme.colorScheme.secondary,
-                                    RoundedCornerShape(100)
-                                )
+                                .scale(diskScale)
                                 .combinedClickable(
                                     onDoubleClick = {
                                         onPlayerEvent(PlayerEvent.SetFavorite(path))
@@ -407,15 +425,28 @@ fun Pager(
                                     bitmap = cover!!.asImageBitmap(),
                                     null,
                                     contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize()
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(CircleShape)
+                                        .clipToBounds()
                                 )
                             else
-                                Icon(
-                                    Icons.Default.MusicNote,
-                                    null,
-                                    Modifier.fillMaxSize(.75f),
-                                    tint = NavigationBarDefaults.containerColor
-                                )
+                                Box(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            MaterialTheme.colorScheme.secondary,
+                                            CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        Icons.Default.MusicNote,
+                                        null,
+                                        Modifier.fillMaxSize(.75f),
+                                        tint = NavigationBarDefaults.containerColor
+                                    )
+                                }
                         }
                         LargeFloatingActionButton(
                             onClick = { onPlayerEvent(PlayerEvent.UpdateFavorite(path, !fav)) },
@@ -576,7 +607,7 @@ fun Controls(
                     .height(100.dp)
                     .fillMaxWidth()
                     .weight(1f),
-                shape = RoundedCornerShape(100),
+                shape = CircleShape,
                 colors = IconButtonDefaults.iconButtonColors(
                     contentColor = MaterialTheme.colorScheme.primaryContainer,
                     containerColor = MaterialTheme.colorScheme.primary
