@@ -28,15 +28,14 @@ import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.AppShortcut
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -64,9 +63,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.models.MusicCard
 import younesbouhouche.musicplayer.events.PlayerEvent
 import younesbouhouche.musicplayer.events.UiEvent
+import younesbouhouche.musicplayer.models.MusicCard
 import younesbouhouche.musicplayer.ui.navBarHeight
 
 data class BottomSheetButton(val text: String, val icon: ImageVector, val active: Boolean = false, val onClick: () -> Unit) {
@@ -113,9 +112,16 @@ fun BottomSheet(
                                 .padding(horizontal = 4.dp),
                             contentPadding = PaddingValues(16.dp),
                         ) {
-                            Row(Modifier.fillMaxWidth()) {
-                                Icon(item.icon, null, Modifier.size(ButtonDefaults.IconSize))
-                                Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    item.icon,
+                                    null,
+                                    Modifier.size(24.dp)
+                                )
+                                Spacer(Modifier.width(12.dp))
                                 Text(item.text)
                             }
                         }
@@ -160,16 +166,10 @@ fun ItemBottomSheet(
                     }
                 ),
                 listOf(
-                    BottomSheetButton("Edit metadata", Icons.Default.Edit) {
-                        onUiEvent(UiEvent.ShowMetadataDialog(toMetadata()))
-                    },
-                    BottomSheetButton("Details", Icons.Default.Info) {
-
+                    BottomSheetButton("Details", Icons.Outlined.Info) {
+                        onUiEvent(UiEvent.ShowDetails(this))
                     },
                     BottomSheetButton("Share", Icons.Default.Share, shareFile),
-                    BottomSheetButton("Delete", Icons.Default.Delete) {
-
-                    }
                 )
             ),
             leadingContent = {
@@ -221,7 +221,7 @@ fun ItemBottomSheet(
                         )
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             SuggestionChip(
-                                modifier = Modifier.fillMaxWidth().weight(1f),
+                                modifier = Modifier.weight(1f, false),
                                 onClick = {
                                     navigateToArtist()
                                     onDismissRequest()
@@ -243,7 +243,7 @@ fun ItemBottomSheet(
                                 }
                             )
                             SuggestionChip(
-                                modifier = Modifier.fillMaxWidth().weight(1f),
+                                modifier = Modifier.weight(1f, false),
                                 onClick = {
                                     navigateToAlbum()
                                     onDismissRequest()
@@ -328,10 +328,7 @@ fun PlaylistBottomSheet(
             ),
             listOf(
                 BottomSheetButton("Share", Icons.Default.Share, shareFiles),
-                BottomSheetButton("Delete Playlist", Icons.Default.DeleteSweep, delete),
-                BottomSheetButton("Delete", Icons.Default.Delete) {
-
-                },
+                BottomSheetButton("Remove Playlist", Icons.Default.DeleteSweep, delete),
                 BottomSheetButton("Create home shortcut", Icons.Default.AppShortcut, addToHomeScreen)
             )
         ),

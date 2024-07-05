@@ -39,6 +39,8 @@ data class UiState(
     val addToPlaylistIndex: Int = 0,
     val addToPlaylistItems: List<String> = emptyList(),
     val metadataDialog: Boolean = false,
+    val detailsDialog: Boolean = false,
+    val detailsFile: MusicCard? = null,
     val lyricsVisible: Boolean = false,
     val syncing: Boolean = true,
     val metadata: MusicMetadata = MusicMetadata()

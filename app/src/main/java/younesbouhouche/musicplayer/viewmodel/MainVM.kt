@@ -1069,6 +1069,12 @@ class MainVM @Inject constructor(
             UiEvent.EnableSyncing -> _uiState.update {
                 it.copy(syncing = true)
             }
+            UiEvent.DismissDetails -> _uiState.update {
+                it.copy(detailsDialog = false)
+            }
+            is UiEvent.ShowDetails -> _uiState.update {
+                it.copy(detailsDialog = true, detailsFile = event.file)
+            }
         }
     }
 

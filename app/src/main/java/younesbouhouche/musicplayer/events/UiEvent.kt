@@ -39,4 +39,6 @@ sealed interface UiEvent {
     data object ToggleLyrics: UiEvent
     data object EnableSyncing: UiEvent
     data object DisableSyncing: UiEvent
+    data class ShowDetails(val file: MusicCard): UiEvent
+    data object DismissDetails: UiEvent
 }

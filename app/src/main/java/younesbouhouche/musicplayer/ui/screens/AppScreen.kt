@@ -64,6 +64,7 @@ import younesbouhouche.musicplayer.ui.components.ItemBottomSheet
 import younesbouhouche.musicplayer.ui.components.ListBottomSheet
 import younesbouhouche.musicplayer.ui.components.PlaylistBottomSheet
 import younesbouhouche.musicplayer.ui.dialogs.AddToPlaylistDialog
+import younesbouhouche.musicplayer.ui.dialogs.DetailsDialog
 import younesbouhouche.musicplayer.ui.dialogs.MetadataDialog
 import younesbouhouche.musicplayer.ui.dialogs.NewPlaylistDialog
 import younesbouhouche.musicplayer.ui.dialogs.SpeedDialog
@@ -396,4 +397,11 @@ fun AppScreen(
         uiState.metadata,
         mainVM::onMetadataEvent
     )
+    uiState.detailsFile?.let {
+        DetailsDialog(
+            uiState.detailsDialog,
+            { mainVM.onUiEvent(UiEvent.DismissDetails) },
+            it
+        )
+    }
 }
