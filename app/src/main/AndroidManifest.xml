@@ -78,5 +78,5 @@
                 android:resource="@xml/my_app_widget_info" />
         </receiver>
     </application>
-
+    
 </manifest>

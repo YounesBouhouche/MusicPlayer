@@ -10,3 +10,7 @@ data class Playlist(
     val name: String = "",
     val items: List<String> = emptyList()
 )
+
+fun Playlist.createM3UText() =
+    "#EXTINF:$name\n#EXTM3U\n" +
+    items.joinToString("\n")

@@ -598,7 +598,7 @@ class MainVM @Inject constructor(
                     val albumIdColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
                     val albumColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
                     val pathColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
-                    val dateColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
+                    val dateColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
                     while (crs.moveToNext()) {
                         val id = crs.getLong(idColumn)
                         val duration = crs.getLong(durationColumn)

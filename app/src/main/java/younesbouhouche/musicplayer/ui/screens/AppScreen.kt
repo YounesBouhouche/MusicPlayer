@@ -6,6 +6,8 @@ import android.content.Intent.ACTION_VIEW
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -57,6 +59,7 @@ import younesbouhouche.musicplayer.events.PlayerEvent
 import younesbouhouche.musicplayer.events.PlaylistEvent
 import younesbouhouche.musicplayer.events.UiEvent
 import younesbouhouche.musicplayer.models.NavRoutes
+import younesbouhouche.musicplayer.models.createM3UText
 import younesbouhouche.musicplayer.states.PlayState
 import younesbouhouche.musicplayer.states.PlaylistViewState
 import younesbouhouche.musicplayer.states.ViewState
@@ -206,16 +209,20 @@ fun AppScreen(
                     NavigationScreen(
                         navController,
                         mainVM,
-                        Modifier.padding(
-                            bottom = bottomPadding + playerPadding,
-                            start = startPadding
-                        ).then(cutout)
+                        Modifier
+                            .padding(
+                                bottom = bottomPadding + playerPadding,
+                                start = startPadding
+                            )
+                            .then(cutout)
                     )
                     AnimatedVisibility(
                         visible = isParent,
                         enter = slideInVertically { -it },
                         exit = slideOutVertically { -it },
-                        modifier = Modifier.padding(start = startPadding).then(cutout)
+                        modifier = Modifier
+                            .padding(start = startPadding)
+                            .then(cutout)
                     ) {
                         SearchScreen(searchState, loading, mainVM::onSearchEvent)
                     }
@@ -322,6 +329,16 @@ fun AppScreen(
             }
         )
     }
+    val savePlaylist = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("audio/x-mpegurl")
+    ) {
+        it?.let { uri ->
+            context.contentResolver.openOutputStream(uri)?.run {
+                write(playlist.createM3UText().toByteArray())
+                close()
+            }
+        }
+    }
     PlaylistBottomSheet(
         open = uiState.playlistBottomSheetVisible,
         state = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -347,6 +364,9 @@ fun AppScreen(
                     .build(),
                 null
             )
+        },
+        savePlaylist = {
+            savePlaylist.launch("${playlist.name}.m3u")
         }
     ) {
         context.startActivity(

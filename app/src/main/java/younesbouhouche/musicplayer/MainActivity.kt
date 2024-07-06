@@ -99,7 +99,9 @@ class MainActivity : ComponentActivity() {
             when (intent.getStringExtra("type")) {
                 "favorites" -> mainVM.onPlayerEvent(PlayerEvent.PlayFavorites)
                 "mostPlayed" -> mainVM.onPlayerEvent(PlayerEvent.PlayMostPlayed)
-                "playlist" -> mainVM.onPlayerEvent(PlayerEvent.PlayPlaylist(intent.getIntExtra("id", -1)))
+                "playlist" -> mainVM.onPlayerEvent(
+                    PlayerEvent.PlayPlaylist(intent.getIntExtra("id", -1))
+                )
             }
     }
 }

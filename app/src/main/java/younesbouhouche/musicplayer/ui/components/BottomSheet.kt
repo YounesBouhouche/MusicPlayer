@@ -26,13 +26,13 @@ import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.material.icons.filled.AddToPhotos
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.AppShortcut
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.outlined.Info
@@ -307,7 +307,8 @@ fun PlaylistBottomSheet(
     onUiEvent: (UiEvent) -> Unit,
     delete: () -> Unit,
     addToHomeScreen: () -> Unit,
-    shareFiles: () -> Unit
+    savePlaylist: () -> Unit,
+    shareFiles: () -> Unit,
 ) {
     BottomSheet(
         open = open,
@@ -327,9 +328,12 @@ fun PlaylistBottomSheet(
                 }
             ),
             listOf(
-                BottomSheetButton("Share", Icons.Default.Share, shareFiles),
+                BottomSheetButton("Save Playlist", Icons.Default.Save, savePlaylist),
                 BottomSheetButton("Remove Playlist", Icons.Default.DeleteSweep, delete),
                 BottomSheetButton("Create home shortcut", Icons.Default.AppShortcut, addToHomeScreen)
+            ),
+            listOf(
+                BottomSheetButton("Share Files", Icons.Default.Share, shareFiles),
             )
         ),
         leadingContent = {
@@ -436,7 +440,6 @@ fun ListBottomSheet(
             )
             ,listOf(
                 BottomSheetButton("Share Files", Icons.Default.Share, shareFiles),
-                BottomSheetButton("Delete Files", Icons.Default.Delete) {}
             )
         ),
         leadingContent = {
