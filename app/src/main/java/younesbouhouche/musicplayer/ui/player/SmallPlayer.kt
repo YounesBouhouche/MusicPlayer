@@ -1,7 +1,14 @@
 package younesbouhouche.musicplayer.ui.player
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,12 +49,14 @@ import younesbouhouche.musicplayer.ui.isCompact
 
 @Composable
 fun SmallPlayer(
-    item: MusicCard,
+    queue: List<MusicCard>,
+    index: Int,
     playerState: PlayerState,
     onPlayerEvent: (PlayerEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cutout = if (isCompact) Modifier else Modifier.displayCutoutPadding()
+    val item = queue[index]
     Box(modifier.height(80.dp).fillMaxWidth().then(cutout)) {
         Column(Modifier.fillMaxSize()) {
             Row(
@@ -61,24 +70,39 @@ fun SmallPlayer(
                     Modifier
                         .fillMaxHeight()
                         .aspectRatio(1f, true)
-                        .padding(10.dp)
-                        .clip(MaterialTheme.shapes.medium)
-                        .clipToBounds(),
+                        .padding(10.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    AnimatedContent(targetState = item.cover, label = "") {
-                        if (it == null)
-                            Icon(
-                                Icons.Default.MusicNote,
-                                null,
-                                Modifier.fillMaxSize(.8f),
-                                MaterialTheme.colorScheme.primary
-                            )
+                    AnimatedContent(
+                        targetState = index,
+                        label = "",
+                        transitionSpec = {
+                            (if (initialState < targetState)
+                                slideInHorizontally { it } + fadeIn() togetherWith slideOutHorizontally { -it } + fadeOut()
+                            else
+                                slideInHorizontally { -it } + fadeIn() togetherWith slideOutHorizontally { it } + fadeOut())
+                                .using(SizeTransform(clip = false))
+                        }) {
+                        if (queue[it].cover == null)
+                            Box(Modifier.fillMaxSize()
+                                .clip(MaterialTheme.shapes.medium).clipToBounds().background(
+                                    MaterialTheme.colorScheme.primary,
+                                    MaterialTheme.shapes.medium
+                                ),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    Icons.Default.MusicNote,
+                                    null,
+                                    Modifier.fillMaxSize(.8f),
+                                    MaterialTheme.colorScheme.surfaceContainer
+                                )
+                            }
                         else
                             Image(
-                                it.asImageBitmap(),
+                                queue[it].cover!!.asImageBitmap(),
                                 null,
-                                Modifier.fillMaxSize(),
+                                Modifier.fillMaxSize().clip(MaterialTheme.shapes.medium).clipToBounds(),
                                 contentScale = ContentScale.Crop
                             )
                     }
