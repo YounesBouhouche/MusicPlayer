@@ -1,6 +1,12 @@
 package younesbouhouche.musicplayer.ui.player
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,8 +48,9 @@ import kotlin.math.absoluteValue
 @Composable
 fun Disk(
     queue: List<MusicCard>,
+    index: Int,
+    playing: Boolean,
     pagerState: PagerState,
-    diskScale: Float,
     onPlayerEvent: (PlayerEvent) -> Unit
 ) {
     HorizontalPager(
@@ -51,6 +58,20 @@ fun Disk(
         modifier = Modifier.fillMaxSize(),
         key = { queue[it].id }
     ) { page ->
+        val transition = rememberInfiniteTransition(label = "Playing animation")
+        val animatedScale by transition.animateFloat(
+            initialValue = 0.9f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(5000),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "Scale animation"
+        )
+        val diskScale by animateFloatAsState(
+            targetValue = if (playing and (index == page)) animatedScale else 1f,
+            label = ""
+        )
         val pageOffset = (
                 (pagerState.currentPage - page) + pagerState
                     .currentPageOffsetFraction
