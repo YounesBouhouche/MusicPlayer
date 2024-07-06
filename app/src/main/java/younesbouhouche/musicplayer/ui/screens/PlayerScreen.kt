@@ -57,7 +57,8 @@ fun PlayerScreen(
             .clipToBounds()) {
         queue.getOrNull(playerState.index)?.run {
             SmallPlayer(
-                this,
+                queue,
+                playerState.index,
                 playerState,
                 onPlayerEvent,
                 Modifier

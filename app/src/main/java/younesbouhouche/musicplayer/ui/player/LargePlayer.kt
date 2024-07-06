@@ -80,7 +80,7 @@ fun LargePlayer(
         snapshotFlow { pagerState.isScrollInProgress }.collect { isScrolling ->
             if (isScrolledByUser && !isScrolling)
                 if (pagerState.settledPage != playerState.index)
-                    onPlayerEvent(PlayerEvent.Seek(pagerState.currentPage, 0))
+                    onPlayerEvent(PlayerEvent.Seek(pagerState.settledPage, 0))
             isScrolledByUser = isScrolling && isDragged
         }
     }

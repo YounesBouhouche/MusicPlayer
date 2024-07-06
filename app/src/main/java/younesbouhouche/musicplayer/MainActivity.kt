@@ -1,5 +1,6 @@
 package younesbouhouche.musicplayer
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -16,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import younesbouhouche.musicplayer.events.PlayerEvent
 import younesbouhouche.musicplayer.models.Routes
 import younesbouhouche.musicplayer.states.StartupEvent
 import younesbouhouche.musicplayer.ui.screens.AppScreen
@@ -25,6 +27,7 @@ import younesbouhouche.musicplayer.viewmodel.NavigationVM
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private lateinit var mainVM: MainVM
     private val permission =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             android.Manifest.permission.READ_MEDIA_AUDIO
@@ -42,7 +45,7 @@ class MainActivity : ComponentActivity() {
         }
         enableEdgeToEdge()
         setContent {
-            val mainVM = hiltViewModel<MainVM>()
+            mainVM = hiltViewModel<MainVM>()
             val playerState by mainVM.playerState.collectAsState()
             val granted by mainVM.granted.collectAsState()
             val navController = rememberNavController()
@@ -88,5 +91,15 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.hasExtra("type"))
+            when (intent.getStringExtra("type")) {
+                "favorites" -> mainVM.onPlayerEvent(PlayerEvent.PlayFavorites)
+                "mostPlayed" -> mainVM.onPlayerEvent(PlayerEvent.PlayMostPlayed)
+                "playlist" -> mainVM.onPlayerEvent(PlayerEvent.PlayPlaylist(intent.getIntExtra("id", -1)))
+            }
     }
 }

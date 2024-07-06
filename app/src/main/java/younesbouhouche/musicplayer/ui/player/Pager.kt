@@ -36,20 +36,6 @@ fun Pager(
     onUiEvent: (UiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val transition = rememberInfiniteTransition(label = "Playing animation")
-    val animatedScale by transition.animateFloat(
-        initialValue = 0.9f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(5000),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "Scale animation"
-    )
-    val diskScale by animateFloatAsState(
-        targetValue = if (playing) animatedScale else 1f,
-        label = ""
-    )
     AnimatedContent(
         targetState = lyricsVisible, label = "",
         modifier = modifier.padding(bottom = 8.dp),
@@ -65,6 +51,6 @@ fun Pager(
         if (lyrics)
             Lyrics(queue[index].lyrics, syncing, time, onPlayerEvent, onUiEvent)
         else
-            Disk(queue, pagerState, diskScale, onPlayerEvent)
+            Disk(queue, index, playing, pagerState, onPlayerEvent)
     }
 }

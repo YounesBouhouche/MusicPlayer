@@ -15,7 +15,7 @@ sealed interface PlayerEvent {
     data object Stop: PlayerEvent
     data object Next: PlayerEvent
     data object Previous: PlayerEvent
-    data class Seek(val index: Int, val time: Long = 0L): PlayerEvent
+    data class Seek(val index: Int, val time: Long = 0L, val skipIfSameIndex: Boolean = true): PlayerEvent
     data class SeekTime(val time: Long): PlayerEvent
     data class Forward(val ms: Long): PlayerEvent
     data class Backward(val ms: Long): PlayerEvent
@@ -31,5 +31,8 @@ sealed interface PlayerEvent {
     data class UpdateFavorite(val path: String, val favorite: Boolean): PlayerEvent
     data class SetFavorite(val path: String): PlayerEvent
     data class ToggleFavorite(val path: String): PlayerEvent
+    data object PlayFavorites: PlayerEvent
+    data object PlayMostPlayed: PlayerEvent
+    data class PlayPlaylist(val id: Int): PlayerEvent
 }
 

@@ -865,7 +865,9 @@ class MainVM @Inject constructor(
                 )
             PlayerEvent.Previous -> player.seekToPrevious()
             PlayerEvent.Resume -> player.play()
-            is PlayerEvent.Seek -> player.seekTo(event.index, event.time)
+            is PlayerEvent.Seek ->
+                if (!((event.skipIfSameIndex) and (event.index == _playerState.value.index)))
+                    player.seekTo(event.index, event.time)
             is PlayerEvent.SeekTime -> player.seekTo(event.time)
             PlayerEvent.Stop -> {
                 timerJob?.cancel()
@@ -975,6 +977,28 @@ class MainVM @Inject constructor(
                 }
                 player.addMediaItems(list.toMediaItems())
             }
+            PlayerEvent.PlayFavorites ->
+                viewModelScope.launch {
+                    play(favoritesFiles.value)
+                }
+            PlayerEvent.PlayMostPlayed ->
+                viewModelScope.launch {
+                    val timestamps = dao.suspendGetTimestamps()
+                    val mostPlayed = timestamps.toList().sortedByDescending { it.times.size }.map { it.path }
+                    play(_files.value.filter { mostPlayed.contains(it.path) })
+                }
+            is PlayerEvent.PlayPlaylist ->
+                viewModelScope.launch {
+                    val p =
+                        playlists.value
+                            .firstOrNull { it.id == event.id }
+                            ?.items
+                            ?.mapNotNull { item -> _files.value.firstOrNull { item == it.path } }
+                    println(p)
+                    p?.let {
+                        play(it)
+                    }
+                }
         }
     }
 
