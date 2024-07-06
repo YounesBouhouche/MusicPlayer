@@ -1,5 +1,7 @@
 package younesbouhouche.musicplayer.ui.routes
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,6 +11,8 @@ import younesbouhouche.musicplayer.events.UiEvent
 import younesbouhouche.musicplayer.states.SortState
 import younesbouhouche.musicplayer.ui.components.LazyColumnWithSortBar
 import younesbouhouche.musicplayer.ui.components.LazyMusicCardScreen
+import younesbouhouche.musicplayer.ui.isCompact
+import younesbouhouche.musicplayer.ui.navBarHeight
 
 @Composable
 fun Library(
@@ -19,6 +23,7 @@ fun Library(
     onUiEvent: (UiEvent) -> Unit,
     play: (Int) -> Unit
 ) {
+    val isCompact = isCompact
     LazyColumnWithSortBar(
         modifier = modifier,
         sortState = sortState,
@@ -32,5 +37,6 @@ fun Library(
                 play(files.indexOf(it))
             }
         }
+        if (!isCompact) item { Spacer(Modifier.height(navBarHeight)) }
     }
 }

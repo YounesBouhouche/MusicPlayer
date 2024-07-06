@@ -46,7 +46,7 @@ fun PlayerScreen(
     val shape = MaterialTheme.shapes.large.copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize)
     val offset = if (dragState.offset.isNaN()) 0 else dragState.offset.roundToInt()
     Box(
-        modifier
+        Modifier
             .fillMaxSize()
             .offset {
                 IntOffset(0, offset)
@@ -54,7 +54,8 @@ fun PlayerScreen(
             .anchoredDraggable(dragState, Orientation.Vertical)
             .background(MaterialTheme.colorScheme.surfaceContainer, shape)
             .clip(shape)
-            .clipToBounds()) {
+            .clipToBounds()
+            .then(modifier)) {
         queue.getOrNull(playerState.index)?.run {
             SmallPlayer(
                 queue,

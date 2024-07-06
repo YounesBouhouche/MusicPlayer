@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.events.ListsSortEvent
 import younesbouhouche.musicplayer.states.ListSortState
+import younesbouhouche.musicplayer.ui.isCompact
+import younesbouhouche.musicplayer.ui.navBarHeight
 import younesbouhouche.musicplayer.ui.statusBarHeight
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,6 +40,7 @@ fun LazyVerticalGridWithHeader(
     leadingContent: @Composable (LazyGridItemScope.() -> Unit),
     content: LazyGridScope.() -> Unit
 ) {
+    val isCompact = isCompact
     LazyVerticalGrid(
         columns, modifier, state, contentPadding, reverseLayout, verticalArrangement, horizontalArrangement, flingBehavior, userScrollEnabled
     ) {
@@ -56,6 +59,8 @@ fun LazyVerticalGridWithHeader(
             leadingContent(this)
         }
         content()
+        if (!isCompact)
+            item(span = { GridItemSpan(maxLineSpan) }) { Spacer(Modifier.height(navBarHeight)) }
     }
 }
 

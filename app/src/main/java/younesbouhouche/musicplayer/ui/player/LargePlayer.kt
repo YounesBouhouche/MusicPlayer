@@ -87,7 +87,7 @@ fun LargePlayer(
     LaunchedEffect(key1 = playerState.index) {
         launch { pagerState.animateScrollToPage(playerState.index) }
     }
-    val m = Modifier
+    val containerModifier = Modifier
         .offset { IntOffset(0, offset) }
         .onGloballyPositioned { height = it.size.height }
         .padding(bottom = 80.dp + navBarHeight)
@@ -100,7 +100,7 @@ fun LargePlayer(
         .clipToBounds()
     Box(modifier) {
         if (isCompact)
-            Column(m.statusBarsPadding(), verticalArrangement = Arrangement.Center) {
+            Column(containerModifier.statusBarsPadding(), verticalArrangement = Arrangement.Center) {
                 Pager(
                     lyrics,
                     syncing,
@@ -125,7 +125,7 @@ fun LargePlayer(
                 Spacer(Modifier.height(12.dp))
             }
         else
-            Row(m.statusBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
+            Row(containerModifier.statusBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
                 Pager(
                     lyrics,
                     syncing,

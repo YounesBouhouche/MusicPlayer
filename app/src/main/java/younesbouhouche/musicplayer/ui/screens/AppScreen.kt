@@ -21,6 +21,9 @@ import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -188,10 +191,12 @@ fun AppScreen(
             PlaylistViewState.EXPANDED -> 1f - playlistState.progress(PlaylistViewState.EXPANDED, PlaylistViewState.COLLAPSED)
         }
     val startPadding = if (isCompact) 0.dp else 80.dp + leftEdgeWidth
-    val bottomPadding = if (isCompact and isParent) (80.dp + navBarHeight) else if (!isCompact) navBarHeight else 0.dp
+    val bottomPadding = if (isCompact and isParent) (80.dp + navBarHeight) else 0.dp
     val playerPadding = (if (isPlaying) 74.dp else 0.dp)
     val pullToRefreshState = rememberPullToRefreshState()
-    val cutout = if (younesbouhouche.musicplayer.ui.isCompact) Modifier else Modifier.displayCutoutPadding()
+    val cutout =
+        if (younesbouhouche.musicplayer.ui.isCompact) Modifier
+        else Modifier.displayCutoutPadding()
     AnimatedContent(targetState = granted, label = "") { isGranted ->
         if (isGranted)
             Surface(modifier = Modifier

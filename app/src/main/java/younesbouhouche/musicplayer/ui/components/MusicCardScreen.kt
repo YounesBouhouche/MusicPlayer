@@ -25,6 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -48,7 +50,10 @@ fun MusicCardScreen(
     MyListItem(
         onClick = onClick,
         onLongClick = onLongClick,
-        modifier = modifier.background(background),
+        modifier = modifier
+            .background(background, MaterialTheme.shapes.medium)
+            .clip(MaterialTheme.shapes.medium)
+            .clipToBounds(),
         headline = file.title,
         supporting = "${file.artist} - ${file.duration.timeString}",
         cover = file.cover?.asImageBitmap(),

@@ -49,6 +49,7 @@ import younesbouhouche.musicplayer.models.Playlist
 import younesbouhouche.musicplayer.states.ListSortState
 import younesbouhouche.musicplayer.ui.components.LazyVerticalGridWithSortBar
 import younesbouhouche.musicplayer.ui.components.MyListItem
+import younesbouhouche.musicplayer.ui.navBarHeight
 
 
 @OptIn(ExperimentalFoundationApi::class)
