@@ -2,8 +2,10 @@ package younesbouhouche.musicplayer
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -12,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -78,9 +81,19 @@ class MainActivity : ComponentActivity() {
                 AppScreen(
                     granted,
                     {
-                        when (PackageManager.PERMISSION_GRANTED) {
-                            ContextCompat.checkSelfPermission(this, permission) ->
+                        when {
+                            ContextCompat.checkSelfPermission(this, permission) ==
+                                    PackageManager.PERMISSION_GRANTED ->
                                 mainVM.setGranted(startupEvent)
+                            ActivityCompat.shouldShowRequestPermissionRationale(
+                                this, permission) -> {
+                                    startActivity(
+                                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                            data = Uri.fromParts("package", packageName, null)
+                                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                        }
+                                    )
+                            }
                             else -> launcher.launch(permission)
                         }
                     },

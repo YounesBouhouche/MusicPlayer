@@ -254,19 +254,7 @@ fun AppScreen(
                 }
             }
         else
-            Scaffold {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(it),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Button(onClick = onPermissionRequest) {
-                        Text("Request permission")
-                    }
-                }
-            }
+            RequestPermissionScreen(onPermissionRequest)
     }
     uiState.bottomSheetItem?.run {
         ItemBottomSheet(

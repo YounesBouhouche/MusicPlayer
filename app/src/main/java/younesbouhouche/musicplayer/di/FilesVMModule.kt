@@ -35,7 +35,7 @@ object FilesVMModule {
             MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.DATA,
-            MediaStore.Audio.Media.DATE_MODIFIED,
+            MediaStore.Audio.Media.DATE_ADDED,
         )
 
     @ViewModelScoped
