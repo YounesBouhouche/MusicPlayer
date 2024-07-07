@@ -20,13 +20,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import younesbouhouche.musicplayer.events.PlayerEvent
-import younesbouhouche.musicplayer.models.Routes
-import younesbouhouche.musicplayer.states.StartupEvent
-import younesbouhouche.musicplayer.ui.screens.AppScreen
+import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.domain.models.Routes
+import younesbouhouche.musicplayer.main.presentation.states.StartupEvent
+import younesbouhouche.musicplayer.main.presentation.AppScreen
 import younesbouhouche.musicplayer.ui.theme.AppTheme
-import younesbouhouche.musicplayer.viewmodel.MainVM
-import younesbouhouche.musicplayer.viewmodel.NavigationVM
+import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
+import younesbouhouche.musicplayer.main.presentation.viewmodel.NavigationVM
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

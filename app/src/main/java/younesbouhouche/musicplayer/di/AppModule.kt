@@ -7,7 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import younesbouhouche.musicplayer.room.AppDatabase
+import younesbouhouche.musicplayer.main.data.db.AppDatabase
 import javax.inject.Singleton
 
 @Module

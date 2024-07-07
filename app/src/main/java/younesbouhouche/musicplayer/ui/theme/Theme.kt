@@ -12,7 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import younesbouhouche.musicplayer.datastores.SettingsDataStore
+import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 
 @Composable
 fun AppTheme(
