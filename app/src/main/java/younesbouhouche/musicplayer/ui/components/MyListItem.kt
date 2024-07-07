@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun MyListItem(
     modifier: Modifier = Modifier,
+    background: Color = Color.Transparent,
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     headline: String,
@@ -50,7 +51,10 @@ fun MyListItem(
     trailingContent: @Composable (RowScope.() -> Unit)? = null,
 ) {
     val isMusicCard = alternative == Icons.Default.MusicNote
-    Row(modifier.combinedClickable(onLongClick = onLongClick, onClick = onClick),
+    Row(modifier.combinedClickable(onLongClick = onLongClick, onClick = onClick)
+        .background(background, MaterialTheme.shapes.medium)
+        .clip(MaterialTheme.shapes.medium)
+        .clipToBounds(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
