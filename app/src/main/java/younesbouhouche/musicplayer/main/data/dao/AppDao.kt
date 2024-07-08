@@ -6,6 +6,7 @@ import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import younesbouhouche.musicplayer.main.data.models.Queue
 import younesbouhouche.musicplayer.main.data.models.Timestamp
 import younesbouhouche.musicplayer.main.domain.models.ItemData
 import younesbouhouche.musicplayer.main.domain.models.Playlist
@@ -64,4 +65,16 @@ interface AppDao {
 
     @Delete
     suspend fun deletePlaylist(playlist: Playlist)
+
+    @Query("SELECT * from Queue WHERE id=0")
+    fun getQueue(): Flow<Queue?>
+
+    @Upsert
+    suspend fun upsertQueue(queue: Queue)
+
+    @Query("UPDATE Queue SET items=:list WHERE id=0")
+    suspend fun updateQueue(list: List<Long>)
+
+    @Query("UPDATE Queue SET `index`=:index WHERE id=0")
+    suspend fun updateCurrentIndex(index: Int)
 }

@@ -66,6 +66,7 @@ import younesbouhouche.musicplayer.main.presentation.util.timerString
 @Composable
 fun Queue(
     queue: List<MusicCard>,
+    index: Int,
     playerState: PlayerState,
     lyrics: Boolean,
     playlistHidden: Boolean,
@@ -211,7 +212,7 @@ fun Queue(
             ) {
                 items(queue, key = { it.id }) { card ->
                     val item by rememberUpdatedState(card)
-                    val index = queue.indexOf(card)
+                    val idx = queue.indexOf(card)
                     val dismissState =
                         rememberSwipeToDismissBoxState(
                             confirmValueChange = { value ->
@@ -230,12 +231,12 @@ fun Queue(
                         file = item,
                         reorderableState = reorderableState,
                         background =
-                            if (playerState.index == index) {
+                            if (index == idx) {
                                 MaterialTheme.colorScheme.background
                             } else {
                                 MaterialTheme.colorScheme.surfaceContainer
                             },
-                    ) { onPlayerEvent(PlayerEvent.Seek(index, 0L)) }
+                    ) { onPlayerEvent(PlayerEvent.Seek(idx, 0L)) }
                 }
                 item {
                     Spacer(Modifier.height(navBarHeight))

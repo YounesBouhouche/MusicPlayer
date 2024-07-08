@@ -34,6 +34,7 @@ import kotlin.math.roundToInt
 fun PlayerScreen(
     modifier: Modifier = Modifier,
     queue: List<MusicCard>,
+    index: Int,
     playerState: PlayerState,
     uiState: UiState,
     dragState: AnchoredDraggableState<ViewState>,
@@ -57,10 +58,10 @@ fun PlayerScreen(
             .clipToBounds()
             .then(modifier),
     ) {
-        queue.getOrNull(playerState.index)?.run {
+        queue.getOrNull(index)?.run {
             SmallPlayer(
                 queue,
-                playerState.index,
+                index,
                 playerState,
                 onPlayerEvent,
                 Modifier
@@ -70,6 +71,7 @@ fun PlayerScreen(
             )
             LargePlayer(
                 queue,
+                index,
                 playerState,
                 onPlayerEvent,
                 uiState.lyricsVisible,

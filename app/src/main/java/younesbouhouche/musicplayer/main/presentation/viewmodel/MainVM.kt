@@ -43,6 +43,7 @@ import org.jaudiotagger.tag.FieldKey
 import younesbouhouche.musicplayer.core.domain.MediaPlayerService
 import younesbouhouche.musicplayer.core.presentation.util.search
 import younesbouhouche.musicplayer.main.data.db.AppDatabase
+import younesbouhouche.musicplayer.main.data.models.Queue
 import younesbouhouche.musicplayer.main.data.models.Timestamp
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent.AddFile
@@ -140,10 +141,23 @@ class MainVM
         private val _playlists = dao.getPlaylist()
         val playlists = _playlists.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-        private val _nowPlaying = MutableStateFlow(emptyList<Long>())
+        private val _queue = dao.getQueue().map { it ?: Queue() }
+
+        private val _queueList =
+            _queue.map { it.items }
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+
+        val queueIndex =
+            _queue.map { it.index }
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), -1)
+
         val queue =
-            combine(_files, _nowPlaying) { files, nowPlaying ->
-                nowPlaying.mapNotNull { item -> files.firstOrNull { it.id == item } }
+            _queue
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), Queue())
+
+        val queueFiles =
+            combine(_queueList, _files) { ids, files ->
+                ids.mapNotNull { id -> files.firstOrNull { it.id == id } }
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
         private val _listScreenFiles = MutableStateFlow(emptyList<MusicCard>())
@@ -777,6 +791,28 @@ class MainVM
             controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
             controllerFuture.addListener({
                 player = controllerFuture.get()
+                viewModelScope.launch {
+                    if (player.playWhenReady) {
+                        dao.updateCurrentIndex(player.currentMediaItemIndex)
+                        _playerState.update {
+                            it.copy(
+                                time = player.currentPosition,
+                                playState =
+                                    if (player.isPlaying) PlayState.PLAYING else PlayState.PAUSED,
+                                repeatMode = player.repeatMode,
+                                shuffle = player.shuffleModeEnabled,
+                                speed = player.playbackParameters.speed,
+                            )
+                        }
+                        dao.updateCurrentIndex(player.currentMediaItemIndex)
+                    }
+                    while (true) {
+                        _playerState.update {
+                            it.copy(time = player.currentPosition)
+                        }
+                        delay(100L)
+                    }
+                }
                 player.addListener(
                     object : Player.Listener {
                         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -823,10 +859,16 @@ class MainVM
                             reason: Int,
                         ) {
                             super.onMediaItemTransition(mediaItem, reason)
-                            _playerState.update { it.copy(index = player.currentMediaItemIndex) }
                             viewModelScope.launch {
+                                dao.updateCurrentIndex(player.currentMediaItemIndex)
                                 try {
-                                    val files = queue.value
+                                    val files =
+                                        _queueList.value
+                                            .map { item ->
+                                                _files.value.first {
+                                                    item == it.id
+                                                }
+                                            }
                                     dao.upsertTimestamp(
                                         Timestamp(
                                             files[player.currentMediaItemIndex].path,
@@ -954,7 +996,7 @@ class MainVM
                 PlayerEvent.Previous -> player.seekToPrevious()
                 PlayerEvent.Resume -> player.play()
                 is PlayerEvent.Seek ->
-                    if (!((event.skipIfSameIndex) and (event.index == _playerState.value.index))) {
+                    if (!((event.skipIfSameIndex) and (event.index == queueIndex.value))) {
                         player.seekTo(event.index, event.time)
                     }
                 is PlayerEvent.SeekTime -> player.seekTo(event.time)
@@ -976,24 +1018,25 @@ class MainVM
                 is PlayerEvent.Remove -> {
                     player.removeMediaItem(event.index)
                     viewModelScope.launch(Dispatchers.IO) {
-                        _nowPlaying.update {
-                            it.toMutableList().apply {
+                        dao.updateQueue(
+                            _queueList.value.toMutableList().apply {
                                 removeAt(event.index)
-                            }
-                        }
+                            },
+                        )
                     }
                 }
                 is PlayerEvent.Swap -> {
                     player.moveMediaItem(event.from, event.to)
                     viewModelScope.launch(Dispatchers.IO) {
-                        _nowPlaying.update {
-                            it.toMutableList().apply {
-                                add(event.to, removeAt(event.from))
-                            }
-                        }
-                    }
-                    _playerState.update {
-                        it.copy(index = player.currentMediaItemIndex)
+                        dao.upsertQueue(
+                            Queue(
+                                items =
+                                    _queueList.value.toMutableList().apply {
+                                        add(event.to, removeAt(event.from))
+                                    },
+                                index = player.currentMediaItemIndex,
+                            ),
+                        )
                     }
                 }
                 PlayerEvent.CycleRepeatMode -> {
@@ -1039,21 +1082,26 @@ class MainVM
                         return
                     }
                     event.items
-                        .map { _nowPlaying.value.indexOf(it.id) }
+                        .map { _queueList.value.indexOf(it.id) }
                         .filter { it >= 0 }
                         .forEach { player.removeMediaItem(it) }
                     player.addMediaItems(
                         player.currentMediaItemIndex + 1,
                         event.items.toMediaItems(),
                     )
-                    val items = event.items.map { item -> item.id }
-                    _nowPlaying.update {
-                        it.toMutableList().apply {
-                            removeAll(items)
-                            addAll(player.currentMediaItemIndex + 1, items)
-                        }
+                    val items = event.items.map { it.id }
+                    viewModelScope.launch {
+                        dao.upsertQueue(
+                            Queue(
+                                items =
+                                    _queueList.value.toMutableList().apply {
+                                        removeAll(items)
+                                        addAll(player.currentMediaItemIndex + 1, items)
+                                    },
+                                index = player.currentMediaItemIndex,
+                            ),
+                        )
                     }
-                    _playerState.update { it.copy(index = player.currentMediaItemIndex) }
                 }
                 is PlayerEvent.AddToQueue -> {
                     if (_playerState.value.playState == PlayState.STOP) {
@@ -1062,10 +1110,12 @@ class MainVM
                     }
                     val list =
                         event.items.filter { item ->
-                            !_nowPlaying.value.contains(item.id)
+                            !_queueList.value.any { it == item.id }
                         }
-                    _nowPlaying.update {
-                        it.toMutableList().apply { addAll(list.map { item -> item.id }) }
+                    viewModelScope.launch {
+                        dao.updateQueue(
+                            _queueList.value.toMutableList().apply { addAll(list.map { it.id }) },
+                        )
                     }
                     player.addMediaItems(list.toMediaItems())
                 }
@@ -1358,12 +1408,12 @@ class MainVM
             autoPlay: Boolean = true,
         ) {
             if (list.isEmpty()) return
-            if ((_nowPlaying == list) and (_playerState.value.playState != PlayState.STOP)) {
-                if (index != _playerState.value.index) seek(index, time)
+            if ((_queueList.value == list) and (_playerState.value.playState != PlayState.STOP)) {
+                if (index != queueIndex.value) seek(index, time)
                 return
             }
             viewModelScope.launch(Dispatchers.IO) {
-                _nowPlaying.value = list.map { it.id }
+                dao.upsertQueue(Queue(items = list.map { it.id }, index = index))
             }
             player.setMediaItems(list.toMediaItems())
             player.seekTo(index, time)
@@ -1373,9 +1423,9 @@ class MainVM
                 dao.upsertTimestamp(
                     Timestamp(list[index].path, list[index].timestamps.first() + LocalDateTime.now()),
                 )
+                dao.updateCurrentIndex(index)
                 _playerState.update {
                     it.copy(
-                        index = index,
                         time = time,
                         playState = if (autoPlay) PlayState.PLAYING else PlayState.PAUSED,
                     )
@@ -1394,8 +1444,11 @@ class MainVM
             index: Int,
             time: Long,
         ) {
+            viewModelScope.launch {
+                dao.updateCurrentIndex(index)
+            }
             _playerState.update {
-                it.copy(index = index, time = time)
+                it.copy(time = time)
             }
             player.seekTo(index, time)
         }

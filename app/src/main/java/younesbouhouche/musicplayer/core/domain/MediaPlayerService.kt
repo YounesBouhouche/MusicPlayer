@@ -138,4 +138,8 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
         }
         super.onDestroy()
     }
+
+    inner class Binder : android.os.Binder() {
+        fun getService() = this@MediaPlayerService
+    }
 }

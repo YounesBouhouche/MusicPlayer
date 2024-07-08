@@ -83,7 +83,8 @@ fun AppScreen(
 ) {
     val context = LocalContext.current
     val loading by mainVM.loading.collectAsState()
-    val queue by mainVM.queue.collectAsState()
+    val queueFiles by mainVM.queueFiles.collectAsState()
+    val queueIndex by mainVM.queueIndex.collectAsState()
     val searchState by mainVM.searchState.collectAsState()
     val playerState by mainVM.playerState.collectAsState()
     val uiState by mainVM.uiState.collectAsState()
@@ -181,17 +182,18 @@ fun AppScreen(
     LaunchedEffect(key1 = uiState.playlistViewState) {
         launch { playlistState.animateTo(uiState.playlistViewState) }
     }
+    LaunchedEffect(key1 = playerState.playState) {
+        if ((playerState.playState != PlayState.STOP) and (state.settledValue == ViewState.HIDDEN)) {
+            launch { state.animateTo(ViewState.SMALL) }
+        }
+    }
     val progress =
-        if (playerState.playState == PlayState.STOP) {
-            0f
-        } else if (state.offset == 0f) {
-            1f
-        } else if (state.settledValue == ViewState.SMALL) {
-            state.progress(ViewState.SMALL, ViewState.LARGE)
-        } else if (state.settledValue == ViewState.LARGE) {
-            1f - state.progress(ViewState.LARGE, ViewState.SMALL)
-        } else {
-            0f
+        when {
+            playerState.playState == PlayState.STOP -> 0f
+            state.offset == 0f -> 1f
+            state.settledValue == ViewState.SMALL -> state.progress(ViewState.SMALL, ViewState.LARGE)
+            state.settledValue == ViewState.LARGE -> 1f - state.progress(ViewState.LARGE, ViewState.SMALL)
+            else -> 0f
         }
     val playlistProgress =
         when (playlistState.settledValue) {
@@ -248,7 +250,8 @@ fun AppScreen(
                     }
                     PlayerScreen(
                         Modifier.padding(start = startPadding),
-                        queue,
+                        queueFiles,
+                        queueIndex,
                         playerState,
                         uiState,
                         state,
@@ -408,7 +411,7 @@ fun AppScreen(
         uiState.renamePlaylistName,
         {
             mainVM.onUiEvent(UiEvent.UpdateRenamePlaylistName(it))
-        }
+        },
     )
     SpeedDialog(
         uiState.speedDialog,

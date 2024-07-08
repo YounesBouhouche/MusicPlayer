@@ -55,6 +55,7 @@ import kotlin.math.roundToInt
 @Composable
 fun LargePlayer(
     queue: List<MusicCard>,
+    index: Int,
     playerState: PlayerState,
     onPlayerEvent: (PlayerEvent) -> Unit,
     lyrics: Boolean,
@@ -65,8 +66,8 @@ fun LargePlayer(
     playlistDragEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val activeItem = queue[playerState.index]
-    val pagerState = rememberPagerState(playerState.index) { queue.count() }
+    val activeItem = queue[index]
+    val pagerState = rememberPagerState(index) { queue.count() }
     val navBarHeight = navBarHeight
     var height by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
@@ -80,15 +81,15 @@ fun LargePlayer(
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.isScrollInProgress }.collect { isScrolling ->
             if (isScrolledByUser && !isScrolling) {
-                if (pagerState.settledPage != playerState.index) {
+                if (pagerState.settledPage != index) {
                     onPlayerEvent(PlayerEvent.Seek(pagerState.settledPage, 0))
                 }
             }
             isScrolledByUser = isScrolling && isDragged
         }
     }
-    LaunchedEffect(key1 = playerState.index) {
-        launch { pagerState.animateScrollToPage(playerState.index) }
+    LaunchedEffect(key1 = index) {
+        launch { pagerState.animateScrollToPage(index) }
     }
     val containerModifier =
         Modifier
@@ -111,7 +112,7 @@ fun LargePlayer(
                     playing,
                     pagerState,
                     queue,
-                    playerState.index,
+                    index,
                     playerState.time,
                     onPlayerEvent,
                     onUiEvent,
@@ -136,7 +137,7 @@ fun LargePlayer(
                     playing,
                     pagerState,
                     queue,
-                    playerState.index,
+                    index,
                     playerState.time,
                     onPlayerEvent,
                     onUiEvent,
@@ -162,6 +163,7 @@ fun LargePlayer(
             }
         Queue(
             queue,
+            index,
             playerState,
             lyrics,
             playlistState.settledValue == PlaylistViewState.COLLAPSED,
