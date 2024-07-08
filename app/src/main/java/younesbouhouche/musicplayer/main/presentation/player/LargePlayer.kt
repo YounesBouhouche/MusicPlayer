@@ -40,15 +40,15 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import younesbouhouche.musicplayer.core.presentation.util.composables.isCompact
+import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
+import younesbouhouche.musicplayer.core.presentation.util.composables.toDp
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
-import younesbouhouche.musicplayer.core.presentation.util.composables.toDp
-import younesbouhouche.musicplayer.core.presentation.util.composables.isCompact
-import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -63,43 +63,47 @@ fun LargePlayer(
     playlistState: AnchoredDraggableState<PlaylistViewState>,
     playlistProgress: Float,
     playlistDragEnabled: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val activeItem = queue[playerState.index]
     val pagerState = rememberPagerState(playerState.index) { queue.count() }
     val navBarHeight = navBarHeight
     var height by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
-    val offset = with(density) {
-        -((height - 72.dp.roundToPx()) * playlistProgress).roundToInt()
-    }
+    val offset =
+        with(density) {
+            -((height - 72.dp.roundToPx()) * playlistProgress).roundToInt()
+        }
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
     var isScrolledByUser by remember { mutableStateOf(false) }
     val playing = playerState.playState == PlayState.PLAYING
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.isScrollInProgress }.collect { isScrolling ->
-            if (isScrolledByUser && !isScrolling)
-                if (pagerState.settledPage != playerState.index)
+            if (isScrolledByUser && !isScrolling) {
+                if (pagerState.settledPage != playerState.index) {
                     onPlayerEvent(PlayerEvent.Seek(pagerState.settledPage, 0))
+                }
+            }
             isScrolledByUser = isScrolling && isDragged
         }
     }
     LaunchedEffect(key1 = playerState.index) {
         launch { pagerState.animateScrollToPage(playerState.index) }
     }
-    val containerModifier = Modifier
-        .offset { IntOffset(0, offset) }
-        .onGloballyPositioned { height = it.size.height }
-        .padding(bottom = 80.dp + navBarHeight)
-        .fillMaxSize()
-        .background(
-            MaterialTheme.colorScheme.background,
-            RoundedCornerShape(bottomEnd = 60.dp, bottomStart = 60.dp)
-        )
-        .clip(RoundedCornerShape(bottomEnd = 60.dp, bottomStart = 60.dp))
-        .clipToBounds()
+    val containerModifier =
+        Modifier
+            .offset { IntOffset(0, offset) }
+            .onGloballyPositioned { height = it.size.height }
+            .padding(bottom = 80.dp + navBarHeight)
+            .fillMaxSize()
+            .background(
+                MaterialTheme.colorScheme.background,
+                RoundedCornerShape(bottomEnd = 60.dp, bottomStart = 60.dp),
+            )
+            .clip(RoundedCornerShape(bottomEnd = 60.dp, bottomStart = 60.dp))
+            .clipToBounds()
     Box(modifier) {
-        if (isCompact)
+        if (isCompact) {
             Column(containerModifier.statusBarsPadding(), verticalArrangement = Arrangement.Center) {
                 Pager(
                     lyrics,
@@ -113,18 +117,18 @@ fun LargePlayer(
                     onUiEvent,
                     Modifier
                         .fillMaxWidth()
-                        .aspectRatio(1f)
+                        .aspectRatio(1f),
                 )
                 Spacer(Modifier.height(8.dp))
                 Controls(
                     activeItem,
                     playerState,
                     onPlayerEvent,
-                    Modifier.fillMaxWidth()
+                    Modifier.fillMaxWidth(),
                 )
                 Spacer(Modifier.height(12.dp))
             }
-        else
+        } else {
             Row(containerModifier.statusBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
                 Pager(
                     lyrics,
@@ -139,19 +143,23 @@ fun LargePlayer(
                     Modifier
                         .fillMaxSize()
                         .weight(1f)
-                        .aspectRatio(1f, true)
+                        .aspectRatio(1f, true),
                 )
                 VerticalDivider(Modifier.fillMaxHeight())
                 Controls(
                     activeItem,
                     playerState,
                     onPlayerEvent,
-                    Modifier.weight(1f)
+                    Modifier.weight(1f),
                 )
             }
+        }
         val playlistOffset =
-            if (playlistState.offset.isNaN()) height.toFloat()
-            else playlistState.offset
+            if (playlistState.offset.isNaN()) {
+                height.toFloat()
+            } else {
+                playlistState.offset
+            }
         Queue(
             queue,
             playerState,
@@ -166,15 +174,18 @@ fun LargePlayer(
                 .offset {
                     IntOffset(
                         0,
-                        playlistOffset.roundToInt()
+                        playlistOffset.roundToInt(),
                     )
                 }
-                .anchoredDraggable(playlistState, Orientation.Vertical, playlistDragEnabled)
+                .anchoredDraggable(playlistState, Orientation.Vertical, playlistDragEnabled),
         )
     }
 }
 
-fun getIndex(list: List<Long>, time: Long): Int =
+fun getIndex(
+    list: List<Long>,
+    time: Long,
+): Int =
     when {
         list.isEmpty() -> -1
         (list.count() == 1) or (list.first() >= time) -> 0

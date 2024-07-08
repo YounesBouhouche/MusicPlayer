@@ -18,15 +18,15 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.IntOffset
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
+import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.presentation.player.LargePlayer
+import younesbouhouche.musicplayer.main.presentation.player.SmallPlayer
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
 import younesbouhouche.musicplayer.main.presentation.states.UiState
 import younesbouhouche.musicplayer.main.presentation.states.ViewState
-import younesbouhouche.musicplayer.main.presentation.player.LargePlayer
-import younesbouhouche.musicplayer.main.presentation.player.SmallPlayer
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -55,7 +55,8 @@ fun PlayerScreen(
             .background(MaterialTheme.colorScheme.surfaceContainer, shape)
             .clip(shape)
             .clipToBounds()
-            .then(modifier)) {
+            .then(modifier),
+    ) {
         queue.getOrNull(playerState.index)?.run {
             SmallPlayer(
                 queue,
@@ -65,7 +66,7 @@ fun PlayerScreen(
                 Modifier
                     .alpha(1f - progress)
                     .align(Alignment.TopStart)
-                    .clickable { onUiEvent(UiEvent.SetViewState(ViewState.LARGE)) }
+                    .clickable { onUiEvent(UiEvent.SetViewState(ViewState.LARGE)) },
             )
             LargePlayer(
                 queue,
@@ -77,7 +78,7 @@ fun PlayerScreen(
                 playlistDragState,
                 playlistProgress,
                 dragState.settledValue == ViewState.LARGE,
-                Modifier.alpha(progress)
+                Modifier.alpha(progress),
             )
         }
     }

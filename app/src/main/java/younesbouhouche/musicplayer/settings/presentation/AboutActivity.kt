@@ -61,8 +61,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 
 class AboutActivity : AppCompatActivity() {
@@ -75,36 +75,41 @@ class AboutActivity : AppCompatActivity() {
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
             val context = LocalContext.current
             val dataStore = SettingsDataStore(LocalContext.current)
-            val isDark = when (dataStore.theme.collectAsState(initial = "system").value) {
-                "light" -> false
-                "dark" -> true
-                else -> isSystemInDarkTheme()
-            }
+            val isDark =
+                when (dataStore.theme.collectAsState(initial = "system").value) {
+                    "light" -> false
+                    "dark" -> true
+                    else -> isSystemInDarkTheme()
+                }
             DisposableEffect(isDark) {
                 enableEdgeToEdge(
-                    statusBarStyle = if (!isDark) {
-                        SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                    } else {
-                        SystemBarStyle.dark(Color.TRANSPARENT)
-                    },
-                    navigationBarStyle = if(!isDark){
-                        SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                    } else {
-                        SystemBarStyle.dark(Color.TRANSPARENT)
-                    }
+                    statusBarStyle =
+                        if (!isDark) {
+                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+                        } else {
+                            SystemBarStyle.dark(Color.TRANSPARENT)
+                        },
+                    navigationBarStyle =
+                        if (!isDark) {
+                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+                        } else {
+                            SystemBarStyle.dark(Color.TRANSPARENT)
+                        },
                 )
                 onDispose { }
             }
             AppTheme {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background),
                 ) {
                     Scaffold(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .nestedScroll(scrollBehavior.nestedScrollConnection),
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .nestedScroll(scrollBehavior.nestedScrollConnection),
                         contentWindowInsets = WindowInsets(0, 0, 0, 0),
                         topBar = {
                             Column {
@@ -113,7 +118,7 @@ class AboutActivity : AppCompatActivity() {
                                         Text(
                                             stringResource(id = R.string.about),
                                             maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
+                                            overflow = TextOverflow.Ellipsis,
                                         )
                                     },
                                     navigationIcon = {
@@ -121,48 +126,66 @@ class AboutActivity : AppCompatActivity() {
                                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                                         }
                                     },
-                                    scrollBehavior = scrollBehavior
+                                    scrollBehavior = scrollBehavior,
                                 )
                             }
-                        }
+                        },
                     ) { paddingValues ->
-                        LazyColumn(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(paddingValues), state = listState) {
-                            item {
-                                OutlinedCard(modifier = Modifier
+                        LazyColumn(
+                            modifier =
+                                Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp)) {
-                                    Spacer(Modifier.height(16.dp))
-                                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
-                                        Spacer(Modifier.width(4.dp))
-                                        //Icon(ImageVector.vectorResource(R.drawable.ic_app_icon), null, modifier = Modifier.size(60.dp))
-                                        Spacer(Modifier.width(12.dp))
-                                        Column(modifier = Modifier
+                                    .padding(paddingValues),
+                            state = listState,
+                        ) {
+                            item {
+                                OutlinedCard(
+                                    modifier =
+                                        Modifier
                                             .fillMaxWidth()
-                                            .weight(1f)) {
+                                            .padding(16.dp),
+                                ) {
+                                    Spacer(Modifier.height(16.dp))
+                                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                        Spacer(Modifier.width(4.dp))
+                                        // Icon(ImageVector.vectorResource(R.drawable.ic_app_icon), null, modifier = Modifier.size(60.dp))
+                                        Spacer(Modifier.width(12.dp))
+                                        Column(
+                                            modifier =
+                                                Modifier
+                                                    .fillMaxWidth()
+                                                    .weight(1f),
+                                        ) {
                                             Text(
                                                 text = stringResource(id = R.string.app_name),
-                                                style = MaterialTheme.typography.bodyLarge
+                                                style = MaterialTheme.typography.bodyLarge,
                                             )
                                             Spacer(Modifier.height(2.dp))
                                             Text(
-                                                (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                                                    context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
-                                                else
-                                                    context.packageManager.getPackageInfo(context.packageName, 0)).versionName,
+                                                (
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                                        context.packageManager.getPackageInfo(
+                                                            context.packageName,
+                                                            PackageManager.PackageInfoFlags.of(0),
+                                                        )
+                                                    } else {
+                                                        context.packageManager.getPackageInfo(context.packageName, 0)
+                                                    }
+                                                ).versionName,
                                                 style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.outline
+                                                color = MaterialTheme.colorScheme.outline,
                                             )
                                         }
                                     }
                                     Spacer(Modifier.height(16.dp))
-                                    Row(modifier = Modifier
-                                        .fillMaxWidth()
-                                        .horizontalScroll(rememberScrollState())){
+                                    Row(
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .horizontalScroll(rememberScrollState()),
+                                    ) {
                                         Spacer(Modifier.width(16.dp))
                                         OutlinedButton(onClick = {
-
                                         }) {
                                             Icon(ImageVector.vectorResource(R.drawable.ic_telegram_app), null)
                                             Spacer(Modifier.width(ButtonDefaults.IconSpacing))
@@ -170,7 +193,6 @@ class AboutActivity : AppCompatActivity() {
                                         }
                                         Spacer(Modifier.width(16.dp))
                                         OutlinedButton(onClick = {
-
                                         }) {
                                             Icon(Icons.Rounded.Apps, null)
                                             Spacer(Modifier.width(ButtonDefaults.IconSpacing))
@@ -183,14 +205,17 @@ class AboutActivity : AppCompatActivity() {
                             }
                             item {
                                 OutlinedCard(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp)
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
                                 ) {
                                     Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
                                     ) {
                                         Spacer(Modifier.width(4.dp))
                                         Icon(Icons.Rounded.Person, null, Modifier.size(64.dp))
@@ -198,47 +223,56 @@ class AboutActivity : AppCompatActivity() {
                                         Text(
                                             text = stringResource(R.string.younes_bouhouche),
                                             color = MaterialTheme.colorScheme.onSurface,
-                                            style = MaterialTheme.typography.bodyLarge
+                                            style = MaterialTheme.typography.bodyLarge,
                                         )
                                         Spacer(Modifier.height(4.dp))
                                         Text(
                                             stringResource(R.string.developer_description),
                                             textAlign = TextAlign.Center,
                                             color = MaterialTheme.colorScheme.outline,
-                                            style = MaterialTheme.typography.bodyMedium
+                                            style = MaterialTheme.typography.bodyMedium,
                                         )
                                         Spacer(Modifier.height(16.dp))
                                         Row(
                                             Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.Center
+                                            horizontalArrangement = Arrangement.Center,
                                         ) {
                                             OutlinedIconButton(onClick = {}) {
                                                 Icon(Icons.Default.Link, null)
                                             }
                                             Spacer(Modifier.width(8.dp))
                                             OutlinedIconButton(onClick = {
-                                                with(Intent(Intent.ACTION_SENDTO).apply {
-                                                    data = Uri.parse("mailto:")
-                                                    putExtra(
-                                                        Intent.EXTRA_EMAIL,
-                                                        arrayOf("younes.bouhouche12@gmail.com")
-                                                    )
-                                                    putExtra(
-                                                        Intent.EXTRA_SUBJECT,
-                                                        "Feedback about Music Player app"
-                                                    )
-                                                    putExtra(
-                                                        Intent.EXTRA_TEXT,
-                                                        "\nApp Version:${
-                                                            (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                                                                context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
-                                                            else
-                                                                context.packageManager.getPackageInfo(context.packageName, 0)).versionName
-                                                        }\nAPI Level:${Build.VERSION.SDK_INT}"
-                                                    )
-                                                }) {
-                                                    if (this.resolveActivity(context.packageManager) != null)
+                                                with(
+                                                    Intent(Intent.ACTION_SENDTO).apply {
+                                                        data = Uri.parse("mailto:")
+                                                        putExtra(
+                                                            Intent.EXTRA_EMAIL,
+                                                            arrayOf("younes.bouhouche12@gmail.com"),
+                                                        )
+                                                        putExtra(
+                                                            Intent.EXTRA_SUBJECT,
+                                                            "Feedback about Music Player app",
+                                                        )
+                                                        putExtra(
+                                                            Intent.EXTRA_TEXT,
+                                                            "\nApp Version:${
+                                                                (
+                                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                                                        context.packageManager.getPackageInfo(
+                                                                            context.packageName,
+                                                                            PackageManager.PackageInfoFlags.of(0),
+                                                                        )
+                                                                    } else {
+                                                                        context.packageManager.getPackageInfo(context.packageName, 0)
+                                                                    }
+                                                                ).versionName
+                                                            }\nAPI Level:${Build.VERSION.SDK_INT}",
+                                                        )
+                                                    },
+                                                ) {
+                                                    if (this.resolveActivity(context.packageManager) != null) {
                                                         context.startActivity(this)
+                                                    }
                                                 }
                                             }) {
                                                 Icon(Icons.Default.Email, null)
@@ -248,23 +282,24 @@ class AboutActivity : AppCompatActivity() {
                                                 with(
                                                     Intent(
                                                         Intent.ACTION_VIEW,
-                                                        Uri.parse("twitter://user?screen_name=younesbouh_05")
-                                                    )
+                                                        Uri.parse("twitter://user?screen_name=younesbouh_05"),
+                                                    ),
                                                 ) {
-                                                    if (this.resolveActivity(context.packageManager) != null)
+                                                    if (this.resolveActivity(context.packageManager) != null) {
                                                         context.startActivity(this)
-                                                    else
+                                                    } else {
                                                         context.startActivity(
                                                             Intent(
                                                                 Intent.ACTION_VIEW,
-                                                                Uri.parse("https://twitter.com/younesbouh_05")
-                                                            )
+                                                                Uri.parse("https://twitter.com/younesbouh_05"),
+                                                            ),
                                                         )
+                                                    }
                                                 }
                                             }) {
                                                 Icon(
                                                     ImageVector.vectorResource(id = R.drawable.ic_twitter),
-                                                    null
+                                                    null,
                                                 )
                                             }
                                             Spacer(Modifier.width(8.dp))
@@ -272,23 +307,24 @@ class AboutActivity : AppCompatActivity() {
                                                 with(
                                                     Intent(
                                                         Intent.ACTION_VIEW,
-                                                        Uri.parse("fb://facewebmodal/f?href=https://www.facebook.com/younesbouh_05")
-                                                    )
+                                                        Uri.parse("fb://facewebmodal/f?href=https://www.facebook.com/younesbouh_05"),
+                                                    ),
                                                 ) {
-                                                    if (this.resolveActivity(context.packageManager) != null)
+                                                    if (this.resolveActivity(context.packageManager) != null) {
                                                         context.startActivity(this)
-                                                    else
+                                                    } else {
                                                         context.startActivity(
                                                             Intent(
                                                                 Intent.ACTION_VIEW,
-                                                                Uri.parse("https://facebook.com/younesbouh_05")
-                                                            )
+                                                                Uri.parse("https://facebook.com/younesbouh_05"),
+                                                            ),
                                                         )
+                                                    }
                                                 }
                                             }) {
                                                 Icon(
                                                     ImageVector.vectorResource(id = R.drawable.ic_facebook),
-                                                    null
+                                                    null,
                                                 )
                                             }
                                             Spacer(Modifier.width(8.dp))
@@ -296,13 +332,13 @@ class AboutActivity : AppCompatActivity() {
                                                 context.startActivity(
                                                     Intent(
                                                         Intent.ACTION_VIEW,
-                                                        Uri.parse("https://www.instagram.com/younesbouh_05")
-                                                    )
+                                                        Uri.parse("https://www.instagram.com/younesbouh_05"),
+                                                    ),
                                                 )
                                             }) {
                                                 Icon(
                                                     ImageVector.vectorResource(id = R.drawable.ic_instagram),
-                                                    null
+                                                    null,
                                                 )
                                             }
                                             Spacer(Modifier.width(8.dp))
@@ -310,13 +346,13 @@ class AboutActivity : AppCompatActivity() {
                                                 context.startActivity(
                                                     Intent(
                                                         Intent.ACTION_VIEW,
-                                                        Uri.parse("tg://resolve?domain=younesbouh_05")
-                                                    )
+                                                        Uri.parse("tg://resolve?domain=younesbouh_05"),
+                                                    ),
                                                 )
                                             }) {
                                                 Icon(
                                                     ImageVector.vectorResource(id = R.drawable.ic_telegram_app),
-                                                    null
+                                                    null,
                                                 )
                                             }
                                         }

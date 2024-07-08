@@ -32,9 +32,7 @@ import younesbouhouche.musicplayer.settings.presentation.SettingsActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WelcomeScreen(
-    onPermissionRequest: () -> Unit
-) {
+fun WelcomeScreen(onPermissionRequest: () -> Unit) {
     val context = LocalContext.current
     Scaffold(
         topBar = {
@@ -44,63 +42,65 @@ fun WelcomeScreen(
                     IconButton(
                         onClick = {
                             context.startActivity(Intent(context, SettingsActivity::class.java))
-                        }
+                        },
                     ) {
                         Icon(Icons.Default.Settings, null)
                     }
-                }
+                },
             )
-        }
+        },
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(it),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Text(
                 "Permission",
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.headlineLarge
+                style = MaterialTheme.typography.headlineLarge,
             )
             Spacer(Modifier.height(48.dp))
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .background(
-                        MaterialTheme.colorScheme.surfaceContainer,
-                        MaterialTheme.shapes.medium
-                    )
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth(0.9f)
+                        .background(
+                            MaterialTheme.colorScheme.surfaceContainer,
+                            MaterialTheme.shapes.medium,
+                        )
+                        .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 8.dp),
                 ) {
                     Icon(Icons.Default.MusicNote, null, Modifier.size(48.dp))
                     Column(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     ) {
                         Text(
                             text = "Music and audio",
                             style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
                             text = "This permission is required to browse and play the audio files",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
                 Button(
                     onClick = onPermissionRequest,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text("Grant permission")
                 }

@@ -23,9 +23,11 @@ fun RadioContainer(
     trailingContent: @Composable RowScope.() -> Unit = {},
 ) {
     Box(modifier.fillMaxWidth().clickable(onClick = onSelected)) {
-        Row(Modifier.fillMaxWidth().padding(8.dp),
+        Row(
+            Modifier.fillMaxWidth().padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             RadioButton(selected = selected, onClick = onSelected)
             Text(text, Modifier.fillMaxWidth().weight(1f))
             trailingContent()

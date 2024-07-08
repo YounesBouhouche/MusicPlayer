@@ -18,36 +18,40 @@ fun DialogButtons(
     cancelListener: (() -> Unit)? = null,
     cancelText: String = "Cancel",
     okListener: (() -> Unit)? = null,
-    neutral: (@Composable () -> Unit)? = null
+    neutral: (@Composable () -> Unit)? = null,
 ) {
     Row(
         Modifier
             .fillMaxWidth()
             .padding(24.dp),
-        horizontalArrangement = Arrangement.SpaceBetween) {
-        val modifier = Modifier
-            .weight(1f)
-            .fillMaxWidth()
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        val modifier =
+            Modifier
+                .weight(1f)
+                .fillMaxWidth()
         val buttons = @Composable {
             if (neutral != null) {
                 neutral()
                 Spacer(Modifier.width(12.dp))
             }
-            if (cancelListener != null)
+            if (cancelListener != null) {
                 OutlinedButton(
                     onClick = cancelListener,
-                    modifier = modifier
+                    modifier = modifier,
                 ) {
                     Text(cancelText)
                 }
+            }
             if ((okListener != null) and (cancelListener != null)) Spacer(Modifier.width(12.dp))
-            if (okListener != null)
+            if (okListener != null) {
                 Button(
                     onClick = okListener,
-                    modifier = modifier
+                    modifier = modifier,
                 ) {
                     Text("Ok")
                 }
+            }
         }
         Row(Modifier.fillMaxWidth()) {
             buttons()

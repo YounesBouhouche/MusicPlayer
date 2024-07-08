@@ -63,48 +63,54 @@ class LanguageActivity : AppCompatActivity() {
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
             val context = LocalContext.current
             val dataStore = SettingsDataStore(context)
-            val languages = mapOf(
-                "system" to R.string.follow_system,
-                "en" to R.string.english,
-                "fr" to R.string.french,
-                "ar" to R.string.arabic,
-                "es" to R.string.spanish,
-                "it" to R.string.italian,
-                "in" to R.string.hindi
-            )
+            val languages =
+                mapOf(
+                    "system" to R.string.follow_system,
+                    "en" to R.string.english,
+                    "fr" to R.string.french,
+                    "ar" to R.string.arabic,
+                    "es" to R.string.spanish,
+                    "it" to R.string.italian,
+                    "in" to R.string.hindi,
+                )
             val language by dataStore.language.collectAsState(initial = "system")
             var selectedLanguage by remember { mutableStateOf("") }
-            val isDark = when (dataStore.theme.collectAsState(initial = "system").value) {
-                "light" -> false
-                "dark" -> true
-                else -> isSystemInDarkTheme()
-            }
+            val isDark =
+                when (dataStore.theme.collectAsState(initial = "system").value) {
+                    "light" -> false
+                    "dark" -> true
+                    else -> isSystemInDarkTheme()
+                }
             val scope = rememberCoroutineScope()
             DisposableEffect(isDark) {
                 enableEdgeToEdge(
-                    statusBarStyle = if (!isDark) {
-                        SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                    } else {
-                        SystemBarStyle.dark(Color.TRANSPARENT)
-                    },
-                    navigationBarStyle = if(!isDark){
-                        SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                    } else {
-                        SystemBarStyle.dark(Color.TRANSPARENT)
-                    }
+                    statusBarStyle =
+                        if (!isDark) {
+                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+                        } else {
+                            SystemBarStyle.dark(Color.TRANSPARENT)
+                        },
+                    navigationBarStyle =
+                        if (!isDark) {
+                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+                        } else {
+                            SystemBarStyle.dark(Color.TRANSPARENT)
+                        },
                 )
                 onDispose { }
             }
             AppTheme {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background),
                 ) {
                     Scaffold(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .nestedScroll(scrollBehavior.nestedScrollConnection),
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .nestedScroll(scrollBehavior.nestedScrollConnection),
                         contentWindowInsets = WindowInsets(0, 0, 0, 0),
                         topBar = {
                             Column {
@@ -113,7 +119,7 @@ class LanguageActivity : AppCompatActivity() {
                                         Text(
                                             stringResource(id = R.string.language),
                                             maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
+                                            overflow = TextOverflow.Ellipsis,
                                         )
                                     },
                                     navigationIcon = {
@@ -121,35 +127,45 @@ class LanguageActivity : AppCompatActivity() {
                                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                                         }
                                     },
-                                    scrollBehavior = scrollBehavior
+                                    scrollBehavior = scrollBehavior,
                                 )
                             }
-                        }
+                        },
                     ) { paddingValues ->
-                        LazyColumn(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(paddingValues), state = listState) {
+                        LazyColumn(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(paddingValues),
+                            state = listState,
+                        ) {
                             settingsRadioItems(
                                 languages.toList(),
                                 languages.map { it.key }.indexOf(language),
                                 {
                                     selectedLanguage = languages.keys.elementAt(it)
                                     context.findActivity()?.runOnUiThread {
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                             context.getSystemService(LocaleManager::class.java)
-                                                .applicationLocales = LocaleList.forLanguageTags(
-                                                if (selectedLanguage == "system") LocaleManagerCompat.getSystemLocales(context)[0]!!.language
-                                                else selectedLanguage
-                                            )
-                                        else
+                                                .applicationLocales =
+                                                LocaleList.forLanguageTags(
+                                                    if (selectedLanguage == "system") {
+                                                        LocaleManagerCompat.getSystemLocales(context)[0]!!.language
+                                                    } else {
+                                                        selectedLanguage
+                                                    },
+                                                )
+                                        } else {
                                             AppCompatDelegate.setApplicationLocales(
-                                                LocaleListCompat.forLanguageTags(selectedLanguage))
+                                                LocaleListCompat.forLanguageTags(selectedLanguage),
+                                            )
+                                        }
                                         scope.launch {
                                             dataStore.saveSettings(language = languages.keys.elementAt(it))
                                         }
                                         finish()
                                     }
-                                }
+                                },
                             ) { Text(stringResource(it.second)) }
                         }
                     }

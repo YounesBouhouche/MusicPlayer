@@ -15,21 +15,24 @@ class CustomMediaNotificationProvider(context: Context) : DefaultMediaNotificati
         mediaSession: MediaSession,
         mediaButtons: ImmutableList<CommandButton>,
         builder: NotificationCompat.Builder,
-        actionFactory: MediaNotification.ActionFactory
+        actionFactory: MediaNotification.ActionFactory,
     ): IntArray {
         val defaultPlayPauseCommandButton = mediaButtons.getOrNull(0)
-        val notificationMediaButtons = if (defaultPlayPauseCommandButton != null) {
-            ImmutableList.builder<CommandButton>().apply {
-                add(NotificationCustomCmdButton.REWIND.commandButton)
-                add(defaultPlayPauseCommandButton)
-                add(NotificationCustomCmdButton.FORWARD.commandButton)
-            }.build()
-        } else mediaButtons
+        val notificationMediaButtons =
+            if (defaultPlayPauseCommandButton != null) {
+                ImmutableList.builder<CommandButton>().apply {
+                    add(NotificationCustomCmdButton.REWIND.commandButton)
+                    add(defaultPlayPauseCommandButton)
+                    add(NotificationCustomCmdButton.FORWARD.commandButton)
+                }.build()
+            } else {
+                mediaButtons
+            }
         return super.addNotificationActions(
             mediaSession,
             notificationMediaButtons,
             builder,
-            actionFactory
+            actionFactory,
         )
     }
 }

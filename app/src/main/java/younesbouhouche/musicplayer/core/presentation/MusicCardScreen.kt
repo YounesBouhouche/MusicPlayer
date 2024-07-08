@@ -58,7 +58,7 @@ fun MusicCardScreen(
             IconButton(onClick = onLongClick) {
                 Icon(Icons.Default.MoreVert, null)
             }
-        }
+        },
     )
 }
 
@@ -82,27 +82,33 @@ fun ReorderableCollectionItemScope.MusicCardScreen(
             IconButton(onClick = onLongClick) {
                 Icon(Icons.Default.MoreVert, null)
             }
-            IconButton(onClick = { }, modifier = Modifier.draggableHandle(
-                onDragStarted = {
-                    view.performHapticFeedback(
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-                            HapticFeedbackConstants.DRAG_START
-                        else
-                            HapticFeedbackConstants.VIRTUAL_KEY
-                    )
-                },
-                onDragStopped = {
-                    view.performHapticFeedback(
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-                            HapticFeedbackConstants.GESTURE_END
-                        else
-                            HapticFeedbackConstants.VIRTUAL_KEY_RELEASE
-                    )
-                })
+            IconButton(
+                onClick = { },
+                modifier =
+                    Modifier.draggableHandle(
+                        onDragStarted = {
+                            view.performHapticFeedback(
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                                    HapticFeedbackConstants.DRAG_START
+                                } else {
+                                    HapticFeedbackConstants.VIRTUAL_KEY
+                                },
+                            )
+                        },
+                        onDragStopped = {
+                            view.performHapticFeedback(
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                                    HapticFeedbackConstants.GESTURE_END
+                                } else {
+                                    HapticFeedbackConstants.VIRTUAL_KEY_RELEASE
+                                },
+                            )
+                        },
+                    ),
             ) {
                 Icon(Icons.Default.DragHandle, null)
             }
-        }
+        },
     )
 }
 
@@ -114,21 +120,21 @@ fun LazyItemScope.LazyMusicCardScreen(
     background: Color = Color.Transparent,
     reorderableState: ReorderableLazyListState? = null,
     onLongClick: () -> Unit = {},
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
 ) {
-    if (reorderableState == null)
+    if (reorderableState == null) {
         MusicCardScreen(
             file = file,
             background = background,
             onClick = onClick,
             onLongClick = onLongClick,
-            modifier = modifier.animateItem()
+            modifier = modifier.animateItem(),
         )
-    else
+    } else {
         ReorderableItem(
             state = reorderableState,
             key = file.id,
-            modifier = modifier.animateItem()
+            modifier = modifier.animateItem(),
         ) {
             MusicCardScreen(
                 file = file,
@@ -137,6 +143,7 @@ fun LazyItemScope.LazyMusicCardScreen(
                 onLongClick = onLongClick,
             )
         }
+    }
 }
 
 @Composable
@@ -147,7 +154,7 @@ fun LazyItemScope.SwipeMusicCardLazyItem(
     background: Color = Color.Transparent,
     reorderableState: ReorderableLazyListState? = null,
     onLongClick: () -> Unit = {},
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
 ) {
     SwipeToDismissBox(
         state = state,
@@ -155,15 +162,19 @@ fun LazyItemScope.SwipeMusicCardLazyItem(
         backgroundContent = {
             val scale by animateFloatAsState(
                 targetValue =
-                if (state.dismissDirection == SwipeToDismissBoxValue.EndToStart) 1f
-                else 0f,
-                label = "Swipe to delete scale"
+                    if (state.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+                        1f
+                    } else {
+                        0f
+                    },
+                label = "Swipe to delete scale",
             )
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 20.dp),
-                contentAlignment = Alignment.CenterEnd
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 20.dp),
+                contentAlignment = Alignment.CenterEnd,
             ) {
                 Icon(
                     Icons.Default.Delete,
@@ -172,11 +183,11 @@ fun LazyItemScope.SwipeMusicCardLazyItem(
                         .fillMaxHeight()
                         .padding(vertical = 2.dp)
                         .scale(scale),
-                    MaterialTheme.colorScheme.error
+                    MaterialTheme.colorScheme.error,
                 )
             }
         },
-        modifier = modifier.animateItem()
+        modifier = modifier.animateItem(),
     ) {
         LazyMusicCardScreen(file, Modifier, background, reorderableState, onLongClick, onClick)
     }

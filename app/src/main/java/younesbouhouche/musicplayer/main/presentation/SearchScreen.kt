@@ -29,17 +29,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
-import younesbouhouche.musicplayer.main.domain.events.SearchEvent
-import younesbouhouche.musicplayer.settings.presentation.SettingsActivity
-import younesbouhouche.musicplayer.main.presentation.states.SearchState
 import younesbouhouche.musicplayer.core.presentation.LazyMusicCardScreen
+import younesbouhouche.musicplayer.main.domain.events.SearchEvent
+import younesbouhouche.musicplayer.main.presentation.states.SearchState
+import younesbouhouche.musicplayer.settings.presentation.SettingsActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     state: SearchState,
     loading: Boolean = false,
-    onSearchEvent: (SearchEvent) -> Unit
+    onSearchEvent: (SearchEvent) -> Unit,
 ) {
     val context = LocalContext.current
     val padding by animateDpAsState(targetValue = if (state.expanded) 0.dp else 8.dp, label = "")
@@ -55,28 +55,30 @@ fun SearchScreen(
                         Text("Search")
                     },
                     leadingIcon = {
-                        if (state.expanded)
+                        if (state.expanded) {
                             IconButton(onClick = { onSearchEvent(SearchEvent.Collapse) }) {
                                 Icon(Icons.AutoMirrored.Default.ArrowBack, null)
                             }
-                        else
+                        } else {
                             IconButton(onClick = { onSearchEvent(SearchEvent.Expand) }) {
                                 Icon(Icons.Default.Search, null)
                             }
+                        }
                     },
                     trailingIcon = {
                         IconButton(onClick = { context.startActivity(Intent(context, SettingsActivity::class.java)) }) {
                             Icon(Icons.Default.Settings, null)
                         }
                     },
-                    onExpandedChange = { onSearchEvent(SearchEvent.UpdateExpanded(it)) }
+                    onExpandedChange = { onSearchEvent(SearchEvent.UpdateExpanded(it)) },
                 )
             },
             expanded = state.expanded,
             onExpandedChange = { onSearchEvent(SearchEvent.UpdateExpanded(it)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(padding)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(padding),
         ) {
             LazyColumn(Modifier.fillMaxSize()) {
                 items(state.result, { it.id }) {
@@ -88,11 +90,13 @@ fun SearchScreen(
             visible = loading,
             enter = materialSharedAxisZIn(true),
             exit = materialSharedAxisZOut(true),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = SearchBarDefaults.InputFieldHeight)
-                .align(Alignment.BottomCenter)
-                .imePadding()) {
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = SearchBarDefaults.InputFieldHeight)
+                    .align(Alignment.BottomCenter)
+                    .imePadding(),
+        ) {
             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
     }

@@ -9,8 +9,13 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class NavigationVM @Inject constructor(): ViewModel() {
-    private val _state = MutableStateFlow(0)
-    val state = _state.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
-    fun update(newState: Int) { _state.value = newState }
-}
+class NavigationVM
+    @Inject
+    constructor() : ViewModel() {
+        private val _state = MutableStateFlow(0)
+        val state = _state.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
+
+        fun update(newState: Int) {
+            _state.value = newState
+        }
+    }

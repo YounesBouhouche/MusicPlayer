@@ -52,22 +52,23 @@ fun Controls(
     activeItem: MusicCard,
     playerState: PlayerState,
     onPlayerEvent: (PlayerEvent) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var showRemaining by remember { mutableStateOf(false) }
     var sliderValue by remember { mutableFloatStateOf(0f) }
     var dragging by remember { mutableStateOf(false) }
     val nextPrevColors =
-        if (isSystemInDarkTheme())
+        if (isSystemInDarkTheme()) {
             IconButtonDefaults.filledIconButtonColors(
                 contentColor = MaterialTheme.colorScheme.tertiaryContainer,
-                containerColor = MaterialTheme.colorScheme.onTertiaryContainer
+                containerColor = MaterialTheme.colorScheme.onTertiaryContainer,
             )
-        else
+        } else {
             IconButtonDefaults.filledIconButtonColors(
                 contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
             )
+        }
     Column(modifier.padding(horizontal = 30.dp)) {
         Text(
             text = activeItem.title,
@@ -76,7 +77,7 @@ fun Controls(
             modifier = Modifier.fillMaxWidth(),
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
-            maxLines = 1
+            maxLines = 1,
         )
         Spacer(Modifier.height(12.dp))
         Text(
@@ -86,21 +87,26 @@ fun Controls(
             modifier = Modifier.fillMaxWidth(),
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
-            maxLines = 1
+            maxLines = 1,
         )
         Spacer(Modifier.height(24.dp))
         Slider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(12.dp),
-            colors = SliderDefaults.colors(
-                thumbColor = MaterialTheme.colorScheme.secondary,
-                activeTrackColor = MaterialTheme.colorScheme.secondary,
-                inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(12.dp),
+            colors =
+                SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.secondary,
+                    activeTrackColor = MaterialTheme.colorScheme.secondary,
+                    inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
+                ),
             value =
-            if ((dragging) or (playerState.loading)) sliderValue
-            else (playerState.time.toFloat() / activeItem.duration),
+                if ((dragging) or (playerState.loading)) {
+                    sliderValue
+                } else {
+                    (playerState.time.toFloat() / activeItem.duration)
+                },
             onValueChange = {
                 sliderValue = it
                 dragging = true
@@ -108,45 +114,54 @@ fun Controls(
             onValueChangeFinished = {
                 dragging = false
                 onPlayerEvent(PlayerEvent.SeekTime((sliderValue * activeItem.duration).roundToLong()))
-            }
+            },
         )
         Row(
             Modifier
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             TextButton(
                 onClick = { },
                 contentPadding = PaddingValues(4.dp),
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor =
-                    animateColorAsState(
-                        targetValue =
-                        if (dragging) MaterialTheme.colorScheme.onBackground
-                        else MaterialTheme.colorScheme.onSurfaceVariant,
-                        animationSpec = tween(),
-                        label = ""
-                    ).value
-                )
+                colors =
+                    ButtonDefaults.textButtonColors(
+                        contentColor =
+                            animateColorAsState(
+                                targetValue =
+                                    if (dragging) {
+                                        MaterialTheme.colorScheme.onBackground
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    },
+                                animationSpec = tween(),
+                                label = "",
+                            ).value,
+                    ),
             ) {
                 Text(
-                    text = (
-                            if (dragging) (activeItem.duration * sliderValue).roundToLong()
-                            else playerState.time
-                            ).timeString,
+                    text =
+                        (
+                            if (dragging) {
+                                (activeItem.duration * sliderValue).roundToLong()
+                            } else {
+                                playerState.time
+                            }
+                        ).timeString,
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
             MaterialSharedAxisZ(
                 targetState = showRemaining,
-                forward = true
+                forward = true,
             ) {
                 TextButton(
                     onClick = { showRemaining = !showRemaining },
                     contentPadding = PaddingValues(4.dp),
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    colors =
+                        ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                 ) {
                     Text(
                         text = (if (it) playerState.time - activeItem.duration else activeItem.duration).timeString,
@@ -156,50 +171,56 @@ fun Controls(
             }
         }
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             FilledIconButton(
                 onClick = { onPlayerEvent(PlayerEvent.Previous) },
                 modifier = Modifier.size(80.dp),
-                colors = nextPrevColors
+                colors = nextPrevColors,
             ) {
                 Icon(
                     Icons.Outlined.SkipPrevious,
                     null,
-                    modifier = Modifier.fillMaxSize(.5f)
+                    modifier = Modifier.fillMaxSize(.5f),
                 )
             }
             FilledIconButton(
                 onClick = { onPlayerEvent(PlayerEvent.PauseResume) },
-                modifier = Modifier
-                    .height(100.dp)
-                    .fillMaxWidth()
-                    .weight(1f),
+                modifier =
+                    Modifier
+                        .height(100.dp)
+                        .fillMaxWidth()
+                        .weight(1f),
                 shape = CircleShape,
-                colors = IconButtonDefaults.iconButtonColors(
-                    contentColor = MaterialTheme.colorScheme.primaryContainer,
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
+                colors =
+                    IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primaryContainer,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    ),
             ) {
                 Icon(
-                    if (playerState.playState == PlayState.PLAYING) Icons.Default.Pause
-                    else Icons.Default.PlayArrow,
+                    if (playerState.playState == PlayState.PLAYING) {
+                        Icons.Default.Pause
+                    } else {
+                        Icons.Default.PlayArrow
+                    },
                     null,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(40.dp),
                 )
             }
             FilledIconButton(
                 onClick = { onPlayerEvent(PlayerEvent.Next) },
                 modifier = Modifier.size(80.dp),
-                colors = nextPrevColors
+                colors = nextPrevColors,
             ) {
                 Icon(
                     Icons.Outlined.SkipNext,
                     null,
-                    modifier = Modifier.fillMaxSize(.5f)
+                    modifier = Modifier.fillMaxSize(.5f),
                 )
             }
         }

@@ -15,4 +15,3 @@ enum class Routes(val title: String, val icon: ImageVector, val destination: Nav
     Playlists("Playlists", Icons.AutoMirrored.Default.PlaylistPlay, NavRoutes.Playlists, 3),
     Library("Library", Icons.Default.LibraryMusic, NavRoutes.Library, 4),
 }
-

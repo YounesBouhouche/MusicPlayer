@@ -8,5 +8,5 @@ import java.time.LocalDateTime
 data class Timestamp(
     @PrimaryKey
     val path: String,
-    val times: List<LocalDateTime>
+    val times: List<LocalDateTime>,
 )

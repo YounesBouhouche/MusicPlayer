@@ -41,15 +41,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
+import younesbouhouche.musicplayer.core.presentation.LazyVerticalGridWithSortBar
+import younesbouhouche.musicplayer.core.presentation.MyListItem
+import younesbouhouche.musicplayer.core.presentation.util.composables.isScrollingUp
 import younesbouhouche.musicplayer.main.domain.events.ListsSortEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
-import younesbouhouche.musicplayer.core.presentation.util.composables.isScrollingUp
 import younesbouhouche.musicplayer.main.domain.models.Playlist
 import younesbouhouche.musicplayer.main.presentation.states.ListSortState
-import younesbouhouche.musicplayer.core.presentation.LazyVerticalGridWithSortBar
-import younesbouhouche.musicplayer.core.presentation.MyListItem
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -61,7 +60,7 @@ fun Playlists(
     sortState: ListSortState = ListSortState(),
     onPlayerEvent: (PlayerEvent) -> Unit,
     onUiEvent: (UiEvent) -> Unit,
-    onPlaylistsSortEvent: (ListsSortEvent) -> Unit
+    onPlaylistsSortEvent: (ListsSortEvent) -> Unit,
 ) {
     var gridCount by remember { mutableIntStateOf(2) }
     val state = rememberLazyListState()
@@ -75,12 +74,12 @@ fun Playlists(
             label = "",
             transitionSpec = { materialSharedAxisZIn(true) togetherWith materialSharedAxisZOut(true) },
         ) { singleItem ->
-            if (singleItem)
+            if (singleItem) {
                 LazyVerticalGridWithSortBar(
                     modifier = Modifier,
                     columns = GridCells.Fixed(1),
                     sortState = sortState,
-                    onSortEvent = onPlaylistsSortEvent
+                    onSortEvent = onPlaylistsSortEvent,
                 ) {
                     items(playlists, { it.id }) {
                         MyListItem(
@@ -92,22 +91,22 @@ fun Playlists(
                             alternative = Icons.AutoMirrored.Default.PlaylistPlay,
                             modifier = Modifier.animateItem(),
                             trailingContent = {
-                                IconButton(onClick = { onPlayerEvent(PlayerEvent.PlayPaths(it.items.toList()))  }) {
+                                IconButton(onClick = { onPlayerEvent(PlayerEvent.PlayPaths(it.items.toList())) }) {
                                     Icon(Icons.Outlined.PlayArrow, null)
                                 }
                                 IconButton(onClick = { onLongClick(playlists.indexOf(it)) }) {
                                     Icon(Icons.Default.MoreVert, null)
                                 }
-                            }
+                            },
                         )
                     }
                 }
-            else
+            } else {
                 LazyVerticalGridWithSortBar(
                     modifier = Modifier,
                     columns = GridCells.Fixed(gridCount),
                     sortState = sortState,
-                    onSortEvent = onPlaylistsSortEvent
+                    onSortEvent = onPlaylistsSortEvent,
                 ) {
                     items(playlists.toList(), { it.id }) {
                         Box(
@@ -118,20 +117,22 @@ fun Playlists(
                                 .clipToBounds()
                                 .combinedClickable(
                                     onClick = { onClick(playlists.indexOf(it)) },
-                                    onLongClick = { onLongClick(playlists.indexOf(it)) }
+                                    onLongClick = { onLongClick(playlists.indexOf(it)) },
                                 )
                                 .aspectRatio(1f)
-                                .padding(8.dp)) {
+                                .padding(8.dp),
+                        ) {
                             Column(
                                 Modifier
                                     .fillMaxSize()
-                                    .padding(4.dp)) {
+                                    .padding(4.dp),
+                            ) {
                                 Icon(
                                     Icons.AutoMirrored.Default.PlaylistPlay,
                                     null,
                                     Modifier
                                         .fillMaxSize()
-                                        .weight(1f)
+                                        .weight(1f),
                                 )
                                 Spacer(Modifier.height(2.dp))
                                 Text(
@@ -140,18 +141,19 @@ fun Playlists(
                                     style = MaterialTheme.typography.bodyMedium,
                                     textAlign = TextAlign.Center,
                                     maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis,
                                 )
                             }
                         }
                     }
                 }
+            }
         }
         AnimatedVisibility(
             modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
             visible = state.isScrollingUp(),
             enter = materialSharedAxisZIn(true),
-            exit = materialSharedAxisZOut(true)
+            exit = materialSharedAxisZOut(true),
         ) {
             FloatingActionButton(onClick = { onUiEvent(UiEvent.ShowNewPlaylistDialog) }) {
                 Icon(Icons.Default.Add, null)

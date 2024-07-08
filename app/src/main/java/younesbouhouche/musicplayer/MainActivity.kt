@@ -22,30 +22,34 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.models.Routes
-import younesbouhouche.musicplayer.main.presentation.states.StartupEvent
 import younesbouhouche.musicplayer.main.presentation.AppScreen
-import younesbouhouche.musicplayer.ui.theme.AppTheme
+import younesbouhouche.musicplayer.main.presentation.states.StartupEvent
 import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
 import younesbouhouche.musicplayer.main.presentation.viewmodel.NavigationVM
+import younesbouhouche.musicplayer.ui.theme.AppTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var mainVM: MainVM
     private val permission =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             android.Manifest.permission.READ_MEDIA_AUDIO
-        else
+        } else {
             android.Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val isGranted = ContextCompat
-            .checkSelfPermission(this@MainActivity, permission) == PackageManager.PERMISSION_GRANTED
-        val startupEvent = when (intent.getStringExtra("type")) {
-            "favorites" -> StartupEvent.PlayFavorites
-            "mostPlayed" -> StartupEvent.PlayMostPlayed
-            "playlist" -> StartupEvent.PlayPlaylist(intent.getIntExtra("id", -1))
-            else -> StartupEvent.None
-        }
+        val isGranted =
+            ContextCompat
+                .checkSelfPermission(this@MainActivity, permission) == PackageManager.PERMISSION_GRANTED
+        val startupEvent =
+            when (intent.getStringExtra("type")) {
+                "favorites" -> StartupEvent.PlayFavorites
+                "mostPlayed" -> StartupEvent.PlayMostPlayed
+                "playlist" -> StartupEvent.PlayPlaylist(intent.getIntExtra("id", -1))
+                else -> StartupEvent.None
+            }
         enableEdgeToEdge()
         setContent {
             mainVM = hiltViewModel<MainVM>()
@@ -54,15 +58,19 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
-            val isParent = currentRoute?.let {
-                route -> Routes.entries.map { it.destination.javaClass.kotlin.qualifiedName }.contains(route) } ?: true
+            val isParent =
+                currentRoute?.let {
+                        route ->
+                    Routes.entries.map { it.destination.javaClass.kotlin.qualifiedName }.contains(route)
+                } ?: true
             val navigationVM = hiltViewModel<NavigationVM>()
             val navigationState by navigationVM.state.collectAsState()
-            val launcher = rememberLauncherForActivityResult(
-                ActivityResultContracts.RequestPermission()
-            ) { isGranted: Boolean ->
-                if (isGranted) mainVM.setGranted(startupEvent)
-            }
+            val launcher =
+                rememberLauncherForActivityResult(
+                    ActivityResultContracts.RequestPermission(),
+                ) { isGranted: Boolean ->
+                    if (isGranted) mainVM.setGranted(startupEvent)
+                }
             LaunchedEffect(key1 = Unit) {
                 println("ViewModel PlayState: ${playerState.playState}")
             }
@@ -83,16 +91,18 @@ class MainActivity : ComponentActivity() {
                     {
                         when {
                             ContextCompat.checkSelfPermission(this, permission) ==
-                                    PackageManager.PERMISSION_GRANTED ->
+                                PackageManager.PERMISSION_GRANTED ->
                                 mainVM.setGranted(startupEvent)
                             ActivityCompat.shouldShowRequestPermissionRationale(
-                                this, permission) -> {
-                                    startActivity(
-                                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                            data = Uri.fromParts("package", packageName, null)
-                                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                        }
-                                    )
+                                this,
+                                permission,
+                            ) -> {
+                                startActivity(
+                                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                        data = Uri.fromParts("package", packageName, null)
+                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    },
+                                )
                             }
                             else -> launcher.launch(permission)
                         }
@@ -108,13 +118,15 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (intent.hasExtra("type"))
+        if (intent.hasExtra("type")) {
             when (intent.getStringExtra("type")) {
                 "favorites" -> mainVM.onPlayerEvent(PlayerEvent.PlayFavorites)
                 "mostPlayed" -> mainVM.onPlayerEvent(PlayerEvent.PlayMostPlayed)
-                "playlist" -> mainVM.onPlayerEvent(
-                    PlayerEvent.PlayPlaylist(intent.getIntExtra("id", -1))
-                )
+                "playlist" ->
+                    mainVM.onPlayerEvent(
+                        PlayerEvent.PlayPlaylist(intent.getIntExtra("id", -1)),
+                    )
             }
+        }
     }
 }

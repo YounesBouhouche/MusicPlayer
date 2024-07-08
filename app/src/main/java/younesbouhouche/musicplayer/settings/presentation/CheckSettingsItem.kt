@@ -17,7 +17,7 @@ fun LazyListScope.checkSettingsItem(
     onClick: (() -> Unit)? = null,
     checked: Boolean,
     visible: Boolean? = null,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
 ) {
     settingsItem(
         icon,
@@ -25,9 +25,12 @@ fun LazyListScope.checkSettingsItem(
         text,
         visible,
         {
-            if (onClick == null) onCheckedChange(!checked)
-            else onClick()
-        }
+            if (onClick == null) {
+                onCheckedChange(!checked)
+            } else {
+                onClick()
+            }
+        },
     ) {
         if (onClick != null) VerticalDivider(Modifier.fillMaxHeight(.5f))
         Spacer(Modifier.width(8.dp))

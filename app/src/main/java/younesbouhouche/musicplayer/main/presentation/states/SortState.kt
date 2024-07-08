@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 data class SortState(
     val sortType: SortType = SortType.Title,
     val expanded: Boolean = false,
-    val ascending: Boolean = true
+    val ascending: Boolean = true,
 )
 
 enum class SortType(val label: String, val icon: ImageVector) {
@@ -24,12 +24,12 @@ enum class SortType(val label: String, val icon: ImageVector) {
 data class PlaylistSortState(
     val sortType: PlaylistSortType = PlaylistSortType.Custom,
     val expanded: Boolean = false,
-    val ascending: Boolean = true
+    val ascending: Boolean = true,
 )
 
 enum class PlaylistSortType(val label: String, val icon: ImageVector) {
     Custom("Custom", Icons.Default.Edit),
     Title("Title", Icons.Default.Title),
     Filename("File name", Icons.AutoMirrored.Default.InsertDriveFile),
-    Duration("Duration", Icons.Default.Timer)
+    Duration("Duration", Icons.Default.Timer),
 }

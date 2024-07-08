@@ -38,51 +38,58 @@ fun Dialog(
     cancelText: String = "Cancel",
     okListener: (() -> Unit)? = null,
     neutral: @Composable (() -> Unit)? = null,
-    content: @Composable (ColumnScope.() -> Unit)
+    content: @Composable (ColumnScope.() -> Unit),
 ) {
-    if (visible)
+    if (visible) {
         BasicAlertDialog(
             onDismissRequest = onDismissRequest,
-            modifier = Modifier
-                .background(
-                    MaterialTheme.colorScheme.background,
-                    RoundedCornerShape(24.dp)
-                )
-                .clip(RoundedCornerShape(24.dp))
-                .clipToBounds()
-                .fillMaxWidth(0.9f)
-                .widthIn(min = 280.dp, max = 560.dp),
-            properties = DialogProperties(
-                usePlatformDefaultWidth = !isCompact
-            )
+            modifier =
+                Modifier
+                    .background(
+                        MaterialTheme.colorScheme.background,
+                        RoundedCornerShape(24.dp),
+                    )
+                    .clip(RoundedCornerShape(24.dp))
+                    .clipToBounds()
+                    .fillMaxWidth(0.9f)
+                    .widthIn(min = 280.dp, max = 560.dp),
+            properties =
+                DialogProperties(
+                    usePlatformDefaultWidth = !isCompact,
+                ),
         ) {
             Surface(
                 contentColor = MaterialTheme.colorScheme.onBackground,
-                color = Color.Transparent
+                color = Color.Transparent,
             ) {
                 Column(Modifier.fillMaxWidth()) {
                     if (header == null) {
                         Row(
                             Modifier
                                 .fillMaxWidth()
-                                .padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
+                                .padding(24.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
                             Text(
                                 text = title,
                                 style = MaterialTheme.typography.titleLarge,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                textAlign = if (centerTitle) TextAlign.Center else null
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f),
+                                textAlign = if (centerTitle) TextAlign.Center else null,
                             )
                             if (trailingContent != null) {
                                 trailingContent(this)
                             }
                         }
+                    } else {
+                        header(this)
                     }
-                    else header(this)
                     content(this)
                     DialogButtons(cancelListener, cancelText, okListener, neutral)
                 }
             }
         }
+    }
 }

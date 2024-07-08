@@ -22,13 +22,13 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
+import younesbouhouche.musicplayer.core.presentation.LazyVerticalGridWithSortBar
+import younesbouhouche.musicplayer.core.presentation.MyCard
+import younesbouhouche.musicplayer.core.presentation.MyListItem
 import younesbouhouche.musicplayer.main.domain.events.ListsSortEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.models.Artist
 import younesbouhouche.musicplayer.main.presentation.states.ListSortState
-import younesbouhouche.musicplayer.core.presentation.LazyVerticalGridWithSortBar
-import younesbouhouche.musicplayer.core.presentation.MyCard
-import younesbouhouche.musicplayer.core.presentation.MyListItem
 
 @Composable
 fun Artists(
@@ -38,7 +38,7 @@ fun Artists(
     modifier: Modifier = Modifier,
     sortState: ListSortState = ListSortState(),
     onPlayerEvent: (PlayerEvent) -> Unit,
-    onArtistsSortEvent: (ListsSortEvent) -> Unit
+    onArtistsSortEvent: (ListsSortEvent) -> Unit,
 ) {
     var gridCount by remember { mutableIntStateOf(2) }
     LaunchedEffect(key1 = sortState.colsCount.count) {
@@ -49,12 +49,12 @@ fun Artists(
         label = "",
         transitionSpec = { materialSharedAxisZIn(true) togetherWith materialSharedAxisZOut(true) },
     ) { singleItem ->
-        if (singleItem)
+        if (singleItem) {
             LazyVerticalGridWithSortBar(
                 modifier = modifier,
                 columns = GridCells.Fixed(1),
                 sortState = sortState,
-                onSortEvent = onArtistsSortEvent
+                onSortEvent = onArtistsSortEvent,
             ) {
                 items(artists.toList(), { it.name }) {
                     MyListItem(
@@ -66,24 +66,24 @@ fun Artists(
                         alternative = Icons.Default.AccountCircle,
                         modifier = Modifier.animateItem(),
                         trailingContent = {
-                            IconButton(onClick = { onPlayerEvent(PlayerEvent.PlayIds(it.items))  }) {
+                            IconButton(onClick = { onPlayerEvent(PlayerEvent.PlayIds(it.items)) }) {
                                 Icon(Icons.Outlined.PlayArrow, null)
                             }
-                            IconButton(onClick = { onLongClick(it)  }) {
+                            IconButton(onClick = { onLongClick(it) }) {
                                 Icon(Icons.Default.MoreVert, null)
                             }
-                        }
+                        },
                     )
                 }
             }
-        else
+        } else {
             LazyVerticalGridWithSortBar(
                 modifier = modifier,
                 columns = GridCells.Fixed(gridCount),
                 sortState = sortState,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                onSortEvent = onArtistsSortEvent
+                onSortEvent = onArtistsSortEvent,
             ) {
                 items(artists.toList(), { it.name }) {
                     MyCard(
@@ -92,9 +92,10 @@ fun Artists(
                         cover = it.cover,
                         alternative = Icons.Default.AccountCircle,
                         onClick = { onClick(it) },
-                        onLongClick = { onLongClick(it) }
+                        onLongClick = { onLongClick(it) },
                     )
                 }
             }
+        }
     }
 }

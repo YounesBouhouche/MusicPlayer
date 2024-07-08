@@ -30,22 +30,23 @@ fun BoxScope.NavBar(
     visible: Boolean,
     progress: Float,
     state: Int,
-    navigate: (NavRoutes) -> Unit
+    navigate: (NavRoutes) -> Unit,
 ) {
     val navBarHeight = navBarHeight
-    if (isCompact)
+    if (isCompact) {
         AnimatedVisibility(
-            modifier = Modifier
-            .align(Alignment.BottomStart)
-            .offset {
-                IntOffset(
-                    0,
-                    ((80 + navBarHeight.roundToPx()) * progress).roundToInt().dp.roundToPx()
-                )
-            },
+            modifier =
+                Modifier
+                    .align(Alignment.BottomStart)
+                    .offset {
+                        IntOffset(
+                            0,
+                            ((80 + navBarHeight.roundToPx()) * progress).roundToInt().dp.roundToPx(),
+                        )
+                    },
             visible = visible,
             enter = slideInVertically { it },
-            exit = slideOutVertically { it }
+            exit = slideOutVertically { it },
         ) {
             NavigationBar {
                 Routes.entries.forEachIndexed { index, screen ->
@@ -60,15 +61,15 @@ fun BoxScope.NavBar(
                         },
                         onClick = {
                             navigate(screen.destination)
-                        }
+                        },
                     )
                 }
             }
         }
-    else
+    } else {
         NavigationRail(
             modifier = Modifier.align(Alignment.TopStart).displayCutoutPadding(),
-            windowInsets = WindowInsets.systemBars
+            windowInsets = WindowInsets.systemBars,
         ) {
             Routes.entries.forEachIndexed { index, screen ->
                 NavigationRailItem(
@@ -82,8 +83,9 @@ fun BoxScope.NavBar(
                     },
                     onClick = {
                         navigate(screen.destination)
-                    }
+                    },
                 )
             }
         }
+    }
 }

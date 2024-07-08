@@ -18,7 +18,7 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-class MediaPlayerService: MediaSessionService(), MediaSession.Callback {
+class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
     private var player: ExoPlayer? = null
     private var mediaSession: MediaSession? = null
     private var controller: MediaSession.ControllerInfo? = null
@@ -31,29 +31,33 @@ class MediaPlayerService: MediaSessionService(), MediaSession.Callback {
 
     override fun onCreate() {
         super.onCreate()
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            packageManager.getLaunchIntentForPackage(packageName),
-            FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT
-        )
-        with (ExoPlayer
-            .Builder(this)
-            .setHandleAudioBecomingNoisy(true)
-            .setAudioAttributes(
-                AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).build(),
-                true
+        val pendingIntent =
+            PendingIntent.getActivity(
+                this,
+                0,
+                packageManager.getLaunchIntentForPackage(packageName),
+                FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT,
             )
-            .build()) {
+        with(
+            ExoPlayer
+                .Builder(this)
+                .setHandleAudioBecomingNoisy(true)
+                .setAudioAttributes(
+                    AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).build(),
+                    true,
+                )
+                .build(),
+        ) {
             setSeekParameters(SeekParameters(1000L, 1000L))
             player = this
-            mediaSession = MediaSession
-                .Builder(
-                    this@MediaPlayerService,
-                    this
-                )
-                .setSessionActivity(pendingIntent)
-                .build()
+            mediaSession =
+                MediaSession
+                    .Builder(
+                        this@MediaPlayerService,
+                        this,
+                    )
+                    .setSessionActivity(pendingIntent)
+                    .build()
             mediaSession!!.setCustomLayout(notificationCustomCmdButtons)
         }
         customMediaNotificationProvider = CustomMediaNotificationProvider(this)
@@ -64,7 +68,7 @@ class MediaPlayerService: MediaSessionService(), MediaSession.Callback {
         session: MediaSession,
         controller: MediaSession.ControllerInfo,
         customCommand: SessionCommand,
-        args: Bundle
+        args: Bundle,
     ): ListenableFuture<SessionResult> {
         when (customCommand.customAction) {
             NotificationCustomCmdButton.REWIND.customAction -> {
@@ -81,7 +85,7 @@ class MediaPlayerService: MediaSessionService(), MediaSession.Callback {
 
     override fun onConnect(
         session: MediaSession,
-        controller: MediaSession.ControllerInfo
+        controller: MediaSession.ControllerInfo,
     ): MediaSession.ConnectionResult {
         val connectionResult = super.onConnect(session, controller)
         this.controller = controller
@@ -92,19 +96,23 @@ class MediaPlayerService: MediaSessionService(), MediaSession.Callback {
         }
         return MediaSession.ConnectionResult.accept(
             availableSessionCommands.build(),
-            connectionResult.availablePlayerCommands
+            connectionResult.availablePlayerCommands,
         )
     }
 
-    override fun onPostConnect(session: MediaSession, controller: MediaSession.ControllerInfo) {
+    override fun onPostConnect(
+        session: MediaSession,
+        controller: MediaSession.ControllerInfo,
+    ) {
         super.onPostConnect(session, controller)
-        if (notificationCustomCmdButtons.isNotEmpty())
+        if (notificationCustomCmdButtons.isNotEmpty()) {
             mediaSession!!.setCustomLayout(notificationCustomCmdButtons)
+        }
     }
 
     override fun onPlaybackResumption(
         mediaSession: MediaSession,
-        controller: MediaSession.ControllerInfo
+        controller: MediaSession.ControllerInfo,
     ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
         this.controller = controller
         this.mediaSession = mediaSession
@@ -114,7 +122,7 @@ class MediaPlayerService: MediaSessionService(), MediaSession.Callback {
     override fun onAddMediaItems(
         mediaSession: MediaSession,
         controller: MediaSession.ControllerInfo,
-        mediaItems: MutableList<MediaItem>
+        mediaItems: MutableList<MediaItem>,
     ): ListenableFuture<MutableList<MediaItem>> {
         this.controller = controller
         this.mediaSession = mediaSession

@@ -32,35 +32,45 @@ fun LazyVerticalGridWithHeader(
     state: LazyGridState = rememberLazyGridState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     reverseLayout: Boolean = false,
-    verticalArrangement: Arrangement. Vertical = if (!reverseLayout) Arrangement. Top else Arrangement. Bottom,
-    horizontalArrangement: Arrangement. Horizontal = Arrangement.Start,
+    verticalArrangement: Arrangement.Vertical = if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
     searchBarSpace: Boolean = true,
     leadingContent: @Composable (LazyGridItemScope.() -> Unit),
-    content: LazyGridScope.() -> Unit
+    content: LazyGridScope.() -> Unit,
 ) {
     val isCompact = isCompact
     LazyVerticalGrid(
-        columns, modifier, state, contentPadding, reverseLayout, verticalArrangement, horizontalArrangement, flingBehavior, userScrollEnabled
+        columns,
+        modifier,
+        state,
+        contentPadding,
+        reverseLayout,
+        verticalArrangement,
+        horizontalArrangement,
+        flingBehavior,
+        userScrollEnabled,
     ) {
-        if (searchBarSpace)
+        if (searchBarSpace) {
             item {
                 Spacer(
                     Modifier
                         .height(
                             statusBarHeight +
-                                    SearchBarDefaults.InputFieldHeight +
-                                    16.dp
-                        )
+                                SearchBarDefaults.InputFieldHeight +
+                                16.dp,
+                        ),
                 )
             }
+        }
         item(span = { GridItemSpan(maxLineSpan) }) {
             leadingContent(this)
         }
         content()
-        if (!isCompact)
+        if (!isCompact) {
             item(span = { GridItemSpan(maxLineSpan) }) { Spacer(Modifier.height(navBarHeight)) }
+        }
     }
 }
 
@@ -71,14 +81,14 @@ fun LazyVerticalGridWithSortBar(
     state: LazyGridState = rememberLazyGridState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     reverseLayout: Boolean = false,
-    verticalArrangement: Arrangement. Vertical = if (!reverseLayout) Arrangement. Top else Arrangement. Bottom,
-    horizontalArrangement: Arrangement. Horizontal = Arrangement.Start,
+    verticalArrangement: Arrangement.Vertical = if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
     searchBarSpace: Boolean = true,
     sortState: ListSortState,
     onSortEvent: (ListsSortEvent) -> Unit,
-    content: LazyGridScope.() -> Unit
+    content: LazyGridScope.() -> Unit,
 ) {
     LazyVerticalGridWithHeader(
         columns,
@@ -94,6 +104,6 @@ fun LazyVerticalGridWithSortBar(
         {
             ListsSortBar(Modifier.animateItem(), sortState, onSortEvent)
         },
-        content
+        content,
     )
 }

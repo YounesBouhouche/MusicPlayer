@@ -10,7 +10,5 @@ class TimesListConverter {
     fun fromTimestamp(times: List<LocalDateTime>): String = Gson().toJson(times)
 
     @TypeConverter
-    fun toTimestamp(json: String): List<LocalDateTime> =
-        Gson().fromJson(json, (object : TypeToken<List<LocalDateTime>>() {}).type)
+    fun toTimestamp(json: String): List<LocalDateTime> = Gson().fromJson(json, (object : TypeToken<List<LocalDateTime>>() {}).type)
 }
-

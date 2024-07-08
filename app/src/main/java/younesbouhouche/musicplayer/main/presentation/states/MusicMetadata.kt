@@ -10,5 +10,5 @@ data class MusicMetadata(
     val newArtist: String = "",
     val newGenre: String = "",
     val newComposer: String = "",
-    val newYear: String = ""
+    val newYear: String = "",
 )

@@ -55,47 +55,55 @@ class SettingsActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContent {
             val context = LocalContext.current
-            val languages = mapOf(
-                "system" to R.string.follow_system,
-                "en" to R.string.english,
-                "fr" to R.string.french,
-                "ar" to R.string.arabic,
-                "es" to R.string.spanish,
-                "it" to R.string.italian,
-                "in" to R.string.hindi
-            )
+            val languages =
+                mapOf(
+                    "system" to R.string.follow_system,
+                    "en" to R.string.english,
+                    "fr" to R.string.french,
+                    "ar" to R.string.arabic,
+                    "es" to R.string.spanish,
+                    "it" to R.string.italian,
+                    "in" to R.string.hindi,
+                )
             val dataStore = SettingsDataStore(LocalContext.current)
             val language by dataStore.language.collectAsState(initial = "system")
-            val isDark = when (SettingsDataStore(context).theme.collectAsState(initial = "system").value) {
-                "light" -> false
-                "dark" -> true
-                else -> isSystemInDarkTheme()
-            }
+            val isDark =
+                when (SettingsDataStore(context).theme.collectAsState(initial = "system").value) {
+                    "light" -> false
+                    "dark" -> true
+                    else -> isSystemInDarkTheme()
+                }
             DisposableEffect(isDark) {
                 enableEdgeToEdge(
-                    statusBarStyle = if (!isDark) {
-                        SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                    } else {
-                        SystemBarStyle.dark(Color.TRANSPARENT)
-                    },
-                    navigationBarStyle = if(!isDark){
-                        SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                    } else {
-                        SystemBarStyle.dark(Color.TRANSPARENT)
-                    }
+                    statusBarStyle =
+                        if (!isDark) {
+                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+                        } else {
+                            SystemBarStyle.dark(Color.TRANSPARENT)
+                        },
+                    navigationBarStyle =
+                        if (!isDark) {
+                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+                        } else {
+                            SystemBarStyle.dark(Color.TRANSPARENT)
+                        },
                 )
                 onDispose { }
             }
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
             val listState = rememberLazyListState()
             AppTheme {
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)) {
-                    Scaffold(
-                        modifier = Modifier
+                Box(
+                    modifier =
+                        Modifier
                             .fillMaxSize()
-                            .nestedScroll(scrollBehavior.nestedScrollConnection),
+                            .background(MaterialTheme.colorScheme.background),
+                ) {
+                    Scaffold(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .nestedScroll(scrollBehavior.nestedScrollConnection),
                         contentWindowInsets = WindowInsets(0, 0, 0, 0),
                         topBar = {
                             Column {
@@ -104,7 +112,7 @@ class SettingsActivity : AppCompatActivity() {
                                         Text(
                                             stringResource(id = R.string.settings),
                                             maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
+                                            overflow = TextOverflow.Ellipsis,
                                         )
                                     },
                                     navigationIcon = {
@@ -112,21 +120,25 @@ class SettingsActivity : AppCompatActivity() {
                                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                                         }
                                     },
-                                    scrollBehavior = scrollBehavior
+                                    scrollBehavior = scrollBehavior,
                                 )
                             }
-                        }
+                        },
                     ) { paddingValues ->
-                        LazyColumn(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(paddingValues), state = listState) {
+                        LazyColumn(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(paddingValues),
+                            state = listState,
+                        ) {
                             largeSettingsItem(
                                 Icons.TwoTone.Brush,
                                 R.string.theme,
                                 R.string.customize_app_look,
                                 onClick = {
                                     startActivity(Intent(context, ThemeActivity::class.java))
-                                }
+                                },
                             )
                             largeSettingsItem(
                                 Icons.TwoTone.Language,
@@ -134,21 +146,21 @@ class SettingsActivity : AppCompatActivity() {
                                 languages[language]!!,
                                 onClick = {
                                     startActivity(Intent(context, LanguageActivity::class.java))
-                                }
+                                },
                             )
                             largeSettingsItem(
                                 Icons.TwoTone.PlayArrow,
                                 R.string.player,
                                 R.string.customize_player,
                                 onClick = {
-                                }
+                                },
                             )
                             largeSettingsItem(
                                 Icons.TwoTone.LibraryMusic,
                                 R.string.library,
                                 R.string.library,
                                 onClick = {
-                                }
+                                },
                             )
                             largeSettingsItem(
                                 Icons.TwoTone.Info,
@@ -156,7 +168,7 @@ class SettingsActivity : AppCompatActivity() {
                                 R.string.about_description,
                                 onClick = {
                                     startActivity(Intent(context, AboutActivity::class.java))
-                                }
+                                },
                             )
                         }
                     }

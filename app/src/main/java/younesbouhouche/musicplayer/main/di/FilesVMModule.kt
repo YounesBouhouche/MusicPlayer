@@ -19,8 +19,7 @@ object FilesVMModule {
     @ViewModelScoped
     @Provides
     @Named("collection")
-    fun provideCollection(): Uri
-        = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+    fun provideCollection(): Uri = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
 
     @ViewModelScoped
     @Provides
@@ -50,12 +49,13 @@ object FilesVMModule {
 
     @ViewModelScoped
     @Provides
-    fun providePlayer(app: Application): ExoPlayer = ExoPlayer
-        .Builder(app)
-        .setHandleAudioBecomingNoisy(true)
-        .setAudioAttributes(
-            AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).build(),
-            true
-        )
-        .build()
+    fun providePlayer(app: Application): ExoPlayer =
+        ExoPlayer
+            .Builder(app)
+            .setHandleAudioBecomingNoisy(true)
+            .setAudioAttributes(
+                AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).build(),
+                true,
+            )
+            .build()
 }

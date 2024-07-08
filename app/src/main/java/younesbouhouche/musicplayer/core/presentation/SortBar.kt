@@ -39,31 +39,32 @@ import younesbouhouche.musicplayer.main.presentation.states.SortType
 fun SortBar(
     modifier: Modifier = Modifier,
     state: SortState,
-    onSortEvent: (SortEvent) -> Unit
+    onSortEvent: (SortEvent) -> Unit,
 ) {
     Row(
         modifier
             .fillMaxWidth()
             .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         ExposedDropdownMenuBox(
             expanded = state.expanded,
-            onExpandedChange = { onSortEvent(SortEvent.UpdateExpanded(it)) }
+            onExpandedChange = { onSortEvent(SortEvent.UpdateExpanded(it)) },
         ) {
             TextButton(
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
-                colors = ButtonDefaults.textButtonColors().copy(
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ),
+                colors =
+                    ButtonDefaults.textButtonColors().copy(
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
                 onClick = {
                     onSortEvent(SortEvent.Expand)
-                }
+                },
             ) {
                 Icon(
                     if (state.ascending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
                     null,
-                    Modifier.size(ButtonDefaults.IconSize)
+                    Modifier.size(ButtonDefaults.IconSize),
                 )
                 Spacer(Modifier.width(ButtonDefaults.IconSpacing))
                 Text(state.sortType.label)
@@ -71,7 +72,7 @@ fun SortBar(
             ExposedDropdownMenu(
                 matchTextFieldWidth = false,
                 expanded = state.expanded,
-                onDismissRequest = { onSortEvent(SortEvent.Collapse) }
+                onDismissRequest = { onSortEvent(SortEvent.Collapse) },
             ) {
                 SortType.entries.forEach {
                     DropdownMenuItem(
@@ -86,11 +87,14 @@ fun SortBar(
                             onSortEvent(SortEvent.Collapse)
                         },
                         colors =
-                            if (state.sortType == it) MenuDefaults.itemColors().copy(
-                                textColor = MaterialTheme.colorScheme.primary,
-                                leadingIconColor = MaterialTheme.colorScheme.primary
-                            )
-                            else MenuDefaults.itemColors()
+                            if (state.sortType == it) {
+                                MenuDefaults.itemColors().copy(
+                                    textColor = MaterialTheme.colorScheme.primary,
+                                    leadingIconColor = MaterialTheme.colorScheme.primary,
+                                )
+                            } else {
+                                MenuDefaults.itemColors()
+                            },
                     )
                 }
             }
@@ -103,31 +107,32 @@ fun SortBar(
 fun ListsSortBar(
     modifier: Modifier = Modifier,
     state: ListSortState,
-    onSortEvent: (ListsSortEvent) -> Unit
+    onSortEvent: (ListsSortEvent) -> Unit,
 ) {
     Row(
         modifier
             .fillMaxWidth()
             .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         ExposedDropdownMenuBox(
             expanded = state.expanded,
-            onExpandedChange = { onSortEvent(ListsSortEvent.UpdateExpanded(it)) }
+            onExpandedChange = { onSortEvent(ListsSortEvent.UpdateExpanded(it)) },
         ) {
             TextButton(
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
-                colors = ButtonDefaults.textButtonColors().copy(
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ),
+                colors =
+                    ButtonDefaults.textButtonColors().copy(
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
                 onClick = {
                     onSortEvent(ListsSortEvent.Expand)
-                }
+                },
             ) {
                 Icon(
                     if (state.ascending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
                     null,
-                    Modifier.size(ButtonDefaults.IconSize)
+                    Modifier.size(ButtonDefaults.IconSize),
                 )
                 Spacer(Modifier.width(ButtonDefaults.IconSpacing))
                 Text(state.sortType.label)
@@ -135,7 +140,7 @@ fun ListsSortBar(
             ExposedDropdownMenu(
                 matchTextFieldWidth = false,
                 expanded = state.expanded,
-                onDismissRequest = { onSortEvent(ListsSortEvent.Collapse) }
+                onDismissRequest = { onSortEvent(ListsSortEvent.Collapse) },
             ) {
                 ListsSortType.entries.forEach {
                     DropdownMenuItem(
@@ -150,32 +155,36 @@ fun ListsSortBar(
                             onSortEvent(ListsSortEvent.Collapse)
                         },
                         colors =
-                            if (state.sortType == it) MenuDefaults.itemColors().copy(
-                                textColor = MaterialTheme.colorScheme.primary,
-                                leadingIconColor = MaterialTheme.colorScheme.primary
-                            )
-                            else MenuDefaults.itemColors()
+                            if (state.sortType == it) {
+                                MenuDefaults.itemColors().copy(
+                                    textColor = MaterialTheme.colorScheme.primary,
+                                    leadingIconColor = MaterialTheme.colorScheme.primary,
+                                )
+                            } else {
+                                MenuDefaults.itemColors()
+                            },
                     )
                 }
             }
         }
         ExposedDropdownMenuBox(
             expanded = state.colsExpanded,
-            onExpandedChange = { onSortEvent(ListsSortEvent.UpdateColsCountExpanded(it)) }
+            onExpandedChange = { onSortEvent(ListsSortEvent.UpdateColsCountExpanded(it)) },
         ) {
             TextButton(
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
-                colors = ButtonDefaults.textButtonColors().copy(
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ),
+                colors =
+                    ButtonDefaults.textButtonColors().copy(
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
                 onClick = {
                     onSortEvent(ListsSortEvent.ExpandCols)
-                }
+                },
             ) {
                 Icon(
                     state.colsCount.icon,
                     null,
-                    Modifier.size(ButtonDefaults.IconSize)
+                    Modifier.size(ButtonDefaults.IconSize),
                 )
                 Spacer(Modifier.width(ButtonDefaults.IconSpacing))
                 Text(state.colsCount.label)
@@ -183,7 +192,7 @@ fun ListsSortBar(
             ExposedDropdownMenu(
                 matchTextFieldWidth = false,
                 expanded = state.colsExpanded,
-                onDismissRequest = { onSortEvent(ListsSortEvent.CollapseCols) }
+                onDismissRequest = { onSortEvent(ListsSortEvent.CollapseCols) },
             ) {
                 ColsCount.entries.forEach {
                     DropdownMenuItem(
@@ -198,11 +207,14 @@ fun ListsSortBar(
                             onSortEvent(ListsSortEvent.CollapseCols)
                         },
                         colors =
-                            if (state.colsCount == it) MenuDefaults.itemColors().copy(
-                                textColor = MaterialTheme.colorScheme.primary,
-                                leadingIconColor = MaterialTheme.colorScheme.primary
-                            )
-                            else MenuDefaults.itemColors()
+                            if (state.colsCount == it) {
+                                MenuDefaults.itemColors().copy(
+                                    textColor = MaterialTheme.colorScheme.primary,
+                                    leadingIconColor = MaterialTheme.colorScheme.primary,
+                                )
+                            } else {
+                                MenuDefaults.itemColors()
+                            },
                     )
                 }
             }
@@ -210,37 +222,37 @@ fun ListsSortBar(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaylistSortBar(
     modifier: Modifier = Modifier,
     state: PlaylistSortState,
-    onSortEvent: (PlaylistSortEvent) -> Unit
+    onSortEvent: (PlaylistSortEvent) -> Unit,
 ) {
     Row(
         modifier
             .fillMaxWidth()
             .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         ExposedDropdownMenuBox(
             expanded = state.expanded,
-            onExpandedChange = { onSortEvent(PlaylistSortEvent.UpdateExpanded(it)) }
+            onExpandedChange = { onSortEvent(PlaylistSortEvent.UpdateExpanded(it)) },
         ) {
             TextButton(
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
-                colors = ButtonDefaults.textButtonColors().copy(
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ),
+                colors =
+                    ButtonDefaults.textButtonColors().copy(
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
                 onClick = {
                     onSortEvent(PlaylistSortEvent.Expand)
-                }
+                },
             ) {
                 Icon(
                     if (state.ascending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
                     null,
-                    Modifier.size(ButtonDefaults.IconSize)
+                    Modifier.size(ButtonDefaults.IconSize),
                 )
                 Spacer(Modifier.width(ButtonDefaults.IconSpacing))
                 Text(state.sortType.label)
@@ -248,7 +260,7 @@ fun PlaylistSortBar(
             ExposedDropdownMenu(
                 matchTextFieldWidth = false,
                 expanded = state.expanded,
-                onDismissRequest = { onSortEvent(PlaylistSortEvent.Collapse) }
+                onDismissRequest = { onSortEvent(PlaylistSortEvent.Collapse) },
             ) {
                 PlaylistSortType.entries.forEach {
                     DropdownMenuItem(
@@ -263,11 +275,14 @@ fun PlaylistSortBar(
                             onSortEvent(PlaylistSortEvent.Collapse)
                         },
                         colors =
-                        if (state.sortType == it) MenuDefaults.itemColors().copy(
-                            textColor = MaterialTheme.colorScheme.primary,
-                            leadingIconColor = MaterialTheme.colorScheme.primary
-                        )
-                        else MenuDefaults.itemColors()
+                            if (state.sortType == it) {
+                                MenuDefaults.itemColors().copy(
+                                    textColor = MaterialTheme.colorScheme.primary,
+                                    leadingIconColor = MaterialTheme.colorScheme.primary,
+                                )
+                            } else {
+                                MenuDefaults.itemColors()
+                            },
                     )
                 }
             }

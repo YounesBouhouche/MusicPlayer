@@ -25,9 +25,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.main.domain.events.TimerType
 import younesbouhouche.musicplayer.core.presentation.Dialog
 import younesbouhouche.musicplayer.core.presentation.RadioContainer
+import younesbouhouche.musicplayer.main.domain.events.TimerType
 import younesbouhouche.musicplayer.main.presentation.util.timeString
 import kotlin.math.roundToLong
 
@@ -51,24 +51,24 @@ fun TimerDialog(
         okListener = {
             onConfirmRequest(type)
             onDismissRequest()
-        }
+        },
     ) {
         RadioContainer(
             selected = type == TimerType.Disabled,
             onSelected = { type = TimerType.Disabled },
-            text = "Disabled"
+            text = "Disabled",
         )
         RadioContainer(
             selected = type is TimerType.Duration,
             onSelected = { type = TimerType.Duration(60000L) },
-            text = "Duration"
+            text = "Duration",
         ) {
-            if(type is TimerType.Duration) {
+            if (type is TimerType.Duration) {
                 Text("${((type as TimerType.Duration).ms) / 60000} minute(s)")
                 Spacer(Modifier.width(8.dp))
             }
         }
-        if(type is TimerType.Duration) {
+        if (type is TimerType.Duration) {
             Spacer(Modifier.height(8.dp))
             Slider(
                 value = (type as TimerType.Duration).ms / 60000f,
@@ -77,52 +77,62 @@ fun TimerDialog(
                 },
                 valueRange = 1f..120f,
                 steps = 119,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(12.dp)
-                    .padding(horizontal = 24.dp),
-                colors = SliderDefaults.colors(
-                    thumbColor = MaterialTheme.colorScheme.primary,
-                    activeTrackColor = MaterialTheme.colorScheme.primary,
-                    inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer,
-                ),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(12.dp)
+                        .padding(horizontal = 24.dp),
+                colors =
+                    SliderDefaults.colors(
+                        thumbColor = MaterialTheme.colorScheme.primary,
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                    ),
             )
             Spacer(Modifier.height(16.dp))
         }
         RadioContainer(
             selected = type is TimerType.Time,
             onSelected = { type = TimerType.Time(0, 0) },
-            text = "Time"
+            text = "Time",
         ) {
-            if(type is TimerType.Time) {
-                with ((type as TimerType.Time)) {
+            if (type is TimerType.Time) {
+                with((type as TimerType.Time)) {
                     Text(((hour * 60 + min) * 60000L).timeString.dropLast(3))
                 }
             }
             IconButton(
                 enabled = type is TimerType.Time,
-                onClick = { timePickerDialog = true }) {
+                onClick = { timePickerDialog = true },
+            ) {
                 Icon(Icons.Default.Edit, null)
             }
         }
         RadioContainer(
             selected = type is TimerType.End,
             onSelected = { type = TimerType.End(1) },
-            text = "End of tracks"
+            text = "End of tracks",
         ) {
-            if (type is TimerType.End)
+            if (type is TimerType.End) {
                 OutlinedTextField(
                     value = (type as TimerType.End).tracks.toString(),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number
-                    ),
+                    keyboardOptions =
+                        KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                        ),
                     onValueChange = {
-                        type = TimerType.End(
-                            try { it.toInt() } catch (_: Exception) { 1 }.coerceIn(1, null)
-                        )
+                        type =
+                            TimerType.End(
+                                try {
+                                    it.toInt()
+                                } catch (_: Exception) {
+                                    1
+                                }.coerceIn(1, null),
+                            )
                     },
-                    modifier = Modifier.size(80.dp, 46.dp)
+                    modifier = Modifier.size(80.dp, 46.dp),
                 )
+            }
         }
     }
     TimePickerDialog(
@@ -132,6 +142,6 @@ fun TimerDialog(
         onConfirmRequest = { h, m ->
             type = TimerType.Time(h, m)
             timePickerDialog = false
-        }
+        },
     )
 }

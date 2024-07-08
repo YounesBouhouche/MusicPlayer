@@ -21,13 +21,13 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
-import younesbouhouche.musicplayer.main.domain.events.SortEvent
-import younesbouhouche.musicplayer.core.presentation.util.composables.isScrollingUp
-import younesbouhouche.musicplayer.main.presentation.states.SortState
 import younesbouhouche.musicplayer.core.presentation.LazyColumnWithHeader
 import younesbouhouche.musicplayer.core.presentation.LazyColumnWithSortBar
 import younesbouhouche.musicplayer.core.presentation.LazyMusicCardScreen
+import younesbouhouche.musicplayer.core.presentation.util.composables.isScrollingUp
+import younesbouhouche.musicplayer.main.domain.events.SortEvent
+import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.presentation.states.SortState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,7 +38,7 @@ fun ListScreen(
     onSortEvent: ((SortEvent) -> Unit)?,
     navigateUp: () -> Unit,
     onLongClick: (Int) -> Unit,
-    onClick: (Int) -> Unit
+    onClick: (Int) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val state = rememberLazyListState()
@@ -49,9 +49,9 @@ fun ListScreen(
                     Text(
                         text = title,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
-                        },
+                },
                 navigationIcon = {
                     IconButton(onClick = navigateUp) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, null)
@@ -65,45 +65,47 @@ fun ListScreen(
             AnimatedVisibility(
                 visible = state.isScrollingUp(),
                 enter = materialSharedAxisZIn(true),
-                exit = materialSharedAxisZOut(true)
+                exit = materialSharedAxisZOut(true),
             ) {
                 FloatingActionButton(onClick = { onClick(0) }) {
                     Icon(Icons.Default.PlayArrow, null)
                 }
             }
-        }
+        },
     ) { paddingValues ->
-        if ((sortState != null) and (onSortEvent != null))
+        if ((sortState != null) and (onSortEvent != null)) {
             LazyColumnWithSortBar(
                 state = state,
                 sortState = sortState!!,
                 onSortEvent = onSortEvent!!,
                 searchBarSpace = false,
-                contentPadding = paddingValues) {
-                items(files, { it.id }) {
-                    LazyMusicCardScreen(
-                        file = it,
-                        onLongClick = { onLongClick(files.indexOf(it)) }
-                    ) {
-                        onClick(files.indexOf(it))
-                    }
-                }
-            }
-        else
-            LazyColumnWithHeader(
-                state = state,
-                leadingContent = {},
-                searchBarSpace = false,
-                contentPadding = paddingValues
+                contentPadding = paddingValues,
             ) {
                 items(files, { it.id }) {
                     LazyMusicCardScreen(
                         file = it,
-                        onLongClick = { onLongClick(files.indexOf(it)) }
+                        onLongClick = { onLongClick(files.indexOf(it)) },
                     ) {
                         onClick(files.indexOf(it))
                     }
                 }
             }
+        } else {
+            LazyColumnWithHeader(
+                state = state,
+                leadingContent = {},
+                searchBarSpace = false,
+                contentPadding = paddingValues,
+            ) {
+                items(files, { it.id }) {
+                    LazyMusicCardScreen(
+                        file = it,
+                        onLongClick = { onLongClick(files.indexOf(it)) },
+                    ) {
+                        onClick(files.indexOf(it))
+                    }
+                }
+            }
+        }
     }
 }

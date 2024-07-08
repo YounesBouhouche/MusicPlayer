@@ -51,56 +51,69 @@ fun MyListItem(
     trailingContent: @Composable (RowScope.() -> Unit)? = null,
 ) {
     val isMusicCard = alternative == Icons.Default.MusicNote
-    Row(modifier.combinedClickable(onLongClick = onLongClick, onClick = onClick)
-        .background(background, MaterialTheme.shapes.medium)
-        .clip(MaterialTheme.shapes.medium)
-        .clipToBounds(),
+    Row(
+        modifier.combinedClickable(onLongClick = onLongClick, onClick = onClick)
+            .background(background, MaterialTheme.shapes.medium)
+            .clip(MaterialTheme.shapes.medium)
+            .clipToBounds(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Box(
             Modifier
                 .size(80.dp)
                 .padding(12.dp)
                 .clip(
-                    if (isMusicCard) MaterialTheme.shapes.medium
-                    else CircleShape
+                    if (isMusicCard) {
+                        MaterialTheme.shapes.medium
+                    } else {
+                        CircleShape
+                    },
                 )
                 .clipToBounds()
                 .background(
-                    if (isMusicCard) MaterialTheme.colorScheme.primary
-                    else Color.Transparent
+                    if (isMusicCard) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        Color.Transparent
+                    },
                 ),
-            contentAlignment = Alignment.Center) {
-            if (cover == null)
+            contentAlignment = Alignment.Center,
+        ) {
+            if (cover == null) {
                 Icon(
                     alternative,
                     null,
                     Modifier.fillMaxSize(
-                        if (isMusicCard) .75f else 1f
+                        if (isMusicCard) .75f else 1f,
                     ),
-                    if (isMusicCard) MaterialTheme.colorScheme.surface
-                    else LocalContentColor.current
+                    if (isMusicCard) {
+                        MaterialTheme.colorScheme.surface
+                    } else {
+                        LocalContentColor.current
+                    },
                 )
-            else
+            } else {
                 Image(
                     cover,
                     null,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
+            }
         }
         Column(
             Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
             Text(
                 headline,
                 modifier = Modifier.fillMaxWidth(),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
             Text(
                 supporting,
@@ -108,7 +121,7 @@ fun MyListItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
             )
         }
         trailingContent?.invoke(this)
@@ -132,30 +145,33 @@ fun MyCard(
             .clipToBounds()
             .combinedClickable(
                 onClick = onClick,
-                onLongClick = onLongClick
+                onLongClick = onLongClick,
             )
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         AnimatedContent(
             targetState = cover,
             label = "",
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)) {
-            if (it == null)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
+        ) {
+            if (it == null) {
                 Icon(
                     alternative,
                     null,
-                    Modifier.fillMaxSize()
+                    Modifier.fillMaxSize(),
                 )
-            else
+            } else {
                 Image(
                     bitmap = it.asImageBitmap(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize().clip(CircleShape).clipToBounds()
+                    modifier = Modifier.fillMaxSize().clip(CircleShape).clipToBounds(),
                 )
+            }
         }
         Text(
             text,
@@ -163,7 +179,7 @@ fun MyCard(
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

@@ -25,7 +25,7 @@ data class MusicCard(
     var duration: Long,
     var favorite: StateFlow<Boolean>,
     var timestamps: StateFlow<List<LocalDateTime>>,
-)  {
+) {
     @Suppress("unused")
     class Builder {
         private var contentUri: Uri = Uri.EMPTY
@@ -42,36 +42,52 @@ data class MusicCard(
         private var duration: Long = -1
         private var favorite: StateFlow<Boolean> = MutableStateFlow(false)
         private var timestamps: StateFlow<List<LocalDateTime>> = MutableStateFlow(emptyList())
+
         fun setContentUri(contentUri: Uri) = apply { this.contentUri = contentUri }
+
         fun setId(id: Long) = apply { this.id = id }
+
         fun setTitle(title: String) = apply { this.title = title }
+
         fun setCover(cover: Bitmap?) = apply { this.cover = cover }
+
         fun setCoverByteArray(coverByteArray: ByteArray) = apply { this.coverByteArray = coverByteArray }
+
         fun setArtist(artist: String) = apply { this.artist = artist }
+
         fun setAlbumId(albumId: Long) = apply { this.albumId = albumId }
+
         fun setAlbum(album: String) = apply { this.album = album }
+
         fun setLyrics(lyrics: String) = apply { this.lyrics = lyrics }
+
         fun setPath(path: String) = apply { this.path = path }
+
         fun setDate(date: LocalDateTime) = apply { this.date = date }
+
         fun setDuration(duration: Long) = apply { this.duration = duration }
+
         fun setFavorite(favorite: StateFlow<Boolean>) = apply { this.favorite = favorite }
+
         fun setTimestamps(timestamps: StateFlow<List<LocalDateTime>>) = apply { this.timestamps = timestamps }
-        fun build() = MusicCard(
-            contentUri,
-            id,
-            title,
-            cover,
-            coverByteArray,
-            artist,
-            albumId,
-            album,
-            lyrics,
-            path,
-            date,
-            duration,
-            favorite,
-            timestamps
-        )
+
+        fun build() =
+            MusicCard(
+                contentUri,
+                id,
+                title,
+                cover,
+                coverByteArray,
+                artist,
+                albumId,
+                album,
+                lyrics,
+                path,
+                date,
+                duration,
+                favorite,
+                timestamps,
+            )
     }
 
     override fun equals(other: Any?): Boolean {
@@ -114,18 +130,20 @@ data class MusicCard(
         result = 31 * result + timestamps.hashCode()
         return result
     }
-    fun toMediaItem() = MediaItem
-        .Builder()
-        .setUri(contentUri)
-        .setMediaId("$id")
-        .setMediaMetadata(
-            MediaMetadata.Builder()
-                .setTitle(title)
-                .setArtist(artist)
-                .setAlbumTitle(album)
-                .setAlbumArtist(artist)
-                .setArtworkData(coverByteArray, MediaMetadata.PICTURE_TYPE_MEDIA)
-                .build()
-        )
-        .build()
+
+    fun toMediaItem() =
+        MediaItem
+            .Builder()
+            .setUri(contentUri)
+            .setMediaId("$id")
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setTitle(title)
+                    .setArtist(artist)
+                    .setAlbumTitle(album)
+                    .setAlbumArtist(artist)
+                    .setArtworkData(coverByteArray, MediaMetadata.PICTURE_TYPE_MEDIA)
+                    .build(),
+            )
+            .build()
 }

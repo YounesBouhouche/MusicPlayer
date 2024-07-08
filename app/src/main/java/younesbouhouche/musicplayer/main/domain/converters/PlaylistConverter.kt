@@ -9,6 +9,5 @@ class PlaylistConverter {
     fun fromPlaylist(playlist: List<String>): String = Gson().toJson(playlist)
 
     @TypeConverter
-    fun toPlaylist(json: String): List<String> =
-        Gson().fromJson(json, (object : TypeToken<List<String>>() {}).type)
+    fun toPlaylist(json: String): List<String> = Gson().fromJson(json, (object : TypeToken<List<String>>() {}).type)
 }

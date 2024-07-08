@@ -72,7 +72,7 @@ fun Queue(
     onPlayerEvent: (PlayerEvent) -> Unit,
     onUiEvent: (UiEvent) -> Unit,
     progress: Float,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val view = LocalView.current
     val listState = rememberLazyListState()
@@ -80,10 +80,11 @@ fun Queue(
         rememberReorderableLazyListState(listState) { from, to ->
             onPlayerEvent(PlayerEvent.Swap(from.index, to.index))
             view.performHapticFeedback(
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     HapticFeedbackConstants.SEGMENT_FREQUENT_TICK
-                else
+                } else {
                     HapticFeedbackConstants.GESTURE_END
+                },
             )
         }
     Box(modifier) {
@@ -93,28 +94,37 @@ fun Queue(
                 FilledToggleIconButton(
                     playerState.repeatMode != Player.REPEAT_MODE_OFF,
                     { onPlayerEvent(PlayerEvent.CycleRepeatMode) },
-                    if (playerState.repeatMode == Player.REPEAT_MODE_ONE) Icons.Default.RepeatOne
-                    else Icons.Default.Repeat
+                    if (playerState.repeatMode == Player.REPEAT_MODE_ONE) {
+                        Icons.Default.RepeatOne
+                    } else {
+                        Icons.Default.Repeat
+                    },
                 )
                 FilledToggleIconButton(
                     playerState.shuffle,
                     { onPlayerEvent(PlayerEvent.ToggleShuffle) },
-                    Icons.Default.Shuffle
+                    Icons.Default.Shuffle,
                 )
                 FilledToggleIconButton(
                     playerState.speed != 1f,
                     {
-                        if (playerState.speed == 1f) onUiEvent(UiEvent.ShowSpeedDialog)
-                        else onPlayerEvent(PlayerEvent.ResetSpeed)
+                        if (playerState.speed == 1f) {
+                            onUiEvent(UiEvent.ShowSpeedDialog)
+                        } else {
+                            onPlayerEvent(PlayerEvent.ResetSpeed)
+                        }
                     },
-                    Icons.Default.Speed
+                    Icons.Default.Speed,
                 )
                 FilledToggleIconButton(
                     playerState.timer != TimerType.Disabled,
                     {
-                        if (playerState.timer == TimerType.Disabled) onUiEvent(UiEvent.ShowTimerDialog)
-                        else onPlayerEvent(PlayerEvent.SetTimer(TimerType.Disabled))
-                    }
+                        if (playerState.timer == TimerType.Disabled) {
+                            onUiEvent(UiEvent.ShowTimerDialog)
+                        } else {
+                            onPlayerEvent(PlayerEvent.SetTimer(TimerType.Disabled))
+                        }
+                    },
                 ) {
                     AnimatedContent(targetState = playerState.timer, label = "") {
                         when (it) {
@@ -123,12 +133,12 @@ fun Queue(
                             is TimerType.Time ->
                                 Text(
                                     ((it.hour * 60 + it.min) * 60000L).timeString.dropLast(3),
-                                    style = MaterialTheme.typography.bodySmall
+                                    style = MaterialTheme.typography.bodySmall,
                                 )
                             is TimerType.Duration ->
                                 Text(
                                     it.ms.timerString,
-                                    style = MaterialTheme.typography.bodySmall
+                                    style = MaterialTheme.typography.bodySmall,
                                 )
                         }
                     }
@@ -136,7 +146,7 @@ fun Queue(
                 FilledToggleIconButton(
                     lyrics,
                     { onUiEvent(UiEvent.ToggleLyrics) },
-                    Icons.Default.Lyrics
+                    Icons.Default.Lyrics,
                 )
             },
             floatingActionButton = {
@@ -144,26 +154,28 @@ fun Queue(
                     Icon(Icons.AutoMirrored.Filled.PlaylistPlay, null)
                 }
             },
-            modifier = Modifier
-                .zIndex(if (playlistHidden) 2f else 1f)
-                .alpha(1f - progress)
-                .align(Alignment.TopStart)
+            modifier =
+                Modifier
+                    .zIndex(if (playlistHidden) 2f else 1f)
+                    .alpha(1f - progress)
+                    .align(Alignment.TopStart),
         )
         Scaffold(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             topBar = {
                 CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors().copy(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
-                    ),
+                    colors =
+                        TopAppBarDefaults.centerAlignedTopAppBarColors().copy(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        ),
                     title = {
                         Text(text = "Up Next")
                     },
                     navigationIcon = {
                         IconButton(
                             onClick = { onUiEvent(UiEvent.CollapsePlaylist) },
-                            modifier = Modifier.padding(start = 12.dp)
+                            modifier = Modifier.padding(start = 12.dp),
                         ) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                         }
@@ -171,38 +183,42 @@ fun Queue(
                     actions = {
                         IconButton(
                             onClick = {
-
                             },
-                            colors = IconButtonDefaults.iconButtonColors(
-                                contentColor = MaterialTheme.colorScheme.onBackground
-                            ),
-                            modifier = Modifier.padding(start = 12.dp)
+                            colors =
+                                IconButtonDefaults.iconButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.onBackground,
+                                ),
+                            modifier = Modifier.padding(start = 12.dp),
                         ) {
                             Icon(Icons.Default.MoreVert, null)
                         }
-                    }
+                    },
                 )
             },
-            modifier = Modifier
-                .alpha(progress)
-                .fillMaxSize()
-                .align(Alignment.TopStart)
-                .zIndex(if (playlistHidden) 1f else 2f)
+            modifier =
+                Modifier
+                    .alpha(progress)
+                    .fillMaxSize()
+                    .align(Alignment.TopStart)
+                    .zIndex(if (playlistHidden) 1f else 2f),
         ) { paddingValues ->
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                state = listState) {
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                state = listState,
+            ) {
                 items(queue, key = { it.id }) { card ->
                     val item by rememberUpdatedState(card)
                     val index = queue.indexOf(card)
-                    val dismissState = rememberSwipeToDismissBoxState(
-                        confirmValueChange = { value ->
-                            value == SwipeToDismissBoxValue.EndToStart
-                        },
-                        positionalThreshold = { it / 1.5f }
-                    )
+                    val dismissState =
+                        rememberSwipeToDismissBoxState(
+                            confirmValueChange = { value ->
+                                value == SwipeToDismissBoxValue.EndToStart
+                            },
+                            positionalThreshold = { it / 1.5f },
+                        )
                     if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
                         onPlayerEvent(PlayerEvent.Remove(queue.indexOf(item)))
                         LaunchedEffect(Unit) {
@@ -214,8 +230,11 @@ fun Queue(
                         file = item,
                         reorderableState = reorderableState,
                         background =
-                        if (playerState.index == index) MaterialTheme.colorScheme.background
-                        else MaterialTheme.colorScheme.surfaceContainer
+                            if (playerState.index == index) {
+                                MaterialTheme.colorScheme.background
+                            } else {
+                                MaterialTheme.colorScheme.surfaceContainer
+                            },
                     ) { onPlayerEvent(PlayerEvent.Seek(index, 0L)) }
                 }
                 item {
@@ -230,18 +249,19 @@ fun Queue(
 private fun FilledToggleIconButton(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    icon: ImageVector
+    icon: ImageVector,
 ) {
     FilledIconToggleButton(
         checked = checked,
         onCheckedChange = onCheckedChange,
-        colors = IconButtonDefaults.filledIconToggleButtonColors().copy(
-            containerColor = Color.Transparent
-        )
+        colors =
+            IconButtonDefaults.filledIconToggleButtonColors().copy(
+                containerColor = Color.Transparent,
+            ),
     ) {
         Icon(
             icon,
-            null
+            null,
         )
     }
 }
@@ -250,14 +270,15 @@ private fun FilledToggleIconButton(
 private fun FilledToggleIconButton(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    icon: @Composable () -> Unit
+    icon: @Composable () -> Unit,
 ) {
     FilledIconToggleButton(
         checked = checked,
         onCheckedChange = onCheckedChange,
-        colors = IconButtonDefaults.filledIconToggleButtonColors().copy(
-            containerColor = Color.Transparent
-        ),
-        content = icon
+        colors =
+            IconButtonDefaults.filledIconToggleButtonColors().copy(
+                containerColor = Color.Transparent,
+            ),
+        content = icon,
     )
 }

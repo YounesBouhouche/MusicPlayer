@@ -55,8 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.core.presentation.Dialog
+import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 
 class ThemeActivity : AppCompatActivity() {
@@ -69,54 +69,61 @@ class ThemeActivity : AppCompatActivity() {
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
             val context = LocalContext.current
             val dataStore = SettingsDataStore(LocalContext.current)
-            val isDark = when (dataStore.theme.collectAsState(initial = "system").value) {
-                "light" -> false
-                "dark" -> true
-                else -> isSystemInDarkTheme()
-            }
+            val isDark =
+                when (dataStore.theme.collectAsState(initial = "system").value) {
+                    "light" -> false
+                    "dark" -> true
+                    else -> isSystemInDarkTheme()
+                }
             val colorTheme by dataStore.colorTheme.collectAsState(initial = "green")
-            val colors = listOf(
-                "blue" to R.string.blue,
-                "green" to R.string.green,
-                "red" to R.string.red,
-                "orange" to R.string.orange,
-                "purple" to R.string.purple
-            )
+            val colors =
+                listOf(
+                    "blue" to R.string.blue,
+                    "green" to R.string.green,
+                    "red" to R.string.red,
+                    "orange" to R.string.orange,
+                    "purple" to R.string.purple,
+                )
             var colorThemeDialogShown by remember { mutableStateOf(false) }
-            val themeOptions = listOf(
-                "light" to R.string.light,
-                "system" to R.string.default_theme,
-                "dark" to R.string.dark,
-            )
+            val themeOptions =
+                listOf(
+                    "light" to R.string.light,
+                    "system" to R.string.default_theme,
+                    "dark" to R.string.dark,
+                )
             val dynamicColorsChecked by dataStore.dynamicColors.collectAsState(initial = true)
             val extraDarkChecked by dataStore.extraDark.collectAsState(initial = true)
             val theme by dataStore.theme.collectAsState(initial = "system")
             val scope = rememberCoroutineScope()
             DisposableEffect(isDark) {
                 enableEdgeToEdge(
-                    statusBarStyle = if (!isDark) {
-                        SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                    } else {
-                        SystemBarStyle.dark(Color.TRANSPARENT)
-                    },
-                    navigationBarStyle = if(!isDark){
-                        SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                    } else {
-                        SystemBarStyle.dark(Color.TRANSPARENT)
-                    }
+                    statusBarStyle =
+                        if (!isDark) {
+                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+                        } else {
+                            SystemBarStyle.dark(Color.TRANSPARENT)
+                        },
+                    navigationBarStyle =
+                        if (!isDark) {
+                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+                        } else {
+                            SystemBarStyle.dark(Color.TRANSPARENT)
+                        },
                 )
                 onDispose { }
             }
             AppTheme {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background),
                 ) {
                     Scaffold(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .nestedScroll(scrollBehavior.nestedScrollConnection),
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .nestedScroll(scrollBehavior.nestedScrollConnection),
                         contentWindowInsets = WindowInsets(0, 0, 0, 0),
                         topBar = {
                             Column {
@@ -125,7 +132,7 @@ class ThemeActivity : AppCompatActivity() {
                                         Text(
                                             stringResource(id = R.string.theme),
                                             maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
+                                            overflow = TextOverflow.Ellipsis,
                                         )
                                     },
                                     navigationIcon = {
@@ -133,24 +140,30 @@ class ThemeActivity : AppCompatActivity() {
                                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                                         }
                                     },
-                                    scrollBehavior = scrollBehavior
+                                    scrollBehavior = scrollBehavior,
                                 )
                             }
-                        }
+                        },
                     ) { paddingValues ->
-                        LazyColumn(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(paddingValues), state = listState) {
+                        LazyColumn(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(paddingValues),
+                            state = listState,
+                        ) {
                             settingsItem(
                                 Icons.TwoTone.InvertColors,
                                 R.string.app_theme,
-                                R.string.choose_app_theme
+                                R.string.choose_app_theme,
                             )
                             item {
                                 Box(
                                     Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
+                                        .padding(vertical = 16.dp),
+                                    contentAlignment = Alignment.Center,
+                                ) {
                                     SingleChoiceSegmentedButtonRow {
                                         themeOptions.forEachIndexed { index, pair ->
                                             SegmentedButton(
@@ -160,7 +173,7 @@ class ThemeActivity : AppCompatActivity() {
                                                         dataStore.saveSettings(theme = pair.first)
                                                     }
                                                 },
-                                                selected = theme == pair.first
+                                                selected = theme == pair.first,
                                             ) {
                                                 Text(stringResource(id = pair.second))
                                             }
@@ -181,7 +194,7 @@ class ThemeActivity : AppCompatActivity() {
                                     scope.launch {
                                         dataStore.saveSettings(extraDark = checked)
                                     }
-                                }
+                                },
                             )
                             checkSettingsItem(
                                 icon = Icons.TwoTone.SettingsSuggest,
@@ -193,14 +206,14 @@ class ThemeActivity : AppCompatActivity() {
                                     scope.launch {
                                         dataStore.saveSettings(dynamic = checked)
                                     }
-                                }
+                                },
                             )
                             settingsItem(
                                 Icons.TwoTone.Palette,
                                 R.string.color_palette,
                                 colors.toMap()[colorTheme]!!,
                                 onClick = { colorThemeDialogShown = true },
-                                visible = (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) or !dynamicColorsChecked
+                                visible = (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) or !dynamicColorsChecked,
                             )
                         }
                     }
@@ -210,13 +223,13 @@ class ThemeActivity : AppCompatActivity() {
                     onDismissRequest = { colorThemeDialogShown = false },
                     title = stringResource(R.string.color_palette),
                     centerTitle = true,
-                    okListener = { colorThemeDialogShown = false }
+                    okListener = { colorThemeDialogShown = false },
                 ) {
                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
                         settingsRadioItems(
                             colors,
                             colors.map { it.first }.indexOf(colorTheme),
-                            { scope.launch { dataStore.saveSettings(colorTheme = colors.map { it.first }[it]) } }
+                            { scope.launch { dataStore.saveSettings(colorTheme = colors.map { it.first }[it]) } },
                         ) { Text(stringResource(it.second)) }
                     }
                 }

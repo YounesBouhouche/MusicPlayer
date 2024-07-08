@@ -7,5 +7,5 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class ListsSortType(val label: String, val icon: ImageVector) {
     Name("Title", Icons.Default.Title),
-    Count("Items count", Icons.AutoMirrored.Default.List)
+    Count("Items count", Icons.AutoMirrored.Default.List),
 }

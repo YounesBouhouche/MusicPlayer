@@ -36,7 +36,7 @@ fun LazyColumnWithHeader(
     userScrollEnabled: Boolean = true,
     searchBarSpace: Boolean = true,
     leadingContent: @Composable (LazyItemScope.() -> Unit),
-    content: LazyListScope.() -> Unit
+    content: LazyListScope.() -> Unit,
 ) {
     LazyColumn(
         modifier,
@@ -46,19 +46,20 @@ fun LazyColumnWithHeader(
         verticalArrangement,
         horizontalAlignment,
         flingBehavior,
-        userScrollEnabled
+        userScrollEnabled,
     ) {
-        if (searchBarSpace)
+        if (searchBarSpace) {
             item {
                 Spacer(
                     Modifier
                         .height(
                             statusBarHeight +
-                            SearchBarDefaults.InputFieldHeight +
-                            16.dp
-                        )
+                                SearchBarDefaults.InputFieldHeight +
+                                16.dp,
+                        ),
                 )
             }
+        }
         item {
             leadingContent()
         }
@@ -79,7 +80,7 @@ fun LazyColumnWithSortBar(
     searchBarSpace: Boolean = true,
     sortState: SortState,
     onSortEvent: (SortEvent) -> Unit,
-    content: LazyListScope.() -> Unit
+    content: LazyListScope.() -> Unit,
 ) {
     LazyColumnWithHeader(
         modifier,
@@ -94,7 +95,7 @@ fun LazyColumnWithSortBar(
         {
             SortBar(Modifier.animateItem(), sortState, onSortEvent)
         },
-        content
+        content,
     )
 }
 
@@ -111,7 +112,7 @@ fun LazyColumnWithPlaylistSortBar(
     searchBarSpace: Boolean = true,
     sortState: PlaylistSortState,
     onSortEvent: (PlaylistSortEvent) -> Unit,
-    content: LazyListScope.() -> Unit
+    content: LazyListScope.() -> Unit,
 ) {
     LazyColumnWithHeader(
         modifier,
@@ -126,6 +127,6 @@ fun LazyColumnWithPlaylistSortBar(
         {
             PlaylistSortBar(Modifier.animateItem(), sortState, onSortEvent)
         },
-        content
+        content,
     )
 }

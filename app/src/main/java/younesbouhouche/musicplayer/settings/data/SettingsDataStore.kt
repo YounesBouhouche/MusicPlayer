@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 
-class SettingsDataStore (private val context: Context) {
+class SettingsDataStore(private val context: Context) {
     companion object {
         private val Context.dataStore by preferencesDataStore(name = "settings")
         val THEME_KEY = stringPreferencesKey("app_theme")
@@ -22,13 +22,29 @@ class SettingsDataStore (private val context: Context) {
     val extraDark = dataFlow(context.dataStore, EXTRA_DARK_KEY, false)
     val language = dataFlow(context.dataStore, LANGUAGE_KEY, "system")
 
-    suspend fun saveSettings(theme: String? = null, colorTheme: String? = null, dynamic: Boolean? = null, extraDark: Boolean? = null, language: String? = null) {
+    suspend fun saveSettings(
+        theme: String? = null,
+        colorTheme: String? = null,
+        dynamic: Boolean? = null,
+        extraDark: Boolean? = null,
+        language: String? = null,
+    ) {
         context.dataStore.edit { preferences ->
-            if (theme != null) { preferences[THEME_KEY] = theme }
-            if (colorTheme != null) { preferences[COLOR_THEME_KEY] = colorTheme }
-            if (dynamic != null) { preferences[DYNAMIC_KEY] = dynamic }
-            if (extraDark != null) { preferences[EXTRA_DARK_KEY] = extraDark }
-            if (language != null) { preferences[LANGUAGE_KEY] = language }
+            if (theme != null) {
+                preferences[THEME_KEY] = theme
+            }
+            if (colorTheme != null) {
+                preferences[COLOR_THEME_KEY] = colorTheme
+            }
+            if (dynamic != null) {
+                preferences[DYNAMIC_KEY] = dynamic
+            }
+            if (extraDark != null) {
+                preferences[EXTRA_DARK_KEY] = extraDark
+            }
+            if (language != null) {
+                preferences[LANGUAGE_KEY] = language
+            }
         }
     }
 }

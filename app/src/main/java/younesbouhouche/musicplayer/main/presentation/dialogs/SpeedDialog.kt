@@ -48,7 +48,7 @@ fun SpeedDialog(
     visible: Boolean,
     onDismissRequest: () -> Unit,
     speed: Float,
-    onSpeedChange: (Float) -> Unit
+    onSpeedChange: (Float) -> Unit,
 ) {
     var selectedSpeed by remember { mutableFloatStateOf(speed) }
     LaunchedEffect(visible) {
@@ -67,12 +67,14 @@ fun SpeedDialog(
         okListener = {
             onSpeedChange(selectedSpeed)
             onDismissRequest()
-        }
+        },
     ) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp), horizontalArrangement = Arrangement.Center) {
+                .padding(horizontal = 24.dp),
+            horizontalArrangement = Arrangement.Center,
+        ) {
             OutlinedIconButton(onClick = { selectedSpeed = max(0f, (selectedSpeed - 0.05f).scale(2)) }) {
                 Icon(Icons.Default.Remove, null, Modifier.size(ButtonDefaults.IconSize))
             }
@@ -81,33 +83,37 @@ fun SpeedDialog(
                     .fillMaxWidth()
                     .weight(1f)
                     .clickable { selectedSpeed = 1f },
-                horizontalArrangement = Arrangement.Center) {
+                horizontalArrangement = Arrangement.Center,
+            ) {
                 Text(
                     text = "× ",
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier,
                     color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
                 AnimatedContent(
                     targetState = selectedSpeed,
                     label = "",
                     transitionSpec = {
-                        (if (targetState > initialState)
-                            slideInVertically { height -> height } + fadeIn() togetherWith
+                        (
+                            if (targetState > initialState) {
+                                slideInVertically { height -> height } + fadeIn() togetherWith
                                     slideOutVertically { height -> -height } + fadeOut()
-                        else
-                            slideInVertically { height -> -height } + fadeIn() togetherWith
+                            } else {
+                                slideInVertically { height -> -height } + fadeIn() togetherWith
                                     slideOutVertically { height -> height } + fadeOut()
-                                ).using(
-                                SizeTransform(clip = false)
-                            )
-                    }) {
+                            }
+                        ).using(
+                            SizeTransform(clip = false),
+                        )
+                    },
+                ) {
                     Text(
                         text = it.round(2),
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 }
             }
@@ -125,15 +131,17 @@ fun SpeedDialog(
             },
             // set steps to 0.05 in range 0.25 to 2 to avoid floating point errors
             steps = 35,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(12.dp)
-                .padding(horizontal = 24.dp),
-            colors = SliderDefaults.colors(
-                thumbColor = MaterialTheme.colorScheme.primary,
-                activeTrackColor = MaterialTheme.colorScheme.primary,
-                inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer,
-            )
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(12.dp)
+                    .padding(horizontal = 24.dp),
+            colors =
+                SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.primary,
+                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                    inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                ),
         )
     }
 }

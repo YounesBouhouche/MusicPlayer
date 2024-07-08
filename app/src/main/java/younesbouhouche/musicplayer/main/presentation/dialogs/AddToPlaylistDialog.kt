@@ -14,10 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import younesbouhouche.musicplayer.core.presentation.Dialog
 import younesbouhouche.musicplayer.main.domain.models.Playlist
 import younesbouhouche.musicplayer.settings.presentation.settingsRadioItems
-import younesbouhouche.musicplayer.core.presentation.Dialog
-
 
 @Composable
 fun AddToPlaylistDialog(
@@ -36,28 +35,28 @@ fun AddToPlaylistDialog(
         okListener = {
             onConfirmRequest()
             onDismissRequest()
-        }
+        },
     ) {
         if (playlists.isEmpty()) {
             Spacer(Modifier.height(16.dp))
             Icon(
                 Icons.AutoMirrored.Default.PlaylistPlay,
                 null,
-                Modifier.size(64.dp).align(Alignment.CenterHorizontally)
+                Modifier.size(64.dp).align(Alignment.CenterHorizontally),
             )
             Spacer(Modifier.height(16.dp))
             Text("No playlists available", Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
             Spacer(Modifier.height(16.dp))
-        }
-        else
+        } else {
             LazyColumn(Modifier.fillMaxWidth()) {
                 settingsRadioItems(
                     playlists,
                     selectedIndex,
-                    onIndexChange
+                    onIndexChange,
                 ) {
                     Text(it.name)
                 }
             }
+        }
     }
 }

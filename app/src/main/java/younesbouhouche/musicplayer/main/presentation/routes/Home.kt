@@ -45,9 +45,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import younesbouhouche.musicplayer.core.presentation.LazyColumnWithHeader
 import younesbouhouche.musicplayer.main.domain.models.Artist
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
-import younesbouhouche.musicplayer.core.presentation.LazyColumnWithHeader
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -56,28 +56,30 @@ fun Home(
     navigateToArtist: (Artist) -> Unit,
     showArtistBottomSheet: (Artist) -> Unit,
     artists: List<Artist>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val state = rememberCarouselState {
-        maxOf(5, artists.size)
-    }
+    val state =
+        rememberCarouselState {
+            maxOf(5, artists.size)
+        }
     LazyColumnWithHeader(
         modifier = modifier,
-        leadingContent = {}
+        leadingContent = {},
     ) {
         item {
             Spacer(Modifier.height(16.dp))
         }
         item {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 HeaderButton(
                     "Last added",
-                    Icons.Default.LibraryAdd
+                    Icons.Default.LibraryAdd,
                 ) { navigate(NavRoutes.RecentlyAddedScreen) }
                 HeaderButton(
                     "Most played",
@@ -90,18 +92,19 @@ fun Home(
         }
         item {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 HeaderButton(
                     "Favorites",
-                    Icons.Default.Favorite
+                    Icons.Default.Favorite,
                 ) { navigate(NavRoutes.FavoritesScreen) }
                 HeaderButton(
                     "History",
-                            Icons.Default.History,
+                    Icons.Default.History,
                 ) { navigate(NavRoutes.MostPlayedScreen) }
             }
         }
@@ -113,7 +116,8 @@ fun Home(
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .padding(16.dp, 24.dp)) {
+                        .padding(16.dp, 24.dp),
+                ) {
                     Text(
                         "Most played artists",
                         style = MaterialTheme.typography.titleLarge,
@@ -126,16 +130,17 @@ fun Home(
                     state = state,
                     itemSpacing = 8.dp,
                     contentPadding = PaddingValues(16.dp),
-                    preferredItemWidth = 200.dp
+                    preferredItemWidth = 200.dp,
                 ) {
                     artists.getOrNull(it)?.let {
-                        Column(Modifier
-                            .alpha(carouselItemInfo.size / carouselItemInfo.maxSize)
+                        Column(
+                            Modifier
+                                .alpha(carouselItemInfo.size / carouselItemInfo.maxSize),
                         ) {
                             AnimatedContent(
                                 targetState = it.cover,
                                 label = "",
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier.fillMaxSize(),
                             ) { bitmap ->
                                 Box(
                                     Modifier
@@ -143,31 +148,32 @@ fun Home(
                                         .aspectRatio(1f)
                                         .background(
                                             MaterialTheme.colorScheme.surfaceContainer,
-                                            rememberMaskShape(CircleShape)
+                                            rememberMaskShape(CircleShape),
                                         )
                                         .clip(rememberMaskShape(CircleShape))
                                         .clipToBounds()
                                         .combinedClickable(
                                             onLongClick = {
                                                 showArtistBottomSheet(it)
-                                            }
+                                            },
                                         ) { navigateToArtist(it) },
-                                    contentAlignment = Alignment.Center
+                                    contentAlignment = Alignment.Center,
                                 ) {
-                                    if (bitmap == null)
+                                    if (bitmap == null) {
                                         Icon(
                                             Icons.Default.Person,
                                             null,
                                             Modifier.size(120.dp),
-                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                            MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
-                                    else
+                                    } else {
                                         Image(
                                             bitmap = bitmap.asImageBitmap(),
                                             contentDescription = null,
                                             modifier = Modifier.fillMaxSize(),
-                                            contentScale = ContentScale.Crop
+                                            contentScale = ContentScale.Crop,
                                         )
+                                    }
                                 }
                             }
                             Text(
@@ -177,7 +183,7 @@ fun Home(
                                     .padding(16.dp),
                                 overflow = TextOverflow.Ellipsis,
                                 textAlign = TextAlign.Center,
-                                maxLines = 1
+                                maxLines = 1,
                             )
                         }
                     }
@@ -191,7 +197,7 @@ fun Home(
 private fun RowScope.HeaderButton(
     label: String,
     icon: ImageVector,
-    navigate: () -> Unit
+    navigate: () -> Unit,
 ) {
     ExtendedFloatingActionButton(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -202,13 +208,14 @@ private fun RowScope.HeaderButton(
             Icon(
                 icon,
                 null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
             )
         },
-        modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .weight(1f),
         elevation = FloatingActionButtonDefaults.elevation(0.dp),
-        onClick = navigate
+        onClick = navigate,
     )
 }

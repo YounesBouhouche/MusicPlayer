@@ -20,8 +20,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.presentation.Dialog
+import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.util.timeString
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -30,21 +30,22 @@ import java.time.format.FormatStyle
 fun DetailsDialog(
     visible: Boolean,
     onDismissRequest: () -> Unit,
-    file: MusicCard
+    file: MusicCard,
 ) {
     Dialog(
         visible = visible,
         onDismissRequest = onDismissRequest,
         title = stringResource(R.string.details),
-        okListener = onDismissRequest
+        okListener = onDismissRequest,
     ) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(2.dp),
             horizontalArrangement = Arrangement.spacedBy(2.dp),
-            modifier = Modifier.padding(horizontal = 8.dp)
-                .clip(MaterialTheme.shapes.large)
-                .clipToBounds()
+            modifier =
+                Modifier.padding(horizontal = 8.dp)
+                    .clip(MaterialTheme.shapes.large)
+                    .clipToBounds(),
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Item("Title", file.title)
@@ -58,7 +59,7 @@ fun DetailsDialog(
             item {
                 Item(
                     "Date Modified",
-                    file.date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
+                    file.date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
                 )
             }
             item {
@@ -79,17 +80,18 @@ fun Item(
 ) {
     val clipboardManager = LocalClipboardManager.current
     Column(
-        modifier = modifier
-            .background(
-                MaterialTheme.colorScheme.surfaceContainer,
-                MaterialTheme.shapes.extraSmall
-            )
-            .clip(MaterialTheme.shapes.extraSmall)
-            .clipToBounds()
-            .clickable {
-                clipboardManager.setText(AnnotatedString(text))
-            }
-            .padding(16.dp),
+        modifier =
+            modifier
+                .background(
+                    MaterialTheme.colorScheme.surfaceContainer,
+                    MaterialTheme.shapes.extraSmall,
+                )
+                .clip(MaterialTheme.shapes.extraSmall)
+                .clipToBounds()
+                .clickable {
+                    clipboardManager.setText(AnnotatedString(text))
+                }
+                .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
@@ -97,14 +99,14 @@ fun Item(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
             text = text,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

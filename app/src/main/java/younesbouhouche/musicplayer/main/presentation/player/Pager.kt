@@ -27,23 +27,27 @@ fun Pager(
     time: Long,
     onPlayerEvent: (PlayerEvent) -> Unit,
     onUiEvent: (UiEvent) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
-        targetState = lyricsVisible, label = "",
+        targetState = lyricsVisible,
+        label = "",
         modifier = modifier.padding(bottom = 8.dp),
         contentAlignment = Alignment.Center,
         transitionSpec = {
-            if (targetState > initialState)
+            if (targetState > initialState) {
                 slideInHorizontally { it } + fadeIn() togetherWith
-                        slideOutHorizontally { -it } + fadeOut()
-            else
+                    slideOutHorizontally { -it } + fadeOut()
+            } else {
                 slideInHorizontally { -it } + fadeIn() togetherWith
-                        slideOutHorizontally { it } + fadeOut()
-        }) { lyrics ->
-        if (lyrics)
+                    slideOutHorizontally { it } + fadeOut()
+            }
+        },
+    ) { lyrics ->
+        if (lyrics) {
             Lyrics(queue[index].lyrics, syncing, time, onPlayerEvent, onUiEvent)
-        else
+        } else {
             Disk(queue, index, playing, pagerState, onPlayerEvent)
+        }
     }
 }

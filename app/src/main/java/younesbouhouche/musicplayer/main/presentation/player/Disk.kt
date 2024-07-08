@@ -51,44 +51,48 @@ fun Disk(
     index: Int,
     playing: Boolean,
     pagerState: PagerState,
-    onPlayerEvent: (PlayerEvent) -> Unit
+    onPlayerEvent: (PlayerEvent) -> Unit,
 ) {
     HorizontalPager(
         state = pagerState,
         modifier = Modifier.fillMaxSize(),
-        key = { queue[it].id }
+        key = { queue[it].id },
     ) { page ->
         val transition = rememberInfiniteTransition(label = "Playing animation")
         val animatedScale by transition.animateFloat(
             initialValue = 0.9f,
             targetValue = 1f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(5000),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "Scale animation"
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(5000),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+            label = "Scale animation",
         )
         val diskScale by animateFloatAsState(
             targetValue = if (playing and (index == page)) animatedScale else 1f,
-            label = ""
+            label = "",
         )
-        val pageOffset = (
-                (pagerState.currentPage - page) + pagerState
-                    .currentPageOffsetFraction
-                ).absoluteValue
+        val pageOffset =
+            (
+                (pagerState.currentPage - page) +
+                    pagerState
+                        .currentPageOffsetFraction
+            ).absoluteValue
         with(queue[page]) {
             val fav by favorite.collectAsState()
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp)
-                    .scale(
-                        lerp(
-                            0.75f,
-                            1f,
-                            1f - pageOffset.coerceIn(0f, 1f)
-                        )
-                    ),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(12.dp)
+                        .scale(
+                            lerp(
+                                0.75f,
+                                1f,
+                                1f - pageOffset.coerceIn(0f, 1f),
+                            ),
+                        ),
             ) {
                 Box(
                     Modifier
@@ -99,58 +103,64 @@ fun Disk(
                         .combinedClickable(
                             onDoubleClick = {
                                 onPlayerEvent(PlayerEvent.SetFavorite(path))
-                            }
+                            },
                         ) {},
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
-                    if (cover != null)
+                    if (cover != null) {
                         Image(
                             bitmap = cover!!.asImageBitmap(),
                             null,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape)
-                                .clipToBounds()
+                            modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .clip(CircleShape)
+                                    .clipToBounds(),
                         )
-                    else
+                    } else {
                         Box(
                             Modifier
                                 .fillMaxSize()
                                 .background(
                                     MaterialTheme.colorScheme.secondary,
-                                    CircleShape
+                                    CircleShape,
                                 ),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 Icons.Default.MusicNote,
                                 null,
                                 Modifier.fillMaxSize(.75f),
-                                tint = NavigationBarDefaults.containerColor
+                                tint = NavigationBarDefaults.containerColor,
                             )
                         }
+                    }
                 }
                 LargeFloatingActionButton(
                     onClick = { onPlayerEvent(PlayerEvent.UpdateFavorite(path, !fav)) },
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .offset(
-                            12.dp,
-                            (-12).dp
-                        )
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomStart)
+                            .offset(
+                                12.dp,
+                                (-12).dp,
+                            ),
                 ) {
                     AnimatedContent(targetState = fav, label = "") {
-                        if (it)
+                        if (it) {
                             Icon(
-                                Icons.Default.Favorite, null,
-                                Modifier.size(ButtonDefaults.IconSize * 2)
+                                Icons.Default.Favorite,
+                                null,
+                                Modifier.size(ButtonDefaults.IconSize * 2),
                             )
-                        else
+                        } else {
                             Icon(
-                                Icons.Default.FavoriteBorder, null,
-                                Modifier.size(ButtonDefaults.IconSize * 2)
+                                Icons.Default.FavoriteBorder,
+                                null,
+                                Modifier.size(ButtonDefaults.IconSize * 2),
                             )
+                        }
                     }
                 }
             }

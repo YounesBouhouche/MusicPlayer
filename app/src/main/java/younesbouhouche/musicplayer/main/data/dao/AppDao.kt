@@ -6,8 +6,8 @@ import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import younesbouhouche.musicplayer.main.domain.models.ItemData
 import younesbouhouche.musicplayer.main.data.models.Timestamp
+import younesbouhouche.musicplayer.main.domain.models.ItemData
 import younesbouhouche.musicplayer.main.domain.models.Playlist
 
 @Dao
@@ -36,21 +36,28 @@ interface AppDao {
     @Query("SELECT * from Timestamp WHERE path=:path")
     fun getTimestamps(path: String): Flow<Timestamp?>
 
-    fun getGroupedTimestamps() = getTimestamps().map { timestamp ->
-        timestamp
-            .groupBy { it.path }
-            .asSequence()
-            .map { entry ->
-                entry.key to entry.value.flatMap { it.times }
-            }
-            .toMap()
-    }
+    fun getGroupedTimestamps() =
+        getTimestamps().map { timestamp ->
+            timestamp
+                .groupBy { it.path }
+                .asSequence()
+                .map { entry ->
+                    entry.key to entry.value.flatMap { it.times }
+                }
+                .toMap()
+        }
 
     @Upsert
     suspend fun upsertTimestamp(timestamp: Timestamp)
 
     @Upsert
     suspend fun upsertPlaylist(playlist: Playlist)
+
+    @Query("UPDATE playlist SET name=:newName WHERE id=:id")
+    suspend fun updatePlaylistName(
+        id: Int,
+        newName: String,
+    )
 
     @Query("SELECT * from Playlist")
     fun getPlaylist(): Flow<List<Playlist>>

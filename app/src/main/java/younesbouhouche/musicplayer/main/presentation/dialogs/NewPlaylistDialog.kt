@@ -21,7 +21,6 @@ import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
 import younesbouhouche.musicplayer.core.presentation.Dialog
 
-
 @Composable
 fun NewPlaylistDialog(
     visible: Boolean,
@@ -42,7 +41,7 @@ fun NewPlaylistDialog(
         okListener = {
             onConfirmRequest()
             onDismissRequest()
-        }
+        },
     ) {
         OutlinedTextField(
             value = playlistName,
@@ -55,7 +54,7 @@ fun NewPlaylistDialog(
                 AnimatedVisibility(
                     visible = playlistName.isNotEmpty(),
                     enter = materialSharedAxisZIn(true),
-                    exit = materialSharedAxisZOut(true)
+                    exit = materialSharedAxisZOut(true),
                 ) {
                     IconButton(onClick = { onNameChange("") }) {
                         Icon(Icons.Default.Close, null)
@@ -63,10 +62,11 @@ fun NewPlaylistDialog(
                 }
             },
             singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .focusRequester(focusRequester)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .focusRequester(focusRequester),
         )
     }
 }

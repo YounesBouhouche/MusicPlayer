@@ -20,9 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.core.presentation.Dialog
 import younesbouhouche.musicplayer.main.domain.events.MetadataEvent
 import younesbouhouche.musicplayer.main.presentation.states.MusicMetadata
-import younesbouhouche.musicplayer.core.presentation.Dialog
 
 @Composable
 fun MetadataDialog(
@@ -37,15 +37,19 @@ fun MetadataDialog(
         onDismissRequest = onDismissRequest,
         title = stringResource(R.string.edit_metadata),
         cancelListener = onDismissRequest,
-        okListener = okListener
+        okListener = okListener,
     ) {
         LazyVerticalGrid(columns = GridCells.Fixed(2)) {
             listOf(
                 listOf((R.string.title to Icons.Default.Title) to metadata.newTitle),
-                listOf((R.string.album to Icons.Default.Album) to metadata.newAlbum,
-                    (R.string.artist to Icons.Default.Person) to metadata.newArtist),
-                listOf((R.string.genre to Icons.Default.Category) to metadata.newGenre,
-                    (R.string.composer to Icons.Default.Person) to metadata.newComposer),
+                listOf(
+                    (R.string.album to Icons.Default.Album) to metadata.newAlbum,
+                    (R.string.artist to Icons.Default.Person) to metadata.newArtist,
+                ),
+                listOf(
+                    (R.string.genre to Icons.Default.Category) to metadata.newGenre,
+                    (R.string.composer to Icons.Default.Person) to metadata.newComposer,
+                ),
                 listOf((R.string.year to Icons.Default.CalendarMonth) to metadata.newYear),
             ).forEach { row ->
                 row.forEach {
@@ -53,7 +57,8 @@ fun MetadataDialog(
                         Column(
                             Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp)) {
+                                .padding(12.dp),
+                        ) {
                             OutlinedTextField(
                                 value = it.second,
                                 onValueChange = { value ->
@@ -66,7 +71,7 @@ fun MetadataDialog(
                                             R.string.composer -> MetadataEvent.Composer(value)
                                             R.string.year -> MetadataEvent.Year(value)
                                             else -> throw IllegalArgumentException("Unknown metadata field")
-                                        }
+                                        },
                                     )
                                 },
                                 modifier = Modifier.fillMaxWidth(),
@@ -75,7 +80,7 @@ fun MetadataDialog(
                                 },
                                 leadingIcon = {
                                     Icon(it.first.second, null)
-                                }
+                                },
                             )
                         }
                     }

@@ -39,7 +39,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.core.presentation.util.functions.removeLeadingTime
+import younesbouhouche.musicplayer.core.presentation.util.removeLeadingTime
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.presentation.util.toMs
@@ -50,33 +50,35 @@ fun Lyrics(
     syncing: Boolean,
     time: Long,
     onPlayerEvent: (PlayerEvent) -> Unit,
-    onUiEvent: (UiEvent) -> Unit
+    onUiEvent: (UiEvent) -> Unit,
 ) {
     val lyricsLineRegex = Regex("^(\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})])\\s[\\w\\s]*")
     val lyricsRegex = Regex("\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})]")
-    val lyricsLines = lyrics
-        .split("\n")
-        .filter { it.isNotBlank() }
-        .sortedBy {
-            lyricsRegex.find(it)?.value?.removeSurrounding("[", "]")?.toMs() ?: 0
-        }
+    val lyricsLines =
+        lyrics
+            .split("\n")
+            .filter { it.isNotBlank() }
+            .sortedBy {
+                lyricsRegex.find(it)?.value?.removeSurrounding("[", "]")?.toMs() ?: 0
+            }
     val synced = lyricsLines.any { it.matches(lyricsLineRegex) }
     var currentLine by remember { mutableIntStateOf(0) }
     val lyricsListState = rememberLazyListState()
     val isDragged by lyricsListState.interactionSource.collectIsDraggedAsState()
     LaunchedEffect(currentLine, syncing) {
-        if (syncing)
+        if (syncing) {
             lyricsListState.animateScrollToItem(currentLine)
+        }
     }
     LaunchedEffect(key1 = isDragged) {
         if (isDragged) onUiEvent(UiEvent.DisableSyncing)
     }
     val scope = rememberCoroutineScope()
-    if (lyrics.isEmpty())
+    if (lyrics.isEmpty()) {
         Column(
             Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Icon(Icons.Default.Lyrics, null, Modifier.size(60.dp))
             Text(
@@ -84,10 +86,10 @@ fun Lyrics(
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
-    else if (synced) {
+    } else if (synced) {
         val segments =
             lyricsLines.map {
                 lyricsRegex
@@ -102,17 +104,22 @@ fun Lyrics(
         Column(
             Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             LazyColumn(
                 Modifier
                     .fillMaxSize()
-                    .weight(1f), state = lyricsListState) {
+                    .weight(1f),
+                state = lyricsListState,
+            ) {
                 itemsIndexed(lyricsLines) { index, line ->
                     val scale by animateFloatAsState(
-                        if ((!syncing) or (index == currentLine)) 1f
-                        else 0.5f,
-                        label = ""
+                        if ((!syncing) or (index == currentLine)) {
+                            1f
+                        } else {
+                            0.5f
+                        },
+                        label = "",
                     )
                     Box(
                         Modifier
@@ -123,16 +130,17 @@ fun Lyrics(
                                     onPlayerEvent(PlayerEvent.SeekTime(segments[index]))
                                     onUiEvent(UiEvent.EnableSyncing)
                                 }
-                            }
+                            },
                     ) {
                         Text(
                             text = line.removeLeadingTime(),
                             color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(32.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(32.dp),
                             style = MaterialTheme.typography.headlineLarge,
-                            textAlign = TextAlign.Start
+                            textAlign = TextAlign.Start,
                         )
                     }
                 }
@@ -147,16 +155,17 @@ fun Lyrics(
         }
     } else {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = lyrics,
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     }

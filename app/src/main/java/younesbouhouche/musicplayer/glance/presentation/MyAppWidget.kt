@@ -7,8 +7,11 @@ import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.Box
 import androidx.glance.text.Text
 
-class MyAppWidget: GlanceAppWidget() {
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
+class MyAppWidget : GlanceAppWidget() {
+    override suspend fun provideGlance(
+        context: Context,
+        id: GlanceId,
+    ) {
         provideContent {
 //            val viewModel = hiltViewModel<MainVM>()
 //            val state by viewModel.playerState.collectAsState()

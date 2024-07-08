@@ -24,8 +24,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.main.domain.events.TimerType
 import younesbouhouche.musicplayer.core.presentation.Dialog
+import younesbouhouche.musicplayer.main.domain.events.TimerType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,7 +33,7 @@ fun TimePickerDialog(
     initialTimer: TimerType.Time,
     visible: Boolean,
     onDismissRequest: () -> Unit,
-    onConfirmRequest: (Int, Int) -> Unit
+    onConfirmRequest: (Int, Int) -> Unit,
 ) {
     var input by remember { mutableStateOf(false) }
     val timePickerState = rememberTimePickerState(initialTimer.hour, initialTimer.min)
@@ -46,36 +46,40 @@ fun TimePickerDialog(
                 onClick = {
                     input = !input
                 },
-                colors = IconButtonDefaults.iconButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                colors =
+                    IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    ),
             ) {
                 Icon(
                     if (input) Icons.Outlined.AccessTime else Icons.Default.Keyboard,
-                    null
+                    null,
                 )
             }
         },
         cancelListener = onDismissRequest,
         okListener = {
             onConfirmRequest(timePickerState.hour, timePickerState.minute)
-        }
+        },
     ) {
         Spacer(Modifier.height(12.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            if (input)
+            if (input) {
                 TimeInput(
                     state = timePickerState,
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp)
+                    modifier =
+                        Modifier
+                            .padding(horizontal = 24.dp),
                 )
-            else
+            } else {
                 TimePicker(
                     state = timePickerState,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
                 )
+            }
         }
     }
 }

@@ -28,13 +28,13 @@ import kotlinx.coroutines.launch
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
-import younesbouhouche.musicplayer.main.domain.events.PlaylistSortEvent
-import younesbouhouche.musicplayer.core.presentation.util.composables.isScrollingUp
-import younesbouhouche.musicplayer.main.presentation.states.PlaylistSortState
-import younesbouhouche.musicplayer.main.presentation.states.PlaylistSortType
 import younesbouhouche.musicplayer.core.presentation.LazyColumnWithPlaylistSortBar
 import younesbouhouche.musicplayer.core.presentation.SwipeMusicCardLazyItem
+import younesbouhouche.musicplayer.core.presentation.util.composables.isScrollingUp
+import younesbouhouche.musicplayer.main.domain.events.PlaylistSortEvent
+import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.presentation.states.PlaylistSortState
+import younesbouhouche.musicplayer.main.presentation.states.PlaylistSortType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,23 +47,26 @@ fun PlaylistScreen(
     reorder: (Int, Int) -> Unit,
     onDismiss: (Int) -> Unit,
     onLongClick: (Int) -> Unit,
-    onClick: (Int) -> Unit
+    onClick: (Int) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val state = rememberLazyListState()
     val view = LocalView.current
     val reorderableState =
-        if ((sortState.ascending) and (sortState.sortType == PlaylistSortType.Custom))
-        rememberReorderableLazyListState(lazyListState = state) { from, to ->
-            view.performHapticFeedback(
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-                    HapticFeedbackConstants.SEGMENT_FREQUENT_TICK
-                else
-                    HapticFeedbackConstants.GESTURE_END
-            )
-            reorder(from.index - 1, to.index - 1)
+        if ((sortState.ascending) and (sortState.sortType == PlaylistSortType.Custom)) {
+            rememberReorderableLazyListState(lazyListState = state) { from, to ->
+                view.performHapticFeedback(
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        HapticFeedbackConstants.SEGMENT_FREQUENT_TICK
+                    } else {
+                        HapticFeedbackConstants.GESTURE_END
+                    },
+                )
+                reorder(from.index - 1, to.index - 1)
+            }
+        } else {
+            null
         }
-        else null
     Scaffold(
         topBar = {
             LargeTopAppBar(
@@ -81,28 +84,30 @@ fun PlaylistScreen(
             AnimatedVisibility(
                 visible = state.isScrollingUp(),
                 enter = materialSharedAxisZIn(true),
-                exit = materialSharedAxisZOut(true)
+                exit = materialSharedAxisZOut(true),
             ) {
                 FloatingActionButton(onClick = { onClick(0) }) {
                     Icon(Icons.Default.PlayArrow, null)
                 }
             }
-        }
+        },
     ) { paddingValues ->
         LazyColumnWithPlaylistSortBar(
             state = state,
             sortState = sortState,
             onSortEvent = onSortEvent,
             searchBarSpace = false,
-            contentPadding = paddingValues) {
+            contentPadding = paddingValues,
+        ) {
             items(files, { it.id }) { file ->
                 val index = files.indexOf(file)
-                val dismissState = rememberSwipeToDismissBoxState(
-                    confirmValueChange = { value ->
-                        value == SwipeToDismissBoxValue.EndToStart
-                    },
-                    positionalThreshold = { it / 1.5f }
-                )
+                val dismissState =
+                    rememberSwipeToDismissBoxState(
+                        confirmValueChange = { value ->
+                            value == SwipeToDismissBoxValue.EndToStart
+                        },
+                        positionalThreshold = { it / 1.5f },
+                    )
                 if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
                     onDismiss(index)
                     LaunchedEffect(Unit) {
@@ -113,7 +118,7 @@ fun PlaylistScreen(
                     state = dismissState,
                     file = file,
                     reorderableState = reorderableState,
-                    onLongClick = { onLongClick(index) }
+                    onLongClick = { onLongClick(index) },
                 ) {
                     onClick(index)
                 }

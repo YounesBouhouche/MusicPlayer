@@ -20,23 +20,25 @@ fun <T> LazyListScope.settingsRadioItems(
     list: List<T>,
     selected: Int,
     onSelectedChange: (Int) -> Unit,
-    label: @Composable (T) -> Unit
+    label: @Composable (T) -> Unit,
 ) {
     itemsIndexed(list) { index, item ->
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onSelectedChange(index) }
-                .padding(4.dp, 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { onSelectedChange(index) }
+                    .padding(4.dp, 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             RadioButton(
                 selected = selected == index,
                 onClick = { onSelectedChange(index) },
-                colors = RadioButtonDefaults.colors(
-                    selectedColor = MaterialTheme.colorScheme.primary,
-                    unselectedColor = MaterialTheme.colorScheme.onSecondaryContainer
-                )
+                colors =
+                    RadioButtonDefaults.colors(
+                        selectedColor = MaterialTheme.colorScheme.primary,
+                        unselectedColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    ),
             )
             Spacer(modifier = Modifier.width(4.dp))
             label(item)

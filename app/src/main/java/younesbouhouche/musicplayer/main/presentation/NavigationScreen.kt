@@ -31,7 +31,7 @@ import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
 fun NavigationScreen(
     navController: NavHostController,
     mainVM: MainVM,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val filesSorted by mainVM.filesSorted.collectAsState()
     val recentlyAdded by mainVM.recentlyAdded.collectAsState()
@@ -65,7 +65,7 @@ fun NavigationScreen(
         startDestination = NavRoutes.Home,
         enterTransition = { materialFadeThroughIn() },
         exitTransition = { materialFadeThroughOut() },
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         composable<NavRoutes.Home> {
             Home(
@@ -81,11 +81,11 @@ fun NavigationScreen(
                             it.name,
                             "${it.items.size} item(s)",
                             it.cover,
-                            Icons.Default.AccountCircle
-                        )
+                            Icons.Default.AccountCircle,
+                        ),
                     )
                 },
-                mostPlayedArtists
+                mostPlayedArtists,
             )
         }
         composable<NavRoutes.Albums> {
@@ -102,14 +102,14 @@ fun NavigationScreen(
                             it.title,
                             "${it.items.size} item(s)",
                             it.cover,
-                            Icons.Default.Album
-                        )
+                            Icons.Default.Album,
+                        ),
                     )
                 },
                 Modifier,
                 albumsSortState,
                 mainVM::onPlayerEvent,
-                mainVM::onAlbumsSortEvent
+                mainVM::onAlbumsSortEvent,
             )
         }
         composable<NavRoutes.Artists> {
@@ -126,14 +126,14 @@ fun NavigationScreen(
                             it.name,
                             "${it.items.size} item(s)",
                             it.cover,
-                            Icons.Default.AccountCircle
-                        )
+                            Icons.Default.AccountCircle,
+                        ),
                     )
                 },
                 Modifier,
                 artistsSortState,
                 mainVM::onPlayerEvent,
-                mainVM::onArtistsSortEvent
+                mainVM::onArtistsSortEvent,
             )
         }
         composable<NavRoutes.Playlists> {
@@ -150,7 +150,7 @@ fun NavigationScreen(
                 playlistsSortState,
                 mainVM::onPlayerEvent,
                 mainVM::onUiEvent,
-                { mainVM.onPlaylistsSortEvent(it) }
+                { mainVM.onPlaylistsSortEvent(it) },
             )
         }
         composable<NavRoutes.Library> {
@@ -159,7 +159,7 @@ fun NavigationScreen(
                 Modifier,
                 sortState,
                 mainVM::onSortEvent,
-                mainVM::onUiEvent
+                mainVM::onUiEvent,
             ) {
                 mainVM.onPlayerEvent(PlayerEvent.Play(filesSorted, it))
             }
@@ -174,7 +174,7 @@ fun NavigationScreen(
                 navController::navigateUp,
                 {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(listScreenFiles[it]))
-                }
+                },
             ) { index ->
                 mainVM.onPlayerEvent(PlayerEvent.Play(listScreenFiles, index))
             }
@@ -195,7 +195,7 @@ fun NavigationScreen(
                 },
                 {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(playlistFiles[it]))
-                }
+                },
             ) { index ->
                 mainVM.onPlayerEvent(PlayerEvent.Play(playlistFiles, index))
             }
@@ -209,7 +209,7 @@ fun NavigationScreen(
                 navController::navigateUp,
                 {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(favoritesFiles[it]))
-                }
+                },
             ) { index ->
                 mainVM.onPlayerEvent(PlayerEvent.Play(favoritesFiles, index))
             }
@@ -223,7 +223,7 @@ fun NavigationScreen(
                 navController::navigateUp,
                 {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(mostPlayedFiles[it]))
-                }
+                },
             ) { index ->
                 mainVM.onPlayerEvent(PlayerEvent.Play(mostPlayedFiles, index))
             }
@@ -237,7 +237,7 @@ fun NavigationScreen(
                 navController::navigateUp,
                 {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(recentlyPlayedFiles[it]))
-                }
+                },
             ) { index ->
                 mainVM.onPlayerEvent(PlayerEvent.Play(recentlyPlayedFiles, index))
             }
@@ -251,7 +251,7 @@ fun NavigationScreen(
                 navController::navigateUp,
                 {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(recentlyAdded[it]))
-                }
+                },
             ) { index ->
                 mainVM.onPlayerEvent(PlayerEvent.Play(recentlyAdded, index))
             }
