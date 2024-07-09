@@ -184,6 +184,7 @@ fun Queue(
                     actions = {
                         IconButton(
                             onClick = {
+                                onUiEvent(UiEvent.ShowQueueBottomSheet)
                             },
                             colors =
                                 IconButtonDefaults.iconButtonColors(

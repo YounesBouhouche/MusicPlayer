@@ -1,6 +1,7 @@
 package younesbouhouche.musicplayer.core.presentation.util
 
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import java.time.ZonedDateTime
 
 fun (Pair<String, String>).containEachOther() = first.contains(second) or second.contains(first)
 
@@ -16,3 +17,5 @@ fun MusicCard.search(query: String) =
         (path to query).containEachOther() or
         (album to query).containEachOther() or
         (artist to query).containEachOther()
+
+fun getCurrentTime(): Long = ZonedDateTime.now().toInstant().toEpochMilli()

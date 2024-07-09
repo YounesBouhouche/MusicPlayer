@@ -155,7 +155,7 @@ fun Playlists(
             enter = materialSharedAxisZIn(true),
             exit = materialSharedAxisZOut(true),
         ) {
-            FloatingActionButton(onClick = { onUiEvent(UiEvent.ShowNewPlaylistDialog) }) {
+            FloatingActionButton(onClick = { onUiEvent(UiEvent.ShowNewPlaylistDialog()) }) {
                 Icon(Icons.Default.Add, null)
             }
         }

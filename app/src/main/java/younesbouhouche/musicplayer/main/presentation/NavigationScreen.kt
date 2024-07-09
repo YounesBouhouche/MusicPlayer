@@ -34,7 +34,7 @@ fun NavigationScreen(
     modifier: Modifier = Modifier,
 ) {
     val filesSorted by mainVM.filesSorted.collectAsState()
-    val recentlyAdded by mainVM.recentlyAdded.collectAsState()
+    val lastAdded by mainVM.lastAdded.collectAsState()
     val sortState by mainVM.sortState.collectAsState()
     val mostPlayedArtists by mainVM.mostPlayedArtists.collectAsState()
 
@@ -50,10 +50,8 @@ fun NavigationScreen(
     val playlist by mainVM.playlist.collectAsState()
     val playlistFiles by mainVM.playlistFiles.collectAsState()
 
-    val timestamps by mainVM.timestampsCards.collectAsState()
-    val recentlyPlayedFiles by mainVM.recentlyPlayed.collectAsState()
-
-    val mostPlayedFiles = timestamps.toList().sortedByDescending { it.second.size }.map { it.first }
+    val history by mainVM.history.collectAsState()
+    val mostPlayed by mainVM.mostPlayed.collectAsState()
 
     val listScreenFiles by mainVM.listScreenFiles.collectAsState()
     val listScreenSortState by mainVM.listScreenSortState.collectAsState()
@@ -216,44 +214,44 @@ fun NavigationScreen(
         }
         composable<NavRoutes.MostPlayedScreen> {
             ListScreen(
-                mostPlayedFiles,
+                mostPlayed,
                 "Most Played",
                 null,
                 null,
                 navController::navigateUp,
                 {
-                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(mostPlayedFiles[it]))
+                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(mostPlayed[it]))
                 },
             ) { index ->
-                mainVM.onPlayerEvent(PlayerEvent.Play(mostPlayedFiles, index))
+                mainVM.onPlayerEvent(PlayerEvent.Play(mostPlayed, index))
             }
         }
-        composable<NavRoutes.RecentlyPlayedScreen> {
+        composable<NavRoutes.HistoryScreen> {
             ListScreen(
-                recentlyPlayedFiles,
-                "Recently Played",
+                history,
+                "History",
                 null,
                 null,
                 navController::navigateUp,
                 {
-                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(recentlyPlayedFiles[it]))
+                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(history[it]))
                 },
             ) { index ->
-                mainVM.onPlayerEvent(PlayerEvent.Play(recentlyPlayedFiles, index))
+                mainVM.onPlayerEvent(PlayerEvent.Play(history, index))
             }
         }
-        composable<NavRoutes.RecentlyAddedScreen> {
+        composable<NavRoutes.LastAddedScreen> {
             ListScreen(
-                recentlyAdded,
-                "Recently Added",
+                lastAdded,
+                "Last Added",
                 null,
                 null,
                 navController::navigateUp,
                 {
-                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(recentlyAdded[it]))
+                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(lastAdded[it]))
                 },
             ) { index ->
-                mainVM.onPlayerEvent(PlayerEvent.Play(recentlyAdded, index))
+                mainVM.onPlayerEvent(PlayerEvent.Play(lastAdded, index))
             }
         }
     }

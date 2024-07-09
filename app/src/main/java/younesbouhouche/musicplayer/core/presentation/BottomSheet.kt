@@ -79,9 +79,9 @@ fun BottomSheet(
     open: Boolean,
     state: SheetState,
     onDismissRequest: () -> Unit,
-    leadingContent: (@Composable (LazyItemScope.() -> Unit))?,
-    trailingContent: (@Composable (LazyItemScope.() -> Unit))?,
-    buttons: List<List<BottomSheetButton>>,
+    leadingContent: (@Composable (LazyItemScope.() -> Unit))? = null,
+    trailingContent: (@Composable (LazyItemScope.() -> Unit))? = null,
+    buttons: List<List<BottomSheetButton>> = emptyList(),
 ) {
     if (open) {
         ModalBottomSheet(
@@ -131,7 +131,13 @@ fun BottomSheet(
                         }
                     }
                 }
-                if (trailingContent != null) item(content = trailingContent)
+                if (trailingContent != null) {
+                    item(content = trailingContent)
+                } else {
+                    item {
+                        Spacer(Modifier.height(navBarHeight))
+                    }
+                }
             }
         }
     }

@@ -44,7 +44,6 @@ import younesbouhouche.musicplayer.core.domain.MediaPlayerService
 import younesbouhouche.musicplayer.core.presentation.util.search
 import younesbouhouche.musicplayer.main.data.db.AppDatabase
 import younesbouhouche.musicplayer.main.data.models.Queue
-import younesbouhouche.musicplayer.main.data.models.Timestamp
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent.AddFile
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent.LoadFiles
@@ -80,12 +79,10 @@ import younesbouhouche.musicplayer.main.presentation.util.getMimeType
 import younesbouhouche.musicplayer.main.presentation.util.toMediaItems
 import java.io.File
 import java.nio.file.Files
-import java.time.Instant
+import java.nio.file.Paths
 import java.time.LocalDateTime
-import java.util.TimeZone
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.io.path.Path
 import kotlin.math.abs
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -103,10 +100,7 @@ class MainVM
         private val dao = db.dao
         private var startupEvent: StartupEvent = StartupEvent.None
 
-        private val _timestamps =
-            dao.getGroupedTimestamps().map { timestamp ->
-                timestamp.filter { Files.exists(Path(it.key)) }
-            }
+        private val _timestamps = dao.getTimestamps()
 
         private val _loading = MutableStateFlow(false)
         val loading = _loading.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
@@ -139,7 +133,8 @@ class MainVM
         private fun List<Long>.toMusicCards() = mapNotNull { id -> _files.value.firstOrNull { it.id == id } }
 
         private val _playlists = dao.getPlaylist()
-        val playlists = _playlists.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+        val playlists =
+            _playlists.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
         private val _queue = dao.getQueue().map { it ?: Queue() }
 
@@ -178,38 +173,55 @@ class MainVM
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), SearchState())
 
         private val _sortState = MutableStateFlow(SortState())
-        val sortState = _sortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SortState())
+        val sortState =
+            _sortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SortState())
 
         private val _listScreenSortState = MutableStateFlow(SortState())
-        val listScreenSortState = _listScreenSortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SortState())
+        val listScreenSortState =
+            _listScreenSortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SortState())
 
         private val _albumsSortState = MutableStateFlow(ListSortState())
-        val albumsSortState = _albumsSortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ListSortState())
+        val albumsSortState =
+            _albumsSortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ListSortState())
 
         private val _artistsSortState = MutableStateFlow(ListSortState())
-        val artistsSortState = _artistsSortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ListSortState())
+        val artistsSortState =
+            _artistsSortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ListSortState())
 
         private val _playlistsSortState = MutableStateFlow(ListSortState())
-        val playlistsSortState = _playlistsSortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ListSortState())
+        val playlistsSortState =
+            _playlistsSortState.stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(),
+                ListSortState(),
+            )
 
         private val _playlistSortState = MutableStateFlow(PlaylistSortState())
-        val playlistSortState = _playlistSortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), PlaylistSortState())
+        val playlistSortState =
+            _playlistSortState.stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(),
+                PlaylistSortState(),
+            )
         private val _playlistIndex = MutableStateFlow(0)
 
-        val recentlyAdded =
+        val lastAdded =
             _files
-                .mapLatest { list -> list.sortedByDescending { it.date } }
-                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+                .map { item -> item.sortedByDescending { it.date } }
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-        val recentlyPlayed =
+        val history =
             combine(_files, _timestamps) { files, timestamps ->
-                files
-                    .asSequence()
-                    .map { it to timestamps[it.path]?.maxOrNull() }
-                    .filter { it.second != null }
-                    // .sortedByDescending { it.second }
-                    .map { it.first }
-                    .toList()
+                timestamps
+                    .sortedByDescending { it.times.maxOrNull() }
+                    .mapNotNull { item -> files.firstOrNull { item.path == it.path } }
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+
+        val mostPlayed =
+            combine(_files, _timestamps) { files, timestamps ->
+                timestamps
+                    .sortedByDescending { it.times.size }
+                    .mapNotNull { item -> files.firstOrNull { item.path == it.path } }
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
         val filesSorted =
@@ -231,26 +243,25 @@ class MainVM
                 }
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
-        val timestampsCards =
-            combine(_files, _timestamps) { files, timestamps ->
-                files
-                    .filter {
-                        timestamps.containsKey(it.path)
-                    }.associateWith {
-                        timestamps[it.path]!!
-                    }
-            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyMap())
-
         private val _mostPlayedArtists =
-            combine(_artists, _timestamps) { artists, timestamps ->
-                // get most played artists
+            combine(_artists, _files, _timestamps) { artists, files, timestamps ->
                 artists
+                    .asSequence()
                     .filter { it.name != "<unknown>" }
                     .map { artist ->
-                        artist to artist.items.toMusicCards().sumOf { item -> timestamps[item.path]?.size ?: 0 }
+                        artist to
+                            artist.items
+                                .mapNotNull { item -> files.firstOrNull { it.id == item } }
+                                .sumOf { item ->
+                                    timestamps.firstOrNull { item.path == it.path }
+                                        ?.times
+                                        ?.size ?: 0
+                                }
                     }
+                    .filter { it.second > 0 }
                     .sortedByDescending { it.second }
                     .map { it.first }
+                    .toList()
             }
         val mostPlayedArtists =
             _mostPlayedArtists
@@ -359,9 +370,15 @@ class MainVM
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
         val playlistFiles =
-            combine(_playlistsSorted, _files, _playlistSortState, _playlistIndex) { playlists, files, sortState, index ->
+            combine(
+                _playlistsSorted,
+                _files,
+                _playlistSortState,
+                _playlistIndex,
+            ) { playlists, files, sortState, index ->
                 val list =
-                    playlists.getOrNull(index)?.items?.mapNotNull { item -> files.firstOrNull { it.path == item } } ?: emptyList()
+                    playlists.getOrNull(index)?.items?.mapNotNull { item -> files.firstOrNull { it.path == item } }
+                        ?: emptyList()
                 if (sortState.ascending) {
                     when (sortState.sortType) {
                         PlaylistSortType.Custom -> list
@@ -381,7 +398,8 @@ class MainVM
 
         val bottomSheetPlaylistFiles =
             combine(_playlistsSorted, _files, _playlistIndex) { playlists, files, index ->
-                playlists.getOrNull(index)?.items?.mapNotNull { item -> files.firstOrNull { it.path == item } } ?: emptyList()
+                playlists.getOrNull(index)?.items?.mapNotNull { item -> files.firstOrNull { it.path == item } }
+                    ?: emptyList()
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
         fun getAlbum(file: MusicCard): Album? = _albums.value.firstOrNull { it.title == file.album }
@@ -403,21 +421,25 @@ class MainVM
                         it.copy(query = "")
                     }
                 }
+
                 is SearchEvent.UpdateQuery -> {
                     _searchState.update {
                         it.copy(query = event.query)
                     }
                 }
+
                 SearchEvent.Collapse -> {
                     _searchState.update {
                         it.copy(expanded = false, query = "")
                     }
                 }
+
                 SearchEvent.Expand -> {
                     _searchState.update {
                         it.copy(expanded = true)
                     }
                 }
+
                 is SearchEvent.UpdateExpanded -> {
                     _searchState.update {
                         it.copy(expanded = event.expanded, query = "")
@@ -433,16 +455,19 @@ class MainVM
                         loadFiles()
                     }
                 }
+
                 is AddFile -> {
                     viewModelScope.launch {
                         _files.value += event.file
                     }
                 }
+
                 is RemoveFile -> {
                     viewModelScope.launch {
                         _files.value -= event.file
                     }
                 }
+
                 is FilesEvent.UpdateMetadata -> {
                     if (Environment.isExternalStorageManager()) {
                         with(AudioFileIO.read(File(event.metadata.path))) {
@@ -465,7 +490,11 @@ class MainVM
                             loadFiles()
                         }
                     } else {
-                        val editPendingIntent = MediaStore.createWriteRequest(context.contentResolver, listOf(event.metadata.uri))
+                        val editPendingIntent =
+                            MediaStore.createWriteRequest(
+                                context.contentResolver,
+                                listOf(event.metadata.uri),
+                            )
                         context.startIntentSender(editPendingIntent.intentSender, null, 0, 0, 0)
                     }
                 }
@@ -481,26 +510,32 @@ class MainVM
                     state.update {
                         it.copy(expanded = false)
                     }
+
                 SortEvent.Expand ->
                     state.update {
                         it.copy(expanded = true)
                     }
+
                 SortEvent.ToggleAscending ->
                     state.update {
                         it.copy(ascending = !it.ascending)
                     }
+
                 is SortEvent.UpdateAscending ->
                     state.update {
                         it.copy(ascending = event.ascending)
                     }
+
                 is SortEvent.UpdateExpanded ->
                     state.update {
                         it.copy(expanded = event.expanded)
                     }
+
                 is SortEvent.UpdateSortType ->
                     state.update {
                         it.copy(sortType = event.sortType)
                     }
+
                 is SortEvent.UpdateSortTypeOrToggleAsc -> {
                     state.update {
                         if (it.sortType == event.sortType) {
@@ -524,31 +559,37 @@ class MainVM
                         it.copy(expanded = false)
                     }
                 }
+
                 PlaylistSortEvent.Expand -> {
                     _playlistSortState.update {
                         it.copy(expanded = true)
                     }
                 }
+
                 PlaylistSortEvent.ToggleAscending -> {
                     _playlistSortState.update {
                         it.copy(ascending = !it.ascending)
                     }
                 }
+
                 is PlaylistSortEvent.UpdateAscending -> {
                     _playlistSortState.update {
                         it.copy(ascending = event.ascending)
                     }
                 }
+
                 is PlaylistSortEvent.UpdateExpanded -> {
                     _playlistSortState.update {
                         it.copy(expanded = event.expanded)
                     }
                 }
+
                 is PlaylistSortEvent.UpdateSortType -> {
                     _playlistSortState.update {
                         it.copy(sortType = event.sortType)
                     }
                 }
+
                 is PlaylistSortEvent.UpdateSortTypeOrToggleAsc -> {
                     _playlistSortState.update {
                         if (it.sortType == event.sortType) {
@@ -579,31 +620,37 @@ class MainVM
                         it.copy(expanded = false)
                     }
                 }
+
                 ListsSortEvent.Expand -> {
                     state.update {
                         it.copy(expanded = true)
                     }
                 }
+
                 ListsSortEvent.ToggleAscending -> {
                     state.update {
                         it.copy(ascending = !it.ascending)
                     }
                 }
+
                 is ListsSortEvent.UpdateAscending -> {
                     state.update {
                         it.copy(ascending = event.ascending)
                     }
                 }
+
                 is ListsSortEvent.UpdateExpanded -> {
                     state.update {
                         it.copy(expanded = event.expanded)
                     }
                 }
+
                 is ListsSortEvent.UpdateSortType -> {
                     state.update {
                         it.copy(sortType = event.sortType)
                     }
                 }
+
                 is ListsSortEvent.UpdateSortTypeOrToggleAsc -> {
                     state.update {
                         if (it.sortType == event.sortType) {
@@ -613,21 +660,25 @@ class MainVM
                         }
                     }
                 }
+
                 ListsSortEvent.CollapseCols -> {
                     state.update {
                         it.copy(colsExpanded = false)
                     }
                 }
+
                 ListsSortEvent.ExpandCols -> {
                     state.update {
                         it.copy(colsExpanded = true)
                     }
                 }
+
                 is ListsSortEvent.UpdateColsCount -> {
                     state.update {
                         it.copy(colsCount = event.colsCount)
                     }
                 }
+
                 is ListsSortEvent.UpdateColsCountExpanded -> {
                     state.update {
                         it.copy(colsExpanded = event.expanded)
@@ -672,7 +723,6 @@ class MainVM
                         val albumIdColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
                         val albumColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
                         val pathColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
-                        val dateColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
                         while (crs.moveToNext()) {
                             val id = crs.getLong(idColumn)
                             val duration = crs.getLong(durationColumn)
@@ -681,7 +731,7 @@ class MainVM
                             val albumId = crs.getLong(albumIdColumn)
                             val album = crs.getString(albumColumn)
                             val path = crs.getString(pathColumn)
-                            val date = crs.getLong(dateColumn)
+                            val date = Files.getLastModifiedTime(Paths.get(path)).toMillis()
                             val contentUri: Uri =
                                 ContentUris.withAppendedId(
                                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -697,13 +747,7 @@ class MainVM
                                     .setAlbum(album)
                                     .setAlbumId(albumId)
                                     .setPath(path)
-                                    .setDate(
-                                        LocalDateTime
-                                            .ofInstant(
-                                                Instant.ofEpochMilli(date),
-                                                TimeZone.getDefault().toZoneId(),
-                                            ),
-                                    )
+                                    .setDate(date)
                                     .setDuration(duration)
                                     .setFavorite(isFavorite(path))
                                     .setTimestamps(getTimestamps(path))
@@ -747,7 +791,11 @@ class MainVM
                                 try {
                                     setDataSource(context, file.contentUri)
                                     if (embeddedPicture != null) {
-                                        BitmapFactory.decodeByteArray(embeddedPicture, 0, embeddedPicture!!.size)!! to embeddedPicture!!
+                                        BitmapFactory.decodeByteArray(
+                                            embeddedPicture,
+                                            0,
+                                            embeddedPicture!!.size,
+                                        )!! to embeddedPicture!!
                                     } else {
                                         null
                                     }
@@ -862,19 +910,7 @@ class MainVM
                             viewModelScope.launch {
                                 dao.updateCurrentIndex(player.currentMediaItemIndex)
                                 try {
-                                    val files =
-                                        _queueList.value
-                                            .map { item ->
-                                                _files.value.first {
-                                                    item == it.id
-                                                }
-                                            }
-                                    dao.upsertTimestamp(
-                                        Timestamp(
-                                            files[player.currentMediaItemIndex].path,
-                                            files[player.currentMediaItemIndex].timestamps.first() + LocalDateTime.now(),
-                                        ),
-                                    )
+                                    dao.addTimestamp(queueFiles.value[player.currentMediaItemIndex].path)
                                 } catch (e: Exception) {
                                     e.printStackTrace()
                                 }
@@ -904,12 +940,15 @@ class MainVM
                             val favorites = dao.suspendGetFavorites()
                             onPlayerEvent(PlayerEvent.Play(_files.value.filter { favorites.contains(it.path) }))
                         }
+
                     StartupEvent.PlayMostPlayed ->
                         viewModelScope.launch {
                             val timestamps = dao.suspendGetTimestamps()
-                            val mostPlayed = timestamps.toList().sortedByDescending { it.times.size }.map { it.path }
+                            val mostPlayed =
+                                timestamps.toList().sortedByDescending { it.times.size }.map { it.path }
                             onPlayerEvent(PlayerEvent.Play(_files.value.filter { mostPlayed.contains(it.path) }))
                         }
+
                     is StartupEvent.PlayPlaylist ->
                         viewModelScope.launch {
                             val p =
@@ -922,6 +961,7 @@ class MainVM
                                 onPlayerEvent(PlayerEvent.Play(it))
                             }
                         }
+
                     else -> {}
                 }
             }, ContextCompat.getMainExecutor(context))
@@ -956,6 +996,7 @@ class MainVM
                             }
                             onPlayerEvent(PlayerEvent.Stop)
                         }
+
                         is TimerType.Time -> {
                             while (true) {
                                 val time = with(LocalDateTime.now()) { hour * 60 + minute }
@@ -964,6 +1005,7 @@ class MainVM
                             }
                             onPlayerEvent(PlayerEvent.Stop)
                         }
+
                         else -> return@launch
                     }
                 }
@@ -982,23 +1024,27 @@ class MainVM
                         player.play()
                     }
                 }
+
                 is PlayerEvent.Play -> play(event.items, event.index)
                 is PlayerEvent.PlayPaths ->
                     play(
                         event.items.mapNotNull { item -> _files.value.firstOrNull { it.path == item } },
                         event.index,
                     )
+
                 is PlayerEvent.PlayIds ->
                     play(
                         event.items.mapNotNull { item -> _files.value.firstOrNull { it.id == item } },
                         event.index,
                     )
+
                 PlayerEvent.Previous -> player.seekToPrevious()
                 PlayerEvent.Resume -> player.play()
                 is PlayerEvent.Seek ->
                     if (!((event.skipIfSameIndex) and (event.index == queueIndex.value))) {
                         player.seekTo(event.index, event.time)
                     }
+
                 is PlayerEvent.SeekTime -> player.seekTo(event.time)
                 PlayerEvent.Stop -> {
                     timerJob?.cancel()
@@ -1025,6 +1071,7 @@ class MainVM
                         )
                     }
                 }
+
                 is PlayerEvent.Swap -> {
                     player.moveMediaItem(event.from, event.to)
                     viewModelScope.launch(Dispatchers.IO) {
@@ -1039,6 +1086,7 @@ class MainVM
                         )
                     }
                 }
+
                 PlayerEvent.CycleRepeatMode -> {
                     player.repeatMode =
                         when (player.repeatMode) {
@@ -1047,12 +1095,15 @@ class MainVM
                             else -> Player.REPEAT_MODE_OFF
                         }
                 }
+
                 is PlayerEvent.SetRepeatMode -> {
                     player.repeatMode = event.repeatMode
                 }
+
                 PlayerEvent.ToggleShuffle -> {
                     player.shuffleModeEnabled = !player.shuffleModeEnabled
                 }
+
                 PlayerEvent.ResetSpeed -> player.setPlaybackSpeed(1f)
                 is PlayerEvent.SetSpeed -> player.setPlaybackSpeed(event.speed)
                 is PlayerEvent.SetTimer -> {
@@ -1061,21 +1112,25 @@ class MainVM
                     }
                     startTimer()
                 }
+
                 is PlayerEvent.UpdateFavorite -> {
                     viewModelScope.launch {
                         dao.upsertItem(ItemData(event.path, event.favorite))
                     }
                 }
+
                 is PlayerEvent.SetFavorite -> {
                     viewModelScope.launch {
                         dao.upsertItem(ItemData(event.path, true))
                     }
                 }
+
                 is PlayerEvent.ToggleFavorite -> {
                     viewModelScope.launch {
                         dao.upsertItem(ItemData(event.path, !isFavorite(event.path).first()))
                     }
                 }
+
                 is PlayerEvent.AddToNext -> {
                     if (_playerState.value.playState == PlayState.STOP) {
                         play(event.items, autoPlay = false)
@@ -1103,6 +1158,7 @@ class MainVM
                         )
                     }
                 }
+
                 is PlayerEvent.AddToQueue -> {
                     if (_playerState.value.playState == PlayState.STOP) {
                         play(event.items, autoPlay = false)
@@ -1119,16 +1175,17 @@ class MainVM
                     }
                     player.addMediaItems(list.toMediaItems())
                 }
+
                 PlayerEvent.PlayFavorites ->
                     viewModelScope.launch {
                         play(favoritesFiles.value)
                     }
+
                 PlayerEvent.PlayMostPlayed ->
                     viewModelScope.launch {
-                        val timestamps = dao.suspendGetTimestamps()
-                        val mostPlayed = timestamps.toList().sortedByDescending { it.times.size }.map { it.path }
-                        play(_files.value.filter { mostPlayed.contains(it.path) })
+                        play(mostPlayed.value)
                     }
+
                 is PlayerEvent.PlayPlaylist ->
                     viewModelScope.launch {
                         val p =
@@ -1150,37 +1207,47 @@ class MainVM
                     _uiState.update {
                         it.copy(speedDialog = true)
                     }
+
                 UiEvent.HideSpeedDialog ->
                     _uiState.update {
                         it.copy(speedDialog = false)
                     }
+
                 UiEvent.HideTimerDialog ->
                     _uiState.update {
                         it.copy(timerDialog = false)
                     }
+
                 UiEvent.ShowTimerDialog ->
                     _uiState.update {
                         it.copy(timerDialog = true)
                     }
+
                 is UiEvent.SetViewState -> _uiState.update { it.copy(viewState = event.viewState) }
                 UiEvent.CollapsePlaylist ->
                     _uiState.update { it.copy(playlistViewState = PlaylistViewState.COLLAPSED) }
+
                 UiEvent.ExpandPlaylist ->
                     _uiState.update { it.copy(playlistViewState = PlaylistViewState.EXPANDED) }
+
                 is UiEvent.SetPlaylistViewState ->
                     _uiState.update { it.copy(playlistViewState = event.playlistViewState) }
+
                 UiEvent.HideBottomSheet ->
                     _uiState.update {
                         it.copy(bottomSheetVisible = false)
                     }
+
                 is UiEvent.ShowBottomSheet ->
                     _uiState.update {
                         it.copy(bottomSheetItem = event.item, bottomSheetVisible = true)
                     }
+
                 UiEvent.HideListBottomSheet ->
                     _uiState.update {
                         it.copy(listBottomSheetVisible = false)
                     }
+
                 is UiEvent.ShowListBottomSheet ->
                     _uiState.update {
                         it.copy(
@@ -1192,34 +1259,42 @@ class MainVM
                             listBottomSheetVisible = true,
                         )
                     }
+
                 UiEvent.HideNewPlaylistDialog ->
                     _uiState.update {
                         it.copy(newPlaylistDialog = false)
                     }
-                UiEvent.ShowNewPlaylistDialog ->
+
+                is UiEvent.ShowNewPlaylistDialog ->
                     _uiState.update {
-                        it.copy(newPlaylistDialog = true)
+                        it.copy(newPlaylistDialog = true, newPlaylistItems = event.items)
                     }
+
                 is UiEvent.UpdateNewPlaylistName ->
                     _uiState.update {
                         it.copy(newPlaylistName = event.newName)
                     }
+
                 is UiEvent.ShowAddToPlaylistDialog ->
                     _uiState.update {
                         it.copy(addToPlaylistDialog = true, addToPlaylistItems = event.items)
                     }
+
                 UiEvent.HideAddToPlaylistDialog ->
                     _uiState.update {
                         it.copy(addToPlaylistDialog = false)
                     }
+
                 is UiEvent.UpdateSelectedPlaylist ->
                     _uiState.update {
                         it.copy(addToPlaylistIndex = event.index)
                     }
+
                 UiEvent.HidePlaylistBottomSheet ->
                     _uiState.update {
                         it.copy(playlistBottomSheetVisible = false)
                     }
+
                 is UiEvent.ShowPlaylistBottomSheet -> {
                     viewModelScope.launch {
                         _playlistIndex.value = event.index
@@ -1228,10 +1303,12 @@ class MainVM
                         it.copy(playlistBottomSheetVisible = true)
                     }
                 }
+
                 UiEvent.HideMetadataDialog ->
                     _uiState.update {
                         it.copy(metadataDialog = false)
                     }
+
                 is UiEvent.ShowMetadataDialog ->
                     _uiState.update {
                         it.copy(
@@ -1239,30 +1316,37 @@ class MainVM
                             metadata = event.metadata,
                         )
                     }
+
                 UiEvent.ToggleLyrics ->
                     _uiState.update {
                         it.copy(lyricsVisible = !it.lyricsVisible)
                     }
+
                 UiEvent.DisableSyncing ->
                     _uiState.update {
                         it.copy(syncing = false)
                     }
+
                 UiEvent.EnableSyncing ->
                     _uiState.update {
                         it.copy(syncing = true)
                     }
+
                 UiEvent.DismissDetails ->
                     _uiState.update {
                         it.copy(detailsDialog = false)
                     }
+
                 is UiEvent.ShowDetails ->
                     _uiState.update {
                         it.copy(detailsDialog = true, detailsFile = event.file)
                     }
+
                 UiEvent.HideRenamePlaylistDialog ->
                     _uiState.update {
                         it.copy(renamePlaylistDialogVisible = false)
                     }
+
                 is UiEvent.ShowRenamePlaylistDialog ->
                     _uiState.update {
                         it.copy(
@@ -1271,9 +1355,20 @@ class MainVM
                             renamePlaylistName = event.name,
                         )
                     }
+
                 is UiEvent.UpdateRenamePlaylistName ->
                     _uiState.update {
                         it.copy(renamePlaylistName = event.newName)
+                    }
+
+                UiEvent.HideQueueBottomSheet ->
+                    _uiState.update {
+                        it.copy(queueSheetVisible = false)
+                    }
+
+                UiEvent.ShowQueueBottomSheet ->
+                    _uiState.update {
+                        it.copy(queueSheetVisible = true)
                     }
             }
         }
@@ -1290,6 +1385,7 @@ class MainVM
                                 ),
                         )
                     }
+
                 is MetadataEvent.Artist ->
                     _uiState.update {
                         it.copy(
@@ -1299,6 +1395,7 @@ class MainVM
                                 ),
                         )
                     }
+
                 is MetadataEvent.Composer ->
                     _uiState.update {
                         it.copy(
@@ -1308,6 +1405,7 @@ class MainVM
                                 ),
                         )
                     }
+
                 is MetadataEvent.Genre ->
                     _uiState.update {
                         it.copy(
@@ -1317,6 +1415,7 @@ class MainVM
                                 ),
                         )
                     }
+
                 is MetadataEvent.Title ->
                     _uiState.update {
                         it.copy(
@@ -1326,6 +1425,7 @@ class MainVM
                                 ),
                         )
                     }
+
                 is MetadataEvent.Year ->
                     _uiState.update {
                         it.copy(
@@ -1355,11 +1455,18 @@ class MainVM
                         }
                     }
                 }
+
                 PlaylistEvent.CreateNew -> {
                     viewModelScope.launch {
-                        dao.upsertPlaylist(Playlist(name = uiState.value.newPlaylistName))
+                        dao.upsertPlaylist(
+                            Playlist(
+                                name = uiState.value.newPlaylistName,
+                                items = uiState.value.newPlaylistItems,
+                            ),
+                        )
                     }
                 }
+
                 is PlaylistEvent.Reorder ->
                     viewModelScope.launch {
                         with(event.playlist) {
@@ -1373,6 +1480,7 @@ class MainVM
                             )
                         }
                     }
+
                 is PlaylistEvent.RemoveAt ->
                     viewModelScope.launch {
                         with(event.playlist) {
@@ -1386,6 +1494,7 @@ class MainVM
                             )
                         }
                     }
+
                 is PlaylistEvent.DeletePlaylist -> {
                     _uiState.update {
                         it.copy(playlistBottomSheetVisible = false)
@@ -1394,9 +1503,13 @@ class MainVM
                         dao.deletePlaylist(event.playlist)
                     }
                 }
+
                 is PlaylistEvent.RenamePlaylist ->
                     viewModelScope.launch {
-                        dao.updatePlaylistName(uiState.value.renamePlaylistId, uiState.value.renamePlaylistName)
+                        dao.updatePlaylistName(
+                            uiState.value.renamePlaylistId,
+                            uiState.value.renamePlaylistName,
+                        )
                     }
             }
         }
@@ -1420,9 +1533,7 @@ class MainVM
             player.prepare()
             if (autoPlay) player.play()
             viewModelScope.launch {
-                dao.upsertTimestamp(
-                    Timestamp(list[index].path, list[index].timestamps.first() + LocalDateTime.now()),
-                )
+                dao.addTimestamp(list[index].path)
                 dao.updateCurrentIndex(index)
                 _playerState.update {
                     it.copy(

@@ -6,6 +6,7 @@ import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import younesbouhouche.musicplayer.core.presentation.util.getCurrentTime
 import younesbouhouche.musicplayer.main.data.models.Queue
 import younesbouhouche.musicplayer.main.data.models.Timestamp
 import younesbouhouche.musicplayer.main.domain.models.ItemData
@@ -37,6 +38,9 @@ interface AppDao {
     @Query("SELECT * from Timestamp WHERE path=:path")
     fun getTimestamps(path: String): Flow<Timestamp?>
 
+    @Query("SELECT * from Timestamp WHERE path=:path")
+    suspend fun suspendGetTimestamps(path: String): Timestamp?
+
     fun getGroupedTimestamps() =
         getTimestamps().map { timestamp ->
             timestamp
@@ -50,6 +54,14 @@ interface AppDao {
 
     @Upsert
     suspend fun upsertTimestamp(timestamp: Timestamp)
+
+    suspend fun addTimestamp(path: String) =
+        upsertTimestamp(
+            Timestamp(
+                path,
+                (suspendGetTimestamps(path)?.times ?: emptyList()) + getCurrentTime(),
+            ),
+        )
 
     @Upsert
     suspend fun upsertPlaylist(playlist: Playlist)

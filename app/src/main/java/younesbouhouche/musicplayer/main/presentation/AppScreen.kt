@@ -51,6 +51,7 @@ import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.ItemBottomSheet
 import younesbouhouche.musicplayer.core.presentation.ListBottomSheet
 import younesbouhouche.musicplayer.core.presentation.PlaylistBottomSheet
+import younesbouhouche.musicplayer.core.presentation.QueueBottomSheet
 import younesbouhouche.musicplayer.core.presentation.util.composables.leftEdgeWidth
 import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent
@@ -59,9 +60,9 @@ import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
 import younesbouhouche.musicplayer.main.presentation.dialogs.AddToPlaylistDialog
+import younesbouhouche.musicplayer.main.presentation.dialogs.CreatePlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.DetailsDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.MetadataDialog
-import younesbouhouche.musicplayer.main.presentation.dialogs.NewPlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.RenamePlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.SpeedDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.TimerDialog
@@ -184,7 +185,10 @@ fun AppScreen(
     }
     LaunchedEffect(key1 = playerState.playState) {
         if ((playerState.playState != PlayState.STOP) and (state.settledValue == ViewState.HIDDEN)) {
-            launch { state.animateTo(ViewState.SMALL) }
+            launch {
+                playlistState.snapTo(PlaylistViewState.COLLAPSED)
+                state.animateTo(ViewState.SMALL)
+            }
         }
     }
     val progress =
@@ -400,6 +404,14 @@ fun AppScreen(
             ),
         )
     }
+    QueueBottomSheet(
+        uiState.queueSheetVisible,
+        rememberModalBottomSheetState(),
+        { mainVM.onUiEvent(UiEvent.HideQueueBottomSheet) },
+        { mainVM.onPlayerEvent(PlayerEvent.Stop) },
+        { mainVM.onUiEvent(UiEvent.ShowNewPlaylistDialog(queueFiles.map { it.path })) },
+        { mainVM.onUiEvent(UiEvent.ShowAddToPlaylistDialog(queueFiles.map { it.path })) },
+    )
     RenamePlaylistDialog(
         uiState.renamePlaylistDialogVisible,
         {
@@ -425,7 +437,7 @@ fun AppScreen(
         { mainVM.onUiEvent(UiEvent.HideTimerDialog) },
         { mainVM.onPlayerEvent(PlayerEvent.SetTimer(it)) },
     )
-    NewPlaylistDialog(
+    CreatePlaylistDialog(
         uiState.newPlaylistDialog,
         uiState.newPlaylistName,
         { mainVM.onUiEvent(UiEvent.UpdateNewPlaylistName(it)) },

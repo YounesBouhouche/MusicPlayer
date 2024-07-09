@@ -23,6 +23,9 @@ import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.Dialog
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.util.timeString
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
@@ -59,7 +62,10 @@ fun DetailsDialog(
             item {
                 Item(
                     "Date Modified",
-                    file.date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
+                    LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(file.date),
+                        ZoneId.systemDefault()
+                    ).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
                 )
             }
             item {

@@ -32,8 +32,8 @@ sealed class NavRoutes {
     data object MostPlayedScreen : NavRoutes()
 
     @Serializable
-    data object RecentlyPlayedScreen : NavRoutes()
+    data object HistoryScreen : NavRoutes()
 
     @Serializable
-    data object RecentlyAddedScreen : NavRoutes()
+    data object LastAddedScreen : NavRoutes()
 }

@@ -22,6 +22,7 @@ data class UiState(
     val timerDialog: Boolean = false,
     val newPlaylistDialog: Boolean = false,
     val newPlaylistName: String = "",
+    val newPlaylistItems: List<String> = emptyList(),
     val addToPlaylistDialog: Boolean = false,
     val addToPlaylistIndex: Int = 0,
     val addToPlaylistItems: List<String> = emptyList(),
@@ -34,4 +35,5 @@ data class UiState(
     val renamePlaylistDialogVisible: Boolean = false,
     val renamePlaylistId: Int = -1,
     val renamePlaylistName: String = "",
+    val queueSheetVisible: Boolean = false,
 )

@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LibraryAdd
@@ -80,7 +81,7 @@ fun Home(
                 HeaderButton(
                     "Last added",
                     Icons.Default.LibraryAdd,
-                ) { navigate(NavRoutes.RecentlyAddedScreen) }
+                ) { navigate(NavRoutes.LastAddedScreen) }
                 HeaderButton(
                     "Most played",
                     Icons.AutoMirrored.Default.TrendingUp,
@@ -105,7 +106,7 @@ fun Home(
                 HeaderButton(
                     "History",
                     Icons.Default.History,
-                ) { navigate(NavRoutes.MostPlayedScreen) }
+                ) { navigate(NavRoutes.HistoryScreen) }
             }
         }
         if (artists.isNotEmpty()) {
@@ -187,6 +188,21 @@ fun Home(
                             )
                         }
                     }
+                }
+            }
+        } else {
+            item {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(vertical = 60.dp),
+                ) {
+                    Icon(Icons.Default.AccountCircle, null, Modifier.size(120.dp))
+                    Text(
+                        text = "No enough data for most played artists",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             }
         }

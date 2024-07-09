@@ -24,6 +24,10 @@ sealed interface UiEvent {
 
     data object HideBottomSheet : UiEvent
 
+    data object ShowQueueBottomSheet : UiEvent
+
+    data object HideQueueBottomSheet : UiEvent
+
     data class ShowListBottomSheet(
         val list: List<Long>,
         val title: String,
@@ -38,7 +42,7 @@ sealed interface UiEvent {
 
     data object HideTimerDialog : UiEvent
 
-    data object ShowNewPlaylistDialog : UiEvent
+    data class ShowNewPlaylistDialog(val items: List<String> = emptyList()) : UiEvent
 
     data class UpdateNewPlaylistName(val newName: String) : UiEvent
 
