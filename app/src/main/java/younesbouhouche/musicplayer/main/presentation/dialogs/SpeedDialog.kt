@@ -75,7 +75,7 @@ fun SpeedDialog(
                 .padding(horizontal = 24.dp),
             horizontalArrangement = Arrangement.Center,
         ) {
-            OutlinedIconButton(onClick = { selectedSpeed = max(0f, (selectedSpeed - 0.05f).scale(2)) }) {
+            OutlinedIconButton(onClick = { selectedSpeed = max(.25f, (selectedSpeed - 0.05f).scale(2)) }) {
                 Icon(Icons.Default.Remove, null, Modifier.size(ButtonDefaults.IconSize))
             }
             Row(
@@ -117,7 +117,7 @@ fun SpeedDialog(
                     )
                 }
             }
-            OutlinedIconButton(onClick = { selectedSpeed = min(1.75f, (selectedSpeed + 0.05f).scale(2)) }) {
+            OutlinedIconButton(onClick = { selectedSpeed = min(2f, (selectedSpeed + 0.05f).scale(2)) }) {
                 Icon(Icons.Default.Add, null, Modifier.size(ButtonDefaults.IconSize))
             }
         }
