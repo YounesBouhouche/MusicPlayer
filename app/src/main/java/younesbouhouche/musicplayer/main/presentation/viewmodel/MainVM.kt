@@ -1265,9 +1265,9 @@ class MainVM
                         it.copy(newPlaylistDialog = false)
                     }
 
-                is UiEvent.ShowNewPlaylistDialog ->
+                is UiEvent.ShowCreatePlaylistDialog ->
                     _uiState.update {
-                        it.copy(newPlaylistDialog = true, newPlaylistItems = event.items)
+                        it.copy(newPlaylistDialog = true, newPlaylistName = "", newPlaylistItems = event.items)
                     }
 
                 is UiEvent.UpdateNewPlaylistName ->

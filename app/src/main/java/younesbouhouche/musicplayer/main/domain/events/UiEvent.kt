@@ -42,7 +42,7 @@ sealed interface UiEvent {
 
     data object HideTimerDialog : UiEvent
 
-    data class ShowNewPlaylistDialog(val items: List<String> = emptyList()) : UiEvent
+    data class ShowCreatePlaylistDialog(val items: List<String> = emptyList()) : UiEvent
 
     data class UpdateNewPlaylistName(val newName: String) : UiEvent
 

@@ -250,7 +250,14 @@ fun AppScreen(
                                 .padding(start = startPadding)
                                 .then(cutout),
                     ) {
-                        SearchScreen(searchState, loading, mainVM::onSearchEvent)
+                        SearchScreen(
+                            searchState,
+                            loading,
+                            mainVM::onSearchEvent,
+                            { mainVM.onPlayerEvent(PlayerEvent.Play(searchState.result, it)) },
+                        ) {
+                            mainVM.onUiEvent(UiEvent.ShowBottomSheet(it))
+                        }
                     }
                     PlayerScreen(
                         Modifier.padding(start = startPadding),
@@ -409,7 +416,7 @@ fun AppScreen(
         rememberModalBottomSheetState(),
         { mainVM.onUiEvent(UiEvent.HideQueueBottomSheet) },
         { mainVM.onPlayerEvent(PlayerEvent.Stop) },
-        { mainVM.onUiEvent(UiEvent.ShowNewPlaylistDialog(queueFiles.map { it.path })) },
+        { mainVM.onUiEvent(UiEvent.ShowCreatePlaylistDialog(queueFiles.map { it.path })) },
         { mainVM.onUiEvent(UiEvent.ShowAddToPlaylistDialog(queueFiles.map { it.path })) },
     )
     RenamePlaylistDialog(

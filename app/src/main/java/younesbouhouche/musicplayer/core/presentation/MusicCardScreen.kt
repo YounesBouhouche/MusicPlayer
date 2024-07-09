@@ -25,6 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -71,7 +73,9 @@ fun ReorderableCollectionItemScope.MusicCardScreen(
     onClick: () -> Unit = {},
 ) {
     MyListItem(
-        modifier = modifier.background(background),
+        modifier =
+            modifier.background(background, MaterialTheme.shapes.medium)
+                .clip(MaterialTheme.shapes.medium).clipToBounds(),
         onLongClick = onLongClick,
         onClick = onClick,
         headline = file.title,
@@ -152,6 +156,7 @@ fun LazyItemScope.SwipeMusicCardLazyItem(
     file: MusicCard,
     modifier: Modifier = Modifier,
     background: Color = Color.Transparent,
+    swipingItemBackground: Color = MaterialTheme.colorScheme.surface,
     reorderableState: ReorderableLazyListState? = null,
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {},
@@ -173,6 +178,7 @@ fun LazyItemScope.SwipeMusicCardLazyItem(
                 modifier =
                     Modifier
                         .fillMaxSize()
+                        .background(background)
                         .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.CenterEnd,
             ) {
@@ -189,6 +195,6 @@ fun LazyItemScope.SwipeMusicCardLazyItem(
         },
         modifier = modifier.animateItem(),
     ) {
-        LazyMusicCardScreen(file, Modifier, background, reorderableState, onLongClick, onClick)
+        LazyMusicCardScreen(file, Modifier, swipingItemBackground, reorderableState, onLongClick, onClick)
     }
 }

@@ -231,7 +231,7 @@ fun Queue(
                         state = dismissState,
                         file = item,
                         reorderableState = reorderableState,
-                        background =
+                        swipingItemBackground =
                             if (index == idx) {
                                 MaterialTheme.colorScheme.background
                             } else {

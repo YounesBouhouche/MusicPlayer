@@ -59,10 +59,6 @@ fun Home(
     artists: List<Artist>,
     modifier: Modifier = Modifier,
 ) {
-    val state =
-        rememberCarouselState {
-            maxOf(5, artists.size)
-        }
     LazyColumnWithHeader(
         modifier = modifier,
         leadingContent = {},
@@ -109,100 +105,104 @@ fun Home(
                 ) { navigate(NavRoutes.HistoryScreen) }
             }
         }
-        if (artists.isNotEmpty()) {
-            item {
-                Spacer(Modifier.height(8.dp))
+        item {
+            Spacer(Modifier.height(8.dp))
+        }
+        item {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp, 24.dp),
+            ) {
+                Text(
+                    "Most played artists",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
             }
-            item {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp, 24.dp),
-                ) {
-                    Text(
-                        "Most played artists",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                }
-            }
-            item {
-                HorizontalMultiBrowseCarousel(
-                    state = state,
-                    itemSpacing = 8.dp,
-                    contentPadding = PaddingValues(16.dp),
-                    preferredItemWidth = 200.dp,
-                ) {
-                    artists.getOrNull(it)?.let {
-                        Column(
-                            Modifier
-                                .alpha(carouselItemInfo.size / carouselItemInfo.maxSize),
-                        ) {
-                            AnimatedContent(
-                                targetState = it.cover,
-                                label = "",
-                                modifier = Modifier.fillMaxSize(),
-                            ) { bitmap ->
-                                Box(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .aspectRatio(1f)
-                                        .background(
-                                            MaterialTheme.colorScheme.surfaceContainer,
-                                            rememberMaskShape(CircleShape),
-                                        )
-                                        .clip(rememberMaskShape(CircleShape))
-                                        .clipToBounds()
-                                        .combinedClickable(
-                                            onLongClick = {
-                                                showArtistBottomSheet(it)
-                                            },
-                                        ) { navigateToArtist(it) },
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    if (bitmap == null) {
-                                        Icon(
-                                            Icons.Default.Person,
-                                            null,
-                                            Modifier.size(120.dp),
-                                            MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
-                                    } else {
-                                        Image(
-                                            bitmap = bitmap.asImageBitmap(),
-                                            contentDescription = null,
-                                            modifier = Modifier.fillMaxSize(),
-                                            contentScale = ContentScale.Crop,
-                                        )
+        }
+        item {
+            AnimatedContent(targetState = artists, label = "") { artistsList ->
+                if (artistsList.isEmpty()) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.padding(vertical = 60.dp),
+                    ) {
+                        Icon(Icons.Default.AccountCircle, null, Modifier.size(120.dp))
+                        Text(
+                            text = "No enough data for most played artists",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                } else {
+                    val state =
+                        rememberCarouselState {
+                            minOf(5, artists.size)
+                        }
+                    HorizontalMultiBrowseCarousel(
+                        state = state,
+                        itemSpacing = 8.dp,
+                        contentPadding = PaddingValues(16.dp),
+                        preferredItemWidth = 200.dp,
+                    ) {
+                        artists.getOrNull(it)?.let {
+                            Column(
+                                Modifier
+                                    .alpha(carouselItemInfo.size / carouselItemInfo.maxSize),
+                            ) {
+                                AnimatedContent(
+                                    targetState = it.cover,
+                                    label = "",
+                                    modifier = Modifier.fillMaxSize(),
+                                ) { bitmap ->
+                                    Box(
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .aspectRatio(1f)
+                                            .background(
+                                                MaterialTheme.colorScheme.surfaceContainer,
+                                                rememberMaskShape(CircleShape),
+                                            )
+                                            .clip(rememberMaskShape(CircleShape))
+                                            .clipToBounds()
+                                            .combinedClickable(
+                                                onLongClick = {
+                                                    showArtistBottomSheet(it)
+                                                },
+                                            ) { navigateToArtist(it) },
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        if (bitmap == null) {
+                                            Icon(
+                                                Icons.Default.Person,
+                                                null,
+                                                Modifier.size(120.dp),
+                                                MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        } else {
+                                            Image(
+                                                bitmap = bitmap.asImageBitmap(),
+                                                contentDescription = null,
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentScale = ContentScale.Crop,
+                                            )
+                                        }
                                     }
                                 }
+                                Text(
+                                    it.name,
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    overflow = TextOverflow.Ellipsis,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 1,
+                                )
                             }
-                            Text(
-                                it.name,
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                overflow = TextOverflow.Ellipsis,
-                                textAlign = TextAlign.Center,
-                                maxLines = 1,
-                            )
                         }
                     }
-                }
-            }
-        } else {
-            item {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.padding(vertical = 60.dp),
-                ) {
-                    Icon(Icons.Default.AccountCircle, null, Modifier.size(120.dp))
-                    Text(
-                        text = "No enough data for most played artists",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
                 }
             }
         }

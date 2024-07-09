@@ -64,7 +64,7 @@ fun DetailsDialog(
                     "Date Modified",
                     LocalDateTime.ofInstant(
                         Instant.ofEpochMilli(file.date),
-                        ZoneId.systemDefault()
+                        ZoneId.systemDefault(),
                     ).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
                 )
             }

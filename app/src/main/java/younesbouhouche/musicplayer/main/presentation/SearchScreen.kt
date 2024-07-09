@@ -31,6 +31,7 @@ import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
 import younesbouhouche.musicplayer.core.presentation.LazyMusicCardScreen
 import younesbouhouche.musicplayer.main.domain.events.SearchEvent
+import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.SearchState
 import younesbouhouche.musicplayer.settings.presentation.SettingsActivity
 
@@ -40,6 +41,8 @@ fun SearchScreen(
     state: SearchState,
     loading: Boolean = false,
     onSearchEvent: (SearchEvent) -> Unit,
+    play: (Int) -> Unit,
+    showBottomSheet: (MusicCard) -> Unit,
 ) {
     val context = LocalContext.current
     val padding by animateDpAsState(targetValue = if (state.expanded) 0.dp else 8.dp, label = "")
@@ -82,7 +85,14 @@ fun SearchScreen(
         ) {
             LazyColumn(Modifier.fillMaxSize()) {
                 items(state.result, { it.id }) {
-                    LazyMusicCardScreen(file = it)
+                    LazyMusicCardScreen(
+                        file = it,
+                        onLongClick = {
+                            showBottomSheet(it)
+                        },
+                    ) {
+                        play(state.result.indexOf(it))
+                    }
                 }
             }
         }
