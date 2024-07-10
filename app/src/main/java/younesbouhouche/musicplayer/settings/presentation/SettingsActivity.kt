@@ -23,8 +23,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.twotone.Brush
 import androidx.compose.material.icons.twotone.Info
 import androidx.compose.material.icons.twotone.Language
-import androidx.compose.material.icons.twotone.LibraryMusic
-import androidx.compose.material.icons.twotone.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -146,20 +144,6 @@ class SettingsActivity : AppCompatActivity() {
                                 languages[language]!!,
                                 onClick = {
                                     startActivity(Intent(context, LanguageActivity::class.java))
-                                },
-                            )
-                            largeSettingsItem(
-                                Icons.TwoTone.PlayArrow,
-                                R.string.player,
-                                R.string.customize_player,
-                                onClick = {
-                                },
-                            )
-                            largeSettingsItem(
-                                Icons.TwoTone.LibraryMusic,
-                                R.string.library,
-                                R.string.library,
-                                onClick = {
                                 },
                             )
                             largeSettingsItem(
