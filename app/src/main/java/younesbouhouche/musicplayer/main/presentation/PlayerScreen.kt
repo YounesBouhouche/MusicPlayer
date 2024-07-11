@@ -46,8 +46,10 @@ fun PlayerScreen(
 ) {
     val shape = MaterialTheme.shapes.large.copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize)
     val offset = if (dragState.offset.isNaN()) 0 else dragState.offset.roundToInt()
+    // val cutout = if (isCompact) Modifier else Modifier.displayCutoutPadding()
     Box(
         Modifier
+            .then(modifier)
             .fillMaxSize()
             .offset {
                 IntOffset(0, offset)
@@ -55,8 +57,7 @@ fun PlayerScreen(
             .anchoredDraggable(dragState, Orientation.Vertical)
             .background(MaterialTheme.colorScheme.surfaceContainer, shape)
             .clip(shape)
-            .clipToBounds()
-            .then(modifier),
+            .clipToBounds(),
     ) {
         queue.getOrNull(index)?.run {
             SmallPlayer(

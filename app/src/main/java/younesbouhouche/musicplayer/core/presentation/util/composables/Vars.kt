@@ -1,6 +1,7 @@
 package younesbouhouche.musicplayer.core.presentation.util.composables
 
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
@@ -10,7 +11,11 @@ import androidx.window.core.layout.WindowWidthSizeClass
 
 val leftEdgeWidth
     @Composable
-    get() = with(LocalDensity.current) { WindowInsets.systemBars.getLeft(this, LocalLayoutDirection.current).toDp() }
+    get() = with(LocalDensity.current) { WindowInsets.displayCutout.getLeft(this, LocalLayoutDirection.current).toDp() }
+
+val rightEdgeWidth
+    @Composable
+    get() = with(LocalDensity.current) { WindowInsets.displayCutout.getRight(this, LocalLayoutDirection.current).toDp() }
 
 val statusBarHeight
     @Composable

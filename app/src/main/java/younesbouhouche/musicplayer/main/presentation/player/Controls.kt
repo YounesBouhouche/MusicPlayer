@@ -1,5 +1,6 @@
 package younesbouhouche.musicplayer.main.presentation.player
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -177,16 +178,18 @@ fun Controls(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            FilledIconButton(
-                onClick = { onPlayerEvent(PlayerEvent.Previous) },
-                modifier = Modifier.size(80.dp),
-                colors = nextPrevColors,
-            ) {
-                Icon(
-                    Icons.Outlined.SkipPrevious,
-                    null,
-                    modifier = Modifier.fillMaxSize(.5f),
-                )
+            AnimatedVisibility(visible = playerState.hasPrevItem) {
+                FilledIconButton(
+                    onClick = { onPlayerEvent(PlayerEvent.Previous) },
+                    modifier = Modifier.size(80.dp),
+                    colors = nextPrevColors,
+                ) {
+                    Icon(
+                        Icons.Outlined.SkipPrevious,
+                        null,
+                        modifier = Modifier.fillMaxSize(.5f),
+                    )
+                }
             }
             FilledIconButton(
                 onClick = { onPlayerEvent(PlayerEvent.PauseResume) },
@@ -212,16 +215,18 @@ fun Controls(
                     modifier = Modifier.size(40.dp),
                 )
             }
-            FilledIconButton(
-                onClick = { onPlayerEvent(PlayerEvent.Next) },
-                modifier = Modifier.size(80.dp),
-                colors = nextPrevColors,
-            ) {
-                Icon(
-                    Icons.Outlined.SkipNext,
-                    null,
-                    modifier = Modifier.fillMaxSize(.5f),
-                )
+            AnimatedVisibility(visible = playerState.hasNextItem) {
+                FilledIconButton(
+                    onClick = { onPlayerEvent(PlayerEvent.Next) },
+                    modifier = Modifier.size(80.dp),
+                    colors = nextPrevColors,
+                ) {
+                    Icon(
+                        Icons.Outlined.SkipNext,
+                        null,
+                        modifier = Modifier.fillMaxSize(.5f),
+                    )
+                }
             }
         }
     }

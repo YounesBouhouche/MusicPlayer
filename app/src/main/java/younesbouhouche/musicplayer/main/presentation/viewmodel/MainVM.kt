@@ -915,6 +915,12 @@ class MainVM
                                     e.printStackTrace()
                                 }
                             }
+                            _playerState.update {
+                                it.copy(
+                                    hasNextItem = player.hasNextMediaItem(),
+                                    hasPrevItem = player.hasPreviousMediaItem(),
+                                )
+                            }
                             if (
                                 (_playerState.value.timer is TimerType.End) and
                                 (

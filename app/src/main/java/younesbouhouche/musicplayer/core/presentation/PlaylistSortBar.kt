@@ -24,16 +24,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.main.domain.events.SortEvent
-import younesbouhouche.musicplayer.main.presentation.states.SortState
-import younesbouhouche.musicplayer.main.presentation.states.SortType
+import younesbouhouche.musicplayer.main.domain.events.PlaylistSortEvent
+import younesbouhouche.musicplayer.main.presentation.states.PlaylistSortState
+import younesbouhouche.musicplayer.main.presentation.states.PlaylistSortType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SortBar(
+fun PlaylistSortBar(
     modifier: Modifier = Modifier,
-    state: SortState,
-    onSortEvent: (SortEvent) -> Unit,
+    state: PlaylistSortState,
+    onSortEvent: (PlaylistSortEvent) -> Unit,
 ) {
     Row(
         modifier
@@ -43,7 +43,7 @@ fun SortBar(
     ) {
         ExposedDropdownMenuBox(
             expanded = state.expanded,
-            onExpandedChange = { onSortEvent(SortEvent.UpdateExpanded(it)) },
+            onExpandedChange = { onSortEvent(PlaylistSortEvent.UpdateExpanded(it)) },
         ) {
             TextButton(
                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
@@ -52,7 +52,7 @@ fun SortBar(
                         contentColor = MaterialTheme.colorScheme.onSurface,
                     ),
                 onClick = {
-                    onSortEvent(SortEvent.Expand)
+                    onSortEvent(PlaylistSortEvent.Expand)
                 },
             ) {
                 Icon(
@@ -66,9 +66,9 @@ fun SortBar(
             ExposedDropdownMenu(
                 matchTextFieldWidth = false,
                 expanded = state.expanded,
-                onDismissRequest = { onSortEvent(SortEvent.Collapse) },
+                onDismissRequest = { onSortEvent(PlaylistSortEvent.Collapse) },
             ) {
-                SortType.entries.forEach {
+                PlaylistSortType.entries.forEach {
                     DropdownMenuItem(
                         text = {
                             Text(stringResource(it.label))
@@ -77,8 +77,8 @@ fun SortBar(
                             Icon(it.icon, null)
                         },
                         onClick = {
-                            onSortEvent(SortEvent.UpdateSortTypeOrToggleAsc(it))
-                            onSortEvent(SortEvent.Collapse)
+                            onSortEvent(PlaylistSortEvent.UpdateSortTypeOrToggleAsc(it))
+                            onSortEvent(PlaylistSortEvent.Collapse)
                         },
                         colors =
                             if (state.sortType == it) {

@@ -54,6 +54,7 @@ import younesbouhouche.musicplayer.core.presentation.PlaylistBottomSheet
 import younesbouhouche.musicplayer.core.presentation.QueueBottomSheet
 import younesbouhouche.musicplayer.core.presentation.util.composables.leftEdgeWidth
 import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
+import younesbouhouche.musicplayer.core.presentation.util.composables.rightEdgeWidth
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
@@ -260,7 +261,7 @@ fun AppScreen(
                         }
                     }
                     PlayerScreen(
-                        Modifier.padding(start = startPadding),
+                        Modifier.padding(start = startPadding, end = rightEdgeWidth),
                         queueFiles,
                         queueIndex,
                         playerState,

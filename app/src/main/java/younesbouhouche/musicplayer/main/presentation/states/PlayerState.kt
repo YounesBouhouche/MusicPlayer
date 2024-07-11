@@ -11,6 +11,8 @@ data class PlayerState(
     val shuffle: Boolean = false,
     val speed: Float = 1f,
     var timer: TimerType = TimerType.Disabled,
+    val hasNextItem: Boolean = true,
+    val hasPrevItem: Boolean = true,
 )
 
 enum class ViewState {
