@@ -47,11 +47,13 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.media3.common.Player
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.SwipeMusicCardLazyItem
 import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
@@ -171,7 +173,7 @@ fun Queue(
                             containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         ),
                     title = {
-                        Text(text = "Up Next")
+                        Text(text = stringResource(R.string.up_next))
                     },
                     navigationIcon = {
                         IconButton(

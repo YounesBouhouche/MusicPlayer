@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.main.domain.events.ListsSortEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistSortEvent
@@ -67,7 +68,7 @@ fun SortBar(
                     Modifier.size(ButtonDefaults.IconSize),
                 )
                 Spacer(Modifier.width(ButtonDefaults.IconSpacing))
-                Text(state.sortType.label)
+                Text(stringResource(state.sortType.label))
             }
             ExposedDropdownMenu(
                 matchTextFieldWidth = false,
@@ -77,7 +78,7 @@ fun SortBar(
                 SortType.entries.forEach {
                     DropdownMenuItem(
                         text = {
-                            Text(it.label)
+                            Text(stringResource(it.label))
                         },
                         leadingIcon = {
                             Icon(it.icon, null)
@@ -135,7 +136,7 @@ fun ListsSortBar(
                     Modifier.size(ButtonDefaults.IconSize),
                 )
                 Spacer(Modifier.width(ButtonDefaults.IconSpacing))
-                Text(state.sortType.label)
+                Text(stringResource(state.sortType.label))
             }
             ExposedDropdownMenu(
                 matchTextFieldWidth = false,
@@ -145,7 +146,7 @@ fun ListsSortBar(
                 ListsSortType.entries.forEach {
                     DropdownMenuItem(
                         text = {
-                            Text(it.label)
+                            Text(stringResource(it.label))
                         },
                         leadingIcon = {
                             Icon(it.icon, null)
@@ -187,7 +188,7 @@ fun ListsSortBar(
                     Modifier.size(ButtonDefaults.IconSize),
                 )
                 Spacer(Modifier.width(ButtonDefaults.IconSpacing))
-                Text(state.colsCount.label)
+                Text(stringResource(state.colsCount.label))
             }
             ExposedDropdownMenu(
                 matchTextFieldWidth = false,
@@ -197,7 +198,7 @@ fun ListsSortBar(
                 ColsCount.entries.forEach {
                     DropdownMenuItem(
                         text = {
-                            Text(it.label)
+                            Text(stringResource(it.label))
                         },
                         leadingIcon = {
                             Icon(it.icon, null)
@@ -255,7 +256,7 @@ fun PlaylistSortBar(
                     Modifier.size(ButtonDefaults.IconSize),
                 )
                 Spacer(Modifier.width(ButtonDefaults.IconSpacing))
-                Text(state.sortType.label)
+                Text(stringResource(state.sortType.label))
             }
             ExposedDropdownMenu(
                 matchTextFieldWidth = false,
@@ -265,7 +266,7 @@ fun PlaylistSortBar(
                 PlaylistSortType.entries.forEach {
                     DropdownMenuItem(
                         text = {
-                            Text(it.label)
+                            Text(stringResource(it.label))
                         },
                         leadingIcon = {
                             Icon(it.icon, null)

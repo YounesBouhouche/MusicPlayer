@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.core.presentation.util.composables.isCompact
@@ -54,10 +55,10 @@ fun BoxScope.NavBar(
                         selected = index == state,
                         alwaysShowLabel = false,
                         icon = {
-                            Icon(screen.icon, screen.title)
+                            Icon(screen.icon, null)
                         },
                         label = {
-                            Text(screen.title)
+                            Text(stringResource(screen.title))
                         },
                         onClick = {
                             navigate(screen.destination)
@@ -68,7 +69,10 @@ fun BoxScope.NavBar(
         }
     } else {
         NavigationRail(
-            modifier = Modifier.align(Alignment.TopStart).displayCutoutPadding(),
+            modifier =
+                Modifier
+                    .align(Alignment.TopStart)
+                    .displayCutoutPadding(),
             windowInsets = WindowInsets.systemBars,
         ) {
             Routes.entries.forEachIndexed { index, screen ->
@@ -76,10 +80,10 @@ fun BoxScope.NavBar(
                     selected = index == state,
                     alwaysShowLabel = false,
                     icon = {
-                        Icon(screen.icon, screen.title)
+                        Icon(screen.icon, null)
                     },
                     label = {
-                        Text(screen.title)
+                        Text(stringResource(screen.title))
                     },
                     onClick = {
                         navigate(screen.destination)

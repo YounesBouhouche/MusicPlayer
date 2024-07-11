@@ -6,7 +6,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -36,33 +35,31 @@ fun AppIcon(modifier: Modifier = Modifier) {
     }
     val animatedAngle by animateFloatAsState(targetValue = angle, label = "")
     Box(
-        modifier = Modifier.fillMaxWidth(),
+        modifier.size(300.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier.size(300.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Image(
-                ImageVector.vectorResource(id = R.drawable.material_3_flower),
-                null,
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                        .clickable {
-                            angle += 30f
-                            view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                        }
-                        .rotate(animatedAngle),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.surfaceContainer),
-            )
-            Icon(
-                Icons.Default.MusicNote,
-                null,
-                Modifier.fillMaxSize(.5f),
-                MaterialTheme.colorScheme.onSurface,
-            )
-        }
+        Image(
+            ImageVector.vectorResource(id = R.drawable.material_3_flower),
+            null,
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .clickable(
+                        indication = null,
+                        interactionSource = null,
+                    ) {
+                        angle += 30f
+                        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                    }
+                    .rotate(animatedAngle),
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.surfaceContainer),
+        )
+        Icon(
+            Icons.Default.MusicNote,
+            null,
+            Modifier.fillMaxSize(.5f),
+            MaterialTheme.colorScheme.onSurface,
+        )
     }
 }

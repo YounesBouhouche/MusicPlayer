@@ -26,8 +26,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.settings.presentation.SettingsActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +61,7 @@ fun WelcomeScreen(onPermissionRequest: () -> Unit) {
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                "Permission",
+                stringResource(R.string.permission),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.headlineLarge,
@@ -87,12 +89,12 @@ fun WelcomeScreen(onPermissionRequest: () -> Unit) {
                         modifier = Modifier.weight(1f),
                     ) {
                         Text(
-                            text = "Music and audio",
+                            text = stringResource(R.string.music_and_audio),
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = "This permission is required to browse and play the audio files",
+                            text = stringResource(R.string.this_permission_is_required_to_browse_and_play_the_audio_files),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -102,7 +104,7 @@ fun WelcomeScreen(onPermissionRequest: () -> Unit) {
                     onClick = onPermissionRequest,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Grant permission")
+                    Text(stringResource(R.string.grant_permission))
                 }
             }
         }

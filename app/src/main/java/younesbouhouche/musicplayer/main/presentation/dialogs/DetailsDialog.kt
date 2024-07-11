@@ -46,22 +46,23 @@ fun DetailsDialog(
             verticalArrangement = Arrangement.spacedBy(2.dp),
             horizontalArrangement = Arrangement.spacedBy(2.dp),
             modifier =
-                Modifier.padding(horizontal = 8.dp)
+                Modifier
+                    .padding(horizontal = 8.dp)
                     .clip(MaterialTheme.shapes.large)
                     .clipToBounds(),
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                Item("Title", file.title)
+                Item(stringResource(R.string.title), file.title)
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
-                Item("Path", file.path)
+                Item(stringResource(R.string.file_path), file.path)
             }
             item {
-                Item("Duration", file.duration.timeString)
+                Item(stringResource(R.string.duration), file.duration.timeString)
             }
             item {
                 Item(
-                    "Date Modified",
+                    stringResource(R.string.date_modified),
                     LocalDateTime.ofInstant(
                         Instant.ofEpochMilli(file.date),
                         ZoneId.systemDefault(),
@@ -69,10 +70,10 @@ fun DetailsDialog(
                 )
             }
             item {
-                Item("Album", file.album)
+                Item(stringResource(R.string.album), file.album)
             }
             item {
-                Item("Artist", file.artist)
+                Item(stringResource(R.string.artist), file.artist)
             }
         }
     }

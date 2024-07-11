@@ -12,8 +12,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.Dialog
 import younesbouhouche.musicplayer.main.domain.models.Playlist
 import younesbouhouche.musicplayer.settings.presentation.settingsRadioItems
@@ -30,7 +32,7 @@ fun AddToPlaylistDialog(
     Dialog(
         visible = visible,
         onDismissRequest = onDismissRequest,
-        title = "Add to playlist",
+        title = stringResource(R.string.add_to_playlist),
         cancelListener = onDismissRequest,
         okListener = {
             onConfirmRequest()
@@ -42,10 +44,12 @@ fun AddToPlaylistDialog(
             Icon(
                 Icons.AutoMirrored.Default.PlaylistPlay,
                 null,
-                Modifier.size(64.dp).align(Alignment.CenterHorizontally),
+                Modifier
+                    .size(64.dp)
+                    .align(Alignment.CenterHorizontally),
             )
             Spacer(Modifier.height(16.dp))
-            Text("No playlists available", Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+            Text(stringResource(R.string.no_playlists_available), Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
             Spacer(Modifier.height(16.dp))
         } else {
             LazyColumn(Modifier.fillMaxWidth()) {

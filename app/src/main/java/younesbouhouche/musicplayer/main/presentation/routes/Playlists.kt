@@ -36,11 +36,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.LazyVerticalGridWithSortBar
 import younesbouhouche.musicplayer.core.presentation.MyListItem
 import younesbouhouche.musicplayer.core.presentation.util.composables.isScrollingUp
@@ -86,7 +88,7 @@ fun Playlists(
                             onClick = { onClick(playlists.indexOf(it)) },
                             onLongClick = { onLongClick(playlists.indexOf(it)) },
                             headline = it.name,
-                            supporting = "${it.items.size} items",
+                            supporting = pluralStringResource(R.plurals.item_s, it.items.size, it.items.size),
                             cover = null,
                             alternative = Icons.AutoMirrored.Default.PlaylistPlay,
                             modifier = Modifier.animateItem(),
@@ -150,7 +152,10 @@ fun Playlists(
             }
         }
         AnimatedVisibility(
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
+            modifier =
+                Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
             visible = state.isScrollingUp(),
             enter = materialSharedAxisZIn(true),
             exit = materialSharedAxisZOut(true),

@@ -19,9 +19,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.LazyVerticalGridWithSortBar
 import younesbouhouche.musicplayer.core.presentation.MyCard
 import younesbouhouche.musicplayer.core.presentation.MyListItem
@@ -61,7 +63,7 @@ fun Albums(
                         onClick = { onClick(it) },
                         onLongClick = { onLongClick(it) },
                         headline = it.title,
-                        supporting = "${it.items.size} items",
+                        supporting = pluralStringResource(R.plurals.item_s, it.items.size, it.items.size),
                         cover = it.cover?.asImageBitmap(),
                         alternative = Icons.Default.Album,
                         modifier = Modifier.animateItem(),

@@ -2,7 +2,6 @@ package younesbouhouche.musicplayer.settings.presentation
 
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
@@ -26,6 +25,8 @@ import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.core.presentation.util.getAppVersion
 import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 
@@ -120,7 +122,7 @@ class AboutActivity : AppCompatActivity() {
                                 .padding(horizontal = 16.dp),
                         state = listState,
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                     ) {
                         item {
                             AppIcon()
@@ -134,24 +136,29 @@ class AboutActivity : AppCompatActivity() {
                             )
                         }
                         item {
+                            Button(onClick = {}) {
+                                Text("v${getAppVersion()}")
+                            }
+                        }
+                        item {
                             AboutCard(
-                                "Developer",
-                                "Younes Bouhouche",
+                                stringResource(R.string.developer),
+                                stringResource(R.string.younes_bouhouche),
                                 Icons.Default.Person,
                             ) {
                             }
                         }
                         item {
                             AboutCard(
-                                "Project",
-                                "Source Code",
+                                stringResource(R.string.project),
+                                stringResource(R.string.source_code),
                                 Icons.Default.Code,
                             ) {
                             }
                         }
                         item {
                             AboutCard(
-                                "Contact me",
+                                stringResource(R.string.send_feedback),
                                 "younes.bouhouche12@gmail.com",
                                 Icons.Default.Mail,
                             ) {
@@ -168,18 +175,8 @@ class AboutActivity : AppCompatActivity() {
                                         )
                                         putExtra(
                                             Intent.EXTRA_TEXT,
-                                            "\nApp Version:${
-                                                (
-                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                                        context.packageManager.getPackageInfo(
-                                                            context.packageName,
-                                                            PackageManager.PackageInfoFlags.of(0),
-                                                        )
-                                                    } else {
-                                                        context.packageManager.getPackageInfo(context.packageName, 0)
-                                                    }
-                                                ).versionName
-                                            }\nAPI Level:${Build.VERSION.SDK_INT}",
+                                            "\nApp Version:${getAppVersion()}," +
+                                                "\nAPI Level:${Build.VERSION.SDK_INT}",
                                         )
                                     },
                                 ) {
@@ -191,7 +188,7 @@ class AboutActivity : AppCompatActivity() {
                         }
                         item {
                             AboutCard(
-                                "Social Media",
+                                stringResource(R.string.social_media),
                                 "@younesbouh_05",
                                 Icons.Default.Link,
                                 trailingContent = {
@@ -234,6 +231,14 @@ class AboutActivity : AppCompatActivity() {
                                     }
                                 },
                             ) {}
+                        }
+                        item {
+                            AboutCard(
+                                stringResource(R.string.translation),
+                                stringResource(R.string.contribute_in_app_translation),
+                                Icons.Default.Translate,
+                            ) {
+                            }
                         }
                     }
                 }

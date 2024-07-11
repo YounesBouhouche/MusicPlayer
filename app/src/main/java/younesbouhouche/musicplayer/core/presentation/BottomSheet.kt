@@ -62,8 +62,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
@@ -165,24 +168,24 @@ fun ItemBottomSheet(
             buttons =
                 listOf(
                     listOf(
-                        BottomSheetButton("Play next", Icons.Default.SkipNext) {
+                        BottomSheetButton(stringResource(R.string.play_next), Icons.Default.SkipNext) {
                             onPlayerEvent(PlayerEvent.AddToNext(listOf(file)))
                         },
-                        BottomSheetButton("Add to playing queue", Icons.Default.AddToPhotos) {
+                        BottomSheetButton(stringResource(R.string.add_to_playing_queue), Icons.Default.AddToPhotos) {
                             onPlayerEvent(PlayerEvent.AddToQueue(listOf(file)))
                         },
                         BottomSheetButton(
-                            "Add to playlist",
+                            stringResource(R.string.add_to_playlist),
                             Icons.AutoMirrored.Default.PlaylistAdd,
                         ) {
                             onUiEvent(UiEvent.ShowAddToPlaylistDialog(listOf(path)))
                         },
                     ),
                     listOf(
-                        BottomSheetButton("Details", Icons.Outlined.Info) {
+                        BottomSheetButton(stringResource(R.string.details), Icons.Outlined.Info) {
                             onUiEvent(UiEvent.ShowDetails(this))
                         },
-                        BottomSheetButton("Share", Icons.Default.Share, shareFile),
+                        BottomSheetButton(stringResource(R.string.share), Icons.Default.Share, shareFile),
                     ),
                 ),
             leadingContent = {
@@ -336,29 +339,29 @@ fun PlaylistBottomSheet(
         buttons =
             listOf(
                 listOf(
-                    BottomSheetButton("Play next", Icons.Default.SkipNext) {
+                    BottomSheetButton(stringResource(R.string.play_next), Icons.Default.SkipNext) {
                         onPlayerEvent(PlayerEvent.AddToNext(files))
                     },
-                    BottomSheetButton("Add to playing queue", Icons.Default.AddToPhotos) {
+                    BottomSheetButton(stringResource(R.string.add_to_playing_queue), Icons.Default.AddToPhotos) {
                         onPlayerEvent(PlayerEvent.AddToQueue(files))
                     },
                     BottomSheetButton(
-                        "Add to playlist",
+                        stringResource(R.string.add_to_playlist),
                         Icons.AutoMirrored.Default.PlaylistAdd,
                     ) {
                         onUiEvent(UiEvent.ShowAddToPlaylistDialog(files.map { it.path }))
                     },
                 ),
                 listOf(
-                    BottomSheetButton("Rename Playlist", Icons.Default.Edit) {
+                    BottomSheetButton(stringResource(R.string.rename_playlist), Icons.Default.Edit) {
                         onUiEvent(UiEvent.ShowRenamePlaylistDialog(id, title))
                     },
-                    BottomSheetButton("Save Playlist", Icons.Default.Save, savePlaylist),
-                    BottomSheetButton("Remove Playlist", Icons.Default.DeleteSweep, delete),
-                    BottomSheetButton("Create home shortcut", Icons.Default.AppShortcut, addToHomeScreen),
+                    BottomSheetButton(stringResource(R.string.save_playlist), Icons.Default.Save, savePlaylist),
+                    BottomSheetButton(stringResource(R.string.remove_playlist), Icons.Default.DeleteSweep, delete),
+                    BottomSheetButton(stringResource(R.string.create_home_shortcut), Icons.Default.AppShortcut, addToHomeScreen),
                 ),
                 listOf(
-                    BottomSheetButton("Share Files", Icons.Default.Share, shareFiles),
+                    BottomSheetButton(stringResource(R.string.share_files), Icons.Default.Share, shareFiles),
                 ),
             ),
         leadingContent = {
@@ -408,7 +411,7 @@ fun PlaylistBottomSheet(
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        text = "${files.size} item(s)",
+                        text = pluralStringResource(R.plurals.item_s, files.size, files.size),
                         modifier = Modifier.fillMaxWidth(),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -456,21 +459,21 @@ fun ListBottomSheet(
         buttons =
             listOf(
                 listOf(
-                    BottomSheetButton("Play next", Icons.Default.SkipNext) {
+                    BottomSheetButton(stringResource(R.string.play_next), Icons.Default.SkipNext) {
                         onPlayerEvent(PlayerEvent.AddToNext(list))
                     },
-                    BottomSheetButton("Add to playing queue", Icons.Default.AddToPhotos) {
+                    BottomSheetButton(stringResource(R.string.add_to_playing_queue), Icons.Default.AddToPhotos) {
                         onPlayerEvent(PlayerEvent.AddToQueue(list))
                     },
                     BottomSheetButton(
-                        "Add to playlist",
+                        stringResource(R.string.add_to_playlist),
                         Icons.AutoMirrored.Filled.PlaylistAdd,
                     ) {
                         onUiEvent(UiEvent.ShowAddToPlaylistDialog(list.map { it.path }))
                     },
                 ),
                 listOf(
-                    BottomSheetButton("Share Files", Icons.Default.Share, shareFiles),
+                    BottomSheetButton(stringResource(R.string.share_files), Icons.Default.Share, shareFiles),
                 ),
             ),
         leadingContent = {

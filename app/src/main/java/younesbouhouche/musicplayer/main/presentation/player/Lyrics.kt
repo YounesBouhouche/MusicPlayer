@@ -36,9 +36,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.util.removeLeadingTime
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
@@ -82,7 +84,7 @@ fun Lyrics(
         ) {
             Icon(Icons.Default.Lyrics, null, Modifier.size(60.dp))
             Text(
-                text = "No lyrics available",
+                text = stringResource(R.string.no_lyrics_available),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.fillMaxWidth(),
@@ -149,7 +151,7 @@ fun Lyrics(
                 Button(onClick = { onUiEvent(UiEvent.EnableSyncing) }) {
                     Icon(Icons.Default.Timer, null)
                     Spacer(Modifier.width(ButtonDefaults.IconSpacing))
-                    Text("Sync to current time")
+                    Text(stringResource(R.string.sync_to_current_time))
                 }
             }
         }

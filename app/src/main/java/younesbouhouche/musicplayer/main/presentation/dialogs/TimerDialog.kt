@@ -23,8 +23,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.Dialog
 import younesbouhouche.musicplayer.core.presentation.RadioContainer
 import younesbouhouche.musicplayer.main.domain.events.TimerType
@@ -46,7 +48,7 @@ fun TimerDialog(
     Dialog(
         visible = visible,
         onDismissRequest = onDismissRequest,
-        title = "Timer",
+        title = stringResource(R.string.timer),
         cancelListener = onDismissRequest,
         okListener = {
             onConfirmRequest(type)
@@ -56,7 +58,7 @@ fun TimerDialog(
         RadioContainer(
             selected = type == TimerType.Disabled,
             onSelected = { type = TimerType.Disabled },
-            text = "Disabled",
+            text = stringResource(R.string.disabled),
         )
         RadioContainer(
             selected = type is TimerType.Duration,
@@ -64,7 +66,7 @@ fun TimerDialog(
             text = "Duration",
         ) {
             if (type is TimerType.Duration) {
-                Text("${((type as TimerType.Duration).ms) / 60000} minute(s)")
+                Text(stringResource(R.string.minute_s, ((type as TimerType.Duration).ms) / 60000))
                 Spacer(Modifier.width(8.dp))
             }
         }
@@ -94,7 +96,7 @@ fun TimerDialog(
         RadioContainer(
             selected = type is TimerType.Time,
             onSelected = { type = TimerType.Time(0, 0) },
-            text = "Time",
+            text = stringResource(R.string.time),
         ) {
             if (type is TimerType.Time) {
                 with((type as TimerType.Time)) {
@@ -111,7 +113,7 @@ fun TimerDialog(
         RadioContainer(
             selected = type is TimerType.End,
             onSelected = { type = TimerType.End(1) },
-            text = "End of tracks",
+            text = stringResource(R.string.end_of_tracks),
         ) {
             if (type is TimerType.End) {
                 OutlinedTextField(

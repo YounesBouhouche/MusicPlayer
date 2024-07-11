@@ -16,9 +16,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.Dialog
 
 @Composable
@@ -36,7 +38,7 @@ fun CreatePlaylistDialog(
     Dialog(
         visible = visible,
         onDismissRequest = onDismissRequest,
-        title = "Create Playlist",
+        title = stringResource(R.string.create_playlist),
         cancelListener = onDismissRequest,
         okListener = {
             onConfirmRequest()
@@ -46,7 +48,7 @@ fun CreatePlaylistDialog(
         OutlinedTextField(
             value = playlistName,
             onValueChange = onNameChange,
-            label = { Text("Playlist name") },
+            label = { Text(stringResource(R.string.playlist_name)) },
             leadingIcon = {
                 Icon(Icons.Default.Title, null)
             },

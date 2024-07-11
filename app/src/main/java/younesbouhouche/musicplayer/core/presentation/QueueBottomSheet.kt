@@ -7,6 +7,8 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import younesbouhouche.musicplayer.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,9 +27,9 @@ fun QueueBottomSheet(
         buttons =
             listOf(
                 listOf(
-                    BottomSheetButton("Clear queue", Icons.Default.ClearAll, clear),
-                    BottomSheetButton("Save queue", Icons.Default.Save, save),
-                    BottomSheetButton("Add to playlist", Icons.AutoMirrored.Default.PlaylistAdd, add),
+                    BottomSheetButton(stringResource(R.string.clear_queue), Icons.Default.ClearAll, clear),
+                    BottomSheetButton(stringResource(R.string.save_queue), Icons.Default.Save, save),
+                    BottomSheetButton(stringResource(R.string.add_to_playlist), Icons.AutoMirrored.Default.PlaylistAdd, add),
                 ),
             ),
     )

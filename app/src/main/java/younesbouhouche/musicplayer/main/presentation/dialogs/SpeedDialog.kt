@@ -34,8 +34,10 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.Dialog
 import younesbouhouche.musicplayer.main.presentation.util.round
 import younesbouhouche.musicplayer.main.presentation.util.scale
@@ -57,7 +59,7 @@ fun SpeedDialog(
     Dialog(
         visible = visible,
         onDismissRequest = onDismissRequest,
-        title = "Playback Speed",
+        title = stringResource(R.string.playback_speed),
         trailingContent = {
             IconButton(onClick = { onSpeedChange(1f) }) {
                 Icon(Icons.Default.Refresh, null)

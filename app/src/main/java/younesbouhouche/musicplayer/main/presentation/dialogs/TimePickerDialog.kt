@@ -23,7 +23,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.Dialog
 import younesbouhouche.musicplayer.main.domain.events.TimerType
 
@@ -39,7 +41,7 @@ fun TimePickerDialog(
     val timePickerState = rememberTimePickerState(initialTimer.hour, initialTimer.min)
     Dialog(
         visible = visible,
-        title = "Pick Time",
+        title = stringResource(R.string.pick_time),
         onDismissRequest = onDismissRequest,
         neutral = {
             IconButton(

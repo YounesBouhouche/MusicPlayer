@@ -32,7 +32,13 @@ fun AboutCard(
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .clipToBounds()
-            .then(if (onClick == null) Modifier else Modifier.clickable(onClick = onClick))
+            .then(
+                if (onClick == null) {
+                    Modifier
+                } else {
+                    Modifier.clickable(onClick = onClick)
+                },
+            )
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),

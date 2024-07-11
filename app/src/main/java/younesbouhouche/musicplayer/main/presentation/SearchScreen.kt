@@ -26,9 +26,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.LazyMusicCardScreen
 import younesbouhouche.musicplayer.main.domain.events.SearchEvent
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
@@ -55,7 +57,7 @@ fun SearchScreen(
                     onSearch = { onSearchEvent(SearchEvent.UpdateQuery(it)) },
                     expanded = state.expanded,
                     placeholder = {
-                        Text("Search")
+                        Text(stringResource(R.string.search))
                     },
                     leadingIcon = {
                         if (state.expanded) {

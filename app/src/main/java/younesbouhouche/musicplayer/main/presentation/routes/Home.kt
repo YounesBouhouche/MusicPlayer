@@ -43,9 +43,11 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.LazyColumnWithHeader
 import younesbouhouche.musicplayer.main.domain.models.Artist
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
@@ -75,11 +77,11 @@ fun Home(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 HeaderButton(
-                    "Last added",
+                    stringResource(R.string.last_added),
                     Icons.Default.LibraryAdd,
                 ) { navigate(NavRoutes.LastAddedScreen) }
                 HeaderButton(
-                    "Most played",
+                    stringResource(R.string.most_played),
                     Icons.AutoMirrored.Default.TrendingUp,
                 ) { navigate(NavRoutes.MostPlayedScreen) }
             }
@@ -96,11 +98,11 @@ fun Home(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 HeaderButton(
-                    "Favorites",
+                    stringResource(R.string.favorites),
                     Icons.Default.Favorite,
                 ) { navigate(NavRoutes.FavoritesScreen) }
                 HeaderButton(
-                    "History",
+                    stringResource(R.string.history),
                     Icons.Default.History,
                 ) { navigate(NavRoutes.HistoryScreen) }
             }
@@ -115,7 +117,7 @@ fun Home(
                     .padding(16.dp, 24.dp),
             ) {
                 Text(
-                    "Most played artists",
+                    stringResource(R.string.most_played_artists),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onBackground,
                 )
@@ -131,7 +133,7 @@ fun Home(
                     ) {
                         Icon(Icons.Default.AccountCircle, null, Modifier.size(120.dp))
                         Text(
-                            text = "No enough data for most played artists",
+                            text = stringResource(R.string.no_enough_data),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
                         )
