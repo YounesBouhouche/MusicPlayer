@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -23,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -66,7 +66,8 @@ fun TimerDialog(
             text = "Duration",
         ) {
             if (type is TimerType.Duration) {
-                Text(stringResource(R.string.minute_s, ((type as TimerType.Duration).ms) / 60000))
+                val time = (((type as TimerType.Duration).ms) / 60000).toInt()
+                Text(pluralStringResource(R.plurals.minutes, time, time))
                 Spacer(Modifier.width(8.dp))
             }
         }
@@ -115,24 +116,21 @@ fun TimerDialog(
             onSelected = { type = TimerType.End(1) },
             text = stringResource(R.string.end_of_tracks),
         ) {
+            var selectedTracks by remember { mutableStateOf("1") }
+            LaunchedEffect(key1 = selectedTracks) {
+                type = TimerType.End((selectedTracks.toIntOrNull() ?: 1).coerceIn(1, null))
+            }
             if (type is TimerType.End) {
                 OutlinedTextField(
-                    value = (type as TimerType.End).tracks.toString(),
+                    value = selectedTracks,
                     keyboardOptions =
                         KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                         ),
                     onValueChange = {
-                        type =
-                            TimerType.End(
-                                try {
-                                    it.toInt()
-                                } catch (_: Exception) {
-                                    1
-                                }.coerceIn(1, null),
-                            )
+                        selectedTracks = it
                     },
-                    modifier = Modifier.size(80.dp, 46.dp),
+                    modifier = Modifier.width(100.dp),
                 )
             }
         }

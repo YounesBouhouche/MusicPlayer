@@ -21,8 +21,6 @@
     <string name="follow_system_dynamic_colors">Follow system dynamic colors (available on android 12 and above)</string>
     <string name="color_palette">Color Palette</string>
     <string name="choose_colors_scheme">Choose colors scheme</string>
-    <string name="group_chat_coming_soon">Group Chat (Coming soon)</string>
-    <string name="more_apps_coming_soon">More Apps (Coming soon)</string>
     <string name="younes_bouhouche">Younes Bouhouche</string>
     <string name="developer_description"><![CDATA[Mobile, Desktop & Web Developer]]></string>
     <string name="choose_theme">Choose theme</string>
@@ -57,10 +55,12 @@
     <string name="improve_translation_description">Your translations will help us reach a global audience and make our app better.</string>
     <string name="type_to_search">Type to search</string>
     <string name="no_result">No result</string>
-    <string name="do_you_really_want_to_delete_files">Do you really want to delete %1$s file(s) ?</string>
     <string name="rename_playlist">Rename playlist</string>
     <string name="sleep_timer">Sleep timer</string>
-    <string name="mins">%1$s mins</string>
+    <plurals name="minutes">
+        <item quantity="one">1 minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
     <string name="confirm_delete">Confirm delete</string>
     <string name="pick_time">Pick Time</string>
     <string name="invalid_value">Invalid value</string>
@@ -70,7 +70,6 @@
     <string name="add_widget">Add widget</string>
     <string name="app_widget_description">This is an app widget description</string>
     <string name="clear_history">Clear History</string>
-    <string name="welcome_to_jetmusicplayer">Welcome to JetMusicPlayer</string>
     <string name="up_next">Up Next</string>
     <string name="copy">Copy</string>
     <string name="choose_a_playlist">Choose a Playlist</string>
@@ -94,11 +93,6 @@
     <string name="create_new">Create new</string>
     <string name="no_playlists">No playlists were found</string>
     <string name="empty_list">Empty list</string>
-    <plurals name="item_s">
-        <item quantity="one">1 item</item>
-        <item quantity="zero">no items</item>
-        <item quantity="other">%d items</item>
-    </plurals>
     <string name="title_activity_dialog">DialogActivity</string>
     <string name="lyrics">Lyrics</string>
     <string name="song">Song</string>
@@ -156,5 +150,9 @@
     <string name="one">One</string>
     <string name="two">Two</string>
     <string name="three">Three</string>
-
+    <plurals name="item_s">
+        <item quantity="one">1 item</item>
+        <item quantity="zero">no items</item>
+        <item quantity="other">%d items</item>
+    </plurals>
 </resources>

@@ -874,7 +874,11 @@ class MainVM
                             super.onRepeatModeChanged(repeatMode)
                             viewModelScope.launch {
                                 _playerState.update {
-                                    it.copy(repeatMode = repeatMode)
+                                    it.copy(
+                                        repeatMode = repeatMode,
+                                        hasNextItem = player.hasNextMediaItem(),
+                                        hasPrevItem = player.hasPreviousMediaItem(),
+                                    )
                                 }
                             }
                         }
