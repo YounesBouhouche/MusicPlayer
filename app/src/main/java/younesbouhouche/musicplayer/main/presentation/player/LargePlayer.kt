@@ -77,7 +77,7 @@ fun LargePlayer(
         }
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
     var isScrolledByUser by remember { mutableStateOf(false) }
-    val playing = playerState.playState == PlayState.PLAYING
+    val playing = (playerState.playState == PlayState.PLAYING) or playerState.loading
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.isScrollInProgress }.collect { isScrolling ->
             if (isScrolledByUser && !isScrolling) {

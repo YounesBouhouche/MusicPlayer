@@ -41,7 +41,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.presentation.util.removeLeadingTime
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.presentation.util.toMs
@@ -54,16 +53,12 @@ fun Lyrics(
     onPlayerEvent: (PlayerEvent) -> Unit,
     onUiEvent: (UiEvent) -> Unit,
 ) {
-    val lyricsLineRegex = Regex("^(\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})])\\s[\\w\\s]*")
+    // val lyricsLineRegex = Regex("^(\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})])\\s[\\w\\s]*")
     val lyricsRegex = Regex("\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})]")
-    val lyricsLines =
-        lyrics
-            .split("\n")
-            .filter { it.isNotBlank() }
-            .sortedBy {
-                lyricsRegex.find(it)?.value?.removeSurrounding("[", "]")?.toMs() ?: 0
-            }
-    val synced = lyricsLines.any { it.matches(lyricsLineRegex) }
+    val positions = lyricsRegex.findAll(lyrics)
+    val synced = positions.toList().isNotEmpty()
+    val lyricsLines = lyrics.splitToSequence(lyricsRegex).toList()
+    // val synced = lyricsLines.any { it.matches(lyricsLineRegex) }
     var currentLine by remember { mutableIntStateOf(0) }
     val lyricsListState = rememberLazyListState()
     val isDragged by lyricsListState.interactionSource.collectIsDraggedAsState()
@@ -93,15 +88,11 @@ fun Lyrics(
         }
     } else if (synced) {
         val segments =
-            lyricsLines.map {
-                lyricsRegex
-                    .find(it)
-                    ?.value
-                    ?.removeSurrounding("[", "]")
-                    ?.toMs() ?: 0
-            }
+            positions.map {
+                it.value.removeSurrounding("[", "]").toMs()
+            }.toList()
         LaunchedEffect(key1 = time) {
-            if (syncing) currentLine = getIndex(segments, time)
+            if (syncing) currentLine = getIndex(segments, time) + 1
         }
         Column(
             Modifier.fillMaxSize(),
@@ -129,13 +120,15 @@ fun Lyrics(
                             .alpha(scale)
                             .clickable {
                                 scope.launch {
-                                    onPlayerEvent(PlayerEvent.SeekTime(segments[index]))
+                                    segments.getOrNull(index - 1)?.let {
+                                        onPlayerEvent(PlayerEvent.SeekTime(it))
+                                    }
                                     onUiEvent(UiEvent.EnableSyncing)
                                 }
                             },
                     ) {
                         Text(
-                            text = line.removeLeadingTime(),
+                            text = line.trim(),
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier =
                                 Modifier

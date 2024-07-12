@@ -877,7 +877,7 @@ class MainVM
                                     it.copy(
                                         repeatMode = repeatMode,
                                         hasNextItem = player.hasNextMediaItem(),
-                                        hasPrevItem = player.hasPreviousMediaItem(),
+                                        hasPrevItem = player.isCommandAvailable(Player.COMMAND_SEEK_TO_PREVIOUS),
                                     )
                                 }
                             }
