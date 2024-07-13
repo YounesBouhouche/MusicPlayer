@@ -192,6 +192,11 @@ fun AppScreen(
             }
         }
     }
+    LaunchedEffect(key1 = playerState.playState) {
+        if (playerState.playState == PlayState.STOP) {
+            launch { state.animateTo(ViewState.HIDDEN) }
+        }
+    }
     val progress =
         when {
             playerState.playState == PlayState.STOP -> 0f

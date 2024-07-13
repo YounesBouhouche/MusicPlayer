@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -53,12 +54,16 @@ fun Lyrics(
     onPlayerEvent: (PlayerEvent) -> Unit,
     onUiEvent: (UiEvent) -> Unit,
 ) {
-    // val lyricsLineRegex = Regex("^(\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})])\\s[\\w\\s]*")
-    val lyricsRegex = Regex("\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})]")
-    val positions = lyricsRegex.findAll(lyrics)
-    val synced = positions.toList().isNotEmpty()
-    val lyricsLines = lyrics.splitToSequence(lyricsRegex).toList()
-    // val synced = lyricsLines.any { it.matches(lyricsLineRegex) }
+    val timeRegex = Regex("\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})]")
+    val positions = timeRegex.findAll(lyrics).toList()
+    val synced = positions.isNotEmpty()
+    val lyricsLines by remember {
+        derivedStateOf {
+            lyrics.splitToSequence(timeRegex).toMutableList().apply {
+                firstOrNull()?.let { if (it.isEmpty()) removeFirst() }
+            }
+        }
+    }
     var currentLine by remember { mutableIntStateOf(0) }
     val lyricsListState = rememberLazyListState()
     val isDragged by lyricsListState.interactionSource.collectIsDraggedAsState()
@@ -90,9 +95,9 @@ fun Lyrics(
         val segments =
             positions.map {
                 it.value.removeSurrounding("[", "]").toMs()
-            }.toList()
+            }
         LaunchedEffect(key1 = time) {
-            if (syncing) currentLine = getIndex(segments, time) + 1
+            if (syncing) currentLine = getIndex(segments, time)
         }
         Column(
             Modifier.fillMaxSize(),
@@ -120,9 +125,11 @@ fun Lyrics(
                             .alpha(scale)
                             .clickable {
                                 scope.launch {
-                                    segments.getOrNull(index - 1)?.let {
-                                        onPlayerEvent(PlayerEvent.SeekTime(it))
-                                    }
+                                    segments
+                                        .getOrNull(index)
+                                        ?.let {
+                                            onPlayerEvent(PlayerEvent.SeekTime(it))
+                                        }
                                     onUiEvent(UiEvent.EnableSyncing)
                                 }
                             },

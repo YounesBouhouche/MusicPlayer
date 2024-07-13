@@ -78,8 +78,8 @@ fun TimerDialog(
                 onValueChange = { value ->
                     type = TimerType.Duration((value * 60000f).roundToLong())
                 },
-                valueRange = 1f..120f,
-                steps = 119,
+                valueRange = 1f..60f,
+                steps = 59,
                 modifier =
                     Modifier
                         .fillMaxWidth()

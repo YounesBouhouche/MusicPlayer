@@ -100,6 +100,8 @@ fun Disk(
                         .padding(12.dp)
                         .align(Alignment.Center)
                         .scale(diskScale)
+                        .clip(CircleShape)
+                        .clipToBounds()
                         .combinedClickable(
                             onDoubleClick = {
                                 onPlayerEvent(PlayerEvent.SetFavorite(path))
@@ -114,18 +116,13 @@ fun Disk(
                             contentScale = ContentScale.Crop,
                             modifier =
                                 Modifier
-                                    .fillMaxSize()
-                                    .clip(CircleShape)
-                                    .clipToBounds(),
+                                    .fillMaxSize(),
                         )
                     } else {
                         Box(
                             Modifier
                                 .fillMaxSize()
-                                .background(
-                                    MaterialTheme.colorScheme.secondary,
-                                    CircleShape,
-                                ),
+                                .background(MaterialTheme.colorScheme.secondary),
                             contentAlignment = Alignment.Center,
                         ) {
                             Icon(
