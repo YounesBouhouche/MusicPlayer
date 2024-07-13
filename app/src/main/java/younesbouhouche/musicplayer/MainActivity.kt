@@ -20,16 +20,21 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import younesbouhouche.musicplayer.core.presentation.util.composables.SetSystemBarColors
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.models.Routes
 import younesbouhouche.musicplayer.main.presentation.AppScreen
 import younesbouhouche.musicplayer.main.presentation.states.StartupEvent
 import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
 import younesbouhouche.musicplayer.main.presentation.viewmodel.NavigationVM
+import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.ui.theme.AppTheme
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
     private lateinit var mainVM: MainVM
     private val permission =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -52,6 +57,7 @@ class MainActivity : ComponentActivity() {
             }
         enableEdgeToEdge()
         setContent {
+            SetSystemBarColors(dataStore = settingsDataStore)
             mainVM = hiltViewModel<MainVM>()
             val playerState by mainVM.playerState.collectAsState()
             val granted by mainVM.granted.collectAsState()

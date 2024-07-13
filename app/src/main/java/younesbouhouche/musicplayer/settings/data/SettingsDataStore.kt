@@ -1,10 +1,14 @@
 package younesbouhouche.musicplayer.settings.data
 
 import android.content.Context
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class SettingsDataStore(private val context: Context) {
     companion object {
@@ -21,6 +25,18 @@ class SettingsDataStore(private val context: Context) {
     val dynamicColors = dataFlow(context.dataStore, DYNAMIC_KEY, true)
     val extraDark = dataFlow(context.dataStore, EXTRA_DARK_KEY, false)
     val language = dataFlow(context.dataStore, LANGUAGE_KEY, "system")
+
+    @Composable
+    fun isDark(): Flow<Boolean> {
+        val isSystemInDarkTheme = isSystemInDarkTheme()
+        return theme.map {
+            when (it) {
+                "light" -> false
+                "dark" -> true
+                else -> isSystemInDarkTheme
+            }
+        }
+    }
 
     suspend fun saveSettings(
         theme: String? = null,

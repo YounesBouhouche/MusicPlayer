@@ -3,6 +3,7 @@ package younesbouhouche.musicplayer.main.presentation.player
 import android.os.Build
 import android.view.HapticFeedbackConstants
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -64,7 +65,7 @@ import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.util.timeString
 import younesbouhouche.musicplayer.main.presentation.util.timerString
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun Queue(
     queue: List<MusicCard>,
@@ -153,7 +154,9 @@ fun Queue(
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(onClick = { onUiEvent(UiEvent.ExpandPlaylist) }) {
+                FloatingActionButton(
+                    onClick = { onUiEvent(UiEvent.ExpandPlaylist) },
+                ) {
                     Icon(Icons.AutoMirrored.Filled.PlaylistPlay, null)
                 }
             },

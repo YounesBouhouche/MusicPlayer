@@ -1,15 +1,11 @@
 package younesbouhouche.musicplayer.settings.presentation
 
 import android.app.Activity
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.SystemBarStyle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -38,7 +34,6 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,65 +48,51 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.Dialog
+import younesbouhouche.musicplayer.core.presentation.util.composables.SetSystemBarColors
 import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.ui.theme.AppTheme
+import javax.inject.Inject
 
-class ThemeActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class ThemeActivity : ComponentActivity() {
+    @Inject
+    lateinit var dataStore: SettingsDataStore
+
+    private val themeOptions =
+        listOf(
+            "light" to R.string.light,
+            "system" to R.string.default_theme,
+            "dark" to R.string.dark,
+        )
+    private val colors =
+        listOf(
+            "blue" to R.string.blue,
+            "green" to R.string.green,
+            "red" to R.string.red,
+            "orange" to R.string.orange,
+            "purple" to R.string.purple,
+        )
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
+            SetSystemBarColors(dataStore = dataStore)
             val listState = rememberLazyListState()
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
             val context = LocalContext.current
-            val dataStore = SettingsDataStore(LocalContext.current)
-            val isDark =
-                when (dataStore.theme.collectAsState(initial = "system").value) {
-                    "light" -> false
-                    "dark" -> true
-                    else -> isSystemInDarkTheme()
-                }
+            val isDark by dataStore.isDark().collectAsState(initial = false)
             val colorTheme by dataStore.colorTheme.collectAsState(initial = "green")
-            val colors =
-                listOf(
-                    "blue" to R.string.blue,
-                    "green" to R.string.green,
-                    "red" to R.string.red,
-                    "orange" to R.string.orange,
-                    "purple" to R.string.purple,
-                )
             var colorThemeDialogShown by remember { mutableStateOf(false) }
-            val themeOptions =
-                listOf(
-                    "light" to R.string.light,
-                    "system" to R.string.default_theme,
-                    "dark" to R.string.dark,
-                )
             val dynamicColorsChecked by dataStore.dynamicColors.collectAsState(initial = true)
             val extraDarkChecked by dataStore.extraDark.collectAsState(initial = true)
             val theme by dataStore.theme.collectAsState(initial = "system")
             val scope = rememberCoroutineScope()
-            DisposableEffect(isDark) {
-                enableEdgeToEdge(
-                    statusBarStyle =
-                        if (!isDark) {
-                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                        } else {
-                            SystemBarStyle.dark(Color.TRANSPARENT)
-                        },
-                    navigationBarStyle =
-                        if (!isDark) {
-                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                        } else {
-                            SystemBarStyle.dark(Color.TRANSPARENT)
-                        },
-                )
-                onDispose { }
-            }
             AppTheme {
                 Box(
                     modifier =
@@ -121,9 +102,9 @@ class ThemeActivity : AppCompatActivity() {
                 ) {
                     Scaffold(
                         modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .nestedScroll(scrollBehavior.nestedScrollConnection),
+                        Modifier
+                            .fillMaxSize()
+                            .nestedScroll(scrollBehavior.nestedScrollConnection),
                         contentWindowInsets = WindowInsets(0, 0, 0, 0),
                         topBar = {
                             Column {
@@ -147,9 +128,9 @@ class ThemeActivity : AppCompatActivity() {
                     ) { paddingValues ->
                         LazyColumn(
                             modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(paddingValues),
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(paddingValues),
                             state = listState,
                         ) {
                             settingsItem(

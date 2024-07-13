@@ -2,15 +2,11 @@ package younesbouhouche.musicplayer.settings.presentation
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.SystemBarStyle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -36,8 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -49,12 +43,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import dagger.hilt.android.AndroidEntryPoint
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.core.presentation.util.composables.SetSystemBarColors
 import younesbouhouche.musicplayer.core.presentation.util.getAppVersion
 import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.ui.theme.AppTheme
+import javax.inject.Inject
 
-class AboutActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class AboutActivity : ComponentActivity() {
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,30 +63,7 @@ class AboutActivity : AppCompatActivity() {
             val listState = rememberLazyListState()
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
             val context = LocalContext.current
-            val dataStore = SettingsDataStore(LocalContext.current)
-            val isDark =
-                when (dataStore.theme.collectAsState(initial = "system").value) {
-                    "light" -> false
-                    "dark" -> true
-                    else -> isSystemInDarkTheme()
-                }
-            DisposableEffect(isDark) {
-                enableEdgeToEdge(
-                    statusBarStyle =
-                        if (!isDark) {
-                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                        } else {
-                            SystemBarStyle.dark(Color.TRANSPARENT)
-                        },
-                    navigationBarStyle =
-                        if (!isDark) {
-                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                        } else {
-                            SystemBarStyle.dark(Color.TRANSPARENT)
-                        },
-                )
-                onDispose { }
-            }
+            SetSystemBarColors(dataStore = settingsDataStore)
             AppTheme {
                 Scaffold(
                     modifier =

@@ -150,6 +150,10 @@
     <string name="one">One</string>
     <string name="two">Two</string>
     <string name="three">Three</string>
+    <string name="customize_the_player">Customize the player</string>
+    <string name="remember_repeat_mode">Remember Repeat Mode</string>
+    <string name="remember_shuffle">Remember Shuffle</string>
+    <string name="remember_playback_speed">Remember Playback Speed</string>
     <plurals name="item_s">
         <item quantity="one">1 item</item>
         <item quantity="zero">no items</item>

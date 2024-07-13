@@ -2,17 +2,13 @@ package younesbouhouche.musicplayer.settings.presentation
 
 import android.app.Activity
 import android.app.LocaleManager
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.LocaleList
-import androidx.activity.SystemBarStyle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -32,7 +28,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,13 +42,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.core.app.LocaleManagerCompat
 import androidx.core.os.LocaleListCompat
 import androidx.core.view.WindowCompat
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.core.presentation.util.composables.SetSystemBarColors
 import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.settings.presentation.util.findActivity
 import younesbouhouche.musicplayer.ui.theme.AppTheme
+import javax.inject.Inject
 
-class LanguageActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class LanguageActivity : ComponentActivity() {
+    @Inject
+    lateinit var dataStore: SettingsDataStore
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +63,6 @@ class LanguageActivity : AppCompatActivity() {
             val listState = rememberLazyListState()
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
             val context = LocalContext.current
-            val dataStore = SettingsDataStore(context)
             val languages =
                 mapOf(
                     "system" to R.string.follow_system,
@@ -75,30 +75,8 @@ class LanguageActivity : AppCompatActivity() {
                 )
             val language by dataStore.language.collectAsState(initial = "system")
             var selectedLanguage by remember { mutableStateOf("") }
-            val isDark =
-                when (dataStore.theme.collectAsState(initial = "system").value) {
-                    "light" -> false
-                    "dark" -> true
-                    else -> isSystemInDarkTheme()
-                }
             val scope = rememberCoroutineScope()
-            DisposableEffect(isDark) {
-                enableEdgeToEdge(
-                    statusBarStyle =
-                        if (!isDark) {
-                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                        } else {
-                            SystemBarStyle.dark(Color.TRANSPARENT)
-                        },
-                    navigationBarStyle =
-                        if (!isDark) {
-                            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                        } else {
-                            SystemBarStyle.dark(Color.TRANSPARENT)
-                        },
-                )
-                onDispose { }
-            }
+            SetSystemBarColors(dataStore)
             AppTheme {
                 Box(
                     modifier =
