@@ -94,7 +94,7 @@ fun WelcomeScreen(onPermissionRequest: () -> Unit) {
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = stringResource(R.string.this_permission_is_required_to_browse_and_play_the_audio_files),
+                            text = stringResource(R.string.permission_description),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

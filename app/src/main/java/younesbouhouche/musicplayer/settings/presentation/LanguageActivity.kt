@@ -53,6 +53,16 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class LanguageActivity : ComponentActivity() {
+    private val languages =
+        mapOf(
+            "system" to R.string.follow_system,
+            "en" to R.string.english,
+            "fr" to R.string.french,
+            "ar" to R.string.arabic,
+            "es" to R.string.spanish,
+            "it" to R.string.italian,
+            "in" to R.string.hindi,
+        )
     @Inject
     lateinit var dataStore: SettingsDataStore
     @OptIn(ExperimentalMaterial3Api::class)
@@ -63,16 +73,6 @@ class LanguageActivity : ComponentActivity() {
             val listState = rememberLazyListState()
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
             val context = LocalContext.current
-            val languages =
-                mapOf(
-                    "system" to R.string.follow_system,
-                    "en" to R.string.english,
-                    "fr" to R.string.french,
-                    "ar" to R.string.arabic,
-                    "es" to R.string.spanish,
-                    "it" to R.string.italian,
-                    "in" to R.string.hindi,
-                )
             val language by dataStore.language.collectAsState(initial = "system")
             var selectedLanguage by remember { mutableStateOf("") }
             val scope = rememberCoroutineScope()
@@ -122,26 +122,25 @@ class LanguageActivity : ComponentActivity() {
                                 languages.map { it.key }.indexOf(language),
                                 {
                                     selectedLanguage = languages.keys.elementAt(it)
-                                    context.findActivity()?.runOnUiThread {
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                            context.getSystemService(LocaleManager::class.java)
-                                                .applicationLocales =
-                                                LocaleList.forLanguageTags(
-                                                    if (selectedLanguage == "system") {
-                                                        LocaleManagerCompat.getSystemLocales(context)[0]!!.language
-                                                    } else {
-                                                        selectedLanguage
-                                                    },
+                                    scope.launch {
+                                        dataStore.saveSettings(language = languages.keys.elementAt(it))
+                                        context.findActivity()?.runOnUiThread {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                                context.getSystemService(LocaleManager::class.java)
+                                                    .applicationLocales =
+                                                    LocaleList.forLanguageTags(
+                                                        if (selectedLanguage == "system") {
+                                                            LocaleManagerCompat.getSystemLocales(context)[0]!!.language
+                                                        } else {
+                                                            selectedLanguage
+                                                        },
+                                                    )
+                                            } else {
+                                                AppCompatDelegate.setApplicationLocales(
+                                                    LocaleListCompat.forLanguageTags(selectedLanguage),
                                                 )
-                                        } else {
-                                            AppCompatDelegate.setApplicationLocales(
-                                                LocaleListCompat.forLanguageTags(selectedLanguage),
-                                            )
+                                            }
                                         }
-                                        scope.launch {
-                                            dataStore.saveSettings(language = languages.keys.elementAt(it))
-                                        }
-                                        finish()
                                     }
                                 },
                             ) { Text(stringResource(it.second)) }

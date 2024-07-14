@@ -76,7 +76,6 @@
     <string name="details">Details</string>
     <string name="recently_added">Recently Added</string>
     <string name="listen_again">Listen again</string>
-    <string name="items">%1$s items</string>
     <string name="favorites">Favorites</string>
     <string name="history">History</string>
     <string name="edit_metadata">Edit metadata</string>
@@ -140,11 +139,10 @@
     <string name="search">Search</string>
     <string name="timer">Timer</string>
     <string name="disabled">Disabled</string>
-    <string name="minute_s">%1$s minute(s)</string>
     <string name="time">Time</string>
     <string name="end_of_tracks">End of tracks</string>
     <string name="permission">Permission</string>
-    <string name="this_permission_is_required_to_browse_and_play_the_audio_files">This permission is required to browse and play the audio files</string>
+    <string name="permission_description">This permission is required to browse and play the audio files</string>
     <string name="music_and_audio">Music and audio</string>
     <string name="grant_permission">Grant permission</string>
     <string name="one">One</string>
