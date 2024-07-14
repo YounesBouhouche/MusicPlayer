@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,7 +25,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -94,109 +92,102 @@ class ThemeActivity : ComponentActivity() {
             val theme by dataStore.theme.collectAsState(initial = "system")
             val scope = rememberCoroutineScope()
             AppTheme {
-                Box(
+                Scaffold(
                     modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.background),
-                ) {
-                    Scaffold(
+                    Modifier
+                        .fillMaxSize()
+                        .nestedScroll(scrollBehavior.nestedScrollConnection),
+                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                    topBar = {
+                        Column {
+                            LargeTopAppBar(
+                                title = {
+                                    Text(
+                                        stringResource(id = R.string.theme),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                },
+                                navigationIcon = {
+                                    IconButton(onClick = { (context as Activity).finish() }) {
+                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                                    }
+                                },
+                                scrollBehavior = scrollBehavior,
+                            )
+                        }
+                    },
+                ) { paddingValues ->
+                    LazyColumn(
                         modifier =
                         Modifier
-                            .fillMaxSize()
-                            .nestedScroll(scrollBehavior.nestedScrollConnection),
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                        topBar = {
-                            Column {
-                                LargeTopAppBar(
-                                    title = {
-                                        Text(
-                                            stringResource(id = R.string.theme),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                        )
-                                    },
-                                    navigationIcon = {
-                                        IconButton(onClick = { (context as Activity).finish() }) {
-                                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                                        }
-                                    },
-                                    scrollBehavior = scrollBehavior,
-                                )
-                            }
-                        },
-                    ) { paddingValues ->
-                        LazyColumn(
-                            modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(paddingValues),
-                            state = listState,
-                        ) {
-                            settingsItem(
-                                Icons.TwoTone.InvertColors,
-                                R.string.app_theme,
-                                R.string.choose_app_theme,
-                            )
-                            item {
-                                Box(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 16.dp),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    SingleChoiceSegmentedButtonRow {
-                                        themeOptions.forEachIndexed { index, pair ->
-                                            SegmentedButton(
-                                                shape = SegmentedButtonDefaults.itemShape(index = index, count = themeOptions.size),
-                                                onClick = {
-                                                    scope.launch {
-                                                        dataStore.saveSettings(theme = pair.first)
-                                                    }
-                                                },
-                                                selected = theme == pair.first,
-                                            ) {
-                                                Text(stringResource(id = pair.second))
-                                            }
+                            .fillMaxWidth()
+                            .padding(paddingValues),
+                        state = listState,
+                    ) {
+                        settingsItem(
+                            Icons.TwoTone.InvertColors,
+                            R.string.app_theme,
+                            R.string.choose_app_theme,
+                        )
+                        item {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 16.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                SingleChoiceSegmentedButtonRow {
+                                    themeOptions.forEachIndexed { index, pair ->
+                                        SegmentedButton(
+                                            shape = SegmentedButtonDefaults.itemShape(index = index, count = themeOptions.size),
+                                            onClick = {
+                                                scope.launch {
+                                                    dataStore.saveSettings(theme = pair.first)
+                                                }
+                                            },
+                                            selected = theme == pair.first,
+                                        ) {
+                                            Text(stringResource(id = pair.second))
                                         }
                                     }
                                 }
                             }
-                            item {
-                                Spacer(Modifier.height(4.dp))
-                            }
-                            checkSettingsItem(
-                                icon = Icons.TwoTone.DarkMode,
-                                title = R.string.extra_dark_colors,
-                                text = R.string.extra_dark_description,
-                                checked = extraDarkChecked,
-                                visible = isDark,
-                                onCheckedChange = { checked ->
-                                    scope.launch {
-                                        dataStore.saveSettings(extraDark = checked)
-                                    }
-                                },
-                            )
-                            checkSettingsItem(
-                                icon = Icons.TwoTone.SettingsSuggest,
-                                title = R.string.dynamic_colors,
-                                text = R.string.follow_system_dynamic_colors,
-                                checked = dynamicColorsChecked,
-                                visible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
-                                onCheckedChange = { checked ->
-                                    scope.launch {
-                                        dataStore.saveSettings(dynamic = checked)
-                                    }
-                                },
-                            )
-                            settingsItem(
-                                Icons.TwoTone.Palette,
-                                R.string.color_palette,
-                                colors.toMap()[colorTheme]!!,
-                                onClick = { colorThemeDialogShown = true },
-                                visible = (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) or !dynamicColorsChecked,
-                            )
                         }
+                        item {
+                            Spacer(Modifier.height(4.dp))
+                        }
+                        checkSettingsItem(
+                            icon = Icons.TwoTone.DarkMode,
+                            title = R.string.extra_dark_colors,
+                            text = R.string.extra_dark_description,
+                            checked = extraDarkChecked,
+                            visible = isDark,
+                            onCheckedChange = { checked ->
+                                scope.launch {
+                                    dataStore.saveSettings(extraDark = checked)
+                                }
+                            },
+                        )
+                        checkSettingsItem(
+                            icon = Icons.TwoTone.SettingsSuggest,
+                            title = R.string.dynamic_colors,
+                            text = R.string.follow_system_dynamic_colors,
+                            checked = dynamicColorsChecked,
+                            visible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
+                            onCheckedChange = { checked ->
+                                scope.launch {
+                                    dataStore.saveSettings(dynamic = checked)
+                                }
+                            },
+                        )
+                        settingsItem(
+                            Icons.TwoTone.Palette,
+                            R.string.color_palette,
+                            colors.toMap()[colorTheme]!!,
+                            onClick = { colorThemeDialogShown = true },
+                            visible = (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) or !dynamicColorsChecked,
+                        )
                     }
                 }
                 Dialog(

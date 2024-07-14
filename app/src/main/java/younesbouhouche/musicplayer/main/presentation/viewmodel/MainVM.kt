@@ -1112,6 +1112,7 @@ constructor(
 
             is PlayerEvent.Swap -> {
                 player.moveMediaItem(event.from, event.to)
+                val index = player.currentMediaItemIndex
                 viewModelScope.launch(Dispatchers.IO) {
                     dao.upsertQueue(
                         Queue(
@@ -1119,7 +1120,7 @@ constructor(
                             _queueList.value.toMutableList().apply {
                                 add(event.to, removeAt(event.from))
                             },
-                            index = player.currentMediaItemIndex,
+                            index = index,
                         ),
                     )
                 }
