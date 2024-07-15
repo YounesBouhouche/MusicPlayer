@@ -159,4 +159,5 @@
         <item quantity="many">1 éléments</item>
         <item quantity="other">%d éléments</item>
     </plurals>
+    <string name="show_volume_slider">Afficher le curseur de volume</string>
 </resources>

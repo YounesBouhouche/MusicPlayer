@@ -164,4 +164,5 @@
         <item quantity="few">%d عناصر</item>
         <item quantity="many">%d عنصرا</item>
     </plurals>
+    <string name="show_volume_slider">إظهار منزلق التحكم بالصوت</string>
 </resources>

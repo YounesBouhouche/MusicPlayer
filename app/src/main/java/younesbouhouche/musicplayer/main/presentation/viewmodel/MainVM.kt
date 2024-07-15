@@ -5,13 +5,18 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.ContentObserver
 import android.graphics.BitmapFactory
+import android.media.AudioManager
 import android.media.MediaMetadataRetriever
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
+import android.provider.Settings
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -85,6 +90,7 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -846,8 +852,25 @@ constructor(
 
     private var controllerFuture: ListenableFuture<MediaController>
     private lateinit var player: Player
+    private val observer = object: ContentObserver(Handler(Looper.getMainLooper())) {
+        override fun onChange(selfChange: Boolean) {
+            super.onChange(selfChange)
+            _playerState.update {
+                it.copy(volume = getVolume())
+            }
+        }
+    }
+
+    protected fun finalize() {
+        context.contentResolver.unregisterContentObserver(observer)
+    }
 
     init {
+        context.contentResolver.registerContentObserver(
+            Settings.System.CONTENT_URI,
+            true,
+            observer
+        )
         val sessionToken =
             SessionToken(context, ComponentName(context, MediaPlayerService::class.java))
         context.startForegroundService(Intent(context, MediaSessionService::class.java))
@@ -1005,15 +1028,21 @@ constructor(
         }, ContextCompat.getMainExecutor(context))
     }
 
-    private val _playerState = MutableStateFlow(PlayerState())
+    private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+    private val _playerState = MutableStateFlow(PlayerState(
+        volume = getVolume()
+    ))
+
     val playerState =
         _playerState
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), PlayerState())
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState =
-        _uiState
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), UiState())
+        combine(_uiState, playerDataStore.showVolumeSlider) { uiState, showSlider ->
+            uiState.copy(showVolumeSlider = showSlider)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), UiState())
 
     private var timerJob: Job? = null
 
@@ -1048,6 +1077,9 @@ constructor(
                 }
             }
     }
+
+    fun getVolume() = (audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
+            / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC))
 
     fun onPlayerEvent(event: PlayerEvent) {
         when (event) {
@@ -1240,6 +1272,38 @@ constructor(
                         play(it)
                     }
                 }
+
+            PlayerEvent.DecreaseVolume -> {
+                audioManager.adjustStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_LOWER,
+                    0
+                )
+                _playerState.update {
+                    it.copy(volume = getVolume())
+                }
+            }
+            PlayerEvent.IncreaseVolume -> {
+                audioManager.adjustStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_RAISE,
+                    0
+                )
+                _playerState.update {
+                    it.copy(volume = getVolume())
+                }
+            }
+            is PlayerEvent.SetVolume -> {
+                audioManager.setStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    (event.volume * audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC))
+                        .roundToInt(),
+                    0
+                )
+                _playerState.update {
+                    it.copy(volume = getVolume())
+                }
+            }
         }
     }
 

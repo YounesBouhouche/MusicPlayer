@@ -65,4 +65,10 @@ sealed interface PlayerEvent {
     data object PlayMostPlayed : PlayerEvent
 
     data class PlayPlaylist(val id: Int) : PlayerEvent
+
+    data class SetVolume(val volume: Float) : PlayerEvent
+
+    data object IncreaseVolume : PlayerEvent
+
+    data object DecreaseVolume : PlayerEvent
 }

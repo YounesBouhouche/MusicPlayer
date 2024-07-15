@@ -36,4 +36,5 @@ data class UiState(
     val renamePlaylistId: Int = -1,
     val renamePlaylistName: String = "",
     val queueSheetVisible: Boolean = false,
+    val showVolumeSlider: Boolean = false
 )

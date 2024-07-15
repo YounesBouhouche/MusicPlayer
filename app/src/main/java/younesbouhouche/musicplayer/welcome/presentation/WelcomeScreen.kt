@@ -39,7 +39,7 @@ fun WelcomeScreen(onPermissionRequest: () -> Unit) {
     Scaffold(
         topBar = {
             LargeTopAppBar(
-                title = { Text(text = "Music Player") },
+                title = { Text(stringResource(R.string.app_name)) },
                 actions = {
                     IconButton(
                         onClick = {

@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.Speed
@@ -53,6 +54,7 @@ class PlayerActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SetSystemBarColors(settingsDataStore)
+            val showVolumeSlider by playerDataStore.showVolumeSlider.collectAsState(initial = false)
             val repeatMode by playerDataStore.rememberRepeat.collectAsState(initial = true)
             val shuffle by playerDataStore.rememberShuffle.collectAsState(initial = false)
             val speed by playerDataStore.rememberSpeed.collectAsState(initial = false)
@@ -62,9 +64,9 @@ class PlayerActivity : ComponentActivity() {
             AppTheme {
                 Scaffold(
                     modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .nestedScroll(scrollBehavior.nestedScrollConnection),
+                    Modifier
+                        .fillMaxSize()
+                        .nestedScroll(scrollBehavior.nestedScrollConnection),
                     contentWindowInsets = WindowInsets(0, 0, 0, 0),
                     topBar = {
                         Column {
@@ -88,11 +90,26 @@ class PlayerActivity : ComponentActivity() {
                 ) { paddingValues ->
                     LazyColumn(
                         modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(paddingValues),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(paddingValues),
                         state = listState,
                     ) {
+                        settingsLabel("Customize view")
+                        checkSettingsItem(
+                            Icons.AutoMirrored.Default.VolumeUp,
+                            R.string.show_volume_slider,
+                            R.string.show_volume_slider,
+                            null,
+                            showVolumeSlider,
+                        ) {
+                            scope.launch {
+                                playerDataStore.saveSettings(
+                                    showVolumeSlider = it,
+                                )
+                            }
+                        }
+                        settingsLabel("Remember options")
                         checkSettingsItem(
                             Icons.Default.Repeat,
                             R.string.remember_repeat_mode,

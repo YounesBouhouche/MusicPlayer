@@ -49,6 +49,7 @@ import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
+import younesbouhouche.musicplayer.main.presentation.states.UiState
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -57,6 +58,7 @@ fun LargePlayer(
     queue: List<MusicCard>,
     index: Int,
     playerState: PlayerState,
+    uiState: UiState,
     onPlayerEvent: (PlayerEvent) -> Unit,
     lyrics: Boolean,
     syncing: Boolean,
@@ -123,6 +125,7 @@ fun LargePlayer(
                 Spacer(Modifier.height(8.dp))
                 Controls(
                     activeItem,
+                    uiState.showVolumeSlider,
                     playerState,
                     onPlayerEvent,
                     Modifier.fillMaxWidth(),
@@ -149,6 +152,7 @@ fun LargePlayer(
                 VerticalDivider(Modifier.fillMaxHeight())
                 Controls(
                     activeItem,
+                    uiState.showVolumeSlider,
                     playerState,
                     onPlayerEvent,
                     Modifier.weight(1f),

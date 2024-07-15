@@ -8,12 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import soup.compose.material.motion.animation.materialFadeThroughIn
 import soup.compose.material.motion.animation.materialFadeThroughOut
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
@@ -201,7 +203,7 @@ fun NavigationScreen(
         composable<NavRoutes.FavoritesScreen> {
             ListScreen(
                 favoritesFiles,
-                "Favorites",
+                stringResource(R.string.favorites),
                 listScreenSortState,
                 mainVM::onListSortEvent,
                 navController::navigateUp,
@@ -215,7 +217,7 @@ fun NavigationScreen(
         composable<NavRoutes.MostPlayedScreen> {
             ListScreen(
                 mostPlayed,
-                "Most Played",
+                stringResource(R.string.most_played),
                 null,
                 null,
                 navController::navigateUp,
@@ -229,7 +231,7 @@ fun NavigationScreen(
         composable<NavRoutes.HistoryScreen> {
             ListScreen(
                 history,
-                "History",
+                stringResource(R.string.history),
                 null,
                 null,
                 navController::navigateUp,
@@ -243,7 +245,7 @@ fun NavigationScreen(
         composable<NavRoutes.LastAddedScreen> {
             ListScreen(
                 lastAdded,
-                "Last Added",
+                stringResource(R.string.last_added),
                 null,
                 null,
                 navController::navigateUp,

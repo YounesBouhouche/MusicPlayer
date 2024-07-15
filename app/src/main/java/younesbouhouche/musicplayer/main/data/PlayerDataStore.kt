@@ -19,6 +19,7 @@ class PlayerDataStore(private val context: Context) {
         val REMEMBER_REPEAT = booleanPreferencesKey("remember_repeat")
         val REMEMBER_SHUFFLE = booleanPreferencesKey("remember_shuffle")
         val REMEMBER_SPEED = booleanPreferencesKey("remember_speed")
+        val SHOW_VOLUME_SLIDER = booleanPreferencesKey("show_volume_slider")
     }
 
     private fun <T> playerDataFlow(
@@ -32,6 +33,7 @@ class PlayerDataStore(private val context: Context) {
     val rememberRepeat = playerDataFlow(REMEMBER_REPEAT, true)
     val rememberShuffle = playerDataFlow(REMEMBER_SHUFFLE, false)
     val rememberSpeed = playerDataFlow(REMEMBER_SPEED, false)
+    val showVolumeSlider = playerDataFlow(SHOW_VOLUME_SLIDER, false)
 
     suspend fun override(
         repeatMode: Int? = null,
@@ -49,11 +51,13 @@ class PlayerDataStore(private val context: Context) {
         rememberRepeat: Boolean? = null,
         rememberShuffle: Boolean? = null,
         rememberSpeed: Boolean? = null,
+        showVolumeSlider: Boolean? = null
     ) {
         context.playerDataStore.edit { preferences ->
             rememberRepeat?.let { preferences[REMEMBER_REPEAT] = it }
             rememberShuffle?.let { preferences[REMEMBER_SHUFFLE] = it }
             rememberSpeed?.let { preferences[REMEMBER_SPEED] = it }
+            showVolumeSlider?.let { preferences[SHOW_VOLUME_SLIDER] = it }
         }
     }
 }

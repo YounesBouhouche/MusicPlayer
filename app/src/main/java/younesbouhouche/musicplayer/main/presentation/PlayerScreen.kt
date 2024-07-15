@@ -74,6 +74,7 @@ fun PlayerScreen(
                 queue,
                 index,
                 playerState,
+                uiState,
                 onPlayerEvent,
                 uiState.lyricsVisible,
                 uiState.syncing,

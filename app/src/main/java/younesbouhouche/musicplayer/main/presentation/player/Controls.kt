@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeDown
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.SkipNext
@@ -23,6 +25,7 @@ import androidx.compose.material.icons.outlined.SkipPrevious
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -51,6 +54,7 @@ import kotlin.math.roundToLong
 @Composable
 fun Controls(
     activeItem: MusicCard,
+    showVolumeSlider: Boolean,
     playerState: PlayerState,
     onPlayerEvent: (PlayerEvent) -> Unit,
     modifier: Modifier = Modifier,
@@ -70,7 +74,7 @@ fun Controls(
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer,
             )
         }
-    Column(modifier.padding(horizontal = 30.dp)) {
+    Column(modifier.padding(start = 30.dp, end = 30.dp, bottom = 30.dp)) {
         Text(
             text = activeItem.title,
             color = MaterialTheme.colorScheme.onBackground,
@@ -92,16 +96,7 @@ fun Controls(
         )
         Spacer(Modifier.height(24.dp))
         Slider(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(12.dp),
-            colors =
-                SliderDefaults.colors(
-                    thumbColor = MaterialTheme.colorScheme.secondary,
-                    activeTrackColor = MaterialTheme.colorScheme.secondary,
-                    inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
-                ),
+            modifier = Modifier.fillMaxWidth(),
             value =
                 if ((dragging) or (playerState.loading)) {
                     sliderValue
@@ -169,6 +164,44 @@ fun Controls(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
+            }
+        }
+        AnimatedVisibility(
+            visible = showVolumeSlider
+        ) {
+            Column {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        onClick = {
+                            onPlayerEvent(PlayerEvent.DecreaseVolume)
+                        },
+                        enabled = playerState.volume > 0f) {
+                        Icon(Icons.AutoMirrored.Default.VolumeDown, null)
+                    }
+                    Slider(
+                        modifier = Modifier.weight(1f).height(16.dp),
+                        colors =
+                            SliderDefaults.colors(
+                                thumbColor = MaterialTheme.colorScheme.secondary,
+                                activeTrackColor = MaterialTheme.colorScheme.secondary,
+                                inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
+                            ),
+                        value = playerState.volume,
+                        onValueChange = {
+                            onPlayerEvent(PlayerEvent.SetVolume(it))
+                        },
+                    )
+                    IconButton(
+                        onClick = {
+                            onPlayerEvent(PlayerEvent.IncreaseVolume)
+                        },
+                        enabled = playerState.volume < 1f
+                    ) {
+                        Icon(Icons.AutoMirrored.Default.VolumeUp, null)
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
             }
         }
         Row(

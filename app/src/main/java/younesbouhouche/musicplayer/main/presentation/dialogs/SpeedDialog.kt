@@ -136,7 +136,6 @@ fun SpeedDialog(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(12.dp)
                     .padding(horizontal = 24.dp),
             colors =
                 SliderDefaults.colors(
