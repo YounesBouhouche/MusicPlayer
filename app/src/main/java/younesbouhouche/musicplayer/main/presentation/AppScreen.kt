@@ -237,6 +237,7 @@ fun AppScreen(
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     NavigationScreen(
+                        context,
                         navController,
                         mainVM,
                         Modifier

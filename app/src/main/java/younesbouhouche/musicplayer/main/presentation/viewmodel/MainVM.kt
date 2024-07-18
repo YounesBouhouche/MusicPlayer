@@ -1557,6 +1557,17 @@ constructor(
                 }
             }
 
+            is PlaylistEvent.CreateNewPlaylist -> {
+                viewModelScope.launch {
+                    dao.upsertPlaylist(
+                        Playlist(
+                            name = event.name,
+                            items = event.items,
+                        ),
+                    )
+                }
+            }
+
             PlaylistEvent.CreateNew -> {
                 viewModelScope.launch {
                     dao.upsertPlaylist(

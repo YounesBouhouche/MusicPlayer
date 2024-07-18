@@ -3,6 +3,8 @@ package younesbouhouche.musicplayer.main.domain.events
 import younesbouhouche.musicplayer.main.domain.models.Playlist
 
 sealed interface PlaylistEvent {
+    data class CreateNewPlaylist(val name: String, val items: List<String>) : PlaylistEvent
+
     data object CreateNew : PlaylistEvent
 
     data object AddToPlaylist : PlaylistEvent

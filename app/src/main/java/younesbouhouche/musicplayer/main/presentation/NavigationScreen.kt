@@ -1,5 +1,6 @@
 package younesbouhouche.musicplayer.main.presentation
 
+import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -31,6 +32,7 @@ import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
 
 @Composable
 fun NavigationScreen(
+    context: Context,
     navController: NavHostController,
     mainVM: MainVM,
     modifier: Modifier = Modifier,
@@ -138,6 +140,7 @@ fun NavigationScreen(
         }
         composable<NavRoutes.Playlists> {
             Playlists(
+                context,
                 playlistsSorted,
                 {
                     mainVM.setCurrentPlaylist(it)
@@ -150,7 +153,8 @@ fun NavigationScreen(
                 playlistsSortState,
                 mainVM::onPlayerEvent,
                 mainVM::onUiEvent,
-                { mainVM.onPlaylistsSortEvent(it) },
+                mainVM::onPlaylistEvent,
+                mainVM::onPlaylistsSortEvent
             )
         }
         composable<NavRoutes.Library> {

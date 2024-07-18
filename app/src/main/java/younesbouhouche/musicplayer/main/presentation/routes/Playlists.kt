@@ -1,10 +1,14 @@
 package younesbouhouche.musicplayer.main.presentation.routes
 
+import android.content.Context
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +23,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.FloatingActionButton
@@ -48,13 +53,17 @@ import younesbouhouche.musicplayer.core.presentation.MyListItem
 import younesbouhouche.musicplayer.core.presentation.util.composables.isScrollingUp
 import younesbouhouche.musicplayer.main.domain.events.ListsSortEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.Playlist
 import younesbouhouche.musicplayer.main.presentation.states.ListSortState
+import java.nio.file.Files
+import java.nio.file.Paths
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Playlists(
+    context: Context,
     playlists: List<Playlist>,
     onClick: (Int) -> Unit,
     onLongClick: (Int) -> Unit,
@@ -62,8 +71,29 @@ fun Playlists(
     sortState: ListSortState = ListSortState(),
     onPlayerEvent: (PlayerEvent) -> Unit,
     onUiEvent: (UiEvent) -> Unit,
+    onPlaylistEvent: (PlaylistEvent) -> Unit,
     onPlaylistsSortEvent: (ListsSortEvent) -> Unit,
 ) {
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) {
+        it?.let { uri ->
+            var name = ""
+            val items = mutableListOf<String>()
+            try {
+                context.contentResolver.openInputStream(uri)?.run {
+                    (reader().readLines()).forEach { line ->
+                        if (line.startsWith("#EXTINF:")) name = line.removePrefix("#EXTINF:").trim()
+                        else if (!line.startsWith("#EXTM3U") and Files.exists(Paths.get(line.trim())))
+                            items.add(line.trim())
+                    }
+                    close()
+                }
+                if (name.isNotBlank() and items.isNotEmpty())
+                    onPlaylistEvent(PlaylistEvent.CreateNewPlaylist(name, items))
+            } catch (_: Exception) {}
+        }
+    }
     var gridCount by remember { mutableIntStateOf(2) }
     val state = rememberLazyListState()
     LaunchedEffect(key1 = sortState.colsCount.count) {
@@ -160,8 +190,13 @@ fun Playlists(
             enter = materialSharedAxisZIn(true),
             exit = materialSharedAxisZOut(true),
         ) {
-            FloatingActionButton(onClick = { onUiEvent(UiEvent.ShowCreatePlaylistDialog()) }) {
-                Icon(Icons.Default.Add, null)
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                FloatingActionButton(onClick = { importLauncher.launch("*/*") }) {
+                    Icon(Icons.Default.FolderOpen, null)
+                }
+                FloatingActionButton(onClick = { onUiEvent(UiEvent.ShowCreatePlaylistDialog()) }) {
+                    Icon(Icons.Default.Add, null)
+                }
             }
         }
     }
