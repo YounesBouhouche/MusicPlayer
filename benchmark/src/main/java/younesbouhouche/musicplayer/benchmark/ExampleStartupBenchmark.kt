@@ -1,9 +1,14 @@
 package younesbouhouche.musicplayer.benchmark
 
+import androidx.benchmark.macro.FrameTimingMetric
+import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.StartupTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.Until
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,4 +40,30 @@ class ExampleStartupBenchmark {
         pressHome()
         startActivityAndWait()
     }
+
+    @Test
+    fun scrollAndNavigate() = benchmarkRule.measureRepeated(
+        packageName = "younesbouhouche.musicplayer",
+        metrics = listOf(FrameTimingMetric()),
+        iterations = 5,
+        startupMode = StartupMode.COLD
+    ) {
+        pressHome()
+        startActivityAndWait()
+        navigateAndScrollDown()
+    }
+}
+
+fun MacrobenchmarkScope.navigateAndScrollDown() {
+    val libraryButton = device.findObject(By.res("nav_library"))
+    // select the library navigation button
+    libraryButton.click()
+    device.wait(Until.hasObject(By.res("library_list")), 2000)
+    // wait until the library list is shown
+    val list = device.findObject(By.res("library_list"))
+    // select the library list
+    list.setGestureMargin(device.displayWidth / 5)
+    list.fling(Direction.DOWN)
+    list.fling(Direction.UP)
+
 }

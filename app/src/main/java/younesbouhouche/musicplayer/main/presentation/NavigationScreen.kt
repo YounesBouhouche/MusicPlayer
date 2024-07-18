@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -160,7 +161,7 @@ fun NavigationScreen(
         composable<NavRoutes.Library> {
             Library(
                 filesSorted,
-                Modifier,
+                Modifier.testTag("library_list"),
                 sortState,
                 mainVM::onSortEvent,
                 mainVM::onUiEvent,

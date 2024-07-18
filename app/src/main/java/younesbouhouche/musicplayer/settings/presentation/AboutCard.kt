@@ -1,5 +1,6 @@
 package younesbouhouche.musicplayer.settings.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ fun AboutCard(
     Row(
         modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.medium)
             .clip(MaterialTheme.shapes.medium)
             .clipToBounds()
             .then(

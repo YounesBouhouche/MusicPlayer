@@ -36,11 +36,14 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -73,7 +76,9 @@ import younesbouhouche.musicplayer.main.presentation.states.ViewState
 import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
 import younesbouhouche.musicplayer.welcome.presentation.WelcomeScreen
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalComposeUiApi::class
+)
 @Composable
 fun AppScreen(
     granted: Boolean,
@@ -226,7 +231,10 @@ fun AppScreen(
                     Modifier
                         .onGloballyPositioned { height = it.size.height }
                         .onSizeChanged { height = it.height }
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .semantics {
+                            testTagsAsResourceId = true
+                        },
             ) {
                 PullToRefreshBox(
                     state = pullToRefreshState,
