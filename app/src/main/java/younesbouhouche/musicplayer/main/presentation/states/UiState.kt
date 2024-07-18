@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
 
 data class UiState(
+    val loading: Boolean = false,
     val bottomSheetItem: MusicCard? = null,
     val bottomSheetVisible: Boolean = false,
     val listBottomSheetList: List<MusicCard>? = null,

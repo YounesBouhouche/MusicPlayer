@@ -1,5 +1,8 @@
 import java.net.URI
 
+include(":benchmark")
+
+
 pluginManagement {
     repositories {
         google {

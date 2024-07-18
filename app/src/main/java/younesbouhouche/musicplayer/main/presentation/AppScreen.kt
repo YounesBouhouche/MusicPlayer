@@ -84,7 +84,6 @@ fun AppScreen(
     navigationState: Int,
 ) {
     val context = LocalContext.current
-    val loading by mainVM.loading.collectAsState()
     val queueFiles by mainVM.queueFiles.collectAsState()
     val queueIndex by mainVM.queueIndex.collectAsState()
     val searchState by mainVM.searchState.collectAsState()
@@ -231,7 +230,7 @@ fun AppScreen(
             ) {
                 PullToRefreshBox(
                     state = pullToRefreshState,
-                    isRefreshing = loading,
+                    isRefreshing = uiState.loading,
                     onRefresh = {
                         mainVM.onFilesEvent(FilesEvent.LoadFiles)
                     },
@@ -258,7 +257,7 @@ fun AppScreen(
                     ) {
                         SearchScreen(
                             searchState,
-                            loading,
+                            uiState.loading,
                             mainVM::onSearchEvent,
                             { mainVM.onPlayerEvent(PlayerEvent.Play(searchState.result, it)) },
                         ) {

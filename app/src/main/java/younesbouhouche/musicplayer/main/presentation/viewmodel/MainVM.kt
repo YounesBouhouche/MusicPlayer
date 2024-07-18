@@ -31,8 +31,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -88,7 +88,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.LocalDateTime
 import javax.inject.Inject
-import javax.inject.Named
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -98,10 +97,6 @@ class MainVM
 @Inject
 constructor(
     @ApplicationContext val context: Context,
-    @Named("collection") val collection: Uri,
-    @Named("projection") val projection: Array<String>,
-    @Named("selection") val selection: String,
-    @Named("sortOrder") val sortOrder: String,
     val playerDataStore: PlayerDataStore,
     db: AppDatabase,
 ) : ViewModel() {
@@ -110,16 +105,15 @@ constructor(
 
     private val _timestamps = dao.getTimestamps()
 
-    private val _loading = MutableStateFlow(false)
-    val loading = _loading.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+    private fun <T> Flow<T>.stateInVM(initialValue: T) =
+        stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), initialValue)
 
     private fun isFavorite(path: String) =
         dao.getFavorite(path).mapLatest { it ?: false }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+            .stateInVM(false)
 
     private fun getTimestamps(path: String) =
-        dao.getTimestamps(path).mapLatest { it?.times ?: emptyList() }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+        dao.getTimestamps(path).mapLatest { it?.times ?: emptyList() }.stateInVM(emptyList())
 
     private val permission =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -132,7 +126,7 @@ constructor(
             .checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
 
     private val _granted = MutableStateFlow(isGranted)
-    val granted = _granted.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), isGranted)
+    val granted = _granted.stateInVM(isGranted)
 
     private var initialized = false
 
@@ -142,27 +136,20 @@ constructor(
         mapNotNull { id -> _files.value.firstOrNull { it.id == id } }
 
     private val _playlists = dao.getPlaylist()
-    val playlists =
-        _playlists.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    val playlists = _playlists.stateInVM(emptyList())
 
     private val _queue = dao.getQueue().map { it ?: Queue() }
 
-    private val _queueList =
-        _queue.map { it.items }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+    private val _queueList = _queue.map { it.items }.stateInVM(emptyList())
 
-    val queueIndex =
-        _queue.map { it.index }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), -1)
+    val queueIndex = _queue.map { it.index }.stateInVM(-1)
 
-    val queue =
-        _queue
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), Queue())
+    val queue = _queue.stateInVM(Queue())
 
     val queueFiles =
         combine(_queueList, _files) { ids, files ->
             ids.mapNotNull { id -> files.firstOrNull { it.id == id } }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+        }.stateInVM(emptyList())
 
     private val _listScreenFiles = MutableStateFlow(emptyList<MusicCard>())
 
@@ -179,59 +166,45 @@ constructor(
                     emptyList()
                 }
             state.copy(result = results)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), SearchState())
+        }.stateInVM(SearchState())
 
     private val _sortState = MutableStateFlow(SortState())
-    val sortState =
-        _sortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SortState())
+    val sortState = _sortState.stateInVM(SortState())
 
     private val _listScreenSortState = MutableStateFlow(SortState())
-    val listScreenSortState =
-        _listScreenSortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SortState())
+    val listScreenSortState = _listScreenSortState.stateInVM(SortState())
 
     private val _albumsSortState = MutableStateFlow(ListSortState())
-    val albumsSortState =
-        _albumsSortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ListSortState())
+    val albumsSortState = _albumsSortState.stateInVM(ListSortState())
 
     private val _artistsSortState = MutableStateFlow(ListSortState())
-    val artistsSortState =
-        _artistsSortState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ListSortState())
+    val artistsSortState = _artistsSortState.stateInVM(ListSortState())
 
     private val _playlistsSortState = MutableStateFlow(ListSortState())
-    val playlistsSortState =
-        _playlistsSortState.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            ListSortState(),
-        )
+    val playlistsSortState = _playlistsSortState.stateInVM(ListSortState())
 
     private val _playlistSortState = MutableStateFlow(PlaylistSortState())
-    val playlistSortState =
-        _playlistSortState.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            PlaylistSortState(),
-        )
+    val playlistSortState = _playlistSortState.stateInVM(PlaylistSortState())
     private val _playlistIndex = MutableStateFlow(0)
 
     val lastAdded =
         _files
             .map { item -> item.sortedByDescending { it.date } }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+            .stateInVM(emptyList())
 
     val history =
         combine(_files, _timestamps) { files, timestamps ->
             timestamps
                 .sortedByDescending { it.times.maxOrNull() }
                 .mapNotNull { item -> files.firstOrNull { item.path == it.path } }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+        }.stateInVM(emptyList())
 
     val mostPlayed =
         combine(_files, _timestamps) { files, timestamps ->
             timestamps
                 .sortedByDescending { it.times.size }
                 .mapNotNull { item -> files.firstOrNull { item.path == it.path } }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+        }.stateInVM(emptyList())
 
     val filesSorted =
         combine(_files, _sortState) { files, sortState ->
@@ -250,7 +223,7 @@ constructor(
                     SortType.Date -> files.sortedByDescending { it.date }
                 }
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+        }.stateInVM(emptyList())
 
     private val _mostPlayedArtists =
         combine(_artists, _files, _timestamps) { artists, files, timestamps ->
@@ -274,7 +247,7 @@ constructor(
         }
     val mostPlayedArtists =
         _mostPlayedArtists
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+            .stateInVM(emptyList())
 
     val listScreenFiles =
         combine(_listScreenFiles, _listScreenSortState) { listScreenFiles, sortState ->
@@ -293,7 +266,7 @@ constructor(
                     SortType.Date -> listScreenFiles.sortedByDescending { it.date }
                 }
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+        }.stateInVM(emptyList())
 
     private val _favorites = dao.getFavorites()
     private val _favoritesFiles =
@@ -317,7 +290,7 @@ constructor(
                     SortType.Date -> listScreenFiles.sortedByDescending { it.date }
                 }
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+        }.stateInVM(emptyList())
 
     val albumsSorted =
         combine(_albums, _albumsSortState) { albums, sortState ->
@@ -332,7 +305,7 @@ constructor(
                     ListsSortType.Count -> albums.toList().sortedByDescending { it.items.size }
                 }
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+        }.stateInVM(emptyList())
 
     val artistsSorted =
         combine(_artists, _artistsSortState) { artists, sortState ->
@@ -347,7 +320,7 @@ constructor(
                     ListsSortType.Count -> artists.toList().sortedByDescending { it.items.size }
                 }
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+        }.stateInVM(emptyList())
 
     private val _playlistsSorted =
         combine(_playlists, _playlistsSortState) { playlists, sortState ->
@@ -362,21 +335,17 @@ constructor(
                     ListsSortType.Count -> playlists.sortedByDescending { it.items.size }
                 }
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
+        }.stateInVM(emptyList())
 
     val playlist =
         combine(_playlistsSorted, _playlistIndex) { playlists, index ->
             playlists.getOrNull(index) ?: Playlist()
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Playlist())
+        }.stateInVM(Playlist())
 
     val bottomSheetPlaylist =
         combine(_playlistsSorted, _playlistIndex) { playlists, index ->
             playlists.getOrNull(index) ?: Playlist()
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Playlist())
-
-    val playlistsSorted =
-        _playlistsSorted
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+        }.stateInVM(Playlist())
 
     val playlistFiles =
         combine(
@@ -403,13 +372,17 @@ constructor(
                     PlaylistSortType.Filename -> list.sortedByDescending { it.path }
                 }
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+        }.stateInVM(emptyList())
 
     val bottomSheetPlaylistFiles =
         combine(_playlistsSorted, _files, _playlistIndex) { playlists, files, index ->
             playlists.getOrNull(index)?.items?.mapNotNull { item -> files.firstOrNull { it.path == item } }
                 ?: emptyList()
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+        }.stateInVM(emptyList())
+
+    val playlistsSorted =
+        _playlistsSorted
+            .stateInVM(emptyList())
 
     private val rememberRepeat = playerDataStore.rememberRepeat
 
@@ -724,17 +697,28 @@ constructor(
         _files.value = emptyList()
         _albums.value = emptyList()
         _artists.value = emptyList()
-        _loading.value = true
+        _uiState.update {
+            it.copy(loading = true)
+        }
         val list = mutableListOf<MusicCard>()
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val cursor =
                     context.contentResolver.query(
-                        collection,
-                        projection,
-                        selection,
+                        MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL),
+                        arrayOf(
+                            MediaStore.Audio.Media._ID,
+                            MediaStore.Audio.Media.DISPLAY_NAME,
+                            MediaStore.Audio.Media.DURATION,
+                            MediaStore.Audio.Media.TITLE,
+                            MediaStore.Audio.Media.ALBUM_ID,
+                            MediaStore.Audio.Media.ALBUM,
+                            MediaStore.Audio.Media.ARTIST,
+                            MediaStore.Audio.Media.DATA,
+                        ),
+                        MediaStore.Audio.Media.IS_MUSIC + "!= 0",
                         null,
-                        sortOrder,
+                        MediaStore.Audio.Media.IS_MUSIC + "!= 0",
                     )
                 cursor?.use { crs ->
                     val idColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
@@ -797,7 +781,9 @@ constructor(
                     )
                 }
             _files.value = list
-            _loading.value = false
+            _uiState.update {
+                it.copy(loading = false)
+            }
             withContext(Dispatchers.IO) {
                 list.forEachIndexed { index, file ->
                     file.lyrics =
@@ -852,7 +838,7 @@ constructor(
 
     private var controllerFuture: ListenableFuture<MediaController>
     private lateinit var player: Player
-    private val observer = object: ContentObserver(Handler(Looper.getMainLooper())) {
+    private val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
         override fun onChange(selfChange: Boolean) {
             super.onChange(selfChange)
             _playerState.update {
@@ -1030,52 +1016,47 @@ constructor(
 
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-    private val _playerState = MutableStateFlow(PlayerState(
-        volume = getVolume()
-    ))
+    private val _playerState = MutableStateFlow(
+        PlayerState(
+            volume = getVolume()
+        )
+    )
 
-    val playerState =
-        _playerState
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), PlayerState())
+    val playerState = _playerState.stateInVM(PlayerState())
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState =
         combine(_uiState, playerDataStore.showVolumeSlider) { uiState, showSlider ->
             uiState.copy(showVolumeSlider = showSlider)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), UiState())
+        }.stateInVM(UiState())
 
-    private var timerJob: Job? = null
+    private var timerTask = Task(viewModelScope)
 
     private fun startTimer() {
-        timerJob?.cancel()
-        timerJob = null
         val timer = _playerState.value.timer
         if (timer == TimerType.Disabled) return
-        timerJob =
-            viewModelScope.launch {
-                when (timer) {
-                    is TimerType.Duration -> {
-                        while ((_playerState.value.timer as TimerType.Duration).ms > 0) {
-                            delay(1000L)
-                            _playerState.update {
-                                it.copy(timer = TimerType.Duration((it.timer as TimerType.Duration).ms - 1000L))
-                            }
+        timerTask.start {
+            when (timer) {
+                is TimerType.Duration -> {
+                    while ((_playerState.value.timer as TimerType.Duration).ms > 0) {
+                        delay(1000L)
+                        _playerState.update {
+                            it.copy(timer = TimerType.Duration((it.timer as TimerType.Duration).ms - 1000L))
                         }
-                        onPlayerEvent(PlayerEvent.Stop)
                     }
-
-                    is TimerType.Time -> {
-                        while (true) {
-                            val time = with(LocalDateTime.now()) { hour * 60 + minute }
-                            if (abs(time - (timer.hour * 60 + timer.min)) == 0) break
-                            delay(1000L)
-                        }
-                        onPlayerEvent(PlayerEvent.Stop)
-                    }
-
-                    else -> return@launch
+                    onPlayerEvent(PlayerEvent.Stop)
                 }
+                is TimerType.Time -> {
+                    while (true) {
+                        val time = with(LocalDateTime.now()) { hour * 60 + minute }
+                        if (abs(time - (timer.hour * 60 + timer.min)) == 0) break
+                        delay(1000L)
+                    }
+                    onPlayerEvent(PlayerEvent.Stop)
+                }
+                else -> return@start
             }
+        }
     }
 
     fun getVolume() = (audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
@@ -1109,23 +1090,31 @@ constructor(
                 )
 
             PlayerEvent.Previous -> player.seekToPrevious()
+
             PlayerEvent.Resume -> player.play()
+
             is PlayerEvent.Seek ->
                 if (!((event.skipIfSameIndex) and (event.index == queueIndex.value))) {
                     player.seekTo(event.index, event.time)
                 }
 
             is PlayerEvent.SeekTime -> player.seekTo(event.time)
+
             PlayerEvent.Stop -> {
-                timerJob?.cancel()
-                timerJob = null
+                timeTask.stop()
                 player.stop()
                 player.clearMediaItems()
                 viewModelScope.launch {
+                    dao.upsertQueue(Queue())
                     _playerState.update {
                         it.copy(
                             playState = PlayState.STOP,
                             timer = TimerType.Disabled,
+                        )
+                    }
+                    _uiState.update {
+                        it.copy(
+                            viewState = ViewState.HIDDEN,
                         )
                     }
                 }
@@ -1283,6 +1272,7 @@ constructor(
                     it.copy(volume = getVolume())
                 }
             }
+
             PlayerEvent.IncreaseVolume -> {
                 audioManager.adjustStreamVolume(
                     AudioManager.STREAM_MUSIC,
@@ -1293,6 +1283,7 @@ constructor(
                     it.copy(volume = getVolume())
                 }
             }
+
             is PlayerEvent.SetVolume -> {
                 audioManager.setStreamVolume(
                     AudioManager.STREAM_MUSIC,
@@ -1624,6 +1615,15 @@ constructor(
         }
     }
 
+    private var timeTask = Task(viewModelScope)
+
+    private fun startTimeUpdate() =
+        timeTask.startRepeating(100L) {
+            _playerState.update {
+                it.copy(time = player.currentPosition)
+            }
+        }
+
     private fun play(
         list: List<MusicCard>,
         index: Int = 0,
@@ -1662,12 +1662,7 @@ constructor(
                 )
             }
             onUiEvent(UiEvent.SetViewState(ViewState.SMALL))
-            while (true) {
-                _playerState.update {
-                    it.copy(time = player.currentPosition)
-                }
-                delay(100L)
-            }
+            startTimeUpdate()
         }
     }
 

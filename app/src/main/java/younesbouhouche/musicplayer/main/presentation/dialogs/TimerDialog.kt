@@ -43,7 +43,7 @@ fun TimerDialog(
     var timePickerDialog by remember { mutableStateOf(false) }
     var type by remember { mutableStateOf(initialTimerType) }
     LaunchedEffect(key1 = visible) {
-        if (visible) type = initialTimerType
+        if (visible) type = TimerType.Disabled
     }
     Dialog(
         visible = visible,
@@ -118,7 +118,8 @@ fun TimerDialog(
         ) {
             var selectedTracks by remember { mutableStateOf("1") }
             LaunchedEffect(key1 = selectedTracks) {
-                type = TimerType.End((selectedTracks.toIntOrNull() ?: 1).coerceIn(1, null))
+                if (type is TimerType.End)
+                    type = TimerType.End((selectedTracks.toIntOrNull() ?: 1).coerceIn(1, null))
             }
             if (type is TimerType.End) {
                 OutlinedTextField(

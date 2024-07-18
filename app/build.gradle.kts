@@ -34,6 +34,12 @@ android {
                 "proguard-rules.pro",
             )
         }
+        create("benchmark") {
+            initWith(buildTypes.getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -84,6 +90,7 @@ dependencies {
 //    implementation("com.github.crowdin.mobile-sdk-android:sdk:1.9.2") {
 //        exclude("com.google.code.gson", "gson")
 //    }
+    implementation(libs.timber)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
     implementation(libs.converter.gson)
@@ -107,4 +114,5 @@ dependencies {
     ksp(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
     implementation(libs.gson)
+    implementation(libs.androidx.profileinstaller)
 }

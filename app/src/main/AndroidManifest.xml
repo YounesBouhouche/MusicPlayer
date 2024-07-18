@@ -31,6 +31,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MusicPlayer"
         tools:targetApi="tiramisu">
+        <profileable android:shell="true" />
+
         <activity
             android:name=".settings.presentation.PlayerActivity"
             android:exported="false"
