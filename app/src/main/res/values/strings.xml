@@ -153,6 +153,9 @@
     <string name="remember_shuffle">Remember Shuffle</string>
     <string name="remember_playback_speed">Remember Playback Speed</string>
     <string name="show_volume_slider">Show volume slider</string>
+    <string name="pitch">Pitch</string>
+    <string name="show_pitch_button">Show pitch button</string>
+    <string name="remember_pitch">Remember Pitch</string>
     <plurals name="item_s">
         <item quantity="one">1 item</item>
         <item quantity="zero">no items</item>

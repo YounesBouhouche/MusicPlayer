@@ -390,11 +390,15 @@ constructor(
 
     private val rememberSpeed = playerDataStore.rememberSpeed
 
+    private val rememberPitch = playerDataStore.rememberPitch
+
     private val repeatMode = playerDataStore.repeatMode
 
     private val shuffle = playerDataStore.shuffle
 
     private val speed = playerDataStore.speed
+
+    private val pitch = playerDataStore.pitch
 
     fun getAlbum(file: MusicCard): Album? = _albums.value.firstOrNull { it.title == file.album }
 
@@ -874,6 +878,7 @@ constructor(
                             repeatMode = player.repeatMode,
                             shuffle = player.shuffleModeEnabled,
                             speed = player.playbackParameters.speed,
+                            pitch = player.playbackParameters.pitch
                         )
                     }
                     dao.updateCurrentIndex(player.currentMediaItemIndex)
@@ -1026,8 +1031,8 @@ constructor(
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState =
-        combine(_uiState, playerDataStore.showVolumeSlider) { uiState, showSlider ->
-            uiState.copy(showVolumeSlider = showSlider)
+        combine(_uiState, playerDataStore.settings) { uiState, settings ->
+            uiState.copy(showVolumeSlider = settings.first, showPitch = settings.second)
         }.stateInVM(UiState())
 
     private var timerTask = Task(viewModelScope)
@@ -1295,6 +1300,19 @@ constructor(
                     it.copy(volume = getVolume())
                 }
             }
+
+            is PlayerEvent.SetPitch -> event.pitch.let {
+                player.playbackParameters = PlaybackParameters(
+                    player.playbackParameters.speed,
+                    it
+                )
+                _playerState.update { state ->
+                    state.copy(pitch = it)
+                }
+                viewModelScope.launch {
+                    playerDataStore.override(pitch = it)
+                }
+            }
         }
     }
 
@@ -1470,6 +1488,15 @@ constructor(
             UiEvent.ShowQueueBottomSheet ->
                 _uiState.update {
                     it.copy(queueSheetVisible = true)
+                }
+
+            UiEvent.HidePitchDialog ->
+                _uiState.update {
+                    it.copy(pitchDialog = false)
+                }
+            UiEvent.ShowPitchDialog ->
+                _uiState.update {
+                    it.copy(pitchDialog = true)
                 }
         }
     }
@@ -1660,8 +1687,10 @@ constructor(
             player.shuffleModeEnabled =
                 if (rememberShuffle.first()) shuffle.first() else false
             player.playbackParameters =
-                player.playbackParameters.withSpeed(
+                PlaybackParameters(
                     if (rememberSpeed.first()) speed.first()
+                    else 1f,
+                    if (rememberPitch.first()) pitch.first()
                     else 1f
                 )
             dao.addTimestamp(list[index].path)
@@ -1670,6 +1699,7 @@ constructor(
                 it.copy(
                     time = time,
                     playState = if (autoPlay) PlayState.PLAYING else PlayState.PAUSED,
+                    pitch = pitch.first()
                 )
             }
             onUiEvent(UiEvent.SetViewState(ViewState.SMALL))

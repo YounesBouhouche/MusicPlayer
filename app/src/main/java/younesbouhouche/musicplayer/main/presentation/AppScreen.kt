@@ -67,6 +67,7 @@ import younesbouhouche.musicplayer.main.presentation.dialogs.AddToPlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.CreatePlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.DetailsDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.MetadataDialog
+import younesbouhouche.musicplayer.main.presentation.dialogs.PitchDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.RenamePlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.SpeedDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.TimerDialog
@@ -451,6 +452,12 @@ fun AppScreen(
         { mainVM.onUiEvent(UiEvent.HideSpeedDialog) },
         playerState.speed,
         { mainVM.onPlayerEvent(PlayerEvent.SetSpeed(it)) },
+    )
+    PitchDialog(
+        uiState.pitchDialog,
+        { mainVM.onUiEvent(UiEvent.HidePitchDialog) },
+        playerState.pitch,
+        { mainVM.onPlayerEvent(PlayerEvent.SetPitch(it)) },
     )
     TimerDialog(
         uiState.timerDialog,

@@ -57,6 +57,7 @@ class ExampleStartupBenchmark {
 fun MacrobenchmarkScope.navigateAndScrollDown() {
     val libraryButton = device.findObject(By.res("nav_library"))
     // select the library navigation button
+    device.wait(Until.hasObject(By.res("nav_library")), 2000)
     libraryButton.click()
     device.wait(Until.hasObject(By.res("library_list")), 2000)
     // wait until the library list is shown

@@ -13,7 +13,8 @@ data class PlayerState(
     var timer: TimerType = TimerType.Disabled,
     val hasNextItem: Boolean = true,
     val hasPrevItem: Boolean = true,
-    val volume: Float = 0f
+    val volume: Float = 0f,
+    val pitch: Float = 1f
 )
 
 enum class ViewState {

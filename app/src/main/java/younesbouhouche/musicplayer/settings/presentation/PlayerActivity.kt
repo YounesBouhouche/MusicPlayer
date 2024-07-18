@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.Speed
@@ -55,9 +56,11 @@ class PlayerActivity : ComponentActivity() {
         setContent {
             SetSystemBarColors(settingsDataStore)
             val showVolumeSlider by playerDataStore.showVolumeSlider.collectAsState(initial = false)
+            val showPitch by playerDataStore.showPitch.collectAsState(initial = false)
             val repeatMode by playerDataStore.rememberRepeat.collectAsState(initial = true)
             val shuffle by playerDataStore.rememberShuffle.collectAsState(initial = false)
             val speed by playerDataStore.rememberSpeed.collectAsState(initial = false)
+            val pitch by playerDataStore.rememberPitch.collectAsState(initial = false)
             val scope = rememberCoroutineScope()
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
             val listState = rememberLazyListState()
@@ -109,6 +112,19 @@ class PlayerActivity : ComponentActivity() {
                                 )
                             }
                         }
+                        checkSettingsItem(
+                            Icons.Default.RecordVoiceOver,
+                            R.string.show_pitch_button,
+                            R.string.show_pitch_button,
+                            null,
+                            showPitch,
+                        ) {
+                            scope.launch {
+                                playerDataStore.saveSettings(
+                                    showPitch = it,
+                                )
+                            }
+                        }
                         settingsLabel("Remember options")
                         checkSettingsItem(
                             Icons.Default.Repeat,
@@ -149,6 +165,20 @@ class PlayerActivity : ComponentActivity() {
                                 )
                             }
                         }
+                        if (showPitch)
+                            checkSettingsItem(
+                                Icons.Default.RecordVoiceOver,
+                                R.string.remember_pitch,
+                                R.string.remember_pitch,
+                                null,
+                                pitch,
+                            ) {
+                                scope.launch {
+                                    playerDataStore.saveSettings(
+                                        rememberPitch = it,
+                                    )
+                                }
+                            }
                     }
                 }
             }

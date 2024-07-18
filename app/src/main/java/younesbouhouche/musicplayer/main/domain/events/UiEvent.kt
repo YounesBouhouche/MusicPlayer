@@ -77,4 +77,8 @@ sealed interface UiEvent {
     data object HideRenamePlaylistDialog : UiEvent
 
     data class UpdateRenamePlaylistName(val newName: String) : UiEvent
+
+    data object ShowPitchDialog : UiEvent
+
+    data object HidePitchDialog : UiEvent
 }

@@ -46,6 +46,11 @@ sealed interface PlayerEvent {
     ) :
         PlayerEvent
 
+    data class SetPitch(
+        @FloatRange(from = 0.0, fromInclusive = false) val pitch: Float,
+    ) :
+        PlayerEvent
+
     data object CycleRepeatMode : PlayerEvent
 
     data object ToggleShuffle : PlayerEvent

@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.material.icons.filled.Lyrics
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.RepeatOne
 import androidx.compose.material.icons.filled.Shuffle
@@ -61,6 +62,7 @@ import younesbouhouche.musicplayer.main.domain.events.TimerType
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
+import younesbouhouche.musicplayer.main.presentation.states.UiState
 import younesbouhouche.musicplayer.main.presentation.util.timeString
 import younesbouhouche.musicplayer.main.presentation.util.timerString
 
@@ -69,6 +71,7 @@ import younesbouhouche.musicplayer.main.presentation.util.timerString
 fun Queue(
     queue: List<MusicCard>,
     index: Int,
+    uiState: UiState,
     playerState: PlayerState,
     lyrics: Boolean,
     playlistHidden: Boolean,
@@ -119,6 +122,15 @@ fun Queue(
                     },
                     Icons.Default.Speed,
                 )
+                if (uiState.showPitch)
+                    FilledToggleIconButton(
+                        playerState.pitch != 1f,
+                        {
+                            if (playerState.pitch == 1f) onUiEvent(UiEvent.ShowPitchDialog)
+                            else onPlayerEvent(PlayerEvent.SetPitch(1f))
+                        },
+                        Icons.Default.RecordVoiceOver,
+                    )
                 FilledToggleIconButton(
                     playerState.timer != TimerType.Disabled,
                     {

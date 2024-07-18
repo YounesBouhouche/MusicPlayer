@@ -168,6 +168,7 @@ fun LargePlayer(
         Queue(
             queue,
             index,
+            uiState,
             playerState,
             lyrics,
             playlistState.settledValue == PlaylistViewState.COLLAPSED,

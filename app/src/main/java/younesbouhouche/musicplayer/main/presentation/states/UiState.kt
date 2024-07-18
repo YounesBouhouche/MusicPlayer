@@ -29,6 +29,7 @@ data class UiState(
     val addToPlaylistItems: List<String> = emptyList(),
     val metadataDialog: Boolean = false,
     val detailsDialog: Boolean = false,
+    val pitchDialog: Boolean = false,
     val detailsFile: MusicCard? = null,
     val lyricsVisible: Boolean = false,
     val syncing: Boolean = true,
@@ -37,5 +38,6 @@ data class UiState(
     val renamePlaylistId: Int = -1,
     val renamePlaylistName: String = "",
     val queueSheetVisible: Boolean = false,
-    val showVolumeSlider: Boolean = false
+    val showVolumeSlider: Boolean = false,
+    val showPitch: Boolean = false,
 )
