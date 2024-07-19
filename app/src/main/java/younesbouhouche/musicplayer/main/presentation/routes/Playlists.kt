@@ -74,26 +74,31 @@ fun Playlists(
     onPlaylistEvent: (PlaylistEvent) -> Unit,
     onPlaylistsSortEvent: (ListsSortEvent) -> Unit,
 ) {
-    val importLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) {
-        it?.let { uri ->
-            var name = ""
-            val items = mutableListOf<String>()
-            try {
-                context.contentResolver.openInputStream(uri)?.run {
-                    (reader().readLines()).forEach { line ->
-                        if (line.startsWith("#EXTINF:")) name = line.removePrefix("#EXTINF:").trim()
-                        else if (!line.startsWith("#EXTM3U") and Files.exists(Paths.get(line.trim())))
-                            items.add(line.trim())
+    val importLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+        ) {
+            it?.let { uri ->
+                var name = ""
+                val items = mutableListOf<String>()
+                try {
+                    context.contentResolver.openInputStream(uri)?.run {
+                        (reader().readLines()).forEach { line ->
+                            if (line.startsWith("#EXTINF:")) {
+                                name = line.removePrefix("#EXTINF:").trim()
+                            } else if (!line.startsWith("#EXTM3U") and Files.exists(Paths.get(line.trim()))) {
+                                items.add(line.trim())
+                            }
+                        }
+                        close()
                     }
-                    close()
+                    if (name.isNotBlank() and items.isNotEmpty()) {
+                        onPlaylistEvent(PlaylistEvent.CreateNewPlaylist(name, items))
+                    }
+                } catch (_: Exception) {
                 }
-                if (name.isNotBlank() and items.isNotEmpty())
-                    onPlaylistEvent(PlaylistEvent.CreateNewPlaylist(name, items))
-            } catch (_: Exception) {}
+            }
         }
-    }
     var gridCount by remember { mutableIntStateOf(2) }
     val state = rememberLazyListState()
     LaunchedEffect(key1 = sortState.colsCount.count) {

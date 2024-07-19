@@ -118,8 +118,9 @@ fun TimerDialog(
         ) {
             var selectedTracks by remember { mutableStateOf("1") }
             LaunchedEffect(key1 = selectedTracks) {
-                if (type is TimerType.End)
+                if (type is TimerType.End) {
                     type = TimerType.End((selectedTracks.toIntOrNull() ?: 1).coerceIn(1, null))
+                }
             }
             if (type is TimerType.End) {
                 OutlinedTextField(

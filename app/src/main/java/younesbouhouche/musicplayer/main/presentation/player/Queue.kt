@@ -124,17 +124,18 @@ fun Queue(
                     { onPlayerEvent(PlayerEvent.ResetSpeed) },
                     Icons.Default.Speed,
                 )
-                if (uiState.showPitch)
+                if (uiState.showPitch) {
                     FilledToggleIconButton(
                         playerState.pitch != 1f,
                         { onUiEvent(UiEvent.ShowPitchDialog) },
                         { onPlayerEvent(PlayerEvent.SetPitch(1f)) },
                         Icons.Default.RecordVoiceOver,
                     )
+                }
                 FilledToggleIconButton(
                     playerState.timer != TimerType.Disabled,
                     { onUiEvent(UiEvent.ShowTimerDialog) },
-                    { onPlayerEvent(PlayerEvent.SetTimer(TimerType.Disabled)) }
+                    { onPlayerEvent(PlayerEvent.SetTimer(TimerType.Disabled)) },
                 ) {
                     AnimatedContent(targetState = playerState.timer, label = "") {
                         when (it) {
@@ -156,7 +157,7 @@ fun Queue(
                 FilledToggleIconButton(
                     lyrics,
                     { onUiEvent(UiEvent.ToggleLyrics) },
-                    icon = Icons.Default.Lyrics
+                    icon = Icons.Default.Lyrics,
                 )
             },
             floatingActionButton = {
@@ -301,6 +302,6 @@ private fun FilledToggleIconButton(
             IconButtonDefaults.filledIconToggleButtonColors().copy(
                 containerColor = Color.Transparent,
             ),
-        content = icon
+        content = icon,
     )
 }

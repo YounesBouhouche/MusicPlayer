@@ -44,99 +44,100 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsActivity : ComponentActivity() {
-        @Inject
-        lateinit var settingsDataStore: SettingsDataStore
-        @OptIn(ExperimentalMaterial3Api::class)
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-            enableEdgeToEdge()
-            setContent {
-                SetSystemBarColors(settingsDataStore)
-                val context = LocalContext.current
-                val languages =
-                    mapOf(
-                        "system" to R.string.follow_system,
-                        "en" to R.string.english,
-                        "fr" to R.string.french,
-                        "ar" to R.string.arabic,
-                        "es" to R.string.spanish,
-                        "it" to R.string.italian,
-                        "in" to R.string.hindi,
-                    )
-                val dataStore = SettingsDataStore(LocalContext.current)
-                val language by dataStore.language.collectAsState(initial = "system")
-                val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-                val listState = rememberLazyListState()
-                AppTheme {
-                    Scaffold(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .nestedScroll(scrollBehavior.nestedScrollConnection),
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                        topBar = {
-                            Column {
-                                LargeTopAppBar(
-                                    title = {
-                                        Text(
-                                            stringResource(id = R.string.settings),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                        )
-                                    },
-                                    navigationIcon = {
-                                        IconButton(onClick = { (context as Activity).finish() }) {
-                                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                                        }
-                                    },
-                                    scrollBehavior = scrollBehavior,
-                                )
-                            }
-                        },
-                    ) { paddingValues ->
-                        LazyColumn(
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(paddingValues),
-                            state = listState,
-                        ) {
-                            largeSettingsItem(
-                                Icons.TwoTone.Brush,
-                                R.string.theme,
-                                R.string.customize_app_look,
-                                onClick = {
-                                    startActivity(Intent(context, ThemeActivity::class.java))
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        enableEdgeToEdge()
+        setContent {
+            SetSystemBarColors(settingsDataStore)
+            val context = LocalContext.current
+            val languages =
+                mapOf(
+                    "system" to R.string.follow_system,
+                    "en" to R.string.english,
+                    "fr" to R.string.french,
+                    "ar" to R.string.arabic,
+                    "es" to R.string.spanish,
+                    "it" to R.string.italian,
+                    "in" to R.string.hindi,
+                )
+            val dataStore = SettingsDataStore(LocalContext.current)
+            val language by dataStore.language.collectAsState(initial = "system")
+            val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+            val listState = rememberLazyListState()
+            AppTheme {
+                Scaffold(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .nestedScroll(scrollBehavior.nestedScrollConnection),
+                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                    topBar = {
+                        Column {
+                            LargeTopAppBar(
+                                title = {
+                                    Text(
+                                        stringResource(id = R.string.settings),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
                                 },
-                            )
-                            largeSettingsItem(
-                                Icons.TwoTone.Language,
-                                R.string.language,
-                                languages[language]!!,
-                                onClick = {
-                                    startActivity(Intent(context, LanguageActivity::class.java))
+                                navigationIcon = {
+                                    IconButton(onClick = { (context as Activity).finish() }) {
+                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                                    }
                                 },
-                            )
-                            largeSettingsItem(
-                                Icons.TwoTone.PlayArrow,
-                                R.string.player,
-                                R.string.customize_the_player,
-                                onClick = {
-                                    startActivity(Intent(context, PlayerActivity::class.java))
-                                },
-                            )
-                            largeSettingsItem(
-                                Icons.TwoTone.Info,
-                                R.string.about,
-                                R.string.about_description,
-                                onClick = {
-                                    startActivity(Intent(context, AboutActivity::class.java))
-                                },
+                                scrollBehavior = scrollBehavior,
                             )
                         }
+                    },
+                ) { paddingValues ->
+                    LazyColumn(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(paddingValues),
+                        state = listState,
+                    ) {
+                        largeSettingsItem(
+                            Icons.TwoTone.Brush,
+                            R.string.theme,
+                            R.string.customize_app_look,
+                            onClick = {
+                                startActivity(Intent(context, ThemeActivity::class.java))
+                            },
+                        )
+                        largeSettingsItem(
+                            Icons.TwoTone.Language,
+                            R.string.language,
+                            languages[language]!!,
+                            onClick = {
+                                startActivity(Intent(context, LanguageActivity::class.java))
+                            },
+                        )
+                        largeSettingsItem(
+                            Icons.TwoTone.PlayArrow,
+                            R.string.player,
+                            R.string.customize_the_player,
+                            onClick = {
+                                startActivity(Intent(context, PlayerActivity::class.java))
+                            },
+                        )
+                        largeSettingsItem(
+                            Icons.TwoTone.Info,
+                            R.string.about,
+                            R.string.about_description,
+                            onClick = {
+                                startActivity(Intent(context, AboutActivity::class.java))
+                            },
+                        )
                     }
                 }
             }
         }
     }
+}

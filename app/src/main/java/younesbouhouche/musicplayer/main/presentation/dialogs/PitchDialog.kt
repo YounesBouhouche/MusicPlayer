@@ -99,16 +99,16 @@ fun PitchDialog(
                     label = "",
                     transitionSpec = {
                         (
-                                if (targetState > initialState) {
-                                    slideInVertically { height -> height } + fadeIn() togetherWith
-                                            slideOutVertically { height -> -height } + fadeOut()
-                                } else {
-                                    slideInVertically { height -> -height } + fadeIn() togetherWith
-                                            slideOutVertically { height -> height } + fadeOut()
-                                }
-                                ).using(
-                                SizeTransform(clip = false),
-                            )
+                            if (targetState > initialState) {
+                                slideInVertically { height -> height } + fadeIn() togetherWith
+                                    slideOutVertically { height -> -height } + fadeOut()
+                            } else {
+                                slideInVertically { height -> -height } + fadeIn() togetherWith
+                                    slideOutVertically { height -> height } + fadeOut()
+                            }
+                        ).using(
+                            SizeTransform(clip = false),
+                        )
                     },
                 ) {
                     Text(
@@ -134,15 +134,15 @@ fun PitchDialog(
             // set steps to 0.05 in range 0.25 to 2 to avoid floating point errors
             steps = 35,
             modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
             colors =
-            SliderDefaults.colors(
-                thumbColor = MaterialTheme.colorScheme.primary,
-                activeTrackColor = MaterialTheme.colorScheme.primary,
-                inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer,
-            ),
+                SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.primary,
+                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                    inactiveTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                ),
         )
     }
 }

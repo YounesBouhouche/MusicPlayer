@@ -46,9 +46,10 @@ import javax.inject.Inject
 class PlayerActivity : ComponentActivity() {
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
+
     @Inject
     lateinit var playerDataStore: PlayerDataStore
-    
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,9 +68,9 @@ class PlayerActivity : ComponentActivity() {
             AppTheme {
                 Scaffold(
                     modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .nestedScroll(scrollBehavior.nestedScrollConnection),
+                        Modifier
+                            .fillMaxSize()
+                            .nestedScroll(scrollBehavior.nestedScrollConnection),
                     contentWindowInsets = WindowInsets(0, 0, 0, 0),
                     topBar = {
                         Column {
@@ -93,9 +94,9 @@ class PlayerActivity : ComponentActivity() {
                 ) { paddingValues ->
                     LazyColumn(
                         modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(paddingValues),
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(paddingValues),
                         state = listState,
                     ) {
                         settingsLabel("Customize view")
@@ -165,7 +166,7 @@ class PlayerActivity : ComponentActivity() {
                                 )
                             }
                         }
-                        if (showPitch)
+                        if (showPitch) {
                             checkSettingsItem(
                                 Icons.Default.RecordVoiceOver,
                                 R.string.remember_pitch,
@@ -179,6 +180,7 @@ class PlayerActivity : ComponentActivity() {
                                     )
                                 }
                             }
+                        }
                     }
                 }
             }

@@ -55,6 +55,7 @@ import javax.inject.Inject
 class AboutActivity : ComponentActivity() {
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

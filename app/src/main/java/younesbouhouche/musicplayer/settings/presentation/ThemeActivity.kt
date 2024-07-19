@@ -94,9 +94,9 @@ class ThemeActivity : ComponentActivity() {
             AppTheme {
                 Scaffold(
                     modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .nestedScroll(scrollBehavior.nestedScrollConnection),
+                        Modifier
+                            .fillMaxSize()
+                            .nestedScroll(scrollBehavior.nestedScrollConnection),
                     contentWindowInsets = WindowInsets(0, 0, 0, 0),
                     topBar = {
                         Column {
@@ -120,9 +120,9 @@ class ThemeActivity : ComponentActivity() {
                 ) { paddingValues ->
                     LazyColumn(
                         modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(paddingValues),
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(paddingValues),
                         state = listState,
                     ) {
                         settingsItem(

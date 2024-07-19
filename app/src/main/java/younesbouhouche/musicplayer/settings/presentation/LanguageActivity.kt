@@ -63,8 +63,10 @@ class LanguageActivity : ComponentActivity() {
             "it" to R.string.italian,
             "in" to R.string.hindi,
         )
+
     @Inject
     lateinit var dataStore: SettingsDataStore
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

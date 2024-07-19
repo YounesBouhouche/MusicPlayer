@@ -167,16 +167,19 @@ fun Controls(
             }
         }
         AnimatedVisibility(
-            visible = showVolumeSlider
+            visible = showVolumeSlider,
         ) {
             Column {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     IconButton(
                         onClick = {
                             onPlayerEvent(PlayerEvent.DecreaseVolume)
                         },
-                        enabled = playerState.volume > 0f) {
+                        enabled = playerState.volume > 0f,
+                    ) {
                         Icon(Icons.AutoMirrored.Default.VolumeDown, null)
                     }
                     Slider(
@@ -196,7 +199,7 @@ fun Controls(
                         onClick = {
                             onPlayerEvent(PlayerEvent.IncreaseVolume)
                         },
-                        enabled = playerState.volume < 1f
+                        enabled = playerState.volume < 1f,
                     ) {
                         Icon(Icons.AutoMirrored.Default.VolumeUp, null)
                     }

@@ -155,7 +155,7 @@ fun NavigationScreen(
                 mainVM::onPlayerEvent,
                 mainVM::onUiEvent,
                 mainVM::onPlaylistEvent,
-                mainVM::onPlaylistsSortEvent
+                mainVM::onPlaylistsSortEvent,
             )
         }
         composable<NavRoutes.Library> {

@@ -64,7 +64,7 @@ fun BoxScope.NavBar(
                             Text(
                                 stringResource(screen.title),
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
                             )
                         },
                         onClick = {

@@ -77,8 +77,10 @@ import younesbouhouche.musicplayer.main.presentation.states.ViewState
 import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
 import younesbouhouche.musicplayer.welcome.presentation.WelcomeScreen
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
-    ExperimentalComposeUiApi::class
+@OptIn(
+    ExperimentalFoundationApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalComposeUiApi::class,
 )
 @Composable
 fun AppScreen(

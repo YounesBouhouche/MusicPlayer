@@ -7,17 +7,22 @@ import kotlinx.coroutines.launch
 
 class Task(private val scope: CoroutineScope) {
     private var job: Job? = null
+
     fun start(block: suspend CoroutineScope.() -> Unit) {
         stop()
         job = scope.launch(block = block)
     }
-    fun startRepeating(delay: Long, block: suspend CoroutineScope.() -> Unit)
-        = start {
-            while (true) {
-                block()
-                delay(delay)
-            }
+
+    fun startRepeating(
+        delay: Long,
+        block: suspend CoroutineScope.() -> Unit,
+    ) = start {
+        while (true) {
+            block()
+            delay(delay)
         }
+    }
+
     fun stop() {
         job?.cancel()
         job = null
