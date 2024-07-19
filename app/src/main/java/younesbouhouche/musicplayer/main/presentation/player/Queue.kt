@@ -3,6 +3,8 @@ package younesbouhouche.musicplayer.main.presentation.player
 import android.os.Build
 import android.view.HapticFeedbackConstants
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -41,6 +43,7 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,10 +51,13 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.media3.common.Player
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import younesbouhouche.musicplayer.R
@@ -100,6 +106,7 @@ fun Queue(
                 FilledToggleIconButton(
                     playerState.repeatMode != Player.REPEAT_MODE_OFF,
                     { onPlayerEvent(PlayerEvent.CycleRepeatMode) },
+                    { onPlayerEvent(PlayerEvent.SetRepeatMode(Player.REPEAT_MODE_OFF)) },
                     if (playerState.repeatMode == Player.REPEAT_MODE_ONE) {
                         Icons.Default.RepeatOne
                     } else {
@@ -109,37 +116,25 @@ fun Queue(
                 FilledToggleIconButton(
                     playerState.shuffle,
                     { onPlayerEvent(PlayerEvent.ToggleShuffle) },
-                    Icons.Default.Shuffle,
+                    icon = Icons.Default.Shuffle,
                 )
                 FilledToggleIconButton(
                     playerState.speed != 1f,
-                    {
-                        if (playerState.speed == 1f) {
-                            onUiEvent(UiEvent.ShowSpeedDialog)
-                        } else {
-                            onPlayerEvent(PlayerEvent.ResetSpeed)
-                        }
-                    },
+                    { onUiEvent(UiEvent.ShowSpeedDialog) },
+                    { onPlayerEvent(PlayerEvent.ResetSpeed) },
                     Icons.Default.Speed,
                 )
                 if (uiState.showPitch)
                     FilledToggleIconButton(
                         playerState.pitch != 1f,
-                        {
-                            if (playerState.pitch == 1f) onUiEvent(UiEvent.ShowPitchDialog)
-                            else onPlayerEvent(PlayerEvent.SetPitch(1f))
-                        },
+                        { onUiEvent(UiEvent.ShowPitchDialog) },
+                        { onPlayerEvent(PlayerEvent.SetPitch(1f)) },
                         Icons.Default.RecordVoiceOver,
                     )
                 FilledToggleIconButton(
                     playerState.timer != TimerType.Disabled,
-                    {
-                        if (playerState.timer == TimerType.Disabled) {
-                            onUiEvent(UiEvent.ShowTimerDialog)
-                        } else {
-                            onPlayerEvent(PlayerEvent.SetTimer(TimerType.Disabled))
-                        }
-                    },
+                    { onUiEvent(UiEvent.ShowTimerDialog) },
+                    { onPlayerEvent(PlayerEvent.SetTimer(TimerType.Disabled)) }
                 ) {
                     AnimatedContent(targetState = playerState.timer, label = "") {
                         when (it) {
@@ -161,7 +156,7 @@ fun Queue(
                 FilledToggleIconButton(
                     lyrics,
                     { onUiEvent(UiEvent.ToggleLyrics) },
-                    Icons.Default.Lyrics,
+                    icon = Icons.Default.Lyrics
                 )
             },
             floatingActionButton = {
@@ -267,36 +262,45 @@ fun Queue(
 private fun FilledToggleIconButton(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    onLongClick: () -> Unit = {},
     icon: ImageVector,
-) {
-    FilledIconToggleButton(
-        checked = checked,
-        onCheckedChange = onCheckedChange,
-        colors =
-            IconButtonDefaults.filledIconToggleButtonColors().copy(
-                containerColor = Color.Transparent,
-            ),
-    ) {
-        Icon(
-            icon,
-            null,
-        )
-    }
+) = FilledToggleIconButton(checked, onCheckedChange, onLongClick) {
+    Icon(icon, null)
 }
 
 @Composable
 private fun FilledToggleIconButton(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    onLongClick: () -> Unit = {},
     icon: @Composable () -> Unit,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val viewConfiguration = LocalViewConfiguration.current
+    LaunchedEffect(interactionSource) {
+        var isLongClick = false
+        interactionSource.interactions.collectLatest { interaction ->
+            when (interaction) {
+                is PressInteraction.Press -> {
+                    isLongClick = false
+                    delay(viewConfiguration.longPressTimeoutMillis)
+                    isLongClick = true
+                    onLongClick()
+                }
+                is PressInteraction.Release -> {
+                    if (!isLongClick) onCheckedChange(!checked)
+                }
+            }
+        }
+    }
     FilledIconToggleButton(
         checked = checked,
-        onCheckedChange = onCheckedChange,
+        onCheckedChange = {},
+        interactionSource = interactionSource,
         colors =
             IconButtonDefaults.filledIconToggleButtonColors().copy(
                 containerColor = Color.Transparent,
             ),
-        content = icon,
+        content = icon
     )
 }

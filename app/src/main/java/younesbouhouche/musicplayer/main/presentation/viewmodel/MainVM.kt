@@ -1037,33 +1037,6 @@ constructor(
 
     private var timerTask = Task(viewModelScope)
 
-    private fun startTimer() {
-        val timer = _playerState.value.timer
-        if (timer == TimerType.Disabled) return
-        timerTask.start {
-            when (timer) {
-                is TimerType.Duration -> {
-                    while ((_playerState.value.timer as TimerType.Duration).ms > 0) {
-                        delay(1000L)
-                        _playerState.update {
-                            it.copy(timer = TimerType.Duration((it.timer as TimerType.Duration).ms - 1000L))
-                        }
-                    }
-                    onPlayerEvent(PlayerEvent.Stop)
-                }
-                is TimerType.Time -> {
-                    while (true) {
-                        val time = with(LocalDateTime.now()) { hour * 60 + minute }
-                        if (abs(time - (timer.hour * 60 + timer.min)) == 0) break
-                        delay(1000L)
-                    }
-                    onPlayerEvent(PlayerEvent.Stop)
-                }
-                else -> return@start
-            }
-        }
-    }
-
     fun getVolume() = (audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
             / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC))
 
@@ -1175,10 +1148,39 @@ constructor(
             PlayerEvent.ResetSpeed -> player.setPlaybackSpeed(1f)
             is PlayerEvent.SetSpeed -> player.setPlaybackSpeed(event.speed)
             is PlayerEvent.SetTimer -> {
-                _playerState.update {
-                    it.copy(timer = event.timer)
+                event.timer.let {
+                    _playerState.update { state ->
+                        state.copy(timer = it)
+                    }
+                    if (it is TimerType.Disabled) timerTask.stop()
+                    else
+                        timerTask.start {
+                            when (it) {
+                                is TimerType.Duration -> {
+                                    while ((_playerState.value.timer as TimerType.Duration).ms > 0) {
+                                        delay(1000L)
+                                        _playerState.update { state ->
+                                            state.copy(
+                                                timer = TimerType.Duration(
+                                                    (state.timer as TimerType.Duration).ms - 1000L
+                                                )
+                                            )
+                                        }
+                                    }
+                                    onPlayerEvent(PlayerEvent.Stop)
+                                }
+                                is TimerType.Time -> {
+                                    while (true) {
+                                        val time = with(LocalDateTime.now()) { hour * 60 + minute }
+                                        if (abs(time - (it.hour * 60 + it.min)) == 0) break
+                                        delay(1000L)
+                                    }
+                                    onPlayerEvent(PlayerEvent.Stop)
+                                }
+                                else -> return@start
+                            }
+                        }
                 }
-                startTimer()
             }
 
             is PlayerEvent.UpdateFavorite -> {
