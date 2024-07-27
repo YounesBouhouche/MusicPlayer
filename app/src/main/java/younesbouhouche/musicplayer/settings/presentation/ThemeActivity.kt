@@ -6,9 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -97,33 +95,28 @@ class ThemeActivity : ComponentActivity() {
                         Modifier
                             .fillMaxSize()
                             .nestedScroll(scrollBehavior.nestedScrollConnection),
-                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
                     topBar = {
-                        Column {
-                            LargeTopAppBar(
-                                title = {
-                                    Text(
-                                        stringResource(id = R.string.theme),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                },
-                                navigationIcon = {
-                                    IconButton(onClick = { (context as Activity).finish() }) {
-                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                                    }
-                                },
-                                scrollBehavior = scrollBehavior,
-                            )
-                        }
+                        LargeTopAppBar(
+                            title = {
+                                Text(
+                                    stringResource(id = R.string.theme),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = { (context as Activity).finish() }) {
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                                }
+                            },
+                            scrollBehavior = scrollBehavior,
+                        )
                     },
                 ) { paddingValues ->
                     LazyColumn(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(paddingValues),
+                        modifier = Modifier.fillMaxWidth(),
                         state = listState,
+                        contentPadding = paddingValues,
                     ) {
                         settingsItem(
                             Icons.TwoTone.InvertColors,

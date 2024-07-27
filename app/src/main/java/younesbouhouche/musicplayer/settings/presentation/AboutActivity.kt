@@ -8,8 +8,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,7 +29,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -62,7 +59,7 @@ class AboutActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             val listState = rememberLazyListState()
-            val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+            val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
             val context = LocalContext.current
             SetSystemBarColors(dataStore = settingsDataStore)
             AppTheme {
@@ -71,34 +68,31 @@ class AboutActivity : ComponentActivity() {
                         Modifier
                             .fillMaxSize()
                             .nestedScroll(scrollBehavior.nestedScrollConnection),
-                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
                     topBar = {
-                        Column {
-                            TopAppBar(
-                                title = {
-                                    Text(
-                                        stringResource(id = R.string.about),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                },
-                                navigationIcon = {
-                                    IconButton(onClick = { (context as Activity).finish() }) {
-                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                                    }
-                                },
-                                scrollBehavior = scrollBehavior,
-                            )
-                        }
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    stringResource(id = R.string.about),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = { (context as Activity).finish() }) {
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                                }
+                            },
+                            scrollBehavior = scrollBehavior,
+                        )
                     },
                 ) { paddingValues ->
                     LazyColumn(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(paddingValues)
                                 .padding(horizontal = 16.dp),
                         state = listState,
+                        contentPadding = paddingValues,
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                     ) {

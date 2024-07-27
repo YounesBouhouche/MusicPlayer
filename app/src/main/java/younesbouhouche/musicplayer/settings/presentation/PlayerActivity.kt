@@ -3,12 +3,8 @@ package younesbouhouche.musicplayer.settings.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -53,7 +49,6 @@ class PlayerActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             SetSystemBarColors(settingsDataStore)
             val showVolumeSlider by playerDataStore.showVolumeSlider.collectAsState(initial = false)
@@ -71,33 +66,28 @@ class PlayerActivity : ComponentActivity() {
                         Modifier
                             .fillMaxSize()
                             .nestedScroll(scrollBehavior.nestedScrollConnection),
-                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
                     topBar = {
-                        Column {
-                            LargeTopAppBar(
-                                title = {
-                                    Text(
-                                        stringResource(id = R.string.player),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                },
-                                navigationIcon = {
-                                    IconButton(onClick = { finish() }) {
-                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                                    }
-                                },
-                                scrollBehavior = scrollBehavior,
-                            )
-                        }
+                        LargeTopAppBar(
+                            title = {
+                                Text(
+                                    stringResource(id = R.string.player),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = { finish() }) {
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                                }
+                            },
+                            scrollBehavior = scrollBehavior,
+                        )
                     },
                 ) { paddingValues ->
                     LazyColumn(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(paddingValues),
+                        modifier = Modifier.fillMaxWidth(),
                         state = listState,
+                        contentPadding = paddingValues,
                     ) {
                         settingsLabel("Customize view")
                         checkSettingsItem(

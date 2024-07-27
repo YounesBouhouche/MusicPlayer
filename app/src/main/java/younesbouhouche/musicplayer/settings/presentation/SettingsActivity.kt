@@ -6,11 +6,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -44,6 +41,17 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsActivity : ComponentActivity() {
+    private val languages =
+        mapOf(
+            "system" to R.string.follow_system,
+            "en" to R.string.english,
+            "fr" to R.string.french,
+            "ar" to R.string.arabic,
+            "es" to R.string.spanish,
+            "it" to R.string.italian,
+            "in" to R.string.hindi,
+        )
+
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
@@ -55,16 +63,6 @@ class SettingsActivity : ComponentActivity() {
         setContent {
             SetSystemBarColors(settingsDataStore)
             val context = LocalContext.current
-            val languages =
-                mapOf(
-                    "system" to R.string.follow_system,
-                    "en" to R.string.english,
-                    "fr" to R.string.french,
-                    "ar" to R.string.arabic,
-                    "es" to R.string.spanish,
-                    "it" to R.string.italian,
-                    "in" to R.string.hindi,
-                )
             val dataStore = SettingsDataStore(LocalContext.current)
             val language by dataStore.language.collectAsState(initial = "system")
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -75,33 +73,28 @@ class SettingsActivity : ComponentActivity() {
                         Modifier
                             .fillMaxSize()
                             .nestedScroll(scrollBehavior.nestedScrollConnection),
-                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
                     topBar = {
-                        Column {
-                            LargeTopAppBar(
-                                title = {
-                                    Text(
-                                        stringResource(id = R.string.settings),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                },
-                                navigationIcon = {
-                                    IconButton(onClick = { (context as Activity).finish() }) {
-                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                                    }
-                                },
-                                scrollBehavior = scrollBehavior,
-                            )
-                        }
+                        LargeTopAppBar(
+                            title = {
+                                Text(
+                                    stringResource(id = R.string.settings),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = { (context as Activity).finish() }) {
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                                }
+                            },
+                            scrollBehavior = scrollBehavior,
+                        )
                     },
                 ) { paddingValues ->
                     LazyColumn(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(paddingValues),
+                        modifier = Modifier.fillMaxWidth(),
                         state = listState,
+                        contentPadding = paddingValues,
                     ) {
                         largeSettingsItem(
                             Icons.TwoTone.Brush,

@@ -8,13 +8,8 @@ import android.os.LocaleList
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -23,7 +18,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -80,73 +74,61 @@ class LanguageActivity : ComponentActivity() {
             val scope = rememberCoroutineScope()
             SetSystemBarColors(dataStore)
             AppTheme {
-                Box(
+                Scaffold(
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.background),
-                ) {
-                    Scaffold(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .nestedScroll(scrollBehavior.nestedScrollConnection),
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                        topBar = {
-                            Column {
-                                LargeTopAppBar(
-                                    title = {
-                                        Text(
-                                            stringResource(id = R.string.language),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                        )
-                                    },
-                                    navigationIcon = {
-                                        IconButton(onClick = { (context as Activity).finish() }) {
-                                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                                        }
-                                    },
-                                    scrollBehavior = scrollBehavior,
+                            .nestedScroll(scrollBehavior.nestedScrollConnection),
+                    topBar = {
+                        LargeTopAppBar(
+                            title = {
+                                Text(
+                                    stringResource(id = R.string.language),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
                                 )
-                            }
-                        },
-                    ) { paddingValues ->
-                        LazyColumn(
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(paddingValues),
-                            state = listState,
-                        ) {
-                            settingsRadioItems(
-                                languages.toList(),
-                                languages.map { it.key }.indexOf(language),
-                                {
-                                    selectedLanguage = languages.keys.elementAt(it)
-                                    scope.launch {
-                                        dataStore.saveSettings(language = languages.keys.elementAt(it))
-                                        context.findActivity()?.runOnUiThread {
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                                context.getSystemService(LocaleManager::class.java)
-                                                    .applicationLocales =
-                                                    LocaleList.forLanguageTags(
-                                                        if (selectedLanguage == "system") {
-                                                            LocaleManagerCompat.getSystemLocales(context)[0]!!.language
-                                                        } else {
-                                                            selectedLanguage
-                                                        },
-                                                    )
-                                            } else {
-                                                AppCompatDelegate.setApplicationLocales(
-                                                    LocaleListCompat.forLanguageTags(selectedLanguage),
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = { (context as Activity).finish() }) {
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                                }
+                            },
+                            scrollBehavior = scrollBehavior,
+                        )
+                    },
+                ) { paddingValues ->
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        state = listState,
+                        contentPadding = paddingValues,
+                    ) {
+                        settingsRadioItems(
+                            languages.toList(),
+                            languages.map { it.key }.indexOf(language),
+                            {
+                                selectedLanguage = languages.keys.elementAt(it)
+                                scope.launch {
+                                    dataStore.saveSettings(language = languages.keys.elementAt(it))
+                                    context.findActivity()?.runOnUiThread {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                            context.getSystemService(LocaleManager::class.java)
+                                                .applicationLocales =
+                                                LocaleList.forLanguageTags(
+                                                    if (selectedLanguage == "system") {
+                                                        LocaleManagerCompat.getSystemLocales(context)[0]!!.language
+                                                    } else {
+                                                        selectedLanguage
+                                                    },
                                                 )
-                                            }
+                                        } else {
+                                            AppCompatDelegate.setApplicationLocales(
+                                                LocaleListCompat.forLanguageTags(selectedLanguage),
+                                            )
                                         }
                                     }
-                                },
-                            ) { Text(stringResource(it.second)) }
-                        }
+                                }
+                            },
+                        ) { Text(stringResource(it.second)) }
                     }
                 }
             }
