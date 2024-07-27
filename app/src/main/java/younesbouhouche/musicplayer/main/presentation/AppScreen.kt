@@ -6,6 +6,7 @@ import android.content.Intent.ACTION_VIEW
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
@@ -19,13 +20,14 @@ import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.gestures.snapTo
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -34,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -92,6 +95,7 @@ fun AppScreen(
     navigationState: Int,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val queueFiles by mainVM.queueFiles.collectAsState()
     val queueIndex by mainVM.queueIndex.collectAsState()
     val searchState by mainVM.searchState.collectAsState()
@@ -212,6 +216,17 @@ fun AppScreen(
             state.settledValue == ViewState.LARGE -> 1f - state.progress(ViewState.LARGE, ViewState.SMALL)
             else -> 0f
         }
+    val smallPlayerProgress =
+        when {
+            playerState.playState == PlayState.STOP -> 0f
+            state.offset == 0f -> 1f
+            state.settledValue == ViewState.HIDDEN -> state.progress(ViewState.HIDDEN, ViewState.SMALL)
+            state.settledValue == ViewState.SMALL -> 1f - state.progress(ViewState.SMALL, ViewState.HIDDEN)
+            else -> 1f
+        }
+    LaunchedEffect(smallPlayerProgress) {
+        mainVM.onPlayerEvent(PlayerEvent.SetPlayerVolume(smallPlayerProgress))
+    }
     val playlistProgress =
         when (playlistState.settledValue) {
             PlaylistViewState.COLLAPSED -> playlistState.progress(PlaylistViewState.COLLAPSED, PlaylistViewState.EXPANDED)
@@ -237,16 +252,16 @@ fun AppScreen(
                         .fillMaxSize()
                         .semantics {
                             testTagsAsResourceId = true
-                        },
+                        }
+                        .pullToRefresh(
+                            state = pullToRefreshState,
+                            isRefreshing = uiState.loading,
+                            onRefresh = {
+                                mainVM.onFilesEvent(FilesEvent.LoadFiles)
+                            },
+                        ),
             ) {
-                PullToRefreshBox(
-                    state = pullToRefreshState,
-                    isRefreshing = uiState.loading,
-                    onRefresh = {
-                        mainVM.onFilesEvent(FilesEvent.LoadFiles)
-                    },
-                    modifier = Modifier.fillMaxSize(),
-                ) {
+                Box(Modifier.fillMaxSize()) {
                     NavigationScreen(
                         context,
                         navController,
@@ -495,5 +510,14 @@ fun AppScreen(
             { mainVM.onUiEvent(UiEvent.DismissDetails) },
             it,
         )
+    }
+    BackHandler(uiState.viewState == ViewState.LARGE) {
+        scope.launch {
+            if (uiState.playlistViewState == PlaylistViewState.EXPANDED) {
+                playlistState.animateTo(PlaylistViewState.COLLAPSED)
+            } else {
+                state.animateTo(ViewState.SMALL)
+            }
+        }
     }
 }
