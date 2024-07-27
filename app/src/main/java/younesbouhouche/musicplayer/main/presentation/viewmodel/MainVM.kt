@@ -1322,6 +1322,12 @@ class MainVM
                             playerDataStore.override(pitch = it)
                         }
                     }
+
+                is PlayerEvent.SetPlayerVolume -> {
+                    if (_playerState.value.playState != PlayState.STOP) {
+                        player.volume = event.volume
+                    }
+                }
             }
         }
 

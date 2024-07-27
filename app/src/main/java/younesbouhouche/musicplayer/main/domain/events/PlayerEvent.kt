@@ -76,4 +76,6 @@ sealed interface PlayerEvent {
     data object IncreaseVolume : PlayerEvent
 
     data object DecreaseVolume : PlayerEvent
+
+    data class SetPlayerVolume(val volume: Float) : PlayerEvent
 }
