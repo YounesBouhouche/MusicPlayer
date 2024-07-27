@@ -242,7 +242,11 @@ fun Queue(
                     SwipeMusicCardLazyItem(
                         state = dismissState,
                         file = item,
+                        number = idx + 1,
                         reorderableState = reorderableState,
+                        onLongClick = {
+                            onUiEvent(UiEvent.ShowBottomSheet(item))
+                        },
                         swipingItemBackground =
                             if (index == idx) {
                                 MaterialTheme.colorScheme.background

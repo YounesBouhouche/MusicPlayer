@@ -42,6 +42,7 @@ import younesbouhouche.musicplayer.main.presentation.util.timeString
 fun MusicCardScreen(
     file: MusicCard,
     modifier: Modifier = Modifier,
+    number: Int? = null,
     background: Color = Color.Transparent,
     trailingContent: @Composable RowScope.() -> Unit = {},
     onLongClick: () -> Unit,
@@ -49,6 +50,7 @@ fun MusicCardScreen(
 ) {
     MyListItem(
         modifier = modifier,
+        number = number,
         background = background,
         onClick = onClick,
         onLongClick = onLongClick,
@@ -68,6 +70,7 @@ fun MusicCardScreen(
 fun ReorderableCollectionItemScope.MusicCardScreen(
     file: MusicCard,
     modifier: Modifier = Modifier,
+    number: Int? = null,
     background: Color = Color.Transparent,
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {},
@@ -81,6 +84,7 @@ fun ReorderableCollectionItemScope.MusicCardScreen(
         headline = file.title,
         supporting = "${file.artist} - ${file.duration.timeString}",
         cover = file.cover?.asImageBitmap(),
+        number = number,
         trailingContent = {
             val view = LocalView.current
             IconButton(onClick = onLongClick) {
@@ -121,6 +125,7 @@ fun ReorderableCollectionItemScope.MusicCardScreen(
 fun LazyItemScope.LazyMusicCardScreen(
     file: MusicCard,
     modifier: Modifier = Modifier,
+    number: Int? = null,
     background: Color = Color.Transparent,
     reorderableState: ReorderableLazyListState? = null,
     onLongClick: () -> Unit = {},
@@ -129,6 +134,7 @@ fun LazyItemScope.LazyMusicCardScreen(
     if (reorderableState == null) {
         MusicCardScreen(
             file = file,
+            number = number,
             background = background,
             onClick = onClick,
             onLongClick = onLongClick,
@@ -142,6 +148,7 @@ fun LazyItemScope.LazyMusicCardScreen(
         ) {
             MusicCardScreen(
                 file = file,
+                number = number,
                 background = background,
                 onClick = onClick,
                 onLongClick = onLongClick,
@@ -155,30 +162,37 @@ fun LazyItemScope.SwipeMusicCardLazyItem(
     state: SwipeToDismissBoxState,
     file: MusicCard,
     modifier: Modifier = Modifier,
-    background: Color = Color.Transparent,
+    number: Int? = null,
+    background: Color = MaterialTheme.colorScheme.errorContainer,
     swipingItemBackground: Color = MaterialTheme.colorScheme.surface,
     reorderableState: ReorderableLazyListState? = null,
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {},
 ) {
+    val scale by animateFloatAsState(
+        targetValue =
+            if (state.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+                1f
+            } else {
+                0f
+            },
+        label = "Swipe to delete scale",
+    )
+    val boxBackground =
+        if (state.dismissDirection == SwipeToDismissBoxValue.Settled) {
+            Color.Transparent
+        } else {
+            background
+        }
     SwipeToDismissBox(
         state = state,
         enableDismissFromStartToEnd = false,
         backgroundContent = {
-            val scale by animateFloatAsState(
-                targetValue =
-                    if (state.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
-                        1f
-                    } else {
-                        0f
-                    },
-                label = "Swipe to delete scale",
-            )
             Box(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .background(background)
+                        .background(boxBackground, MaterialTheme.shapes.medium)
                         .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.CenterEnd,
             ) {
@@ -195,6 +209,14 @@ fun LazyItemScope.SwipeMusicCardLazyItem(
         },
         modifier = modifier.animateItem(),
     ) {
-        LazyMusicCardScreen(file, Modifier, swipingItemBackground, reorderableState, onLongClick, onClick)
+        LazyMusicCardScreen(
+            file,
+            Modifier,
+            number,
+            swipingItemBackground,
+            reorderableState,
+            onLongClick,
+            onClick,
+        )
     }
 }

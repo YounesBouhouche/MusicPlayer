@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.Icon
@@ -28,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -47,6 +50,7 @@ fun MyListItem(
     headline: String,
     supporting: String,
     cover: ImageBitmap? = null,
+    number: Int? = null,
     alternative: ImageVector = Icons.Default.MusicNote,
     trailingContent: @Composable (RowScope.() -> Unit)? = null,
 ) {
@@ -59,46 +63,69 @@ fun MyListItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Box(
-            Modifier
-                .size(80.dp)
-                .padding(12.dp)
-                .clip(
-                    if (isMusicCard) {
-                        MaterialTheme.shapes.medium
-                    } else {
-                        CircleShape
-                    },
-                )
-                .clipToBounds()
-                .background(
-                    if (isMusicCard) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        Color.Transparent
-                    },
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (cover == null) {
-                Icon(
-                    alternative,
-                    null,
-                    Modifier.fillMaxSize(
-                        if (isMusicCard) .75f else 1f,
+        Box(Modifier.size(80.dp).padding(12.dp)) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .clip(
+                        if (isMusicCard) {
+                            MaterialTheme.shapes.medium
+                        } else {
+                            CircleShape
+                        },
+                    )
+                    .clipToBounds()
+                    .background(
+                        if (isMusicCard) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            Color.Transparent
+                        },
                     ),
-                    if (isMusicCard) {
-                        MaterialTheme.colorScheme.surface
-                    } else {
-                        LocalContentColor.current
-                    },
-                )
-            } else {
-                Image(
-                    cover,
-                    null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
+                contentAlignment = Alignment.Center,
+            ) {
+                if (cover == null) {
+                    Icon(
+                        alternative,
+                        null,
+                        Modifier.fillMaxSize(
+                            if (isMusicCard) .75f else 1f,
+                        ),
+                        if (isMusicCard) {
+                            MaterialTheme.colorScheme.surface
+                        } else {
+                            LocalContentColor.current
+                        },
+                    )
+                } else {
+                    Image(
+                        cover,
+                        null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                    )
+                }
+            }
+            number?.let {
+                Text(
+                    "$it",
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .offset(y = 8.dp)
+                        .background(
+                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = .8f),
+                            RoundedCornerShape(100),
+                        )
+                        .clip(RoundedCornerShape(100))
+                        .shadow(8.dp, RoundedCornerShape(100))
+                        .clipToBounds()
+                        .padding(vertical = 4.dp)
+                        .fillMaxWidth(.8f),
+                    MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelSmall,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
