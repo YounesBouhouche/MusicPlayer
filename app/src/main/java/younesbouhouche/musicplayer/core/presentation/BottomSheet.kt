@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,24 +21,25 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.material.icons.filled.AddToPhotos
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.AppShortcut
-import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.SkipNext
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconToggleButton
@@ -58,12 +60,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
@@ -71,6 +75,7 @@ import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeig
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.presentation.util.timeString
 
 data class BottomSheetButton(val text: String, val icon: ImageVector, val active: Boolean = false, val onClick: () -> Unit) {
     constructor(text: String, icon: ImageVector, onClick: () -> Unit) : this(text, icon, false, onClick)
@@ -168,7 +173,7 @@ fun ItemBottomSheet(
             buttons =
                 listOf(
                     listOf(
-                        BottomSheetButton(stringResource(R.string.play_next), Icons.Default.SkipNext) {
+                        BottomSheetButton(stringResource(R.string.play_next), Icons.Outlined.SkipNext) {
                             onPlayerEvent(PlayerEvent.AddToNext(listOf(file)))
                         },
                         BottomSheetButton(stringResource(R.string.add_to_playing_queue), Icons.Default.AddToPhotos) {
@@ -185,7 +190,7 @@ fun ItemBottomSheet(
                         BottomSheetButton(stringResource(R.string.details), Icons.Outlined.Info) {
                             onUiEvent(UiEvent.ShowDetails(this))
                         },
-                        BottomSheetButton(stringResource(R.string.share), Icons.Default.Share, shareFile),
+                        BottomSheetButton(stringResource(R.string.share), Icons.Outlined.Share, shareFile),
                     ),
                 ),
             leadingContent = {
@@ -196,33 +201,51 @@ fun ItemBottomSheet(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Box(
-                        Modifier
-                            .size(80.dp)
-                            .padding(8.dp)
-                            .background(
-                                MaterialTheme.colorScheme.secondary,
-                                MaterialTheme.shapes.medium,
-                            )
-                            .clip(MaterialTheme.shapes.medium)
-                            .clipToBounds(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        if (cover != null) {
-                            Image(
-                                bitmap = cover!!.asImageBitmap(),
-                                null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize(),
-                            )
-                        } else {
-                            Icon(
-                                Icons.Default.MusicNote,
-                                null,
-                                modifier = Modifier.fillMaxSize(0.7f),
-                                tint = BottomSheetDefaults.ContainerColor,
-                            )
+                    Box(Modifier.size(80.dp).padding(8.dp)) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .clip(MaterialTheme.shapes.medium)
+                                .clipToBounds()
+                                .background(MaterialTheme.colorScheme.primary),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            if (cover == null) {
+                                Icon(
+                                    Icons.Default.MusicNote,
+                                    null,
+                                    Modifier.fillMaxSize(.75f),
+                                    MaterialTheme.colorScheme.surface,
+                                )
+                            } else {
+                                Image(
+                                    cover!!.asImageBitmap(),
+                                    null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+                                )
+                            }
                         }
+                        Text(
+                            duration.timeString,
+                            Modifier
+                                .align(Alignment.BottomCenter)
+                                .offset(y = 8.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = .8f),
+                                    RoundedCornerShape(100),
+                                )
+                                .clip(RoundedCornerShape(100))
+                                .shadow(8.dp, RoundedCornerShape(100))
+                                .clipToBounds()
+                                .padding(4.dp)
+                                .fillMaxWidth(.8f),
+                            MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.labelSmall,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                     }
                     Column(
                         Modifier
@@ -339,7 +362,7 @@ fun PlaylistBottomSheet(
         buttons =
             listOf(
                 listOf(
-                    BottomSheetButton(stringResource(R.string.play_next), Icons.Default.SkipNext) {
+                    BottomSheetButton(stringResource(R.string.play_next), Icons.Outlined.SkipNext) {
                         onPlayerEvent(PlayerEvent.AddToNext(files))
                     },
                     BottomSheetButton(stringResource(R.string.add_to_playing_queue), Icons.Default.AddToPhotos) {
@@ -353,15 +376,15 @@ fun PlaylistBottomSheet(
                     },
                 ),
                 listOf(
-                    BottomSheetButton(stringResource(R.string.rename_playlist), Icons.Default.Edit) {
+                    BottomSheetButton(stringResource(R.string.rename_playlist), Icons.Outlined.Edit) {
                         onUiEvent(UiEvent.ShowRenamePlaylistDialog(id, title))
                     },
                     BottomSheetButton(stringResource(R.string.save_playlist), Icons.Default.Save, savePlaylist),
-                    BottomSheetButton(stringResource(R.string.remove_playlist), Icons.Default.DeleteSweep, delete),
+                    BottomSheetButton(stringResource(R.string.remove_playlist), Icons.Outlined.Delete, delete),
                     BottomSheetButton(stringResource(R.string.create_home_shortcut), Icons.Default.AppShortcut, addToHomeScreen),
                 ),
                 listOf(
-                    BottomSheetButton(stringResource(R.string.share_files), Icons.Default.Share, shareFiles),
+                    BottomSheetButton(stringResource(R.string.share_files), Icons.Outlined.Share, shareFiles),
                 ),
             ),
         leadingContent = {
@@ -426,7 +449,7 @@ fun PlaylistBottomSheet(
                     modifier = Modifier.size(48.dp),
                 ) {
                     Icon(
-                        Icons.Default.PlayArrow,
+                        Icons.Outlined.PlayArrow,
                         null,
                         Modifier.size(28.dp),
                     )
@@ -459,7 +482,7 @@ fun ListBottomSheet(
         buttons =
             listOf(
                 listOf(
-                    BottomSheetButton(stringResource(R.string.play_next), Icons.Default.SkipNext) {
+                    BottomSheetButton(stringResource(R.string.play_next), Icons.Outlined.SkipNext) {
                         onPlayerEvent(PlayerEvent.AddToNext(list))
                     },
                     BottomSheetButton(stringResource(R.string.add_to_playing_queue), Icons.Default.AddToPhotos) {
@@ -473,7 +496,7 @@ fun ListBottomSheet(
                     },
                 ),
                 listOf(
-                    BottomSheetButton(stringResource(R.string.share_files), Icons.Default.Share, shareFiles),
+                    BottomSheetButton(stringResource(R.string.share_files), Icons.Outlined.Share, shareFiles),
                 ),
             ),
         leadingContent = {
