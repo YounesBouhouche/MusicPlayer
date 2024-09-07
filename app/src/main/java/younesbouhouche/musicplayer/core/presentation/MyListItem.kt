@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -113,16 +113,16 @@ fun MyListItem(
                     Modifier
                         .align(Alignment.BottomCenter)
                         .offset(y = 8.dp)
+                        .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(100))
                         .background(
-                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = .8f),
+                            MaterialTheme.colorScheme.surface.copy(alpha = .9f),
                             RoundedCornerShape(100),
                         )
                         .clip(RoundedCornerShape(100))
-                        .shadow(8.dp, RoundedCornerShape(100))
                         .clipToBounds()
-                        .padding(vertical = 4.dp)
+                        .padding(vertical = 2.dp)
                         .fillMaxWidth(.8f),
-                    MaterialTheme.colorScheme.primary,
+                    MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.labelSmall,
                     textAlign = TextAlign.Center,
                     maxLines = 1,
