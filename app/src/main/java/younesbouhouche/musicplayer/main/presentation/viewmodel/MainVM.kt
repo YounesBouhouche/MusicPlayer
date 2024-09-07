@@ -787,13 +787,15 @@ class MainVM
                 }
                 withContext(Dispatchers.IO) {
                     list.forEachIndexed { index, file ->
-                        file.lyrics =
-                            try {
-                                AudioFileIO.read(File(file.path)).tag.getFirst(FieldKey.LYRICS)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                ""
+                        try {
+                            AudioFileIO.read(File(file.path)).tag.let {
+                                file.lyrics = it.getFirst(FieldKey.LYRICS)
+                                file.genre = it.getFirst(FieldKey.GENRE)
+                                file.composer = it.getFirst(FieldKey.COMPOSER)
                             }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                         val result =
                             with(MediaMetadataRetriever()) {
                                 try {

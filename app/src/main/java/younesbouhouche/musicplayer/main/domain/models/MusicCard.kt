@@ -18,6 +18,8 @@ data class MusicCard(
     var artist: String,
     var albumId: Long,
     var album: String,
+    var genre: String,
+    var composer: String,
     var lyrics: String,
     var path: String,
     var date: Long,
@@ -35,6 +37,8 @@ data class MusicCard(
         private var artist: String = ""
         private var albumId: Long = -1
         private var album: String = ""
+        private var genre: String = ""
+        private var composer: String = ""
         private var lyrics: String = ""
         private var path: String = ""
         private var date: Long = 0
@@ -58,6 +62,10 @@ data class MusicCard(
 
         fun setAlbum(album: String) = apply { this.album = album }
 
+        fun setGenre(genre: String) = apply { this.genre = genre }
+
+        fun setComposer(composer: String) = apply { this.composer = composer }
+
         fun setLyrics(lyrics: String) = apply { this.lyrics = lyrics }
 
         fun setPath(path: String) = apply { this.path = path }
@@ -80,6 +88,8 @@ data class MusicCard(
                 artist,
                 albumId,
                 album,
+                genre,
+                composer,
                 lyrics,
                 path,
                 date,
@@ -103,6 +113,8 @@ data class MusicCard(
         if (artist != other.artist) return false
         if (albumId != other.albumId) return false
         if (album != other.album) return false
+        if (genre != other.genre) return false
+        if (composer != other.composer) return false
         if (path != other.path) return false
         if (date != other.date) return false
         if (duration != other.duration) return false
@@ -122,6 +134,8 @@ data class MusicCard(
         result = 31 * result + artist.hashCode()
         result = 31 * result + albumId.hashCode()
         result = 31 * result + album.hashCode()
+        result = 31 * result + genre.hashCode()
+        result = 31 * result + composer.hashCode()
         result = 31 * result + path.hashCode()
         result = 31 * result + date.hashCode()
         result = 31 * result + duration.hashCode()
@@ -140,7 +154,9 @@ data class MusicCard(
                     .setTitle(title)
                     .setArtist(artist)
                     .setAlbumTitle(album)
-                    .setAlbumArtist(artist)
+                    .setArtist(artist)
+                    .setGenre(genre)
+                    .setComposer(composer)
                     .setArtworkData(coverByteArray, MediaMetadata.PICTURE_TYPE_MEDIA)
                     .build(),
             )

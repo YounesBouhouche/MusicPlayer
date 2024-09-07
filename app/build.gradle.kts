@@ -87,10 +87,6 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.retrofit)
     implementation(libs.jaudiotagger)
-//    implementation(libs.crowdin.sdk)
-//    implementation("com.github.crowdin.mobile-sdk-android:sdk:1.9.2") {
-//        exclude("com.google.code.gson", "gson")
-//    }
     implementation(libs.timber)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)

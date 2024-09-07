@@ -156,6 +156,8 @@
     <string name="pitch">Pitch</string>
     <string name="show_pitch_button">Show pitch button</string>
     <string name="remember_pitch">Remember Pitch</string>
+    <string name="unspecified">Unspecified</string>
+    <string name="track_number">Track number</string>
     <plurals name="item_s">
         <item quantity="one">1 item</item>
         <item quantity="zero">no items</item>

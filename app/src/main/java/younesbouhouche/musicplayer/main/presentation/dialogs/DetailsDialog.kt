@@ -73,7 +73,13 @@ fun DetailsDialog(
                 Item(stringResource(R.string.album), file.album)
             }
             item {
-                Item(stringResource(R.string.artist), file.artist)
+                Item(stringResource(R.string.artist), if (file.artist == "<unknown>") "" else file.artist)
+            }
+            item {
+                Item(stringResource(R.string.genre), file.genre)
+            }
+            item {
+                Item(stringResource(R.string.composer), file.composer)
             }
         }
     }
@@ -109,7 +115,7 @@ fun Item(
             color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
-            text = text,
+            text = text.ifEmpty { stringResource(R.string.unspecified) },
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.bodySmall,

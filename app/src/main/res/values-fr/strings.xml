@@ -160,4 +160,6 @@
         <item quantity="other">%d éléments</item>
     </plurals>
     <string name="show_volume_slider">Afficher le curseur de volume</string>
+    <string name="unspecified">Unspecified</string>
+    <string name="track_number">Track number</string>
 </resources>

@@ -2,9 +2,11 @@ package younesbouhouche.musicplayer.main.presentation.player
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -43,6 +45,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import ir.mahozad.multiplatform.wavyslider.material3.WaveHeight
+import ir.mahozad.multiplatform.wavyslider.material3.WaveLength
+import ir.mahozad.multiplatform.wavyslider.material3.WavySlider
 import soup.compose.material.motion.MaterialSharedAxisZ
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
@@ -62,6 +67,14 @@ fun Controls(
     var showRemaining by remember { mutableStateOf(false) }
     var sliderValue by remember { mutableFloatStateOf(0f) }
     var dragging by remember { mutableStateOf(false) }
+    val waveHeight by animateDpAsState(
+        if (playerState.playState == PlayState.PLAYING) {
+            SliderDefaults.WaveHeight
+        } else {
+            0.dp
+        },
+        label = "Wave height",
+    )
     val nextPrevColors =
         if (isSystemInDarkTheme()) {
             IconButtonDefaults.filledIconButtonColors(
@@ -95,23 +108,27 @@ fun Controls(
             maxLines = 1,
         )
         Spacer(Modifier.height(24.dp))
-        Slider(
-            modifier = Modifier.fillMaxWidth(),
-            value =
-                if ((dragging) or (playerState.loading)) {
-                    sliderValue
-                } else {
-                    (playerState.time.toFloat() / activeItem.duration)
+        Box(Modifier.fillMaxWidth()) {
+            WavySlider(
+                modifier = Modifier.fillMaxWidth(),
+                value =
+                    if ((dragging) or (playerState.loading)) {
+                        sliderValue
+                    } else {
+                        (playerState.time.toFloat() / activeItem.duration)
+                    },
+                onValueChange = {
+                    sliderValue = it
+                    dragging = true
                 },
-            onValueChange = {
-                sliderValue = it
-                dragging = true
-            },
-            onValueChangeFinished = {
-                dragging = false
-                onPlayerEvent(PlayerEvent.SeekTime((sliderValue * activeItem.duration).roundToLong()))
-            },
-        )
+                onValueChangeFinished = {
+                    dragging = false
+                    onPlayerEvent(PlayerEvent.SeekTime((sliderValue * activeItem.duration).roundToLong()))
+                },
+                waveLength = SliderDefaults.WaveLength * 2,
+                waveHeight = waveHeight,
+            )
+        }
         Row(
             Modifier
                 .fillMaxWidth(),
