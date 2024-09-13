@@ -1,6 +1,6 @@
 ## Project Description
 
-#Summary
+# **Summary**
 
 A modern and efficient music player application built using Kotlin, Jetpack Compose, Material 3, Room, DataStore, and ExoPlayer Media3. This app offers a seamless user experience with features such as:
 
@@ -9,7 +9,7 @@ A modern and efficient music player application built using Kotlin, Jetpack Comp
 * **Search Functionality:** Quickly find your desired songs or artists.
 * **Playback Controls:** Pause, play, skip, and adjust volume with ease.
 
-#Key Technologies Used:
+# **Key Technologies Used:**
 
 * **[Kotlin](https://kotlinlang.org/):** A modern programming language that enhances code readability and maintainability.
 * **[Jetpack Compose](https://developer.android.com/compose):** A declarative UI toolkit for building Android apps with less code.
@@ -18,7 +18,7 @@ A modern and efficient music player application built using Kotlin, Jetpack Comp
 * **[DataStore](https://developer.android.com/topic/libraries/architecture/datastore):** A lightweight, asynchronous data storage solution for preferences.
 * **[ExoPlayer Media3](https://developer.android.com/media/media3/exoplayer):** A powerful media player library for handling various media formats.
 
-#Project Structure:
+# **Project Structure:**
 
 * **presentation:** Contains the UI components and screens.
 * **data:** Manages data access and persistence.
