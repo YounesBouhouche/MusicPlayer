@@ -406,6 +406,7 @@ fun AppScreen(
         onDismissRequest = { mainVM.onUiEvent(UiEvent.HidePlaylistBottomSheet) },
         id = playlist.id,
         title = playlist.name,
+        cover = playlist.image,
         files = playlistFiles,
         onPlayerEvent = mainVM::onPlayerEvent,
         onUiEvent = mainVM::onUiEvent,
@@ -490,6 +491,8 @@ fun AppScreen(
         uiState.newPlaylistDialog,
         uiState.newPlaylistName,
         { mainVM.onUiEvent(UiEvent.UpdateNewPlaylistName(it)) },
+        uiState.newPlaylistImage,
+        { mainVM.onUiEvent(UiEvent.UpdateNewPlaylistImage(it)) },
         { mainVM.onUiEvent(UiEvent.HideNewPlaylistDialog) },
         { mainVM.onPlaylistEvent(PlaylistEvent.CreateNew) },
     )

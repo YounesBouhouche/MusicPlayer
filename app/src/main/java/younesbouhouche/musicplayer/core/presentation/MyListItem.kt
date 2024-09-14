@@ -50,12 +50,10 @@ fun MyListItem(
     onLongClick: () -> Unit = {},
     headline: String,
     supporting: String,
-    cover: ImageBitmap? = null,
+    cover: @Composable () -> Unit,
     number: Int? = null,
-    alternative: ImageVector = Icons.Default.MusicNote,
     trailingContent: @Composable (RowScope.() -> Unit)? = null,
 ) {
-    val isMusicCard = alternative == Icons.Default.MusicNote
     Row(
         modifier.combinedClickable(onLongClick = onLongClick, onClick = onClick)
             .background(background, MaterialTheme.shapes.medium)
@@ -65,48 +63,7 @@ fun MyListItem(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Box(Modifier.size(80.dp).padding(12.dp)) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .clip(
-                        if (isMusicCard) {
-                            MaterialTheme.shapes.medium
-                        } else {
-                            CircleShape
-                        },
-                    )
-                    .clipToBounds()
-                    .background(
-                        if (isMusicCard) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            Color.Transparent
-                        },
-                    ),
-                contentAlignment = Alignment.Center,
-            ) {
-                if (cover == null) {
-                    Icon(
-                        alternative,
-                        null,
-                        Modifier.fillMaxSize(
-                            if (isMusicCard) .75f else 1f,
-                        ),
-                        if (isMusicCard) {
-                            MaterialTheme.colorScheme.surface
-                        } else {
-                            LocalContentColor.current
-                        },
-                    )
-                } else {
-                    Image(
-                        cover,
-                        null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop,
-                    )
-                }
-            }
+            cover()
             number?.let {
                 Text(
                     "$it",
@@ -157,6 +114,76 @@ fun MyListItem(
         }
         trailingContent?.invoke(this)
     }
+}
+
+@Composable
+fun MyListItem(
+    modifier: Modifier = Modifier,
+    background: Color = Color.Transparent,
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {},
+    headline: String,
+    supporting: String,
+    cover: ImageBitmap? = null,
+    number: Int? = null,
+    alternative: ImageVector = Icons.Default.MusicNote,
+    trailingContent: @Composable (RowScope.() -> Unit)? = null,
+) {
+    val isMusicCard = alternative == Icons.Default.MusicNote
+    MyListItem(
+        modifier,
+        background,
+        onClick,
+        onLongClick,
+        headline,
+        supporting,
+        {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .clip(
+                        if (isMusicCard) {
+                            MaterialTheme.shapes.medium
+                        } else {
+                            CircleShape
+                        },
+                    )
+                    .clipToBounds()
+                    .background(
+                        if (isMusicCard) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            Color.Transparent
+                        },
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (cover == null) {
+                    Icon(
+                        alternative,
+                        null,
+                        Modifier.fillMaxSize(
+                            if (isMusicCard) .75f else 1f,
+                        ),
+                        if (isMusicCard) {
+                            MaterialTheme.colorScheme.surface
+                        } else {
+                            LocalContentColor.current
+                        },
+                    )
+                } else {
+                    Image(
+                        cover,
+                        null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                    )
+                }
+            }
+        },
+        number,
+        trailingContent,
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)

@@ -65,17 +65,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.util.timeString
+import java.io.File
 
 data class BottomSheetButton(val text: String, val icon: ImageVector, val active: Boolean = false, val onClick: () -> Unit) {
     constructor(text: String, icon: ImageVector, onClick: () -> Unit) : this(text, icon, false, onClick)
@@ -347,7 +351,7 @@ fun PlaylistBottomSheet(
     id: Int,
     title: String,
     files: List<MusicCard>,
-    cover: Bitmap? = null,
+    cover: String? = null,
     onPlayerEvent: (PlayerEvent) -> Unit,
     onUiEvent: (UiEvent) -> Unit,
     delete: () -> Unit,
@@ -355,6 +359,7 @@ fun PlaylistBottomSheet(
     savePlaylist: () -> Unit,
     shareFiles: () -> Unit,
 ) {
+    val context = LocalContext.current
     BottomSheet(
         open = open,
         state = state,
@@ -404,11 +409,16 @@ fun PlaylistBottomSheet(
                     contentAlignment = Alignment.Center,
                 ) {
                     if (cover != null) {
+                        val file = File(context.filesDir, cover)
+                        val request =
+                            ImageRequest.Builder(context)
+                                .data(file)
+                                .build()
                         Image(
-                            bitmap = cover.asImageBitmap(),
+                            rememberAsyncImagePainter(request),
                             null,
+                            Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize(),
                         )
                     } else {
                         Icon(

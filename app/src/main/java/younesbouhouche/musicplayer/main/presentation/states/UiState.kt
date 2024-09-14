@@ -1,6 +1,7 @@
 package younesbouhouche.musicplayer.main.presentation.states
 
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -23,6 +24,7 @@ data class UiState(
     val timerDialog: Boolean = false,
     val newPlaylistDialog: Boolean = false,
     val newPlaylistName: String = "",
+    val newPlaylistImage: Uri? = null,
     val newPlaylistItems: List<String> = emptyList(),
     val addToPlaylistDialog: Boolean = false,
     val addToPlaylistIndex: Int = 0,

@@ -112,4 +112,5 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.gson)
     implementation(libs.androidx.profileinstaller)
+    implementation(libs.coil.compose)
 }

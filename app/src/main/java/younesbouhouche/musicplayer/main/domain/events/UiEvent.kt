@@ -1,6 +1,7 @@
 package younesbouhouche.musicplayer.main.domain.events
 
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.ui.graphics.vector.ImageVector
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.MusicMetadata
@@ -45,6 +46,8 @@ sealed interface UiEvent {
     data class ShowCreatePlaylistDialog(val items: List<String> = emptyList()) : UiEvent
 
     data class UpdateNewPlaylistName(val newName: String) : UiEvent
+
+    data class UpdateNewPlaylistImage(val image: Uri?) : UiEvent
 
     data object HideNewPlaylistDialog : UiEvent
 

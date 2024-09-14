@@ -46,6 +46,7 @@ import kotlinx.coroutines.withContext
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
 import younesbouhouche.musicplayer.core.domain.MediaPlayerService
+import younesbouhouche.musicplayer.core.presentation.util.saveUriImageToInternalStorage
 import younesbouhouche.musicplayer.core.presentation.util.search
 import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.main.data.db.AppDatabase
@@ -1515,6 +1516,11 @@ class MainVM
                     _uiState.update {
                         it.copy(pitchDialog = true)
                     }
+
+                is UiEvent.UpdateNewPlaylistImage ->
+                    _uiState.update {
+                        it.copy(newPlaylistImage = event.image)
+                    }
             }
         }
 
@@ -1614,10 +1620,18 @@ class MainVM
 
                 PlaylistEvent.CreateNew -> {
                     viewModelScope.launch {
+                        val fileName = "pl_${playlists.value.size}.jpg"
+                        val saved =
+                            uiState.value.newPlaylistImage?.let {
+                                withContext(Dispatchers.IO) {
+                                    saveUriImageToInternalStorage(context, it, fileName) != null
+                                }
+                            } ?: false
                         dao.upsertPlaylist(
                             Playlist(
                                 name = uiState.value.newPlaylistName,
                                 items = uiState.value.newPlaylistItems,
+                                image = if (saved) fileName else null,
                             ),
                         )
                     }

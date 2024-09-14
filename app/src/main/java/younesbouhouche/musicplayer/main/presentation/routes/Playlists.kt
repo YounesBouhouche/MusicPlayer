@@ -7,15 +7,14 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.items
@@ -24,11 +23,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FolderOpen
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,15 +37,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
-import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.LazyVerticalGridWithSortBar
-import younesbouhouche.musicplayer.core.presentation.MyListItem
+import younesbouhouche.musicplayer.core.presentation.PlaylistListItem
 import younesbouhouche.musicplayer.core.presentation.util.composables.isScrollingUp
 import younesbouhouche.musicplayer.main.domain.events.ListsSortEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
@@ -57,6 +53,7 @@ import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.Playlist
 import younesbouhouche.musicplayer.main.presentation.states.ListSortState
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -119,22 +116,12 @@ fun Playlists(
                     onSortEvent = onPlaylistsSortEvent,
                 ) {
                     items(playlists, { it.id }) {
-                        MyListItem(
-                            onClick = { onClick(playlists.indexOf(it)) },
-                            onLongClick = { onLongClick(playlists.indexOf(it)) },
-                            headline = it.name,
-                            supporting = pluralStringResource(R.plurals.item_s, it.items.size, it.items.size),
-                            cover = null,
-                            alternative = Icons.AutoMirrored.Default.PlaylistPlay,
-                            modifier = Modifier.animateItem(),
-                            trailingContent = {
-                                IconButton(onClick = { onPlayerEvent(PlayerEvent.PlayPaths(it.items.toList())) }) {
-                                    Icon(Icons.Outlined.PlayArrow, null)
-                                }
-                                IconButton(onClick = { onLongClick(playlists.indexOf(it)) }) {
-                                    Icon(Icons.Default.MoreVert, null)
-                                }
-                            },
+                        PlaylistListItem(
+                            it,
+                            { onClick(playlists.indexOf(it)) },
+                            { onLongClick(playlists.indexOf(it)) },
+                            { onPlayerEvent(PlayerEvent.PlayPaths(it.items.toList())) },
+                            Modifier.animateItem(),
                         )
                     }
                 }
@@ -156,29 +143,45 @@ fun Playlists(
                                     onClick = { onClick(playlists.indexOf(it)) },
                                     onLongClick = { onLongClick(playlists.indexOf(it)) },
                                 )
-                                .aspectRatio(1f)
                                 .padding(8.dp),
                         ) {
                             Column(
-                                Modifier
-                                    .fillMaxSize()
-                                    .padding(4.dp),
+                                Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
-                                Icon(
-                                    Icons.AutoMirrored.Default.PlaylistPlay,
-                                    null,
-                                    Modifier
-                                        .fillMaxSize()
-                                        .weight(1f),
-                                )
-                                Spacer(Modifier.height(2.dp))
+                                Box(
+                                    Modifier.fillMaxWidth().aspectRatio(1f)
+                                        .clip(MaterialTheme.shapes.large)
+                                        .clipToBounds(),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    if (it.image == null) {
+                                        Icon(
+                                            Icons.AutoMirrored.Default.PlaylistPlay,
+                                            null,
+                                            Modifier.fillMaxSize(),
+                                        )
+                                    } else {
+                                        val file = File(context.filesDir, it.image)
+                                        val request =
+                                            ImageRequest.Builder(context)
+                                                .data(file)
+                                                .build()
+                                        Image(
+                                            rememberAsyncImagePainter(request),
+                                            null,
+                                            Modifier.fillMaxSize(),
+                                            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                        )
+                                    }
+                                }
                                 Text(
                                     it.name,
                                     Modifier.fillMaxWidth(),
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    style = MaterialTheme.typography.titleMedium,
                                     textAlign = TextAlign.Center,
                                     maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }

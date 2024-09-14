@@ -8,6 +8,7 @@ data class Playlist(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val name: String = "",
+    val image: String? = null,
     val items: List<String> = emptyList(),
 ) {
     fun createM3UText() =

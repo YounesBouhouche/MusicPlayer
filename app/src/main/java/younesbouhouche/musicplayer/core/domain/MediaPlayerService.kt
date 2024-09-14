@@ -57,8 +57,8 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
                         this,
                     )
                     .setSessionActivity(pendingIntent)
+                    .setCustomLayout(notificationCustomCmdButtons)
                     .build()
-            mediaSession!!.setCustomLayout(notificationCustomCmdButtons)
         }
         customMediaNotificationProvider = CustomMediaNotificationProvider(this)
         setMediaNotificationProvider(customMediaNotificationProvider)
