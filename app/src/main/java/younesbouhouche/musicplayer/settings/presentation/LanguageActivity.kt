@@ -8,6 +8,7 @@ import android.os.LocaleList
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -96,6 +97,7 @@ class LanguageActivity : ComponentActivity() {
                             scrollBehavior = scrollBehavior,
                         )
                     },
+                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 ) { paddingValues ->
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth(),

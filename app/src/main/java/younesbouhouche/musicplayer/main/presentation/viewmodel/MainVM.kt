@@ -34,18 +34,17 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
 import younesbouhouche.musicplayer.core.domain.MediaPlayerService
+import younesbouhouche.musicplayer.core.domain.util.stateInVM
 import younesbouhouche.musicplayer.core.presentation.util.saveUriImageToInternalStorage
 import younesbouhouche.musicplayer.core.presentation.util.search
 import younesbouhouche.musicplayer.main.data.PlayerDataStore
@@ -106,10 +105,10 @@ class MainVM
 
         private val _timestamps = dao.getTimestamps()
 
-        private fun <T> Flow<T>.stateInVM(initialValue: T) = stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), initialValue)
+        private fun <T> Flow<T>.stateInVM(initialValue: T) = stateInVM(initialValue, viewModelScope)
 
         private fun isFavorite(path: String) =
-            dao.getFavorite(path).mapLatest { it ?: false }
+            dao.getFavorite(path).mapLatest { it == true }
                 .stateInVM(false)
 
         private fun getTimestamps(path: String) = dao.getTimestamps(path).mapLatest { it?.times ?: emptyList() }.stateInVM(emptyList())
@@ -695,7 +694,7 @@ class MainVM
             onListsSortEvent(event, _playlistsSortState)
         }
 
-        private suspend fun loadFiles() {
+        private fun loadFiles() {
             _files.value = emptyList()
             _albums.value = emptyList()
             _artists.value = emptyList()
@@ -810,7 +809,7 @@ class MainVM
                                     } else {
                                         null
                                     }
-                                } catch (e: Exception) {
+                                } catch (_: Exception) {
                                     null
                                 }
                             }
@@ -1626,7 +1625,7 @@ class MainVM
                                 withContext(Dispatchers.IO) {
                                     saveUriImageToInternalStorage(context, it, fileName) != null
                                 }
-                            } ?: false
+                            } == true
                         dao.upsertPlaylist(
                             Playlist(
                                 name = uiState.value.newPlaylistName,
@@ -1733,7 +1732,9 @@ class MainVM
                             1f
                         },
                     )
-                dao.addTimestamp(list[index].path)
+                list.getOrNull(index)?.let {
+                    dao.addTimestamp(it.path)
+                }
                 dao.updateCurrentIndex(index)
                 _playerState.update {
                     it.copy(

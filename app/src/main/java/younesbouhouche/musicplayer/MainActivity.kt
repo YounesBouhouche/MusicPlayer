@@ -65,10 +65,9 @@ class MainActivity : ComponentActivity() {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
             val isParent =
-                currentRoute?.let {
-                        route ->
+                currentRoute?.let { route ->
                     Routes.entries.map { it.destination.javaClass.kotlin.qualifiedName }.contains(route)
-                } ?: true
+                } != false
             val navigationVM = hiltViewModel<NavigationVM>()
             val navigationState by navigationVM.state.collectAsState()
             val launcher =

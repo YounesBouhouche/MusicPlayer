@@ -62,7 +62,7 @@ fun Home(
     modifier: Modifier = Modifier,
 ) {
     LazyColumnWithHeader(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         leadingContent = {},
     ) {
         item {

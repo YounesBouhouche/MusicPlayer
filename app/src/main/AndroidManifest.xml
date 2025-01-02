@@ -31,6 +31,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MusicPlayer"
         tools:targetApi="tiramisu">
+        <activity
+            android:name=".DialogActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="@string/title_activity_dialog"
+            android:theme="@style/Theme.MusicPlayer.Dialog" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/*" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+            </intent-filter>
+        </activity>
+
+
         <profileable android:shell="true" />
 
         <activity

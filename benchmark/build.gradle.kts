@@ -18,7 +18,7 @@ android {
 
     defaultConfig {
         minSdk = 30
-        targetSdk = 34
+        targetSdk = 35
         testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

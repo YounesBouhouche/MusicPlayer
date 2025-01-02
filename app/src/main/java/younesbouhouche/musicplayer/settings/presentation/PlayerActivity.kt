@@ -3,6 +3,7 @@ package younesbouhouche.musicplayer.settings.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -83,6 +84,7 @@ class PlayerActivity : ComponentActivity() {
                             scrollBehavior = scrollBehavior,
                         )
                     },
+                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 ) { paddingValues ->
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth(),
