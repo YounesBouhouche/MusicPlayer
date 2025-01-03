@@ -27,7 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.core.domain.MediaPlayerService
+import younesbouhouche.musicplayer.core.domain.DialogService
 import younesbouhouche.musicplayer.core.domain.util.stateInVM
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
@@ -67,7 +67,7 @@ class DialogVM
                 observer,
             )
             val sessionToken =
-                SessionToken(context, ComponentName(context, MediaPlayerService::class.java))
+                SessionToken(context, ComponentName(context, DialogService::class.java))
             context.startForegroundService(Intent(context, MediaSessionService::class.java))
             controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
         }

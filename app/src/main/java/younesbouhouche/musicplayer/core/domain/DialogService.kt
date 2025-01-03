@@ -5,9 +5,11 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Intent
 import android.os.Bundle
+import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.session.MediaSession
@@ -17,8 +19,8 @@ import androidx.media3.session.SessionResult
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 
-@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
+@OptIn(UnstableApi::class)
+class DialogService : MediaSessionService(), MediaSession.Callback {
     private var player: ExoPlayer? = null
     private var mediaSession: MediaSession? = null
     private var controller: MediaSession.ControllerInfo? = null
@@ -53,10 +55,10 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
             mediaSession =
                 MediaSession
                     .Builder(
-                        this@MediaPlayerService,
+                        this@DialogService,
                         this,
                     )
-                    .setId("MusicPlayerMediaPlayerService")
+                    .setId("MusicPlayerDialogService")
                     .setSessionActivity(pendingIntent)
                     .setCustomLayout(notificationCustomCmdButtons)
                     .build()
