@@ -11,6 +11,8 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:background">@android:color/transparent</item>
         <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
     </style>
 
     <style name="Theme.MusicPlayer.AppWidgetContainerParent" parent="@android:style/Theme.DeviceDefault" />
