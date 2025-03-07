@@ -90,14 +90,13 @@ class LanguageActivity : ComponentActivity() {
                                 )
                             },
                             navigationIcon = {
-                                IconButton(onClick = { (context as Activity).finish() }) {
+                                IconButton(onClick = { finish() }) {
                                     Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                                 }
                             },
                             scrollBehavior = scrollBehavior,
                         )
                     },
-                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 ) { paddingValues ->
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth(),

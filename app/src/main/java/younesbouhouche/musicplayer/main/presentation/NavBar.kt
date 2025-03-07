@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.core.presentation.util.composables.isCompact
+import younesbouhouche.musicplayer.core.presentation.util.composables.leftEdgeWidth
 import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
 import younesbouhouche.musicplayer.main.domain.models.Routes
@@ -36,6 +37,7 @@ fun BoxScope.NavBar(
     navigate: (NavRoutes) -> Unit,
 ) {
     val navBarHeight = navBarHeight
+    val leftEdgeWidth = leftEdgeWidth
     if (isCompact) {
         AnimatedVisibility(
             modifier =
@@ -79,7 +81,13 @@ fun BoxScope.NavBar(
             modifier =
                 Modifier
                     .align(Alignment.TopStart)
-                    .displayCutoutPadding(),
+                    .displayCutoutPadding()
+                    .offset {
+                        IntOffset(
+                            (-(80 + leftEdgeWidth.roundToPx()) * progress).roundToInt().dp.roundToPx(),
+                            0,
+                        )
+                    },
             windowInsets = WindowInsets.systemBars,
         ) {
             Routes.entries.forEachIndexed { index, screen ->

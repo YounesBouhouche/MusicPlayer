@@ -6,9 +6,9 @@ import younesbouhouche.musicplayer.main.domain.models.MusicCard
 sealed interface PlayerEvent {
     data class AddToQueue(val items: List<MusicCard>) : PlayerEvent
 
-    data class AddToNext(val items: List<MusicCard>) : PlayerEvent
+    data class PlayNext(val items: List<MusicCard>) : PlayerEvent
 
-    data class Play(val items: List<MusicCard>, val index: Int = 0) : PlayerEvent
+    data class Play(val items: List<MusicCard>, val index: Int = 0, val shuffle: Boolean = false) : PlayerEvent
 
     data class PlayPaths(val items: List<String>, val index: Int = 0) : PlayerEvent
 

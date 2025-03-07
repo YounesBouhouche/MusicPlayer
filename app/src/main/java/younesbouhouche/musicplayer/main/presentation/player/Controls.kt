@@ -183,9 +183,7 @@ fun Controls(
                 }
             }
         }
-        AnimatedVisibility(
-            visible = showVolumeSlider,
-        ) {
+        AnimatedVisibility(visible = showVolumeSlider) {
             Column {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -196,6 +194,9 @@ fun Controls(
                             onPlayerEvent(PlayerEvent.DecreaseVolume)
                         },
                         enabled = playerState.volume > 0f,
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = MaterialTheme.colorScheme.secondary
+                        )
                     ) {
                         Icon(Icons.AutoMirrored.Default.VolumeDown, null)
                     }
@@ -217,6 +218,9 @@ fun Controls(
                             onPlayerEvent(PlayerEvent.IncreaseVolume)
                         },
                         enabled = playerState.volume < 1f,
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = MaterialTheme.colorScheme.secondary
+                        )
                     ) {
                         Icon(Icons.AutoMirrored.Default.VolumeUp, null)
                     }
@@ -227,7 +231,8 @@ fun Controls(
         Row(
             modifier =
                 Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .height(80.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {

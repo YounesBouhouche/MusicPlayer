@@ -10,21 +10,27 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.materialkolor.DynamicMaterialTheme
+import com.materialkolor.PaletteStyle
+import com.materialkolor.rememberDynamicColorScheme
 import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 
 @Composable
-fun AppTheme(content: @Composable () -> Unit) {
+internal fun AppTheme(
+    seedColor: Color? = null,
+    content: @Composable() () -> Unit,
+) {
     val datastore = SettingsDataStore(LocalContext.current)
     val theme by datastore.theme.collectAsState(initial = "system")
+    val extraDark by datastore.extraDark.collectAsState(initial = false)
     val isDark =
         when (theme) {
             "light" -> false
             "dark" -> true
             else -> isSystemInDarkTheme()
         }
-    val dynamicColor = datastore.dynamicColors.collectAsState(initial = false).value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-    val extraDark by datastore.extraDark.collectAsState(initial = false)
     val colorTheme by datastore.colorTheme.collectAsState(initial = "green")
+    val dynamicColor = datastore.dynamicColors.collectAsState(initial = false).value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val lightColors =
         when (colorTheme) {
             "blue" -> BlueColors.lightScheme
@@ -45,30 +51,24 @@ fun AppTheme(content: @Composable () -> Unit) {
         }
     val colorScheme =
         when {
+            seedColor != null -> rememberDynamicColorScheme(seedColor = seedColor, isDark, extraDark)
             dynamicColor && isDark -> {
-                if (extraDark) {
-                    dynamicDarkColorScheme(LocalContext.current).copy(
-                        background = Color.Black,
-                        surface = Color.Black,
-                    )
-                } else {
-                    dynamicDarkColorScheme(LocalContext.current)
-                }
+                dynamicDarkColorScheme(LocalContext.current)
             }
             dynamicColor && !isDark -> {
                 dynamicLightColorScheme(LocalContext.current)
             }
-            isDark and extraDark ->
-                darkColors.copy(
-                    background = Color.Black,
-                    surface = Color.Black,
-                )
             isDark -> darkColors
             else -> lightColors
         }
-    MaterialTheme(
-        colorScheme = colorScheme,
+    DynamicMaterialTheme(
+        primary = colorScheme.primary,
+        secondary = colorScheme.secondary,
+        tertiary = colorScheme.tertiary,
+        animate = true,
+        useDarkTheme = isDark,
+        withAmoled = extraDark,
         typography = rubikTypography(MaterialTheme.typography),
-        content = content,
+        content = content
     )
 }

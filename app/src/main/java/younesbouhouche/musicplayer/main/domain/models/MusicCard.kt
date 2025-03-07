@@ -157,7 +157,11 @@ data class MusicCard(
                     .setArtist(artist)
                     .setGenre(genre)
                     .setComposer(composer)
-                    .setArtworkData(coverByteArray, MediaMetadata.PICTURE_TYPE_MEDIA)
+                    .setArtworkData(
+                        coverByteArray.takeIf { it.isNotEmpty() }
+                            ?: MediaItem.fromUri(contentUri).mediaMetadata.artworkData,
+                        MediaMetadata.PICTURE_TYPE_MEDIA
+                    )
                     .build(),
             )
             .build()

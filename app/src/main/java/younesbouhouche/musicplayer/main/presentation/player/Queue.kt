@@ -42,6 +42,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -50,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.res.stringResource
@@ -63,6 +65,7 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.SwipeMusicCardLazyItem
 import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
+import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.TimerType
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
@@ -77,7 +80,6 @@ import younesbouhouche.musicplayer.main.presentation.util.timerString
 fun Queue(
     queue: List<MusicCard>,
     index: Int,
-    uiState: UiState,
     playerState: PlayerState,
     lyrics: Boolean,
     playlistHidden: Boolean,
@@ -86,6 +88,14 @@ fun Queue(
     progress: Float,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val playerDataStore = PlayerDataStore(context)
+    val showRepeatButton by playerDataStore.showRepeat.collectAsState(initial = false)
+    val showShuffleButton by playerDataStore.showShuffle.collectAsState(initial = false)
+    val showSpeedButton by playerDataStore.showSpeed.collectAsState(initial = false)
+    val showPitchButton by playerDataStore.showPitch.collectAsState(initial = false)
+    val showTimerButton by playerDataStore.showTimer.collectAsState(initial = false)
+    val showLyricsButton by playerDataStore.showLyrics.collectAsState(initial = false)
     val view = LocalView.current
     val listState = rememberLazyListState()
     val reorderableState =
@@ -103,62 +113,66 @@ fun Queue(
         BottomAppBar(
             contentPadding = PaddingValues(horizontal = 8.dp),
             actions = {
-                FilledToggleIconButton(
-                    playerState.repeatMode != Player.REPEAT_MODE_OFF,
-                    { onPlayerEvent(PlayerEvent.CycleRepeatMode) },
-                    { onPlayerEvent(PlayerEvent.SetRepeatMode(Player.REPEAT_MODE_OFF)) },
-                    if (playerState.repeatMode == Player.REPEAT_MODE_ONE) {
-                        Icons.Default.RepeatOne
-                    } else {
-                        Icons.Default.Repeat
-                    },
-                )
-                FilledToggleIconButton(
-                    playerState.shuffle,
-                    { onPlayerEvent(PlayerEvent.ToggleShuffle) },
-                    icon = Icons.Default.Shuffle,
-                )
-                FilledToggleIconButton(
-                    playerState.speed != 1f,
-                    { onUiEvent(UiEvent.ShowSpeedDialog) },
-                    { onPlayerEvent(PlayerEvent.ResetSpeed) },
-                    Icons.Default.Speed,
-                )
-                if (uiState.showPitch) {
+                if (showRepeatButton)
+                    FilledToggleIconButton(
+                        playerState.repeatMode != Player.REPEAT_MODE_OFF,
+                        { onPlayerEvent(PlayerEvent.CycleRepeatMode) },
+                        { onPlayerEvent(PlayerEvent.SetRepeatMode(Player.REPEAT_MODE_OFF)) },
+                        if (playerState.repeatMode == Player.REPEAT_MODE_ONE) {
+                            Icons.Default.RepeatOne
+                        } else {
+                            Icons.Default.Repeat
+                        },
+                    )
+                if (showShuffleButton)
+                    FilledToggleIconButton(
+                        playerState.shuffle,
+                        { onPlayerEvent(PlayerEvent.ToggleShuffle) },
+                        icon = Icons.Default.Shuffle,
+                    )
+                if (showSpeedButton)
+                    FilledToggleIconButton(
+                        playerState.speed != 1f,
+                        { onUiEvent(UiEvent.ShowSpeedDialog) },
+                        { onPlayerEvent(PlayerEvent.ResetSpeed) },
+                        Icons.Default.Speed,
+                    )
+                if (showPitchButton)
                     FilledToggleIconButton(
                         playerState.pitch != 1f,
                         { onUiEvent(UiEvent.ShowPitchDialog) },
                         { onPlayerEvent(PlayerEvent.SetPitch(1f)) },
                         Icons.Default.RecordVoiceOver,
                     )
-                }
-                FilledToggleIconButton(
-                    playerState.timer != TimerType.Disabled,
-                    { onUiEvent(UiEvent.ShowTimerDialog) },
-                    { onPlayerEvent(PlayerEvent.SetTimer(TimerType.Disabled)) },
-                ) {
-                    AnimatedContent(targetState = playerState.timer, label = "") {
-                        when (it) {
-                            TimerType.Disabled -> Icon(Icons.Default.Timer, null)
-                            is TimerType.End -> Text("${it.tracks}")
-                            is TimerType.Time ->
-                                Text(
-                                    ((it.hour * 60 + it.min) * 60000L).timeString.dropLast(3),
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-                            is TimerType.Duration ->
-                                Text(
-                                    it.ms.timerString,
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
+                if (showTimerButton)
+                    FilledToggleIconButton(
+                        playerState.timer != TimerType.Disabled,
+                        { onUiEvent(UiEvent.ShowTimerDialog) },
+                        { onPlayerEvent(PlayerEvent.SetTimer(TimerType.Disabled)) },
+                    ) {
+                        AnimatedContent(targetState = playerState.timer, label = "") {
+                            when (it) {
+                                TimerType.Disabled -> Icon(Icons.Default.Timer, null)
+                                is TimerType.End -> Text("${it.tracks}")
+                                is TimerType.Time ->
+                                    Text(
+                                        ((it.hour * 60 + it.min) * 60000L).timeString.dropLast(3),
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                is TimerType.Duration ->
+                                    Text(
+                                        it.ms.timerString,
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                            }
                         }
                     }
-                }
-                FilledToggleIconButton(
-                    lyrics,
-                    { onUiEvent(UiEvent.ToggleLyrics) },
-                    icon = Icons.Default.Lyrics,
-                )
+                if (showLyricsButton)
+                    FilledToggleIconButton(
+                        lyrics,
+                        { onUiEvent(UiEvent.ToggleLyrics) },
+                        icon = Icons.Default.Lyrics,
+                    )
             },
             floatingActionButton = {
                 FloatingActionButton(

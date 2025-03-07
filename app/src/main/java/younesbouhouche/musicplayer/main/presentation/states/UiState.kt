@@ -41,5 +41,10 @@ data class UiState(
     val renamePlaylistName: String = "",
     val queueSheetVisible: Boolean = false,
     val showVolumeSlider: Boolean = false,
-    val showPitch: Boolean = false,
+    val showRepeat: Boolean = true,
+    val showShuffle: Boolean = true,
+    val showSpeed: Boolean = true,
+    val showPitch: Boolean = true,
+    val showTimer: Boolean = true,
+    val showLyrics: Boolean = true
 )

@@ -12,12 +12,19 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
+import com.kmpalette.color
+import com.kmpalette.rememberPaletteState
+import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
@@ -27,6 +34,7 @@ import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
 import younesbouhouche.musicplayer.main.presentation.states.UiState
 import younesbouhouche.musicplayer.main.presentation.states.ViewState
+import younesbouhouche.musicplayer.ui.theme.AppTheme
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -46,44 +54,56 @@ fun PlayerScreen(
 ) {
     val shape = MaterialTheme.shapes.large.copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize)
     val offset = if (dragState.offset.isNaN()) 0 else dragState.offset.roundToInt()
-    // val cutout = if (isCompact) Modifier else Modifier.displayCutoutPadding()
-    Box(
-        Modifier
-            .then(modifier)
-            .fillMaxSize()
-            .offset {
-                IntOffset(0, offset)
-            }
-            .anchoredDraggable(dragState, Orientation.Vertical)
-            .background(MaterialTheme.colorScheme.surfaceContainer, shape)
-            .clip(shape)
-            .clipToBounds(),
+    val paletteState = rememberPaletteState()
+    val context = LocalContext.current
+    val matchPictureColors = PlayerDataStore(context).matchPictureColors.collectAsState(true).value
+    LaunchedEffect(queue.getOrNull(index)?.cover, matchPictureColors) {
+        if (matchPictureColors)
+            queue.getOrNull(index)?.cover?.let { paletteState.generate(it.asImageBitmap()) }
+        else
+            paletteState.reset()
+    }
+    AppTheme(
+        paletteState.palette?.vibrantSwatch?.color ?: paletteState.palette?.dominantSwatch?.color
     ) {
-        queue.getOrNull(index)?.run {
-            SmallPlayer(
-                queue,
-                index,
-                playerState,
-                onPlayerEvent,
-                Modifier
-                    .alpha(1f - progress)
-                    .align(Alignment.TopStart)
-                    .clickable { onUiEvent(UiEvent.SetViewState(ViewState.LARGE)) },
-            )
-            LargePlayer(
-                queue,
-                index,
-                playerState,
-                uiState,
-                onPlayerEvent,
-                uiState.lyricsVisible,
-                uiState.syncing,
-                onUiEvent,
-                playlistDragState,
-                playlistProgress,
-                dragState.settledValue == ViewState.LARGE,
-                Modifier.alpha(progress),
-            )
+        Box(
+            Modifier
+                .then(modifier)
+                .fillMaxSize()
+                .offset {
+                    IntOffset(0, offset)
+                }
+                .anchoredDraggable(dragState, Orientation.Vertical)
+                .background(MaterialTheme.colorScheme.surfaceContainer, shape)
+                .clip(shape)
+                .clipToBounds(),
+        ) {
+            queue.getOrNull(index)?.run {
+                SmallPlayer(
+                    queue,
+                    index,
+                    playerState,
+                    onPlayerEvent,
+                    Modifier
+                        .alpha(1f - progress)
+                        .align(Alignment.TopStart)
+                        .clickable { onUiEvent(UiEvent.SetViewState(ViewState.LARGE)) },
+                )
+                LargePlayer(
+                    queue,
+                    index,
+                    playerState,
+                    uiState,
+                    onPlayerEvent,
+                    uiState.lyricsVisible,
+                    uiState.syncing,
+                    onUiEvent,
+                    playlistDragState,
+                    playlistProgress,
+                    dragState.settledValue == ViewState.LARGE,
+                    Modifier.alpha(progress),
+                )
+            }
         }
     }
 }

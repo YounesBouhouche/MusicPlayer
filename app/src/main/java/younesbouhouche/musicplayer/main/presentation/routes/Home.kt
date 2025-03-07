@@ -18,13 +18,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.LibraryAdd
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -48,14 +48,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.core.presentation.HomeMusicCard
 import younesbouhouche.musicplayer.core.presentation.LazyColumnWithHeader
 import younesbouhouche.musicplayer.main.domain.models.Artist
+import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun Home(
     navigate: (NavRoutes) -> Unit,
+    recentlyAdded: List<MusicCard>,
+    mostPlayed: List<MusicCard>,
+    play: (List<MusicCard>, Int) -> Unit,
+    showInfo: (MusicCard) -> Unit,
     navigateToArtist: (Artist) -> Unit,
     showArtistBottomSheet: (Artist) -> Unit,
     artists: List<Artist>,
@@ -77,27 +83,6 @@ fun Home(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 HeaderButton(
-                    stringResource(R.string.last_added),
-                    Icons.Default.LibraryAdd,
-                ) { navigate(NavRoutes.LastAddedScreen) }
-                HeaderButton(
-                    stringResource(R.string.most_played),
-                    Icons.AutoMirrored.Default.TrendingUp,
-                ) { navigate(NavRoutes.MostPlayedScreen) }
-            }
-        }
-        item {
-            Spacer(Modifier.height(8.dp))
-        }
-        item {
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                HeaderButton(
                     stringResource(R.string.favorites),
                     Icons.Default.Favorite,
                 ) { navigate(NavRoutes.FavoritesScreen) }
@@ -107,8 +92,56 @@ fun Home(
                 ) { navigate(NavRoutes.HistoryScreen) }
             }
         }
+        if (recentlyAdded.isNotEmpty()) {
+            item {
+                Row(Modifier.fillMaxWidth().padding(16.dp, 24.dp).animateItem()) {
+                    Text(
+                        "Recently Added",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+                }
+            }
+            item {
+                LazyRow(
+                    Modifier.fillMaxWidth().animateItem(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
+                ) {
+                    itemsIndexed(recentlyAdded, { index, item -> item.id }) { index, item ->
+                        HomeMusicCard(item, Modifier.animateItem(), onLongClick = { showInfo(item) }) {
+                            play(recentlyAdded, index)
+                        }
+                    }
+                }
+            }
+        }
+        if (mostPlayed.isNotEmpty()) {
+            item {
+                Row(Modifier.fillMaxWidth().padding(16.dp, 24.dp).animateItem()) {
+                    Text(
+                        "Most Played",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+                }
+            }
+            item {
+                LazyRow(
+                    Modifier.fillMaxWidth().animateItem(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
+                ) {
+                    itemsIndexed(mostPlayed, { index, item -> item.id }) { index, item ->
+                        HomeMusicCard(item, Modifier.animateItem(), onLongClick = { showInfo(item) }) {
+                            play(mostPlayed, index)
+                        }
+                    }
+                }
+            }
+        }
         item {
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(16.dp))
         }
         item {
             Row(

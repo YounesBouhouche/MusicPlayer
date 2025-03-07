@@ -178,7 +178,7 @@ fun ItemBottomSheet(
                 listOf(
                     listOf(
                         BottomSheetButton(stringResource(R.string.play_next), Icons.Outlined.SkipNext) {
-                            onPlayerEvent(PlayerEvent.AddToNext(listOf(file)))
+                            onPlayerEvent(PlayerEvent.PlayNext(listOf(file)))
                         },
                         BottomSheetButton(stringResource(R.string.add_to_playing_queue), Icons.Default.AddToPhotos) {
                             onPlayerEvent(PlayerEvent.AddToQueue(listOf(file)))
@@ -368,7 +368,7 @@ fun PlaylistBottomSheet(
             listOf(
                 listOf(
                     BottomSheetButton(stringResource(R.string.play_next), Icons.Outlined.SkipNext) {
-                        onPlayerEvent(PlayerEvent.AddToNext(files))
+                        onPlayerEvent(PlayerEvent.PlayNext(files))
                     },
                     BottomSheetButton(stringResource(R.string.add_to_playing_queue), Icons.Default.AddToPhotos) {
                         onPlayerEvent(PlayerEvent.AddToQueue(files))
@@ -493,7 +493,7 @@ fun ListBottomSheet(
             listOf(
                 listOf(
                     BottomSheetButton(stringResource(R.string.play_next), Icons.Outlined.SkipNext) {
-                        onPlayerEvent(PlayerEvent.AddToNext(list))
+                        onPlayerEvent(PlayerEvent.PlayNext(list))
                     },
                     BottomSheetButton(stringResource(R.string.add_to_playing_queue), Icons.Default.AddToPhotos) {
                         onPlayerEvent(PlayerEvent.AddToQueue(list))

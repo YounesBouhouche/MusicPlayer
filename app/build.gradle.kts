@@ -62,9 +62,11 @@ android {
     }
 }
 
-tasks.getByPath("preBuild").dependsOn("ktlintFormat")
+//tasks.getByPath("preBuild").dependsOn("ktlintFormat")
 
 dependencies {
+    implementation(libs.material.kolor)
+    implementation(libs.kmpalette.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

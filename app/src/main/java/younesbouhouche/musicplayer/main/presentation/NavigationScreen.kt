@@ -40,6 +40,7 @@ fun NavigationScreen(
 ) {
     val filesSorted by mainVM.filesSorted.collectAsState()
     val lastAdded by mainVM.lastAdded.collectAsState()
+    val recentlyAdded = if (lastAdded.size > 5) lastAdded.subList(0, 5) else lastAdded
     val sortState by mainVM.sortState.collectAsState()
     val mostPlayedArtists by mainVM.mostPlayedArtists.collectAsState()
 
@@ -52,11 +53,11 @@ fun NavigationScreen(
     val playlistsSorted by mainVM.playlistsSorted.collectAsState()
     val playlistsSortState by mainVM.playlistsSortState.collectAsState()
     val playlistSortState by mainVM.playlistSortState.collectAsState()
-    val playlist by mainVM.playlist.collectAsState()
-    val playlistFiles by mainVM.playlistFiles.collectAsState()
+    val playlist by mainVM.uiPlaylist.collectAsState()
 
     val history by mainVM.history.collectAsState()
-    val mostPlayed by mainVM.mostPlayed.collectAsState()
+    val _mostPlayed by mainVM.mostPlayed.collectAsState()
+    val mostPlayed = if (_mostPlayed.size > 5) _mostPlayed.subList(0, 5) else _mostPlayed
 
     val listScreenFiles by mainVM.listScreenFiles.collectAsState()
     val listScreenSortState by mainVM.listScreenSortState.collectAsState()
@@ -73,6 +74,10 @@ fun NavigationScreen(
         composable<NavRoutes.Home> {
             Home(
                 navController::navigate,
+                recentlyAdded,
+                mostPlayed,
+                { list, index -> mainVM.onPlayerEvent(PlayerEvent.Play(list, index)) },
+                { mainVM.onUiEvent(UiEvent.ShowBottomSheet(it)) },
                 {
                     mainVM.setListFiles(it.items)
                     navController.navigate(NavRoutes.ListScreen(it.name))
@@ -185,10 +190,8 @@ fun NavigationScreen(
             }
         }
         composable<NavRoutes.PlaylistScreen> { entry ->
-            val route = entry.toRoute<NavRoutes.PlaylistScreen>()
             PlaylistScreen(
-                playlistFiles,
-                route.title,
+                playlist,
                 playlistSortState,
                 mainVM::onPlaylistSortEvent,
                 navController::navigateUp,
@@ -199,10 +202,16 @@ fun NavigationScreen(
                     mainVM.onPlaylistEvent(PlaylistEvent.RemoveAt(playlist, it))
                 },
                 {
-                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(playlistFiles[it]))
+                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(playlist.items[it]))
                 },
+                {
+                    mainVM.onPlayerEvent(PlayerEvent.Play(playlist.items))
+                },
+                {
+                    mainVM.onPlayerEvent(PlayerEvent.Play(playlist.items, shuffle = true))
+                }
             ) { index ->
-                mainVM.onPlayerEvent(PlayerEvent.Play(playlistFiles, index))
+                mainVM.onPlayerEvent(PlayerEvent.Play(playlist.items, index))
             }
         }
         composable<NavRoutes.FavoritesScreen> {

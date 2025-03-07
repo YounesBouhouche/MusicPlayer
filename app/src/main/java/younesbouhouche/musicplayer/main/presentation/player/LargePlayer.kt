@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -43,6 +45,7 @@ import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.core.presentation.util.composables.isCompact
 import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.core.presentation.util.composables.toDp
+import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
@@ -80,6 +83,9 @@ fun LargePlayer(
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
     var isScrolledByUser by remember { mutableStateOf(false) }
     val playing = (playerState.playState == PlayState.PLAYING) or playerState.loading
+    val context = LocalContext.current
+    val playerDataStore = PlayerDataStore(context)
+    val showVolumeSlider by playerDataStore.showVolumeSlider.collectAsState(initial = false)
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.isScrollInProgress }.collect { isScrolling ->
             if (isScrolledByUser && !isScrolling) {
@@ -107,7 +113,11 @@ fun LargePlayer(
             .clipToBounds()
     Box(modifier) {
         if (isCompact) {
-            Column(containerModifier.statusBarsPadding(), verticalArrangement = Arrangement.Center) {
+            Column(
+                containerModifier.statusBarsPadding(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Pager(
                     lyrics,
                     syncing,
@@ -119,13 +129,13 @@ fun LargePlayer(
                     onPlayerEvent,
                     onUiEvent,
                     Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f),
+                        .weight(1f)
+                        .aspectRatio(1f, true),
                 )
                 Spacer(Modifier.height(8.dp))
                 Controls(
                     activeItem,
-                    uiState.showVolumeSlider,
+                    showVolumeSlider,
                     playerState,
                     onPlayerEvent,
                     Modifier.fillMaxWidth(),
@@ -168,7 +178,6 @@ fun LargePlayer(
         Queue(
             queue,
             index,
-            uiState,
             playerState,
             lyrics,
             playlistState.settledValue == PlaylistViewState.COLLAPSED,

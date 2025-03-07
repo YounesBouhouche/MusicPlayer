@@ -84,7 +84,7 @@ fun SmallPlayer(
                                 .using(SizeTransform(clip = false))
                         },
                     ) {
-                        if (queue[it].cover == null) {
+                        if (queue.getOrNull(it)?.cover == null) {
                             Box(
                                 Modifier.fillMaxSize()
                                     .clip(MaterialTheme.shapes.medium).clipToBounds().background(

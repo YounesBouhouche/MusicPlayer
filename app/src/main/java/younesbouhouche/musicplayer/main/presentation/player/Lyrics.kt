@@ -60,7 +60,7 @@ fun Lyrics(
     val lyricsLines by remember {
         derivedStateOf {
             lyrics.splitToSequence(timeRegex).toMutableList().apply {
-                firstOrNull()?.let { if (it.isEmpty()) removeFirst() }
+                firstOrNull()?.let { if (it.isEmpty()) removeAt(0) }
             }
         }
     }
@@ -74,6 +74,9 @@ fun Lyrics(
     }
     LaunchedEffect(key1 = isDragged) {
         if (isDragged) onUiEvent(UiEvent.DisableSyncing)
+    }
+    LaunchedEffect(lyrics) {
+        println("Lyrics: \n $lyrics")
     }
     val scope = rememberCoroutineScope()
     if (lyrics.isEmpty()) {

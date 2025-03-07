@@ -16,6 +16,13 @@ import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import younesbouhouche.musicplayer.main.data.PlayerDataStore
+import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
@@ -38,31 +45,34 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
                 packageManager.getLaunchIntentForPackage(packageName),
                 FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT,
             )
-        with(
-            ExoPlayer
-                .Builder(this)
-                .setHandleAudioBecomingNoisy(true)
-                .setAudioAttributes(
-                    AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).build(),
-                    true,
-                )
-                .build(),
-        ) {
-            setSeekParameters(SeekParameters(1000L, 1000L))
-            player = this
-            mediaSession =
-                MediaSession
-                    .Builder(
-                        this@MediaPlayerService,
-                        this,
-                    )
-                    .setId("MusicPlayerMediaPlayerService")
-                    .setSessionActivity(pendingIntent)
-                    .setCustomLayout(notificationCustomCmdButtons)
-                    .build()
+        CoroutineScope(Dispatchers.IO).launch {
+            val skipSilence = PlayerDataStore(this@MediaPlayerService).skipSilence.first()
+            withContext(Dispatchers.Main) {
+                with(
+                    ExoPlayer
+                        .Builder(this@MediaPlayerService)
+                        .setHandleAudioBecomingNoisy(true)
+                        .setSkipSilenceEnabled(skipSilence)
+                        .setAudioAttributes(
+                            AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).build(),
+                            true,
+                        )
+                        .build(),
+                ) {
+                    setSeekParameters(SeekParameters(1000L, 1000L))
+                    player = this
+                    mediaSession =
+                        MediaSession
+                            .Builder(this@MediaPlayerService, this)
+                            .setId("MusicPlayerMediaPlayerService")
+                            .setSessionActivity(pendingIntent)
+                            .setCustomLayout(notificationCustomCmdButtons)
+                            .build()
+                }
+                customMediaNotificationProvider = CustomMediaNotificationProvider(this@MediaPlayerService)
+                setMediaNotificationProvider(customMediaNotificationProvider)
+            }
         }
-        customMediaNotificationProvider = CustomMediaNotificationProvider(this)
-        setMediaNotificationProvider(customMediaNotificationProvider)
     }
 
     override fun onCustomCommand(

@@ -16,7 +16,7 @@ fun LazyListScope.checkSettingsItem(
     text: Int,
     onClick: (() -> Unit)? = null,
     checked: Boolean,
-    visible: Boolean? = null,
+    visible: Boolean = true,
     onCheckedChange: (Boolean) -> Unit,
 ) {
     settingsItem(

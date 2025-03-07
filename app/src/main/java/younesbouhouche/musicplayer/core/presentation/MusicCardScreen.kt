@@ -4,39 +4,59 @@ import android.os.Build
 import android.view.HapticFeedbackConstants
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toOffset
+import com.kmpalette.color
+import com.kmpalette.rememberPaletteState
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.ReorderableLazyListState
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.util.timeString
+import younesbouhouche.musicplayer.ui.theme.AppTheme
 
 @Composable
 fun MusicCardScreen(
@@ -64,6 +84,106 @@ fun MusicCardScreen(
             }
         },
     )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun HomeMusicCard(
+    card: MusicCard,
+    modifier: Modifier = Modifier,
+    onLongClick: () -> Unit,
+    onClick: () -> Unit,
+) {
+    val paletteState = rememberPaletteState()
+    LaunchedEffect(card.cover) {
+        card.cover?.let { paletteState.generate(it.asImageBitmap()) }
+    }
+    AppTheme(
+        paletteState.palette?.vibrantSwatch?.color ?: paletteState.palette?.dominantSwatch?.color
+    ) {
+        Box(
+            modifier.size(300.dp, 112.dp)
+                .clip(CardDefaults.shape)
+                .combinedClickable(onClick = onClick, onLongClick = onLongClick)) {
+            card.cover?.let {
+                Image(
+                    it.asImageBitmap(),
+                    null,
+                    Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+            Row(
+                Modifier
+                    .background(
+                        Brush
+                            .horizontalGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.surfaceContainer,
+                                    MaterialTheme.colorScheme.surfaceContainer.copy(.2f)
+                                )
+                            )
+                    )
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    Modifier
+                        .size(80.dp)
+                        .background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.medium)
+                        .clip(MaterialTheme.shapes.medium)
+                        .clipToBounds(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (card.cover == null)
+                        Icon(
+                            Icons.Default.MusicNote,
+                            null,
+                            Modifier.size(60.dp),
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    else
+                        Image(
+                            card.cover!!.asImageBitmap(),
+                            null,
+                            Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                }
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        card.title,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            shadow = Shadow(
+                                MaterialTheme.colorScheme.surface,
+                                IntOffset(0, 5).toOffset(),
+                                3f
+                            )
+                        ),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        card.artist,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            shadow = Shadow(
+                                MaterialTheme.colorScheme.surface,
+                                IntOffset(0, 5).toOffset(),
+                                3f
+                            )
+                        ),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable

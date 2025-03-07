@@ -234,7 +234,8 @@ fun AppScreen(
             PlaylistViewState.COLLAPSED -> playlistState.progress(PlaylistViewState.COLLAPSED, PlaylistViewState.EXPANDED)
             PlaylistViewState.EXPANDED -> 1f - playlistState.progress(PlaylistViewState.EXPANDED, PlaylistViewState.COLLAPSED)
         }
-    val startPadding = if (isCompact) 0.dp else 80.dp + leftEdgeWidth
+    val startPadding = if (isCompact) 0.dp else (80.dp + leftEdgeWidth) * (1f - progress)
+    val endPadding = if (isCompact) 0.dp else (rightEdgeWidth * (1f - progress))
     val bottomPadding = if (isCompact and isParent) (80.dp + navBarHeight) else 0.dp
     val playerPadding = (if (isPlaying) 74.dp else 0.dp)
     val pullToRefreshState = rememberPullToRefreshState()
@@ -257,7 +258,7 @@ fun AppScreen(
                         }
                         .pullToRefresh(
                             state = pullToRefreshState,
-                            enabled = isParent,
+                            enabled = isParent and (state.settledValue != ViewState.LARGE),
                             isRefreshing = uiState.loading,
                             onRefresh = {
                                 mainVM.onFilesEvent(FilesEvent.LoadFiles)
@@ -295,7 +296,7 @@ fun AppScreen(
                         }
                     }
                     PlayerScreen(
-                        Modifier.padding(start = startPadding, end = rightEdgeWidth),
+                        Modifier.padding(start = startPadding, end = endPadding),
                         queueFiles,
                         queueIndex,
                         playerState,

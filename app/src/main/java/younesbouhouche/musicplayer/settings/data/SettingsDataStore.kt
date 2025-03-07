@@ -46,21 +46,11 @@ class SettingsDataStore(private val context: Context) {
         language: String? = null,
     ) {
         context.dataStore.edit { preferences ->
-            if (theme != null) {
-                preferences[THEME_KEY] = theme
-            }
-            if (colorTheme != null) {
-                preferences[COLOR_THEME_KEY] = colorTheme
-            }
-            if (dynamic != null) {
-                preferences[DYNAMIC_KEY] = dynamic
-            }
-            if (extraDark != null) {
-                preferences[EXTRA_DARK_KEY] = extraDark
-            }
-            if (language != null) {
-                preferences[LANGUAGE_KEY] = language
-            }
+            theme?.let { preferences[THEME_KEY] = it }
+            colorTheme?.let { preferences[COLOR_THEME_KEY] = it }
+            dynamic?.let { preferences[DYNAMIC_KEY] = it }
+            extraDark?.let { preferences[EXTRA_DARK_KEY] = it }
+            language?.let { preferences[LANGUAGE_KEY] = it }
         }
     }
 }

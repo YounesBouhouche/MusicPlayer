@@ -11,10 +11,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Colorize
+import androidx.compose.material.icons.filled.Lyrics
+import androidx.compose.material.icons.filled.MusicOff
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,12 +56,14 @@ class PlayerActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SetSystemBarColors(settingsDataStore)
+            val matchPictureColors by playerDataStore.matchPictureColors.collectAsState(initial = false)
             val showVolumeSlider by playerDataStore.showVolumeSlider.collectAsState(initial = false)
-            val showPitch by playerDataStore.showPitch.collectAsState(initial = false)
-            val repeatMode by playerDataStore.rememberRepeat.collectAsState(initial = true)
-            val shuffle by playerDataStore.rememberShuffle.collectAsState(initial = false)
-            val speed by playerDataStore.rememberSpeed.collectAsState(initial = false)
-            val pitch by playerDataStore.rememberPitch.collectAsState(initial = false)
+            val showRepeatButton by playerDataStore.showRepeat.collectAsState(initial = false)
+            val showShuffleButton by playerDataStore.showShuffle.collectAsState(initial = false)
+            val showSpeedButton by playerDataStore.showSpeed.collectAsState(initial = false)
+            val showPitchButton by playerDataStore.showPitch.collectAsState(initial = false)
+            val showTimerButton by playerDataStore.showTimer.collectAsState(initial = false)
+            val showLyricsButton by playerDataStore.showLyrics.collectAsState(initial = false)
             val scope = rememberCoroutineScope()
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
             val listState = rememberLazyListState()
@@ -93,6 +99,19 @@ class PlayerActivity : ComponentActivity() {
                     ) {
                         settingsLabel("Customize view")
                         checkSettingsItem(
+                            Icons.Default.Colorize,
+                            R.string.match_picture_colors,
+                            R.string.match_picture_colors_description,
+                            null,
+                            matchPictureColors,
+                        ) {
+                            scope.launch {
+                                playerDataStore.saveSettings(
+                                    matchPictureColors = it,
+                                )
+                            }
+                        }
+                        checkSettingsItem(
                             Icons.AutoMirrored.Default.VolumeUp,
                             R.string.show_volume_slider,
                             R.string.show_volume_slider,
@@ -105,12 +124,52 @@ class PlayerActivity : ComponentActivity() {
                                 )
                             }
                         }
+                        settingsLabel("Controls")
+                        checkSettingsItem(
+                            Icons.Default.Repeat,
+                            R.string.show_repeat_button,
+                            R.string.show_repeat_button,
+                            null,
+                            showRepeatButton,
+                        ) {
+                            scope.launch {
+                                playerDataStore.saveSettings(
+                                    showRepeat = it,
+                                )
+                            }
+                        }
+                        checkSettingsItem(
+                            Icons.Default.Shuffle,
+                            R.string.show_shuffle_button,
+                            R.string.show_shuffle_button,
+                            null,
+                            showShuffleButton,
+                        ) {
+                            scope.launch {
+                                playerDataStore.saveSettings(
+                                    showShuffle = it,
+                                )
+                            }
+                        }
+                        checkSettingsItem(
+                            Icons.Default.Speed,
+                            R.string.show_speed_button,
+                            R.string.show_speed_button,
+                            null,
+                            showSpeedButton,
+                        ) {
+                            scope.launch {
+                                playerDataStore.saveSettings(
+                                    showSpeed = it,
+                                )
+                            }
+                        }
                         checkSettingsItem(
                             Icons.Default.RecordVoiceOver,
                             R.string.show_pitch_button,
                             R.string.show_pitch_button,
                             null,
-                            showPitch,
+                            showPitchButton,
                         ) {
                             scope.launch {
                                 playerDataStore.saveSettings(
@@ -118,59 +177,30 @@ class PlayerActivity : ComponentActivity() {
                                 )
                             }
                         }
-                        settingsLabel("Remember options")
                         checkSettingsItem(
-                            Icons.Default.Repeat,
-                            R.string.remember_repeat_mode,
-                            R.string.remember_repeat_mode,
+                            Icons.Default.Timer,
+                            R.string.show_timer_button,
+                            R.string.show_timer_button,
                             null,
-                            repeatMode,
+                            showTimerButton,
                         ) {
                             scope.launch {
                                 playerDataStore.saveSettings(
-                                    rememberRepeat = it,
+                                    showTimer = it,
                                 )
                             }
                         }
                         checkSettingsItem(
-                            Icons.Default.Shuffle,
-                            R.string.remember_shuffle,
-                            R.string.remember_shuffle,
+                            Icons.Default.Lyrics,
+                            R.string.show_lyrics_button,
+                            R.string.show_lyrics_button,
                             null,
-                            shuffle,
+                            showLyricsButton,
                         ) {
                             scope.launch {
                                 playerDataStore.saveSettings(
-                                    rememberShuffle = it,
+                                    showLyrics = it,
                                 )
-                            }
-                        }
-                        checkSettingsItem(
-                            Icons.Default.Speed,
-                            R.string.remember_playback_speed,
-                            R.string.remember_playback_speed,
-                            null,
-                            speed,
-                        ) {
-                            scope.launch {
-                                playerDataStore.saveSettings(
-                                    rememberSpeed = it,
-                                )
-                            }
-                        }
-                        if (showPitch) {
-                            checkSettingsItem(
-                                Icons.Default.RecordVoiceOver,
-                                R.string.remember_pitch,
-                                R.string.remember_pitch,
-                                null,
-                                pitch,
-                            ) {
-                                scope.launch {
-                                    playerDataStore.saveSettings(
-                                        rememberPitch = it,
-                                    )
-                                }
                             }
                         }
                     }
