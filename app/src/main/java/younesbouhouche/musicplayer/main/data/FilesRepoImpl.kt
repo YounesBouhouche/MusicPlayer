@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
+import okhttp3.internal.EMPTY_BYTE_ARRAY
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
 import younesbouhouche.musicplayer.core.presentation.util.saveUriImageToInternalStorage
@@ -82,7 +83,7 @@ class FilesRepoImpl(
                 Album(
                     title = album.key,
                     items = album.value.map { it.id },
-                    cover = null,
+                    cover = album.value.firstOrNull { it.cover != null }?.cover,
                 )
             }
         }
@@ -92,7 +93,7 @@ class FilesRepoImpl(
                 Artist(
                     name = artist.key,
                     items = artist.value.map { it.id },
-                    cover = null,
+                    cover = artist.value.firstOrNull { it.cover != null }?.cover,
                 )
             }
         }
@@ -188,11 +189,14 @@ class FilesRepoImpl(
     override suspend fun getFilesMetadata(files: List<MusicCard>): List<MusicCard> {
         return withContext(Dispatchers.IO) {
             files.map { file ->
+                var lyrics = ""
+                var genre = ""
+                var composer = ""
                 try {
                     AudioFileIO.read(File(file.path)).tag.let {
-                        file.lyrics = it.getFirst(FieldKey.LYRICS)
-                        file.genre = it.getFirst(FieldKey.GENRE)
-                        file.composer = it.getFirst(FieldKey.COMPOSER)
+                        lyrics = it.getFirst(FieldKey.LYRICS)
+                        genre = it.getFirst(FieldKey.GENRE)
+                        composer = it.getFirst(FieldKey.COMPOSER)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -200,25 +204,25 @@ class FilesRepoImpl(
                 val result =
                     with(mediaMetadataRetriever) {
                         try {
-                            setDataSource(context, file.contentUri)
-                            if (embeddedPicture != null) {
+                            mediaMetadataRetriever.setDataSource(context, file.contentUri)
+                            embeddedPicture?.let {
                                 BitmapFactory.decodeByteArray(
                                     embeddedPicture,
                                     0,
                                     embeddedPicture!!.size,
                                 )!! to embeddedPicture!!
-                            } else {
-                                null
                             }
                         } catch (_: Exception) {
                             null
                         }
                     }
-                result?.let { r ->
-                    file.cover = r.first
-                    file.coverByteArray = r.second
-                }
-                file
+                file.copy(
+                    lyrics = lyrics,
+                    genre = genre,
+                    composer = composer,
+                    cover = result?.first,
+                    coverByteArray = result?.second ?: EMPTY_BYTE_ARRAY,
+                )
             }
         }
     }
