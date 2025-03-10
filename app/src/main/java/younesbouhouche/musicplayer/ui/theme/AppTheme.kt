@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.materialkolor.DynamicMaterialTheme
-import com.materialkolor.PaletteStyle
 import com.materialkolor.rememberDynamicColorScheme
 import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 

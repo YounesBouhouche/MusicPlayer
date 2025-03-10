@@ -50,8 +50,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import dagger.hilt.android.AndroidEntryPoint
+import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.dialog.DialogVM
 import younesbouhouche.musicplayer.main.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
@@ -60,7 +59,7 @@ import younesbouhouche.musicplayer.main.presentation.util.timeString
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 import kotlin.math.roundToLong
 
-@AndroidEntryPoint
+
 class DialogActivity : ComponentActivity() {
     private lateinit var viewModel: DialogVM
 
@@ -74,7 +73,7 @@ class DialogActivity : ComponentActivity() {
         window.setLayout(resources.displayMetrics.widthPixels, resources.displayMetrics.heightPixels)
         enableEdgeToEdge()
         setContent {
-            viewModel = hiltViewModel<DialogVM>()
+            viewModel = koinViewModel<DialogVM>()
             val card = viewModel.card.collectAsState().value
             val state = viewModel.state.collectAsState().value
             LaunchedEffect(Unit) {

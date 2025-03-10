@@ -52,6 +52,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.window.core.layout.WindowWidthSizeClass
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.MainActivity
@@ -68,6 +69,7 @@ import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
+import younesbouhouche.musicplayer.main.domain.models.Routes
 import younesbouhouche.musicplayer.main.presentation.dialogs.AddToPlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.CreatePlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.DetailsDialog
@@ -94,8 +96,17 @@ fun AppScreen(
     mainVM: MainVM,
     navController: NavHostController,
     isParent: Boolean,
-    navigationState: Int,
 ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val currentNavRoute =
+        currentRoute?.let { route ->
+            Routes
+                .entries
+                .firstOrNull {
+                    it.destination.javaClass.kotlin.qualifiedName?.contains(route) == true
+                }
+        } ?: Routes.Home
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val queueFiles by mainVM.queueFiles.collectAsState()
@@ -249,21 +260,21 @@ fun AppScreen(
         if (isGranted) {
             Surface(
                 modifier =
-                    Modifier
-                        .onGloballyPositioned { height = it.size.height }
-                        .onSizeChanged { height = it.height }
-                        .fillMaxSize()
-                        .semantics {
-                            testTagsAsResourceId = true
-                        }
-                        .pullToRefresh(
-                            state = pullToRefreshState,
-                            enabled = isParent and (state.settledValue != ViewState.LARGE),
-                            isRefreshing = uiState.loading,
-                            onRefresh = {
-                                mainVM.onFilesEvent(FilesEvent.LoadFiles)
-                            },
-                        ),
+                Modifier
+                    .onGloballyPositioned { height = it.size.height }
+                    .onSizeChanged { height = it.height }
+                    .fillMaxSize()
+                    .semantics {
+                        testTagsAsResourceId = true
+                    }
+                    .pullToRefresh(
+                        state = pullToRefreshState,
+                        enabled = isParent and (state.settledValue != ViewState.LARGE),
+                        isRefreshing = uiState.loading,
+                        onRefresh = {
+                            mainVM.onFilesEvent(FilesEvent.LoadFiles)
+                        },
+                    ),
             ) {
                 Box(Modifier.fillMaxSize()) {
                     NavigationScreen(
@@ -311,7 +322,7 @@ fun AppScreen(
                     NavBar(
                         visible = isParent and (!searchState.expanded),
                         progress = progress,
-                        state = navigationState,
+                        route = currentNavRoute
                     ) {
                         navController.navigate(it) {
                             popUpTo(navController.graph.findStartDestination().id) {
@@ -463,7 +474,7 @@ fun AppScreen(
             mainVM.onUiEvent(UiEvent.HideRenamePlaylistDialog)
         },
         {
-            mainVM.onPlaylistEvent(PlaylistEvent.RenamePlaylist)
+            mainVM.onPlaylistEvent(PlaylistEvent.RenamePlaylist(uiState.renamePlaylistId, uiState.renamePlaylistName))
         },
         uiState.renamePlaylistName,
         {
@@ -495,7 +506,7 @@ fun AppScreen(
         uiState.newPlaylistImage,
         { mainVM.onUiEvent(UiEvent.UpdateNewPlaylistImage(it)) },
         { mainVM.onUiEvent(UiEvent.HideNewPlaylistDialog) },
-        { mainVM.onPlaylistEvent(PlaylistEvent.CreateNew) },
+        { mainVM.onPlaylistEvent(PlaylistEvent.CreateNew(uiState.newPlaylistName, uiState.newPlaylistItems, uiState.newPlaylistImage)) },
     )
     AddToPlaylistDialog(
         uiState.addToPlaylistDialog,
@@ -503,7 +514,7 @@ fun AppScreen(
         uiState.addToPlaylistIndex,
         { mainVM.onUiEvent(UiEvent.UpdateSelectedPlaylist(it)) },
         { mainVM.onUiEvent(UiEvent.HideAddToPlaylistDialog) },
-        { mainVM.onPlaylistEvent(PlaylistEvent.AddToPlaylist) },
+        { mainVM.onPlaylistEvent(PlaylistEvent.AddToPlaylist(uiState.addToPlaylistIndex, uiState.addToPlaylistItems)) },
     )
     MetadataDialog(
         uiState.metadataDialog,

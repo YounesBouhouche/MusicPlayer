@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.main.data.db.AppDatabase
+import younesbouhouche.musicplayer.main.domain.models.Routes
 import younesbouhouche.musicplayer.main.presentation.NavBar
 import younesbouhouche.musicplayer.main.presentation.NavigationScreen
 import younesbouhouche.musicplayer.main.presentation.SearchScreen
@@ -24,15 +25,16 @@ fun AppPreview() {
     val navController = rememberNavController()
     val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
     Box(Modifier.fillMaxSize()) {
-        NavigationScreen(
-            context,
-            navController,
-            MainVM(
-                context,
-                PlayerDataStore(context),
-                db,
-            ),
-        )
+//        NavigationScreen(
+//            context,
+//            navController,
+//            MainVM(
+//                context,
+//                PlayerDataStore(context),
+//                db.dao,
+//                MyPlayer
+//            ),
+//        )
         SearchScreen(
             SearchState(),
             false,
@@ -43,7 +45,7 @@ fun AppPreview() {
         NavBar(
             visible = true,
             progress = 0f,
-            state = 0,
+            route = Routes.Home,
         ) {
             navController.navigate(it) {
                 popUpTo(navController.graph.findStartDestination().id) {

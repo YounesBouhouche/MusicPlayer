@@ -33,7 +33,7 @@ import kotlin.math.roundToInt
 fun BoxScope.NavBar(
     visible: Boolean,
     progress: Float,
-    state: Int,
+    route: Routes,
     navigate: (NavRoutes) -> Unit,
 ) {
     val navBarHeight = navBarHeight
@@ -54,10 +54,10 @@ fun BoxScope.NavBar(
             exit = slideOutVertically { it },
         ) {
             NavigationBar {
-                Routes.entries.forEachIndexed { index, screen ->
+                Routes.entries.forEach { screen ->
                     NavigationBarItem(
                         modifier = Modifier.testTag("nav_${screen.name.lowercase()}"),
-                        selected = index == state,
+                        selected = route == screen,
                         alwaysShowLabel = false,
                         icon = {
                             Icon(screen.icon, null)
@@ -90,9 +90,9 @@ fun BoxScope.NavBar(
                     },
             windowInsets = WindowInsets.systemBars,
         ) {
-            Routes.entries.forEachIndexed { index, screen ->
+            Routes.entries.forEach { screen ->
                 NavigationRailItem(
-                    selected = index == state,
+                    selected = screen == route,
                     alwaysShowLabel = false,
                     icon = {
                         Icon(screen.icon, null)

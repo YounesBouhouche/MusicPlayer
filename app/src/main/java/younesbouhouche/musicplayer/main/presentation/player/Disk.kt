@@ -80,7 +80,7 @@ fun Disk(
                         .currentPageOffsetFraction
             ).absoluteValue
         with(queue[page]) {
-            val fav by favorite.collectAsState()
+            val fav by favorite.collectAsState(false)
             Box(
                 modifier =
                     Modifier
@@ -104,7 +104,7 @@ fun Disk(
                         .clipToBounds()
                         .combinedClickable(
                             onDoubleClick = {
-                                onPlayerEvent(PlayerEvent.SetFavorite(path))
+                                onPlayerEvent(PlayerEvent.UpdateFavorite(path, true))
                             },
                         ) {},
                     contentAlignment = Alignment.Center,

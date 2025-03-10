@@ -26,73 +26,72 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.get
+import org.koin.compose.KoinContext
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.util.composables.SetSystemBarColors
 import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.ui.theme.AppTheme
-import javax.inject.Inject
 
-@AndroidEntryPoint
+
 class PlaybackActivity : ComponentActivity() {
-    @Inject
-    lateinit var settingsDataStore: SettingsDataStore
-
-    @Inject
-    lateinit var playerDataStore: PlayerDataStore
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SetSystemBarColors(settingsDataStore)
-            val skipSilence by playerDataStore.skipSilence.collectAsState(initial = false)
-            val scope = rememberCoroutineScope()
-            val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-            val listState = rememberLazyListState()
-            AppTheme {
-                Scaffold(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .nestedScroll(scrollBehavior.nestedScrollConnection),
-                    topBar = {
-                        LargeTopAppBar(
-                            title = {
-                                Text(
-                                    stringResource(id = R.string.player),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            },
-                            navigationIcon = {
-                                IconButton(onClick = { finish() }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                                }
-                            },
-                            scrollBehavior = scrollBehavior,
-                        )
-                    },
-                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                ) { paddingValues ->
-                    LazyColumn(
-                        modifier = Modifier.fillMaxWidth(),
-                        state = listState,
-                        contentPadding = paddingValues,
-                    ) {
-                        checkSettingsItem(
-                            Icons.Default.MusicOff,
-                            R.string.skip_silence,
-                            R.string.skip_silence_description,
-                            null,
-                            skipSilence,
+            KoinContext {
+                val settingsDataStore = get<SettingsDataStore>()
+                val playerDataStore = get<PlayerDataStore>()
+                SetSystemBarColors(settingsDataStore)
+                val skipSilence by playerDataStore.skipSilence.collectAsState(initial = false)
+                val scope = rememberCoroutineScope()
+                val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+                val listState = rememberLazyListState()
+                AppTheme {
+                    Scaffold(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .nestedScroll(scrollBehavior.nestedScrollConnection),
+                        topBar = {
+                            LargeTopAppBar(
+                                title = {
+                                    Text(
+                                        stringResource(id = R.string.player),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                },
+                                navigationIcon = {
+                                    IconButton(onClick = { finish() }) {
+                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                                    }
+                                },
+                                scrollBehavior = scrollBehavior,
+                            )
+                        },
+                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                    ) { paddingValues ->
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth(),
+                            state = listState,
+                            contentPadding = paddingValues,
                         ) {
-                            scope.launch {
-                                playerDataStore.saveSettings(
-                                    skipSilence = it,
-                                )
+                            checkSettingsItem(
+                                Icons.Default.MusicOff,
+                                R.string.skip_silence,
+                                R.string.skip_silence_description,
+                                null,
+                                skipSilence,
+                            ) {
+                                scope.launch {
+                                    playerDataStore.saveSettings(
+                                        skipSilence = it,
+                                    )
+                                }
                             }
                         }
                     }

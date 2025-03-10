@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.runtime.Immutable
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -24,8 +25,8 @@ data class MusicCard(
     var path: String,
     var date: Long,
     var duration: Long,
-    var favorite: StateFlow<Boolean>,
-    var timestamps: StateFlow<List<Long>>,
+    var favorite: Flow<Boolean>,
+    var timestamps: Flow<List<Long>>,
 ) {
     @Suppress("unused")
     class Builder {
@@ -43,8 +44,8 @@ data class MusicCard(
         private var path: String = ""
         private var date: Long = 0
         private var duration: Long = -1
-        private var favorite: StateFlow<Boolean> = MutableStateFlow(false)
-        private var timestamps: StateFlow<List<Long>> = MutableStateFlow(emptyList())
+        private var favorite: Flow<Boolean> = MutableStateFlow(false)
+        private var timestamps: Flow<List<Long>> = MutableStateFlow(emptyList())
 
         fun setContentUri(contentUri: Uri) = apply { this.contentUri = contentUri }
 
@@ -74,9 +75,9 @@ data class MusicCard(
 
         fun setDuration(duration: Long) = apply { this.duration = duration }
 
-        fun setFavorite(favorite: StateFlow<Boolean>) = apply { this.favorite = favorite }
+        fun setFavorite(favorite: Flow<Boolean>) = apply { this.favorite = favorite }
 
-        fun setTimestamps(timestamps: StateFlow<List<Long>>) = apply { this.timestamps = timestamps }
+        fun setTimestamps(timestamps: Flow<List<Long>>) = apply { this.timestamps = timestamps }
 
         fun build() =
             MusicCard(

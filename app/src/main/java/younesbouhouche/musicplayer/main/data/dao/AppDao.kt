@@ -73,7 +73,7 @@ interface AppDao {
     )
 
     @Query("SELECT * from Playlist")
-    fun getPlaylist(): Flow<List<Playlist>>
+    fun getPlaylists(): Flow<List<Playlist>>
 
     @Delete
     suspend fun deletePlaylist(playlist: Playlist)

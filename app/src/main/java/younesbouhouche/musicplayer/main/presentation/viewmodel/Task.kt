@@ -1,19 +1,23 @@
 package younesbouhouche.musicplayer.main.presentation.viewmodel
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class Task(private val scope: CoroutineScope) {
+class Task() {
     private var job: Job? = null
 
-    fun start(block: suspend CoroutineScope.() -> Unit) {
+    suspend fun start(block: suspend CoroutineScope.() -> Unit) {
         stop()
-        job = scope.launch(block = block)
+        job = withContext(Dispatchers.Main) {
+            launch(block = block)
+        }
     }
 
-    fun startRepeating(
+    suspend fun startRepeating(
         delay: Long,
         block: suspend CoroutineScope.() -> Unit,
     ) = start {

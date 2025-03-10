@@ -10,10 +10,6 @@ sealed interface PlayerEvent {
 
     data class Play(val items: List<MusicCard>, val index: Int = 0, val shuffle: Boolean = false) : PlayerEvent
 
-    data class PlayPaths(val items: List<String>, val index: Int = 0) : PlayerEvent
-
-    data class PlayIds(val items: List<Long>, val index: Int = 0) : PlayerEvent
-
     data object Resume : PlayerEvent
 
     data object Pause : PlayerEvent
@@ -61,16 +57,6 @@ sealed interface PlayerEvent {
 
     data class UpdateFavorite(val path: String, val favorite: Boolean) : PlayerEvent
 
-    data class SetFavorite(val path: String) : PlayerEvent
-
-    data class ToggleFavorite(val path: String) : PlayerEvent
-
-    data object PlayFavorites : PlayerEvent
-
-    data object PlayMostPlayed : PlayerEvent
-
-    data class PlayPlaylist(val id: Int) : PlayerEvent
-
     data class SetVolume(val volume: Float) : PlayerEvent
 
     data object IncreaseVolume : PlayerEvent
@@ -78,4 +64,14 @@ sealed interface PlayerEvent {
     data object DecreaseVolume : PlayerEvent
 
     data class SetPlayerVolume(val volume: Float) : PlayerEvent
+
+    data class PlayPaths(val items: List<String>, val index: Int = 0) : PlayerEvent
+
+    data class PlayIds(val items: List<Long>, val index: Int = 0) : PlayerEvent
+
+    data object PlayFavorites: PlayerEvent
+
+    data object PlayMostPlayed: PlayerEvent
+
+    data class PlayPlaylist(val id: Int): PlayerEvent
 }

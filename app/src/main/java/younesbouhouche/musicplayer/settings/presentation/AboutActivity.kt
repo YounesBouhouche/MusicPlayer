@@ -40,176 +40,174 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import dagger.hilt.android.AndroidEntryPoint
+import org.koin.android.ext.android.get
+import org.koin.compose.KoinContext
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.util.composables.SetSystemBarColors
 import younesbouhouche.musicplayer.core.presentation.util.getAppVersion
-import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.ui.theme.AppTheme
-import javax.inject.Inject
 
-@AndroidEntryPoint
+
 class AboutActivity : ComponentActivity() {
-    @Inject
-    lateinit var settingsDataStore: SettingsDataStore
-
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            val listState = rememberLazyListState()
-            val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-            val context = LocalContext.current
-            SetSystemBarColors(dataStore = settingsDataStore)
-            AppTheme {
-                Scaffold(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .nestedScroll(scrollBehavior.nestedScrollConnection),
-                    topBar = {
-                        TopAppBar(
-                            title = {
-                                Text(
-                                    stringResource(id = R.string.about),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            },
-                            navigationIcon = {
-                                IconButton(onClick = { (context as Activity).finish() }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                                }
-                            },
-                            scrollBehavior = scrollBehavior,
-                        )
-                    },
-                ) { paddingValues ->
-                    LazyColumn(
+            KoinContext {
+                val listState = rememberLazyListState()
+                val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+                val context = LocalContext.current
+                SetSystemBarColors(dataStore = get())
+                AppTheme {
+                    Scaffold(
                         modifier =
                             Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                        state = listState,
-                        contentPadding = paddingValues,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-                    ) {
-                        item {
-                            AppIcon()
-                        }
-                        item {
-                            Text(
-                                "MusicPlayer",
-                                Modifier.fillMaxWidth(),
-                                style = MaterialTheme.typography.headlineLarge,
-                                textAlign = TextAlign.Center,
+                                .fillMaxSize()
+                                .nestedScroll(scrollBehavior.nestedScrollConnection),
+                        topBar = {
+                            TopAppBar(
+                                title = {
+                                    Text(
+                                        stringResource(id = R.string.about),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                },
+                                navigationIcon = {
+                                    IconButton(onClick = { (context as Activity).finish() }) {
+                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                                    }
+                                },
+                                scrollBehavior = scrollBehavior,
                             )
-                        }
-                        item {
-                            Button(onClick = {}) {
-                                Text("v${getAppVersion()}")
+                        },
+                    ) { paddingValues ->
+                        LazyColumn(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                            state = listState,
+                            contentPadding = paddingValues,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                        ) {
+                            item {
+                                AppIcon()
                             }
-                        }
-                        item {
-                            AboutCard(
-                                stringResource(R.string.developer),
-                                stringResource(R.string.younes_bouhouche),
-                                Icons.Default.Person,
-                            ) {
+                            item {
+                                Text(
+                                    "MusicPlayer",
+                                    Modifier.fillMaxWidth(),
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    textAlign = TextAlign.Center,
+                                )
                             }
-                        }
-                        item {
-                            AboutCard(
-                                stringResource(R.string.project),
-                                stringResource(R.string.source_code),
-                                Icons.Default.Code,
-                            ) {
+                            item {
+                                Button(onClick = {}) {
+                                    Text("v${getAppVersion()}")
+                                }
                             }
-                        }
-                        item {
-                            AboutCard(
-                                stringResource(R.string.send_feedback),
-                                "younes.bouhouche12@gmail.com",
-                                Icons.Default.Mail,
-                            ) {
-                                with(
-                                    Intent(Intent.ACTION_SENDTO).apply {
-                                        data = Uri.parse("mailto:")
-                                        putExtra(
-                                            Intent.EXTRA_EMAIL,
-                                            arrayOf("younes.bouhouche12@gmail.com"),
-                                        )
-                                        putExtra(
-                                            Intent.EXTRA_SUBJECT,
-                                            "Feedback about Music Player app",
-                                        )
-                                        putExtra(
-                                            Intent.EXTRA_TEXT,
-                                            "\nApp Version:${getAppVersion()}," +
-                                                "\nAPI Level:${Build.VERSION.SDK_INT}",
-                                        )
-                                    },
+                            item {
+                                AboutCard(
+                                    stringResource(R.string.developer),
+                                    stringResource(R.string.younes_bouhouche),
+                                    Icons.Default.Person,
                                 ) {
-                                    if (this.resolveActivity(context.packageManager) != null) {
-                                        context.startActivity(this)
+                                }
+                            }
+                            item {
+                                AboutCard(
+                                    stringResource(R.string.project),
+                                    stringResource(R.string.source_code),
+                                    Icons.Default.Code,
+                                ) {
+                                }
+                            }
+                            item {
+                                AboutCard(
+                                    stringResource(R.string.send_feedback),
+                                    "younes.bouhouche12@gmail.com",
+                                    Icons.Default.Mail,
+                                ) {
+                                    with(
+                                        Intent(Intent.ACTION_SENDTO).apply {
+                                            data = Uri.parse("mailto:")
+                                            putExtra(
+                                                Intent.EXTRA_EMAIL,
+                                                arrayOf("younes.bouhouche12@gmail.com"),
+                                            )
+                                            putExtra(
+                                                Intent.EXTRA_SUBJECT,
+                                                "Feedback about Music Player app",
+                                            )
+                                            putExtra(
+                                                Intent.EXTRA_TEXT,
+                                                "\nApp Version:${getAppVersion()}," +
+                                                    "\nAPI Level:${Build.VERSION.SDK_INT}",
+                                            )
+                                        },
+                                    ) {
+                                        if (this.resolveActivity(context.packageManager) != null) {
+                                            context.startActivity(this)
+                                        }
                                     }
                                 }
                             }
-                        }
-                        item {
-                            AboutCard(
-                                stringResource(R.string.social_media),
-                                "@younesbouh_05",
-                                Icons.Default.Link,
-                                trailingContent = {
-                                    IconButton(onClick = {
-                                        with(
-                                            Intent(
-                                                Intent.ACTION_VIEW,
-                                                Uri.parse("twitter://user?screen_name=younesbouh_05"),
-                                            ),
-                                        ) {
-                                            if (this.resolveActivity(context.packageManager) != null) {
-                                                context.startActivity(this)
-                                            } else {
-                                                context.startActivity(
-                                                    Intent(
-                                                        Intent.ACTION_VIEW,
-                                                        Uri.parse("https://twitter.com/younesbouh_05"),
-                                                    ),
-                                                )
+                            item {
+                                AboutCard(
+                                    stringResource(R.string.social_media),
+                                    "@younesbouh_05",
+                                    Icons.Default.Link,
+                                    trailingContent = {
+                                        IconButton(onClick = {
+                                            with(
+                                                Intent(
+                                                    Intent.ACTION_VIEW,
+                                                    Uri.parse("twitter://user?screen_name=younesbouh_05"),
+                                                ),
+                                            ) {
+                                                if (this.resolveActivity(context.packageManager) != null) {
+                                                    context.startActivity(this)
+                                                } else {
+                                                    context.startActivity(
+                                                        Intent(
+                                                            Intent.ACTION_VIEW,
+                                                            Uri.parse("https://twitter.com/younesbouh_05"),
+                                                        ),
+                                                    )
+                                                }
                                             }
+                                        }) {
+                                            Icon(
+                                                ImageVector.vectorResource(id = R.drawable.ic_twitter),
+                                                null,
+                                            )
                                         }
-                                    }) {
-                                        Icon(
-                                            ImageVector.vectorResource(id = R.drawable.ic_twitter),
-                                            null,
-                                        )
-                                    }
-                                    IconButton(onClick = {
-                                        context.startActivity(
-                                            Intent(
-                                                Intent.ACTION_VIEW,
-                                                Uri.parse("tg://resolve?domain=younesbouh_05"),
-                                            ),
-                                        )
-                                    }) {
-                                        Icon(
-                                            ImageVector.vectorResource(id = R.drawable.ic_telegram_app),
-                                            null,
-                                        )
-                                    }
-                                },
-                            ) {}
-                        }
-                        item {
-                            AboutCard(
-                                stringResource(R.string.translation),
-                                stringResource(R.string.contribute_in_app_translation),
-                                Icons.Default.Translate,
-                            ) {
+                                        IconButton(onClick = {
+                                            context.startActivity(
+                                                Intent(
+                                                    Intent.ACTION_VIEW,
+                                                    Uri.parse("tg://resolve?domain=younesbouh_05"),
+                                                ),
+                                            )
+                                        }) {
+                                            Icon(
+                                                ImageVector.vectorResource(id = R.drawable.ic_telegram_app),
+                                                null,
+                                            )
+                                        }
+                                    },
+                                ) {}
+                            }
+                            item {
+                                AboutCard(
+                                    stringResource(R.string.translation),
+                                    stringResource(R.string.contribute_in_app_translation),
+                                    Icons.Default.Translate,
+                                ) {
+                                }
                             }
                         }
                     }

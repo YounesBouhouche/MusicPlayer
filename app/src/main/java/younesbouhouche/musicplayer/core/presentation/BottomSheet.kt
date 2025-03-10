@@ -168,7 +168,7 @@ fun ItemBottomSheet(
     navigateToArtist: () -> Unit,
     shareFile: () -> Unit,
 ) {
-    val favorite by file.favorite.collectAsState()
+    val favorite by file.favorite.collectAsState(false)
     with(file) {
         BottomSheet(
             open = open,

@@ -44,158 +44,145 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.get
+import org.koin.compose.KoinContext
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.Dialog
 import younesbouhouche.musicplayer.core.presentation.util.composables.SetSystemBarColors
+import younesbouhouche.musicplayer.settings.constants.SettingsMaps.colors
+import younesbouhouche.musicplayer.settings.constants.SettingsMaps.themeOptions
 import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.ui.theme.AppTheme
-import javax.inject.Inject
 
-@AndroidEntryPoint
+
 class ThemeActivity : ComponentActivity() {
-    @Inject
-    lateinit var dataStore: SettingsDataStore
-
-    private val themeOptions =
-        listOf(
-            "light" to R.string.light,
-            "system" to R.string.default_theme,
-            "dark" to R.string.dark,
-        )
-    private val colors =
-        listOf(
-            "blue" to R.string.blue,
-            "green" to R.string.green,
-            "red" to R.string.red,
-            "orange" to R.string.orange,
-            "purple" to R.string.purple,
-        )
-
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            SetSystemBarColors(dataStore = dataStore)
-            val listState = rememberLazyListState()
-            val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-            val context = LocalContext.current
-            val isDark by dataStore.isDark().collectAsState(initial = false)
-            val colorTheme by dataStore.colorTheme.collectAsState(initial = "green")
-            var colorThemeDialogShown by remember { mutableStateOf(false) }
-            val dynamicColorsChecked by dataStore.dynamicColors.collectAsState(initial = true)
-            val extraDarkChecked by dataStore.extraDark.collectAsState(initial = true)
-            val theme by dataStore.theme.collectAsState(initial = "system")
-            val scope = rememberCoroutineScope()
-            AppTheme {
-                Scaffold(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .nestedScroll(scrollBehavior.nestedScrollConnection),
-                    topBar = {
-                        LargeTopAppBar(
-                            title = {
-                                Text(
-                                    stringResource(id = R.string.theme),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            },
-                            navigationIcon = {
-                                IconButton(onClick = { (context as Activity).finish() }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                                }
-                            },
-                            scrollBehavior = scrollBehavior,
-                        )
-                    },
-                ) { paddingValues ->
-                    LazyColumn(
-                        modifier = Modifier.fillMaxWidth(),
-                        state = listState,
-                        contentPadding = paddingValues,
-                    ) {
-                        settingsItem(
-                            Icons.TwoTone.InvertColors,
-                            R.string.app_theme,
-                            R.string.choose_app_theme,
-                        )
-                        item {
-                            Box(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 16.dp),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                SingleChoiceSegmentedButtonRow {
-                                    themeOptions.forEachIndexed { index, pair ->
-                                        SegmentedButton(
-                                            shape = SegmentedButtonDefaults.itemShape(index = index, count = themeOptions.size),
-                                            onClick = {
-                                                scope.launch {
-                                                    dataStore.saveSettings(theme = pair.first)
-                                                }
-                                            },
-                                            selected = theme == pair.first,
-                                        ) {
-                                            Text(stringResource(id = pair.second))
+            KoinContext {
+                val dataStore = get<SettingsDataStore>()
+                SetSystemBarColors(dataStore = dataStore)
+                val listState = rememberLazyListState()
+                val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+                val context = LocalContext.current
+                val isDark by dataStore.isDark().collectAsState(initial = false)
+                val colorTheme by dataStore.colorTheme.collectAsState(initial = "green")
+                var colorThemeDialogShown by remember { mutableStateOf(false) }
+                val dynamicColorsChecked by dataStore.dynamicColors.collectAsState(initial = true)
+                val extraDarkChecked by dataStore.extraDark.collectAsState(initial = true)
+                val theme by dataStore.theme.collectAsState(initial = "system")
+                val scope = rememberCoroutineScope()
+                AppTheme {
+                    Scaffold(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .nestedScroll(scrollBehavior.nestedScrollConnection),
+                        topBar = {
+                            LargeTopAppBar(
+                                title = {
+                                    Text(
+                                        stringResource(id = R.string.theme),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                },
+                                navigationIcon = {
+                                    IconButton(onClick = { (context as Activity).finish() }) {
+                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                                    }
+                                },
+                                scrollBehavior = scrollBehavior,
+                            )
+                        },
+                    ) { paddingValues ->
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth(),
+                            state = listState,
+                            contentPadding = paddingValues,
+                        ) {
+                            settingsItem(
+                                Icons.TwoTone.InvertColors,
+                                R.string.app_theme,
+                                R.string.choose_app_theme,
+                            )
+                            item {
+                                Box(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 16.dp),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    SingleChoiceSegmentedButtonRow {
+                                        themeOptions.forEachIndexed { index, pair ->
+                                            SegmentedButton(
+                                                shape = SegmentedButtonDefaults.itemShape(index = index, count = themeOptions.size),
+                                                onClick = {
+                                                    scope.launch {
+                                                        dataStore.saveSettings(theme = pair.first)
+                                                    }
+                                                },
+                                                selected = theme == pair.first,
+                                            ) {
+                                                Text(stringResource(id = pair.second))
+                                            }
                                         }
                                     }
                                 }
                             }
+                            item {
+                                Spacer(Modifier.height(4.dp))
+                            }
+                            checkSettingsItem(
+                                icon = Icons.TwoTone.DarkMode,
+                                title = R.string.extra_dark_colors,
+                                text = R.string.extra_dark_description,
+                                checked = extraDarkChecked,
+                                visible = isDark,
+                                onCheckedChange = { checked ->
+                                    scope.launch {
+                                        dataStore.saveSettings(extraDark = checked)
+                                    }
+                                },
+                            )
+                            checkSettingsItem(
+                                icon = Icons.TwoTone.SettingsSuggest,
+                                title = R.string.dynamic_colors,
+                                text = R.string.follow_system_dynamic_colors,
+                                checked = dynamicColorsChecked,
+                                visible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
+                                onCheckedChange = { checked ->
+                                    scope.launch {
+                                        dataStore.saveSettings(dynamic = checked)
+                                    }
+                                },
+                            )
+                            settingsItem(
+                                Icons.TwoTone.Palette,
+                                R.string.color_palette,
+                                colors.toMap()[colorTheme]!!,
+                                onClick = { colorThemeDialogShown = true },
+                                visible = (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) or !dynamicColorsChecked,
+                            )
                         }
-                        item {
-                            Spacer(Modifier.height(4.dp))
-                        }
-                        checkSettingsItem(
-                            icon = Icons.TwoTone.DarkMode,
-                            title = R.string.extra_dark_colors,
-                            text = R.string.extra_dark_description,
-                            checked = extraDarkChecked,
-                            visible = isDark,
-                            onCheckedChange = { checked ->
-                                scope.launch {
-                                    dataStore.saveSettings(extraDark = checked)
-                                }
-                            },
-                        )
-                        checkSettingsItem(
-                            icon = Icons.TwoTone.SettingsSuggest,
-                            title = R.string.dynamic_colors,
-                            text = R.string.follow_system_dynamic_colors,
-                            checked = dynamicColorsChecked,
-                            visible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
-                            onCheckedChange = { checked ->
-                                scope.launch {
-                                    dataStore.saveSettings(dynamic = checked)
-                                }
-                            },
-                        )
-                        settingsItem(
-                            Icons.TwoTone.Palette,
-                            R.string.color_palette,
-                            colors.toMap()[colorTheme]!!,
-                            onClick = { colorThemeDialogShown = true },
-                            visible = (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) or !dynamicColorsChecked,
-                        )
                     }
-                }
-                Dialog(
-                    visible = colorThemeDialogShown,
-                    onDismissRequest = { colorThemeDialogShown = false },
-                    title = stringResource(R.string.color_palette),
-                    centerTitle = true,
-                    okListener = { colorThemeDialogShown = false },
-                ) {
-                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                        settingsRadioItems(
-                            colors,
-                            colors.map { it.first }.indexOf(colorTheme),
-                            { scope.launch { dataStore.saveSettings(colorTheme = colors.map { it.first }[it]) } },
-                        ) { Text(stringResource(it.second)) }
+                    Dialog(
+                        visible = colorThemeDialogShown,
+                        onDismissRequest = { colorThemeDialogShown = false },
+                        title = stringResource(R.string.color_palette),
+                        centerTitle = true,
+                        okListener = { colorThemeDialogShown = false },
+                    ) {
+                        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                            settingsRadioItems(
+                                colors,
+                                colors.map { it.first }.indexOf(colorTheme),
+                                { scope.launch { dataStore.saveSettings(colorTheme = colors.map { it.first }[it]) } },
+                            ) { Text(stringResource(it.second)) }
+                        }
                     }
                 }
             }

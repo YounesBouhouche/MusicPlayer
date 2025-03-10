@@ -1,14 +1,15 @@
 package younesbouhouche.musicplayer.main.domain.events
 
+import android.net.Uri
 import younesbouhouche.musicplayer.main.domain.models.Playlist
 import younesbouhouche.musicplayer.main.domain.models.UiPlaylist
 
 sealed interface PlaylistEvent {
     data class CreateNewPlaylist(val name: String, val items: List<String>) : PlaylistEvent
 
-    data object CreateNew : PlaylistEvent
+    data class CreateNew(val name: String, val items: List<String>, val image: Uri?) : PlaylistEvent
 
-    data object AddToPlaylist : PlaylistEvent
+    data class AddToPlaylist(val index: Int, val items: List<String>) : PlaylistEvent
 
     data class Reorder(val playlist: UiPlaylist, val from: Int, val to: Int) : PlaylistEvent
 
@@ -18,5 +19,5 @@ sealed interface PlaylistEvent {
 
     data class DeletePlaylist(val playlist: Playlist) : PlaylistEvent
 
-    data object RenamePlaylist : PlaylistEvent
+    data class RenamePlaylist(val id: Int, val name: String) : PlaylistEvent
 }
