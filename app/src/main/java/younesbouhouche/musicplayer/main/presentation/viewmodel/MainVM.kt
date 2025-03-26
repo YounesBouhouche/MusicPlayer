@@ -43,6 +43,7 @@ import younesbouhouche.musicplayer.main.presentation.util.PlaylistSortType
 import younesbouhouche.musicplayer.main.presentation.util.SortState
 import younesbouhouche.musicplayer.main.presentation.util.SortType
 import younesbouhouche.musicplayer.main.presentation.util.isPermissionGranted
+import younesbouhouche.musicplayer.main.util.sortBy
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainVM(
@@ -138,25 +139,8 @@ class MainVM(
                 .mapNotNull { item -> files.firstOrNull { item.path == it.path } }
         }.stateInVM(emptyList())
 
-    val filesSorted =
-        combine(_files, _sortState) { files, sortState ->
-            if (sortState.ascending) {
-                when (sortState.sortType) {
-                    SortType.Title -> files.sortedBy { it.title }
-                    SortType.Filename -> files.sortedBy { it.path }
-                    SortType.Duration -> files.sortedBy { it.duration }
-                    SortType.Date -> files.sortedBy { it.date }
-                    SortType.Size -> TODO()
-                }
-            } else {
-                when (sortState.sortType) {
-                    SortType.Title -> files.sortedByDescending { it.title }
-                    SortType.Filename -> files.sortedByDescending { it.path }
-                    SortType.Duration -> files.sortedByDescending { it.duration }
-                    SortType.Date -> files.sortedByDescending { it.date }
-                    SortType.Size -> TODO()
-                }
-            }
+    val filesSorted = combine(_files, _sortState) { files, sortState ->
+            files.sortBy(sortState.sortType, sortState.ascending)
         }.stateInVM(emptyList())
 
     private val _mostPlayedArtists =
@@ -184,24 +168,8 @@ class MainVM(
             .stateInVM(emptyList())
 
     val listScreenFiles =
-        combine(_listScreenFiles, _listScreenSortState) { listScreenFiles, sortState ->
-            if (sortState.ascending) {
-                when (sortState.sortType) {
-                    SortType.Title -> listScreenFiles.sortedBy { it.title }
-                    SortType.Filename -> listScreenFiles.sortedBy { it.path }
-                    SortType.Duration -> listScreenFiles.sortedBy { it.duration }
-                    SortType.Date -> listScreenFiles.sortedBy { it.date }
-                    SortType.Size -> TODO()
-                }
-            } else {
-                when (sortState.sortType) {
-                    SortType.Title -> listScreenFiles.sortedByDescending { it.title }
-                    SortType.Filename -> listScreenFiles.sortedByDescending { it.path }
-                    SortType.Duration -> listScreenFiles.sortedByDescending { it.duration }
-                    SortType.Date -> listScreenFiles.sortedByDescending { it.date }
-                    SortType.Size -> TODO()
-                }
-            }
+        combine(_listScreenFiles, _listScreenSortState) { files, sortState ->
+            files.sortBy(sortState.sortType, sortState.ascending)
         }.stateInVM(emptyList())
 
     private val _favorites = dao.getFavorites()
@@ -210,69 +178,23 @@ class MainVM(
             files.filter { favorites.contains(it.path) }
         }
     val favoritesFiles =
-        combine(_favoritesFiles, _listScreenSortState) { listScreenFiles, sortState ->
-            if (sortState.ascending) {
-                when (sortState.sortType) {
-                    SortType.Title -> listScreenFiles.sortedBy { it.title }
-                    SortType.Filename -> listScreenFiles.sortedBy { it.path }
-                    SortType.Duration -> listScreenFiles.sortedBy { it.duration }
-                    SortType.Date -> listScreenFiles.sortedBy { it.date }
-                    SortType.Size -> TODO()
-                }
-            } else {
-                when (sortState.sortType) {
-                    SortType.Title -> listScreenFiles.sortedByDescending { it.title }
-                    SortType.Filename -> listScreenFiles.sortedByDescending { it.path }
-                    SortType.Duration -> listScreenFiles.sortedByDescending { it.duration }
-                    SortType.Date -> listScreenFiles.sortedByDescending { it.date }
-                    SortType.Size -> TODO()
-                }
-            }
+        combine(_favoritesFiles, _listScreenSortState) { files, sortState ->
+            files.sortBy(sortState.sortType, sortState.ascending)
         }.stateInVM(emptyList())
 
     val albumsSorted =
         combine(_albums, _albumsSortState) { albums, sortState ->
-            if (sortState.ascending) {
-                when (sortState.sortType) {
-                    ListsSortType.Name -> albums.toList().sortedBy { it.title }
-                    ListsSortType.Count -> albums.toList().sortedBy { it.items.size }
-                }
-            } else {
-                when (sortState.sortType) {
-                    ListsSortType.Name -> albums.toList().sortedByDescending { it.title }
-                    ListsSortType.Count -> albums.toList().sortedByDescending { it.items.size }
-                }
-            }
+            albums.sortBy(sortState.sortType, sortState.ascending)
         }.stateInVM(emptyList())
 
     val artistsSorted =
         combine(_artists, _artistsSortState) { artists, sortState ->
-            if (sortState.ascending) {
-                when (sortState.sortType) {
-                    ListsSortType.Name -> artists.toList().sortedBy { it.name }
-                    ListsSortType.Count -> artists.toList().sortedBy { it.items.size }
-                }
-            } else {
-                when (sortState.sortType) {
-                    ListsSortType.Name -> artists.toList().sortedByDescending { it.name }
-                    ListsSortType.Count -> artists.toList().sortedByDescending { it.items.size }
-                }
-            }
+            artists.sortBy(sortState.sortType, sortState.ascending)
         }.stateInVM(emptyList())
 
     private val _playlistsSorted =
         combine(_playlists, _playlistsSortState) { playlists, sortState ->
-            if (sortState.ascending) {
-                when (sortState.sortType) {
-                    ListsSortType.Name -> playlists.sortedBy { it.name }
-                    ListsSortType.Count -> playlists.sortedBy { it.items.size }
-                }
-            } else {
-                when (sortState.sortType) {
-                    ListsSortType.Name -> playlists.sortedByDescending { it.name }
-                    ListsSortType.Count -> playlists.sortedByDescending { it.items.size }
-                }
-            }
+            playlists.sortBy(sortState.sortType, sortState.ascending)
         }.stateInVM(emptyList())
 
     private val _playlist =
@@ -292,26 +214,7 @@ class MainVM(
             _playlistSortState,
         ) { playlist, files, sortState ->
             val list = playlist.items.mapNotNull { item -> files.firstOrNull { it.path == item } }
-            val files =
-                if (sortState.ascending) {
-                    when (sortState.sortType) {
-                        PlaylistSortType.Custom -> list
-                        PlaylistSortType.Title -> list.sortedBy { it.title }
-                        PlaylistSortType.Duration -> list.sortedBy { it.duration }
-                        PlaylistSortType.Filename -> list.sortedBy { it.path }
-                        PlaylistSortType.Size -> TODO()
-                        PlaylistSortType.Date -> TODO()
-                    }
-                } else {
-                    when (sortState.sortType) {
-                        PlaylistSortType.Custom -> list.reversed()
-                        PlaylistSortType.Title -> list.sortedByDescending { it.title }
-                        PlaylistSortType.Duration -> list.sortedByDescending { it.duration }
-                        PlaylistSortType.Filename -> list.sortedByDescending { it.path }
-                        PlaylistSortType.Size -> TODO()
-                        PlaylistSortType.Date -> TODO()
-                    }
-                }
+            val files = list.sortBy(sortState.sortType, sortState.ascending)
             UiPlaylist(
                 id = playlist.id,
                 name = playlist.name,

@@ -27,6 +27,7 @@ data class MusicCard(
     var composer: String,
     var lyrics: String,
     var path: String,
+    var size: Long,
     var date: Long,
     var duration: Long,
     var favorite: Flow<Boolean>,
@@ -46,6 +47,7 @@ data class MusicCard(
         private var composer: String = ""
         private var lyrics: String = ""
         private var path: String = ""
+        private var size: Long = 0L
         private var date: Long = 0
         private var duration: Long = -1
         private var favorite: Flow<Boolean> = MutableStateFlow(false)
@@ -75,6 +77,8 @@ data class MusicCard(
 
         fun setPath(path: String) = apply { this.path = path }
 
+        fun setSize(size: Long) = apply { this.size = size }
+
         fun setDate(date: Long) = apply { this.date = date }
 
         fun setDuration(duration: Long) = apply { this.duration = duration }
@@ -97,6 +101,7 @@ data class MusicCard(
                 composer,
                 lyrics,
                 path,
+                size,
                 date,
                 duration,
                 favorite,
@@ -121,6 +126,7 @@ data class MusicCard(
         if (genre != other.genre) return false
         if (composer != other.composer) return false
         if (path != other.path) return false
+        if (size != other.size) return false
         if (date != other.date) return false
         if (duration != other.duration) return false
         if (favorite != other.favorite) return false
@@ -142,6 +148,7 @@ data class MusicCard(
         result = 31 * result + genre.hashCode()
         result = 31 * result + composer.hashCode()
         result = 31 * result + path.hashCode()
+        result = 31 * result + size.hashCode()
         result = 31 * result + date.hashCode()
         result = 31 * result + duration.hashCode()
         result = 31 * result + favorite.hashCode()
