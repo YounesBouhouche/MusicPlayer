@@ -6,10 +6,10 @@ import kotlinx.coroutines.flow.StateFlow
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
-import younesbouhouche.musicplayer.main.domain.models.Album
-import younesbouhouche.musicplayer.main.domain.models.Artist
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
-import younesbouhouche.musicplayer.main.domain.models.Playlist
+import younesbouhouche.musicplayer.core.domain.models.Album
+import younesbouhouche.musicplayer.core.domain.models.Artist
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 
 interface FilesRepo {

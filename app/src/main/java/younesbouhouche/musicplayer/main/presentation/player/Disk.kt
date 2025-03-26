@@ -41,7 +41,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)

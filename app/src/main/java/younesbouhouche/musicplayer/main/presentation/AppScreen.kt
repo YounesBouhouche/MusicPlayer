@@ -24,7 +24,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
@@ -57,13 +61,13 @@ import androidx.window.core.layout.WindowWidthSizeClass
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.MainActivity
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.presentation.ItemBottomSheet
-import younesbouhouche.musicplayer.core.presentation.ListBottomSheet
-import younesbouhouche.musicplayer.core.presentation.PlaylistBottomSheet
-import younesbouhouche.musicplayer.core.presentation.QueueBottomSheet
-import younesbouhouche.musicplayer.core.presentation.util.composables.leftEdgeWidth
-import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
-import younesbouhouche.musicplayer.core.presentation.util.composables.rightEdgeWidth
+import younesbouhouche.musicplayer.main.presentation.components.ItemBottomSheet
+import younesbouhouche.musicplayer.main.presentation.components.ListBottomSheet
+import younesbouhouche.musicplayer.main.presentation.components.PlaylistBottomSheet
+import younesbouhouche.musicplayer.main.presentation.components.QueueBottomSheet
+import younesbouhouche.musicplayer.main.presentation.util.composables.leftEdgeWidth
+import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
+import younesbouhouche.musicplayer.main.presentation.util.composables.rightEdgeWidth
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
@@ -278,7 +282,6 @@ fun AppScreen(
             ) {
                 Box(Modifier.fillMaxSize()) {
                     NavigationScreen(
-                        context,
                         navController,
                         mainVM,
                         Modifier
@@ -302,6 +305,13 @@ fun AppScreen(
                             uiState.loading,
                             mainVM::onSearchEvent,
                             { mainVM.onPlayerEvent(PlayerEvent.Play(searchState.result, it)) },
+                            if (currentNavRoute != Routes.Home) {
+                                @Composable {
+                                    IconButton(onClick = { mainVM.onUiEvent(UiEvent.ShowSortSheet(currentNavRoute)) }) {
+                                        Icon(Icons.AutoMirrored.Default.Sort, null)
+                                    }
+                                }
+                            } else null
                         ) {
                             mainVM.onUiEvent(UiEvent.ShowBottomSheet(it))
                         }

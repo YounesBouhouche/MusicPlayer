@@ -30,8 +30,8 @@ import younesbouhouche.musicplayer.main.data.events.PlayerEvent
 import younesbouhouche.musicplayer.main.data.models.Queue
 import younesbouhouche.musicplayer.main.data.util.getVolume
 import younesbouhouche.musicplayer.main.domain.events.TimerType
-import younesbouhouche.musicplayer.main.domain.models.ItemData
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.ItemData
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.domain.repo.PlayerRepo
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState

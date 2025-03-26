@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.core.presentation
+package younesbouhouche.musicplayer.main.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.presentation.util.composables.isCompact
+import younesbouhouche.musicplayer.main.presentation.util.composables.isCompact
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

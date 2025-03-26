@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.core.presentation
+package younesbouhouche.musicplayer.main.presentation.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistAdd

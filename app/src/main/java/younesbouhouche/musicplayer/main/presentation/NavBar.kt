@@ -22,9 +22,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.core.presentation.util.composables.isCompact
-import younesbouhouche.musicplayer.core.presentation.util.composables.leftEdgeWidth
-import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
+import younesbouhouche.musicplayer.main.presentation.util.composables.isCompact
+import younesbouhouche.musicplayer.main.presentation.util.composables.leftEdgeWidth
+import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
 import younesbouhouche.musicplayer.main.domain.models.Routes
 import kotlin.math.roundToInt

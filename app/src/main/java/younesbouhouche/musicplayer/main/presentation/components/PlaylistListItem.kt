@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.core.presentation
+package younesbouhouche.musicplayer.main.presentation.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -20,7 +20,7 @@ import androidx.compose.ui.res.pluralStringResource
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.main.domain.models.Playlist
+import younesbouhouche.musicplayer.core.domain.models.Playlist
 import java.io.File
 
 @Composable

@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.main.domain.models
+package younesbouhouche.musicplayer.core.domain.models
 
 data class FilesData(
     val files: List<MusicCard>,

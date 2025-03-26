@@ -50,7 +50,7 @@ import ir.mahozad.multiplatform.wavyslider.material3.WaveLength
 import ir.mahozad.multiplatform.wavyslider.material3.WavySlider
 import soup.compose.material.motion.MaterialSharedAxisZ
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.util.timeString

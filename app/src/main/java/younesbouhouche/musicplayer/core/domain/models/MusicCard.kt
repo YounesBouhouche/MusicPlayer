@@ -1,13 +1,17 @@
-package younesbouhouche.musicplayer.main.domain.models
+package younesbouhouche.musicplayer.core.domain.models
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
 import android.net.Uri
+import androidx.annotation.OptIn
 import androidx.compose.runtime.Immutable
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.util.UnstableApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import okhttp3.internal.EMPTY_BYTE_ARRAY
 
 @Immutable
 data class MusicCard(
@@ -143,6 +147,30 @@ data class MusicCard(
         result = 31 * result + favorite.hashCode()
         result = 31 * result + timestamps.hashCode()
         return result
+    }
+
+    companion object {
+        @OptIn(UnstableApi::class)
+        fun fromUri(uri: Uri) =
+            with(MediaItem.fromUri(uri)) {
+                val cover =
+                    mediaMetadata.artworkUri?.let { uri ->
+                        MediaMetadataRetriever().apply {
+                            setDataSource(uri.toString())
+                        }.embeddedPicture?.let {
+                            BitmapFactory.decodeByteArray(it, 0, it.size)
+                        }
+                    }
+                Builder()
+                    .setContentUri(uri)
+                    .setTitle("${mediaMetadata.title}")
+                    .setAlbum("${mediaMetadata.albumTitle}")
+                    .setArtist("${mediaMetadata.artist}")
+                    .setDuration(mediaMetadata.durationMs ?: 0L)
+                    .setCover(cover)
+                    .setCoverByteArray(mediaMetadata.artworkData ?: EMPTY_BYTE_ARRAY)
+                    .build()
+            }
     }
 
     fun toMediaItem() =

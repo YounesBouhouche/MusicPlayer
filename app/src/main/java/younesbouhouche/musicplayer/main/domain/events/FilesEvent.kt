@@ -1,6 +1,6 @@
 package younesbouhouche.musicplayer.main.domain.events
 
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.MusicMetadata
 
 sealed interface FilesEvent {

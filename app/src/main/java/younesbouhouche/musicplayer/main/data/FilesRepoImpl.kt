@@ -21,7 +21,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.internal.EMPTY_BYTE_ARRAY
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
-import younesbouhouche.musicplayer.core.presentation.util.saveUriImageToInternalStorage
+import younesbouhouche.musicplayer.main.presentation.util.saveUriImageToInternalStorage
 import younesbouhouche.musicplayer.main.data.dao.AppDao
 import younesbouhouche.musicplayer.main.data.events.PlayerEvent.AddToQueue
 import younesbouhouche.musicplayer.main.data.events.PlayerEvent.Backward
@@ -56,10 +56,10 @@ import younesbouhouche.musicplayer.main.domain.events.FilesEvent.LoadFiles
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent.RemoveFile
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
-import younesbouhouche.musicplayer.main.domain.models.Album
-import younesbouhouche.musicplayer.main.domain.models.Artist
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
-import younesbouhouche.musicplayer.main.domain.models.Playlist
+import younesbouhouche.musicplayer.core.domain.models.Album
+import younesbouhouche.musicplayer.core.domain.models.Artist
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.main.domain.repo.FilesRepo
 import younesbouhouche.musicplayer.main.domain.repo.PlayerRepo
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState

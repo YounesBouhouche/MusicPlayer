@@ -27,7 +27,7 @@ import com.kmpalette.rememberPaletteState
 import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.player.LargePlayer
 import younesbouhouche.musicplayer.main.presentation.player.SmallPlayer
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState

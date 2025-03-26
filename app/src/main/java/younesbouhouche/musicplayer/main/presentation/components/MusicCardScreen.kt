@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.core.presentation
+package younesbouhouche.musicplayer.main.presentation.components
 
 import android.os.Build
 import android.view.HapticFeedbackConstants
@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DragHandle
@@ -53,8 +54,9 @@ import com.kmpalette.color
 import com.kmpalette.rememberPaletteState
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.ReorderableLazyGridState
 import sh.calvin.reorderable.ReorderableLazyListState
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.util.timeString
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 
@@ -248,6 +250,43 @@ fun LazyItemScope.LazyMusicCardScreen(
     number: Int? = null,
     background: Color = Color.Transparent,
     reorderableState: ReorderableLazyListState? = null,
+    onLongClick: () -> Unit = {},
+    onClick: () -> Unit = {},
+) {
+    if (reorderableState == null) {
+        MusicCardScreen(
+            file = file,
+            number = number,
+            background = background,
+            onClick = onClick,
+            onLongClick = onLongClick,
+            modifier = modifier.animateItem(),
+        )
+    } else {
+        ReorderableItem(
+            state = reorderableState,
+            key = file.id,
+            modifier = modifier.animateItem(),
+        ) {
+            MusicCardScreen(
+                file = file,
+                number = number,
+                background = background,
+                onClick = onClick,
+                onLongClick = onLongClick,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun LazyGridItemScope.LazyMusicCardScreen(
+    file: MusicCard,
+    modifier: Modifier = Modifier,
+    number: Int? = null,
+    background: Color = Color.Transparent,
+    reorderableState: ReorderableLazyGridState? = null,
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {},
 ) {

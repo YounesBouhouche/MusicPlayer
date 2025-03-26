@@ -14,7 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import org.koin.android.ext.android.get
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
-import younesbouhouche.musicplayer.core.presentation.util.composables.SetSystemBarColors
+import younesbouhouche.musicplayer.main.presentation.util.composables.SetSystemBarColors
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent.*
 import younesbouhouche.musicplayer.main.presentation.AppScreen
 import younesbouhouche.musicplayer.main.presentation.constants.Permissions

@@ -7,46 +7,42 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import younesbouhouche.musicplayer.core.domain.models.Album
+import younesbouhouche.musicplayer.core.domain.models.Artist
+import younesbouhouche.musicplayer.core.domain.models.ColsCount
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.Playlist
+import younesbouhouche.musicplayer.core.domain.models.UiPlaylist
 import younesbouhouche.musicplayer.core.domain.util.stateInVM
-import younesbouhouche.musicplayer.core.presentation.util.search
-import younesbouhouche.musicplayer.main.data.PlayerDataStore
+import younesbouhouche.musicplayer.main.presentation.util.search
 import younesbouhouche.musicplayer.main.data.dao.AppDao
 import younesbouhouche.musicplayer.main.data.models.Queue
 import younesbouhouche.musicplayer.main.data.util.getVolume
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent.LoadFiles
-import younesbouhouche.musicplayer.main.domain.events.ListsSortEvent
 import younesbouhouche.musicplayer.main.domain.events.MetadataEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
-import younesbouhouche.musicplayer.main.domain.events.PlaylistSortEvent
 import younesbouhouche.musicplayer.main.domain.events.SearchEvent
-import younesbouhouche.musicplayer.main.domain.events.SortEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
-import younesbouhouche.musicplayer.main.domain.models.Album
-import younesbouhouche.musicplayer.main.domain.models.Artist
-import younesbouhouche.musicplayer.main.domain.models.ListsSortType
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
-import younesbouhouche.musicplayer.main.domain.models.Playlist
-import younesbouhouche.musicplayer.main.domain.models.UiPlaylist
+import younesbouhouche.musicplayer.main.domain.models.Routes
 import younesbouhouche.musicplayer.main.domain.repo.FilesRepo
 import younesbouhouche.musicplayer.main.presentation.constants.Permissions
-import younesbouhouche.musicplayer.main.presentation.states.ListSortState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
-import younesbouhouche.musicplayer.main.presentation.states.PlaylistSortState
-import younesbouhouche.musicplayer.main.presentation.states.PlaylistSortType
 import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
 import younesbouhouche.musicplayer.main.presentation.states.SearchState
-import younesbouhouche.musicplayer.main.presentation.states.SortState
-import younesbouhouche.musicplayer.main.presentation.states.SortType
 import younesbouhouche.musicplayer.main.presentation.states.StartupEvent
 import younesbouhouche.musicplayer.main.presentation.states.UiState
+import younesbouhouche.musicplayer.main.presentation.util.ListsSortType
+import younesbouhouche.musicplayer.main.presentation.util.PlaylistSortType
+import younesbouhouche.musicplayer.main.presentation.util.SortState
+import younesbouhouche.musicplayer.main.presentation.util.SortType
 import younesbouhouche.musicplayer.main.presentation.util.isPermissionGranted
-import kotlin.collections.map
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainVM(
@@ -102,23 +98,24 @@ class MainVM(
             state.copy(result = results)
         }.stateInVM(SearchState())
 
-    private val _sortState = MutableStateFlow(SortState())
-    val sortState = _sortState.stateInVM(SortState())
+    private val _sortState = MutableStateFlow(SortState(SortType.Title))
+    val sortState = _sortState.asStateFlow()
 
-    private val _listScreenSortState = MutableStateFlow(SortState())
-    val listScreenSortState = _listScreenSortState.stateInVM(SortState())
+    private val _listScreenSortState = MutableStateFlow(SortState(SortType.Title))
+    val listScreenSortState = _listScreenSortState.asStateFlow()
 
-    private val _albumsSortState = MutableStateFlow(ListSortState())
-    val albumsSortState = _albumsSortState.stateInVM(ListSortState())
+    private val _albumsSortState = MutableStateFlow(SortState(ListsSortType.Name, ColsCount.One))
+    val albumsSortState = _albumsSortState.asStateFlow()
 
-    private val _artistsSortState = MutableStateFlow(ListSortState())
-    val artistsSortState = _artistsSortState.stateInVM(ListSortState())
+    private val _artistsSortState = MutableStateFlow(SortState(ListsSortType.Name, ColsCount.One))
+    val artistsSortState = _artistsSortState.asStateFlow()
 
-    private val _playlistsSortState = MutableStateFlow(ListSortState())
-    val playlistsSortState = _playlistsSortState.stateInVM(ListSortState())
+    private val _playlistsSortState = MutableStateFlow(SortState(ListsSortType.Name, ColsCount.One))
+    val playlistsSortState = _playlistsSortState.asStateFlow()
 
-    private val _playlistSortState = MutableStateFlow(PlaylistSortState())
-    val playlistSortState = _playlistSortState.stateInVM(PlaylistSortState())
+    private val _playlistSortState = MutableStateFlow(SortState(PlaylistSortType.Custom))
+    val playlistSortState = _playlistSortState.asStateFlow()
+
     private val _playlistIndex = MutableStateFlow(0)
 
     val lastAdded =
@@ -149,6 +146,7 @@ class MainVM(
                     SortType.Filename -> files.sortedBy { it.path }
                     SortType.Duration -> files.sortedBy { it.duration }
                     SortType.Date -> files.sortedBy { it.date }
+                    SortType.Size -> TODO()
                 }
             } else {
                 when (sortState.sortType) {
@@ -156,6 +154,7 @@ class MainVM(
                     SortType.Filename -> files.sortedByDescending { it.path }
                     SortType.Duration -> files.sortedByDescending { it.duration }
                     SortType.Date -> files.sortedByDescending { it.date }
+                    SortType.Size -> TODO()
                 }
             }
         }.stateInVM(emptyList())
@@ -192,6 +191,7 @@ class MainVM(
                     SortType.Filename -> listScreenFiles.sortedBy { it.path }
                     SortType.Duration -> listScreenFiles.sortedBy { it.duration }
                     SortType.Date -> listScreenFiles.sortedBy { it.date }
+                    SortType.Size -> TODO()
                 }
             } else {
                 when (sortState.sortType) {
@@ -199,6 +199,7 @@ class MainVM(
                     SortType.Filename -> listScreenFiles.sortedByDescending { it.path }
                     SortType.Duration -> listScreenFiles.sortedByDescending { it.duration }
                     SortType.Date -> listScreenFiles.sortedByDescending { it.date }
+                    SortType.Size -> TODO()
                 }
             }
         }.stateInVM(emptyList())
@@ -216,6 +217,7 @@ class MainVM(
                     SortType.Filename -> listScreenFiles.sortedBy { it.path }
                     SortType.Duration -> listScreenFiles.sortedBy { it.duration }
                     SortType.Date -> listScreenFiles.sortedBy { it.date }
+                    SortType.Size -> TODO()
                 }
             } else {
                 when (sortState.sortType) {
@@ -223,6 +225,7 @@ class MainVM(
                     SortType.Filename -> listScreenFiles.sortedByDescending { it.path }
                     SortType.Duration -> listScreenFiles.sortedByDescending { it.duration }
                     SortType.Date -> listScreenFiles.sortedByDescending { it.date }
+                    SortType.Size -> TODO()
                 }
             }
         }.stateInVM(emptyList())
@@ -296,6 +299,8 @@ class MainVM(
                         PlaylistSortType.Title -> list.sortedBy { it.title }
                         PlaylistSortType.Duration -> list.sortedBy { it.duration }
                         PlaylistSortType.Filename -> list.sortedBy { it.path }
+                        PlaylistSortType.Size -> TODO()
+                        PlaylistSortType.Date -> TODO()
                     }
                 } else {
                     when (sortState.sortType) {
@@ -303,6 +308,8 @@ class MainVM(
                         PlaylistSortType.Title -> list.sortedByDescending { it.title }
                         PlaylistSortType.Duration -> list.sortedByDescending { it.duration }
                         PlaylistSortType.Filename -> list.sortedByDescending { it.path }
+                        PlaylistSortType.Size -> TODO()
+                        PlaylistSortType.Date -> TODO()
                     }
                 }
             UiPlaylist(
@@ -371,107 +378,6 @@ class MainVM(
         }
     }
 
-    private fun onItemsSortEvent(
-        event: SortEvent,
-        state: MutableStateFlow<SortState>,
-    ) {
-        when (event) {
-            SortEvent.Collapse ->
-                state.update {
-                    it.copy(expanded = false)
-                }
-
-            SortEvent.Expand ->
-                state.update {
-                    it.copy(expanded = true)
-                }
-
-            SortEvent.ToggleAscending ->
-                state.update {
-                    it.copy(ascending = !it.ascending)
-                }
-
-            is SortEvent.UpdateAscending ->
-                state.update {
-                    it.copy(ascending = event.ascending)
-                }
-
-            is SortEvent.UpdateExpanded ->
-                state.update {
-                    it.copy(expanded = event.expanded)
-                }
-
-            is SortEvent.UpdateSortType ->
-                state.update {
-                    it.copy(sortType = event.sortType)
-                }
-
-            is SortEvent.UpdateSortTypeOrToggleAsc -> {
-                state.update {
-                    if (it.sortType == event.sortType) {
-                        it.copy(ascending = !it.ascending)
-                    } else {
-                        it.copy(sortType = event.sortType)
-                    }
-                }
-            }
-        }
-    }
-
-    fun onSortEvent(event: SortEvent) = onItemsSortEvent(event, _sortState)
-
-    fun onListSortEvent(event: SortEvent) = onItemsSortEvent(event, _listScreenSortState)
-
-    fun onPlaylistSortEvent(event: PlaylistSortEvent) {
-        when (event) {
-            PlaylistSortEvent.Collapse -> {
-                _playlistSortState.update {
-                    it.copy(expanded = false)
-                }
-            }
-
-            PlaylistSortEvent.Expand -> {
-                _playlistSortState.update {
-                    it.copy(expanded = true)
-                }
-            }
-
-            PlaylistSortEvent.ToggleAscending -> {
-                _playlistSortState.update {
-                    it.copy(ascending = !it.ascending)
-                }
-            }
-
-            is PlaylistSortEvent.UpdateAscending -> {
-                _playlistSortState.update {
-                    it.copy(ascending = event.ascending)
-                }
-            }
-
-            is PlaylistSortEvent.UpdateExpanded -> {
-                _playlistSortState.update {
-                    it.copy(expanded = event.expanded)
-                }
-            }
-
-            is PlaylistSortEvent.UpdateSortType -> {
-                _playlistSortState.update {
-                    it.copy(sortType = event.sortType)
-                }
-            }
-
-            is PlaylistSortEvent.UpdateSortTypeOrToggleAsc -> {
-                _playlistSortState.update {
-                    if (it.sortType == event.sortType) {
-                        it.copy(ascending = !it.ascending)
-                    } else {
-                        it.copy(sortType = event.sortType)
-                    }
-                }
-            }
-        }
-    }
-
     fun setCurrentPlaylist(index: Int) {
         _playlistIndex.value = index
     }
@@ -480,93 +386,28 @@ class MainVM(
         _listScreenFiles.value = list.mapNotNull { id -> _files.value.firstOrNull { it.id == id } }
     }
 
-    private fun onListsSortEvent(
-        event: ListsSortEvent,
-        state: MutableStateFlow<ListSortState>,
-    ) {
-        when (event) {
-            ListsSortEvent.Collapse -> {
-                state.update {
-                    it.copy(expanded = false)
-                }
-            }
-
-            ListsSortEvent.Expand -> {
-                state.update {
-                    it.copy(expanded = true)
-                }
-            }
-
-            ListsSortEvent.ToggleAscending -> {
-                state.update {
-                    it.copy(ascending = !it.ascending)
-                }
-            }
-
-            is ListsSortEvent.UpdateAscending -> {
-                state.update {
-                    it.copy(ascending = event.ascending)
-                }
-            }
-
-            is ListsSortEvent.UpdateExpanded -> {
-                state.update {
-                    it.copy(expanded = event.expanded)
-                }
-            }
-
-            is ListsSortEvent.UpdateSortType -> {
-                state.update {
-                    it.copy(sortType = event.sortType)
-                }
-            }
-
-            is ListsSortEvent.UpdateSortTypeOrToggleAsc -> {
-                state.update {
-                    if (it.sortType == event.sortType) {
-                        it.copy(ascending = !it.ascending)
-                    } else {
-                        it.copy(sortType = event.sortType)
-                    }
-                }
-            }
-
-            ListsSortEvent.CollapseCols -> {
-                state.update {
-                    it.copy(colsExpanded = false)
-                }
-            }
-
-            ListsSortEvent.ExpandCols -> {
-                state.update {
-                    it.copy(colsExpanded = true)
-                }
-            }
-
-            is ListsSortEvent.UpdateColsCount -> {
-                state.update {
-                    it.copy(colsCount = event.colsCount)
-                }
-            }
-
-            is ListsSortEvent.UpdateColsCountExpanded -> {
-                state.update {
-                    it.copy(colsExpanded = event.expanded)
-                }
-            }
-        }
+    fun onListScreenSortChange(state: SortState<SortType>) {
+        _listScreenSortState.value = state
     }
 
-    fun onAlbumsSortEvent(event: ListsSortEvent) {
-        onListsSortEvent(event, _albumsSortState)
+    fun onPlaylistScreenSortChange(state: SortState<PlaylistSortType>) {
+        _playlistSortState.value = state
     }
 
-    fun onArtistsSortEvent(event: ListsSortEvent) {
-        onListsSortEvent(event, _artistsSortState)
+    fun onLibrarySortChange(state: SortState<SortType>) {
+        _sortState.value = state
     }
 
-    fun onPlaylistsSortEvent(event: ListsSortEvent) {
-        onListsSortEvent(event, _playlistsSortState)
+    fun onAlbumsSortChange(state: SortState<ListsSortType>) {
+        _albumsSortState.value = state
+    }
+
+    fun onArtistsSortChange(state: SortState<ListsSortType>) {
+        _artistsSortState.value = state
+    }
+
+    fun onPlaylistsSortChange(state: SortState<ListsSortType>) {
+        _playlistsSortState.value = state
     }
 
     protected fun finalize() {
@@ -683,6 +524,7 @@ class MainVM(
                         newPlaylistDialog = true,
                         newPlaylistName = "",
                         newPlaylistItems = event.items,
+                        newPlaylistImage = null
                     )
                 }
 
@@ -801,6 +643,26 @@ class MainVM(
                 _uiState.update {
                     it.copy(newPlaylistImage = event.image)
                 }
+
+            is UiEvent.ShowSortSheet -> {
+                when(event.route) {
+                    Routes.Home -> _sortState.update {
+                        it.copy(expanded = true)
+                    }
+                    Routes.Albums -> _albumsSortState.update {
+                        it.copy(expanded = true)
+                    }
+                    Routes.Artists -> _artistsSortState.update {
+                        it.copy(expanded = true)
+                    }
+                    Routes.Playlists -> _playlistsSortState.update {
+                        it.copy(expanded = true)
+                    }
+                    Routes.Library -> _sortState.update {
+                        it.copy(expanded = true)
+                    }
+                }
+            }
         }
     }
 

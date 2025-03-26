@@ -171,6 +171,10 @@
     <string name="show_pitch_button">Show pitch button</string>
     <string name="show_timer_button">Show timer button</string>
     <string name="show_lyrics_button">Show lyrics button</string>
+    <string name="name">Name</string>
+    <string name="size">Size</string>
+    <string name="last_played">Last played</string>
+    <string name="shuffle">Shuffle</string>
     <plurals name="item_s">
         <item quantity="one">1 item</item>
         <item quantity="zero">no items</item>

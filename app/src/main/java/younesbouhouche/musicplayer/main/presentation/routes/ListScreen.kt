@@ -1,7 +1,8 @@
 package younesbouhouche.musicplayer.main.presentation.routes
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -21,23 +22,24 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
-import younesbouhouche.musicplayer.core.presentation.LazyColumnWithHeader
-import younesbouhouche.musicplayer.core.presentation.LazyColumnWithSortBar
-import younesbouhouche.musicplayer.core.presentation.LazyMusicCardScreen
-import younesbouhouche.musicplayer.core.presentation.util.composables.isScrollingUp
-import younesbouhouche.musicplayer.main.domain.events.SortEvent
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
-import younesbouhouche.musicplayer.main.presentation.states.SortState
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.presentation.components.LazyMusicCardScreen
+import younesbouhouche.musicplayer.main.presentation.components.LazyVerticalGridWithHeader
+import younesbouhouche.musicplayer.main.presentation.components.SortSheet
+import younesbouhouche.musicplayer.main.presentation.util.composables.isScrollingUp
+import younesbouhouche.musicplayer.main.presentation.util.SortState
+import younesbouhouche.musicplayer.main.presentation.util.SortType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(
     files: List<MusicCard>,
     title: String,
-    sortState: SortState?,
-    onSortEvent: ((SortEvent) -> Unit)?,
+    sortState: (SortState<SortType>)?,
+    onSortStateChange: ((SortState<SortType>) -> Unit)?,
     navigateUp: () -> Unit,
     onLongClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
     onClick: (Int) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
@@ -73,39 +75,24 @@ fun ListScreen(
             }
         },
     ) { paddingValues ->
-        if ((sortState != null) and (onSortEvent != null)) {
-            LazyColumnWithSortBar(
-                state = state,
-                sortState = sortState!!,
-                onSortEvent = onSortEvent!!,
-                searchBarSpace = false,
-                contentPadding = paddingValues,
-            ) {
-                items(files, { it.id }) {
-                    LazyMusicCardScreen(
-                        file = it,
-                        onLongClick = { onLongClick(files.indexOf(it)) },
-                    ) {
-                        onClick(files.indexOf(it))
-                    }
-                }
-            }
-        } else {
-            LazyColumnWithHeader(
-                state = state,
-                leadingContent = {},
-                searchBarSpace = false,
-                contentPadding = paddingValues,
-            ) {
-                items(files, { it.id }) {
-                    LazyMusicCardScreen(
-                        file = it,
-                        onLongClick = { onLongClick(files.indexOf(it)) },
-                    ) {
-                        onClick(files.indexOf(it))
-                    }
+        LazyVerticalGridWithHeader(
+            GridCells.Fixed(1),
+            modifier,
+            contentPadding = paddingValues,
+            statusBarSpace = false,
+            searchBarSpace = false
+        ) {
+            items(files, { it.id }) {
+                LazyMusicCardScreen(
+                    file = it,
+                    onLongClick = { onLongClick(files.indexOf(it)) },
+                ) {
+                    onClick(files.indexOf(it))
                 }
             }
         }
+    }
+    sortState?.let { state ->
+        SortSheet(state) { onSortStateChange?.invoke(it) }
     }
 }

@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.main.domain.models
+package younesbouhouche.musicplayer.core.domain.models
 
 import android.graphics.Bitmap
 

@@ -42,7 +42,7 @@ import coil.compose.rememberAsyncImagePainter
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.presentation.Dialog
+import younesbouhouche.musicplayer.main.presentation.components.Dialog
 
 @Composable
 fun CreatePlaylistDialog(

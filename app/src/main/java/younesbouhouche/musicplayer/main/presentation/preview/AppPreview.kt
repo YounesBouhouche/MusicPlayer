@@ -9,14 +9,11 @@ import androidx.glance.LocalContext
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
-import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.main.data.db.AppDatabase
 import younesbouhouche.musicplayer.main.domain.models.Routes
 import younesbouhouche.musicplayer.main.presentation.NavBar
-import younesbouhouche.musicplayer.main.presentation.NavigationScreen
 import younesbouhouche.musicplayer.main.presentation.SearchScreen
 import younesbouhouche.musicplayer.main.presentation.states.SearchState
-import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
 
 @Preview
 @Composable
@@ -41,7 +38,9 @@ fun AppPreview() {
             {},
             {},
             {},
-        )
+        ) {
+
+        }
         NavBar(
             visible = true,
             progress = 0f,

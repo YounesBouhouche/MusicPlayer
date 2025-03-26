@@ -2,7 +2,7 @@ package younesbouhouche.musicplayer.main.data.events
 
 import androidx.annotation.FloatRange
 import younesbouhouche.musicplayer.main.domain.events.TimerType
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 
 sealed interface PlayerEvent {
     data class AddToQueue(val items: List<MusicCard>) : PlayerEvent

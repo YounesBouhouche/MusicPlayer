@@ -9,8 +9,8 @@ import younesbouhouche.musicplayer.main.data.models.Timestamp
 import younesbouhouche.musicplayer.main.domain.converters.PlaylistConverter
 import younesbouhouche.musicplayer.main.domain.converters.QueueConverter
 import younesbouhouche.musicplayer.main.domain.converters.TimesListConverter
-import younesbouhouche.musicplayer.main.domain.models.ItemData
-import younesbouhouche.musicplayer.main.domain.models.Playlist
+import younesbouhouche.musicplayer.core.domain.models.ItemData
+import younesbouhouche.musicplayer.core.domain.models.Playlist
 
 @Database(
     entities = [ItemData::class, Timestamp::class, Playlist::class, Queue::class],

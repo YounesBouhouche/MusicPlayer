@@ -20,8 +20,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.presentation.Dialog
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.presentation.components.Dialog
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.util.timeString
 import java.time.Instant
 import java.time.LocalDateTime

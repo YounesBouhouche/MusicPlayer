@@ -27,8 +27,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.presentation.Dialog
-import younesbouhouche.musicplayer.core.presentation.RadioContainer
+import younesbouhouche.musicplayer.main.presentation.components.Dialog
+import younesbouhouche.musicplayer.main.presentation.components.RadioContainer
 import younesbouhouche.musicplayer.main.domain.events.TimerType
 import younesbouhouche.musicplayer.main.presentation.util.timeString
 import kotlin.math.roundToLong

@@ -1,6 +1,6 @@
 package younesbouhouche.musicplayer.main.presentation.states
 
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 
 data class SearchState(
     val query: String = "",

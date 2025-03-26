@@ -1,8 +1,8 @@
 package younesbouhouche.musicplayer.main.domain.events
 
 import android.net.Uri
-import younesbouhouche.musicplayer.main.domain.models.Playlist
-import younesbouhouche.musicplayer.main.domain.models.UiPlaylist
+import younesbouhouche.musicplayer.core.domain.models.Playlist
+import younesbouhouche.musicplayer.core.domain.models.UiPlaylist
 
 sealed interface PlaylistEvent {
     data class CreateNewPlaylist(val name: String, val items: List<String>) : PlaylistEvent

@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -31,9 +32,9 @@ import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.presentation.LazyMusicCardScreen
+import younesbouhouche.musicplayer.main.presentation.components.LazyMusicCardScreen
 import younesbouhouche.musicplayer.main.domain.events.SearchEvent
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.SearchState
 import younesbouhouche.musicplayer.settings.presentation.SettingsActivity
 
@@ -44,6 +45,7 @@ fun SearchScreen(
     loading: Boolean = false,
     onSearchEvent: (SearchEvent) -> Unit,
     play: (Int) -> Unit,
+    sortButton: (@Composable () -> Unit)? = null,
     showBottomSheet: (MusicCard) -> Unit,
 ) {
     val context = LocalContext.current
@@ -71,8 +73,11 @@ fun SearchScreen(
                         }
                     },
                     trailingIcon = {
-                        IconButton(onClick = { context.startActivity(Intent(context, SettingsActivity::class.java)) }) {
-                            Icon(Icons.Default.Settings, null)
+                        Row {
+                            IconButton(onClick = { context.startActivity(Intent(context, SettingsActivity::class.java)) }) {
+                                Icon(Icons.Default.Settings, null)
+                            }
+                            sortButton?.invoke()
                         }
                     },
                     onExpandedChange = { onSearchEvent(SearchEvent.UpdateExpanded(it)) },

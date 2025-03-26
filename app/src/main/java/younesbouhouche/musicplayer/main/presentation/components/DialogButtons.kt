@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.core.presentation
+package younesbouhouche.musicplayer.main.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.core.presentation.util.composables
+package younesbouhouche.musicplayer.main.presentation.util.composables
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity

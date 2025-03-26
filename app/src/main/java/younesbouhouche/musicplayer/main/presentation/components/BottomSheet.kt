@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.core.presentation
+package younesbouhouche.musicplayer.main.presentation.components
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
@@ -74,10 +74,10 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
+import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.util.timeString
 import java.io.File
 

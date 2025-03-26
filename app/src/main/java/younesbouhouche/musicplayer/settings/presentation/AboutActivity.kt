@@ -2,7 +2,6 @@ package younesbouhouche.musicplayer.settings.presentation
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -43,9 +42,10 @@ import androidx.core.view.WindowCompat
 import org.koin.android.ext.android.get
 import org.koin.compose.KoinContext
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.presentation.util.composables.SetSystemBarColors
-import younesbouhouche.musicplayer.core.presentation.util.getAppVersion
+import younesbouhouche.musicplayer.main.presentation.util.composables.SetSystemBarColors
+import younesbouhouche.musicplayer.main.presentation.util.getAppVersion
 import younesbouhouche.musicplayer.ui.theme.AppTheme
+import androidx.core.net.toUri
 
 
 class AboutActivity : ComponentActivity() {
@@ -133,7 +133,7 @@ class AboutActivity : ComponentActivity() {
                                 ) {
                                     with(
                                         Intent(Intent.ACTION_SENDTO).apply {
-                                            data = Uri.parse("mailto:")
+                                            data = "mailto:".toUri()
                                             putExtra(
                                                 Intent.EXTRA_EMAIL,
                                                 arrayOf("younes.bouhouche12@gmail.com"),
@@ -165,7 +165,7 @@ class AboutActivity : ComponentActivity() {
                                             with(
                                                 Intent(
                                                     Intent.ACTION_VIEW,
-                                                    Uri.parse("twitter://user?screen_name=younesbouh_05"),
+                                                    "twitter://user?screen_name=younesbouh_05".toUri(),
                                                 ),
                                             ) {
                                                 if (this.resolveActivity(context.packageManager) != null) {
@@ -174,7 +174,7 @@ class AboutActivity : ComponentActivity() {
                                                     context.startActivity(
                                                         Intent(
                                                             Intent.ACTION_VIEW,
-                                                            Uri.parse("https://twitter.com/younesbouh_05"),
+                                                            "https://twitter.com/younesbouh_05".toUri(),
                                                         ),
                                                     )
                                                 }
@@ -189,7 +189,7 @@ class AboutActivity : ComponentActivity() {
                                             context.startActivity(
                                                 Intent(
                                                     Intent.ACTION_VIEW,
-                                                    Uri.parse("tg://resolve?domain=younesbouh_05"),
+                                                    "https://t.me/younesbouhouche".toUri(),
                                                 ),
                                             )
                                         }) {

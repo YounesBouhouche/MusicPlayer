@@ -1,6 +1,5 @@
 package younesbouhouche.musicplayer.main.presentation
 
-import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -33,7 +32,6 @@ import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
 
 @Composable
 fun NavigationScreen(
-    context: Context,
     navController: NavHostController,
     mainVM: MainVM,
     modifier: Modifier = Modifier,
@@ -116,8 +114,8 @@ fun NavigationScreen(
                 },
                 Modifier,
                 albumsSortState,
+                mainVM::onAlbumsSortChange,
                 mainVM::onPlayerEvent,
-                mainVM::onAlbumsSortEvent,
             )
         }
         composable<NavRoutes.Artists> {
@@ -140,13 +138,12 @@ fun NavigationScreen(
                 },
                 Modifier,
                 artistsSortState,
+                mainVM::onArtistsSortChange,
                 mainVM::onPlayerEvent,
-                mainVM::onArtistsSortEvent,
             )
         }
         composable<NavRoutes.Playlists> {
             Playlists(
-                context,
                 playlistsSorted,
                 {
                     mainVM.setCurrentPlaylist(it)
@@ -157,10 +154,10 @@ fun NavigationScreen(
                 { mainVM.onUiEvent(UiEvent.ShowPlaylistBottomSheet(it)) },
                 Modifier,
                 playlistsSortState,
+                mainVM::onPlaylistsSortChange,
                 mainVM::onPlayerEvent,
-                mainVM::onUiEvent,
                 mainVM::onPlaylistEvent,
-                mainVM::onPlaylistsSortEvent,
+                mainVM::onUiEvent,
             )
         }
         composable<NavRoutes.Library> {
@@ -168,7 +165,7 @@ fun NavigationScreen(
                 filesSorted,
                 Modifier.testTag("library_list"),
                 sortState,
-                mainVM::onSortEvent,
+                mainVM::onLibrarySortChange,
                 mainVM::onUiEvent,
             ) {
                 mainVM.onPlayerEvent(PlayerEvent.Play(filesSorted, it))
@@ -180,7 +177,7 @@ fun NavigationScreen(
                 listScreenFiles,
                 route.title,
                 listScreenSortState,
-                mainVM::onListSortEvent,
+                mainVM::onListScreenSortChange,
                 navController::navigateUp,
                 {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(listScreenFiles[it]))
@@ -193,7 +190,7 @@ fun NavigationScreen(
             PlaylistScreen(
                 playlist,
                 playlistSortState,
-                mainVM::onPlaylistSortEvent,
+                mainVM::onPlaylistScreenSortChange,
                 navController::navigateUp,
                 { from, to ->
                     mainVM.onPlaylistEvent(PlaylistEvent.Reorder(playlist, from, to))
@@ -219,7 +216,7 @@ fun NavigationScreen(
                 favoritesFiles,
                 stringResource(R.string.favorites),
                 listScreenSortState,
-                mainVM::onListSortEvent,
+                mainVM::onListScreenSortChange,
                 navController::navigateUp,
                 {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(favoritesFiles[it]))

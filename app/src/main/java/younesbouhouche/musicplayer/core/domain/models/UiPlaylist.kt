@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.main.domain.models
+package younesbouhouche.musicplayer.core.domain.models
 
 data class UiPlaylist(
     val id: Int = 0,

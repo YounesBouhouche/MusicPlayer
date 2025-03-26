@@ -6,11 +6,11 @@ import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import younesbouhouche.musicplayer.core.presentation.util.getCurrentTime
+import younesbouhouche.musicplayer.main.presentation.util.getCurrentTime
 import younesbouhouche.musicplayer.main.data.models.Queue
 import younesbouhouche.musicplayer.main.data.models.Timestamp
-import younesbouhouche.musicplayer.main.domain.models.ItemData
-import younesbouhouche.musicplayer.main.domain.models.Playlist
+import younesbouhouche.musicplayer.core.domain.models.ItemData
+import younesbouhouche.musicplayer.core.domain.models.Playlist
 
 @Dao
 interface AppDao {

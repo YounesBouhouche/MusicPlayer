@@ -38,7 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.presentation.Dialog
+import younesbouhouche.musicplayer.main.presentation.components.Dialog
 import younesbouhouche.musicplayer.main.presentation.util.round
 import younesbouhouche.musicplayer.main.presentation.util.scale
 import kotlin.math.max

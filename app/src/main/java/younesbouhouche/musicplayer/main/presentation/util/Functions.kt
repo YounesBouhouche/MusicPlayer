@@ -1,9 +1,9 @@
-package younesbouhouche.musicplayer.core.presentation.util
+package younesbouhouche.musicplayer.main.presentation.util
 
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import java.time.ZonedDateTime
 
 fun (Pair<String, String>).containEachOther() = first.contains(second) or second.contains(first)

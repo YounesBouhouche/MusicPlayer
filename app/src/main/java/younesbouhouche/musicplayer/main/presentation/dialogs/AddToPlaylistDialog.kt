@@ -16,8 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.presentation.Dialog
-import younesbouhouche.musicplayer.main.domain.models.Playlist
+import younesbouhouche.musicplayer.main.presentation.components.Dialog
+import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.settings.presentation.settingsRadioItems
 
 @Composable

@@ -42,13 +42,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.core.presentation.util.composables.isCompact
-import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
-import younesbouhouche.musicplayer.core.presentation.util.composables.toDp
+import younesbouhouche.musicplayer.main.presentation.util.composables.isCompact
+import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
+import younesbouhouche.musicplayer.main.presentation.util.composables.toDp
 import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState

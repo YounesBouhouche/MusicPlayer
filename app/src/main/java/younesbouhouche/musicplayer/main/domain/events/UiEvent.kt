@@ -3,7 +3,8 @@ package younesbouhouche.musicplayer.main.domain.events
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.ui.graphics.vector.ImageVector
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.domain.models.Routes
 import younesbouhouche.musicplayer.main.presentation.states.MusicMetadata
 import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
 import younesbouhouche.musicplayer.main.presentation.states.ViewState
@@ -84,4 +85,6 @@ sealed interface UiEvent {
     data object ShowPitchDialog : UiEvent
 
     data object HidePitchDialog : UiEvent
+
+    data class ShowSortSheet(val route: Routes) : UiEvent
 }

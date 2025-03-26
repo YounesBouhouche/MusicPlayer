@@ -63,15 +63,14 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.presentation.SwipeMusicCardLazyItem
-import younesbouhouche.musicplayer.core.presentation.util.composables.navBarHeight
+import younesbouhouche.musicplayer.main.presentation.components.SwipeMusicCardLazyItem
+import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.TimerType
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
-import younesbouhouche.musicplayer.main.presentation.states.UiState
 import younesbouhouche.musicplayer.main.presentation.util.timeString
 import younesbouhouche.musicplayer.main.presentation.util.timerString
 

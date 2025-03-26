@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.core.presentation
+package younesbouhouche.musicplayer.main.presentation.components
 
 import android.graphics.Bitmap
 import androidx.compose.animation.AnimatedContent

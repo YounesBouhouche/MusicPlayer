@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import org.koin.compose.KoinContext
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.presentation.util.composables.SetSystemBarColors
+import younesbouhouche.musicplayer.main.presentation.util.composables.SetSystemBarColors
 import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.ui.theme.AppTheme

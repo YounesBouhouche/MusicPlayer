@@ -1,10 +1,5 @@
-package younesbouhouche.musicplayer
+package younesbouhouche.musicplayer.dialog.presentation
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -35,8 +30,6 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -50,52 +43,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import org.koin.compose.viewmodel.koinViewModel
-import younesbouhouche.musicplayer.dialog.DialogVM
-import younesbouhouche.musicplayer.main.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.util.timeString
-import younesbouhouche.musicplayer.ui.theme.AppTheme
 import kotlin.math.roundToLong
 
-
-class DialogActivity : ComponentActivity() {
-    private lateinit var viewModel: DialogVM
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (!intent.action.equals(Intent.ACTION_VIEW) or (intent.data == null)) {
-            finish()
-            return
-        }
-        val uri = intent.data!!
-        window.setLayout(resources.displayMetrics.widthPixels, resources.displayMetrics.heightPixels)
-        enableEdgeToEdge()
-        setContent {
-            viewModel = koinViewModel<DialogVM>()
-            val card = viewModel.card.collectAsState().value
-            val state = viewModel.state.collectAsState().value
-            LaunchedEffect(Unit) {
-                viewModel.play(uri)
-            }
-            AppTheme {
-                DialogContent(
-                    card,
-                    state,
-                    viewModel::pauseResume,
-                    viewModel::seekTo,
-                    Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                )
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.stop()
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -217,15 +170,15 @@ fun DialogContent(
                                 )
                             },
                             value =
-                                if (dragging or state.loading) {
-                                    value
-                                } else if (card == null) {
-                                    0f
-                                } else if (card.duration == 0L) {
-                                    0f
-                                } else {
-                                    state.time / card.duration.toFloat()
-                                },
+                            if (dragging or state.loading) {
+                                value
+                            } else if (card == null) {
+                                0f
+                            } else if (card.duration == 0L) {
+                                0f
+                            } else {
+                                state.time / card.duration.toFloat()
+                            },
                             onValueChange = {
                                 dragging = true
                                 value = it
