@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.ui.graphics.vector.ImageVector
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.main.domain.models.Routes
 import younesbouhouche.musicplayer.main.presentation.states.MusicMetadata
 import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
@@ -21,6 +22,8 @@ sealed interface UiEvent {
     data object ExpandPlaylist : UiEvent
 
     data object CollapsePlaylist : UiEvent
+
+    data class SharePlaylist(val playlist: Playlist): UiEvent
 
     data class ShowBottomSheet(val item: MusicCard) : UiEvent
 
@@ -60,11 +63,15 @@ sealed interface UiEvent {
 
     data class ShowPlaylistBottomSheet(val index: Int) : UiEvent
 
+    data class SavePlaylist(val playlist: Playlist): UiEvent
+
     data object HidePlaylistBottomSheet : UiEvent
 
     data class ShowMetadataDialog(val metadata: MusicMetadata) : UiEvent
 
     data object HideMetadataDialog : UiEvent
+
+    data class UpdateMetadata(val metadata: MusicMetadata) : UiEvent
 
     data object ToggleLyrics : UiEvent
 
