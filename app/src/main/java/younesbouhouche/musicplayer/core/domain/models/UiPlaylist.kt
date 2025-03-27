@@ -5,6 +5,7 @@ data class UiPlaylist(
     val name: String = "",
     val image: String? = null,
     val items: List<MusicCard> = emptyList(),
+    val favorite: Boolean = false,
 ) {
     fun createM3UText() =
         "#EXTINF:$name\n#EXTM3U\n" +
@@ -13,6 +14,7 @@ data class UiPlaylist(
         id = id,
         name = name,
         image = image,
-        items = items.map { it.path }
+        items = items.map { it.path },
+        favorite = favorite
     )
 }

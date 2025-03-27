@@ -20,4 +20,6 @@ sealed interface PlaylistEvent {
     data class DeletePlaylist(val playlist: Playlist) : PlaylistEvent
 
     data class RenamePlaylist(val id: Int, val name: String) : PlaylistEvent
+
+    data class SetFavorite(val id: Int, val favorite: Boolean) : PlaylistEvent
 }

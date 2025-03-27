@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Environment
 import android.view.HapticFeedbackConstants
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
@@ -81,6 +83,9 @@ fun PlaylistScreen(
     sortState: SortState<PlaylistSortType>,
     onSortStateChange: (SortState<PlaylistSortType>) -> Unit,
     navigateUp: () -> Unit = {},
+    onRename: () -> Unit = {},
+    onSetFavorite: (Boolean) -> Unit = {},
+    onShare: () -> Unit = {},
     reorder: (Int, Int) -> Unit = { _, _ -> },
     onDismiss: (Int) -> Unit = {},
     onLongClick: (Int) -> Unit = {},
@@ -205,13 +210,16 @@ fun PlaylistScreen(
                                     Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
                                 ) {
-                                    IconButton({}) {
-                                        Icon(Icons.Default.FavoriteBorder, null)
+                                    IconButton({ onSetFavorite(!playlist.favorite) }) {
+                                        AnimatedContent(playlist.favorite) {
+                                            if (it) Icon(Icons.Default.Favorite, null)
+                                            else Icon(Icons.Default.FavoriteBorder, null)
+                                        }
                                     }
-                                    IconButton({}) {
+                                    IconButton(onShare) {
                                         Icon(Icons.Default.Share, null)
                                     }
-                                    IconButton({}) {
+                                    IconButton(onRename) {
                                         Icon(Icons.Default.Edit, null)
                                     }
                                 }

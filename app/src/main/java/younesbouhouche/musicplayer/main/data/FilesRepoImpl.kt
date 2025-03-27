@@ -60,6 +60,7 @@ import younesbouhouche.musicplayer.core.domain.models.Album
 import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.domain.models.Playlist
+import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent.*
 import younesbouhouche.musicplayer.main.domain.repo.FilesRepo
 import younesbouhouche.musicplayer.main.domain.repo.PlayerRepo
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
@@ -386,9 +387,11 @@ class FilesRepoImpl(
             is PlaylistEvent.DeletePlaylist -> dao.deletePlaylist(event.playlist)
 
             is PlaylistEvent.DeleteUiPlaylist ->
-                onPlaylistEvent(PlaylistEvent.DeletePlaylist(event.playlist.toPlaylist()))
+                onPlaylistEvent(DeletePlaylist(event.playlist.toPlaylist()))
 
             is PlaylistEvent.RenamePlaylist -> dao.updatePlaylistName(event.id, event.name)
+
+            is PlaylistEvent.SetFavorite -> dao.setPlaylistFavorite(event.id, event.favorite)
         }
     }
 }
