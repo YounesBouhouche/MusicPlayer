@@ -72,6 +72,12 @@ interface AppDao {
         newName: String,
     )
 
+    @Query("UPDATE playlist SET favorite=:favorite WHERE id=:id")
+    suspend fun setPlaylistFavorite(
+        id: Int,
+        favorite: Boolean,
+    )
+
     @Query("SELECT * from Playlist")
     fun getPlaylists(): Flow<List<Playlist>>
 
