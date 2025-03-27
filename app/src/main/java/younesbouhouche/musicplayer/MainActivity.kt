@@ -14,14 +14,21 @@ import androidx.navigation.compose.rememberNavController
 import org.koin.android.ext.android.get
 import org.koin.compose.KoinContext
 import org.koin.compose.viewmodel.koinViewModel
-import younesbouhouche.musicplayer.main.presentation.util.composables.SetSystemBarColors
-import younesbouhouche.musicplayer.main.domain.events.PlayerEvent.*
+import younesbouhouche.musicplayer.core.domain.models.Playlist
+import younesbouhouche.musicplayer.main.domain.events.PlayerEvent.PlayFavorites
+import younesbouhouche.musicplayer.main.domain.events.PlayerEvent.PlayMostPlayed
+import younesbouhouche.musicplayer.main.domain.events.PlayerEvent.PlayPlaylist
 import younesbouhouche.musicplayer.main.presentation.AppScreen
 import younesbouhouche.musicplayer.main.presentation.constants.Permissions
 import younesbouhouche.musicplayer.main.presentation.states.StartupEvent
+import younesbouhouche.musicplayer.main.presentation.util.Event
+import younesbouhouche.musicplayer.main.presentation.util.composables.CollectEvents
+import younesbouhouche.musicplayer.main.presentation.util.composables.SetSystemBarColors
+import younesbouhouche.musicplayer.main.presentation.util.createTempFile
 import younesbouhouche.musicplayer.main.presentation.util.isPermissionGranted
 import younesbouhouche.musicplayer.main.presentation.util.isRouteParent
 import younesbouhouche.musicplayer.main.presentation.util.requestPermission
+import younesbouhouche.musicplayer.main.presentation.util.shareFile
 import younesbouhouche.musicplayer.main.presentation.util.toStartupEvent
 import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
 import younesbouhouche.musicplayer.ui.theme.AppTheme
@@ -43,6 +50,7 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
                 val isParent = currentRoute.isRouteParent
+                var savePlaylist: Playlist? = null
                 val launcher =
                     rememberLauncherForActivityResult(
                         ActivityResultContracts.RequestPermission(),
@@ -51,6 +59,36 @@ class MainActivity : ComponentActivity() {
                     }
                 LaunchedEffect(Unit) {
                     if (isGranted) mainVM.setGranted(startupEvent)
+                }
+                val savePlaylistDialog =
+                    rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.CreateDocument("audio/x-mpegurl"),
+                    ) {
+                        it?.let { uri ->
+                            savePlaylist?.let { playlist ->
+                                contentResolver.openOutputStream(uri)?.run {
+                                    write(playlist.createM3UText().toByteArray())
+                                    close()
+                                }
+                            }
+                        }
+                    }
+                CollectEvents { event ->
+                    when (event) {
+                        is Event.SavePlaylist -> {
+                            savePlaylist = event.playlist
+                            savePlaylistDialog.launch("${event.playlist.name}.m3u")
+                        }
+                        is Event.SharePlaylist -> {
+                            shareFile(
+                                createTempFile(
+                                    "${event.playlist.name}.m3u",
+                                    event.playlist.createM3UText()
+                                ),
+                                "audio/x-mpegurl"
+                            )
+                        }
+                    }
                 }
                 AppTheme {
                     AppScreen(

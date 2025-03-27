@@ -19,13 +19,11 @@ import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.core.domain.models.UiPlaylist
 import younesbouhouche.musicplayer.core.domain.util.stateInVM
-import younesbouhouche.musicplayer.main.presentation.util.search
 import younesbouhouche.musicplayer.main.data.dao.AppDao
 import younesbouhouche.musicplayer.main.data.models.Queue
 import younesbouhouche.musicplayer.main.data.util.getVolume
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent.LoadFiles
-import younesbouhouche.musicplayer.main.domain.events.MetadataEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.domain.events.SearchEvent
@@ -38,11 +36,15 @@ import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
 import younesbouhouche.musicplayer.main.presentation.states.SearchState
 import younesbouhouche.musicplayer.main.presentation.states.StartupEvent
 import younesbouhouche.musicplayer.main.presentation.states.UiState
+import younesbouhouche.musicplayer.main.presentation.util.Event.SavePlaylist
+import younesbouhouche.musicplayer.main.presentation.util.Event.SharePlaylist
 import younesbouhouche.musicplayer.main.presentation.util.ListsSortType
 import younesbouhouche.musicplayer.main.presentation.util.PlaylistSortType
 import younesbouhouche.musicplayer.main.presentation.util.SortState
 import younesbouhouche.musicplayer.main.presentation.util.SortType
 import younesbouhouche.musicplayer.main.presentation.util.isPermissionGranted
+import younesbouhouche.musicplayer.main.presentation.util.search
+import younesbouhouche.musicplayer.main.presentation.util.sendEvent
 import younesbouhouche.musicplayer.main.util.sortBy
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -119,10 +121,7 @@ class MainVM(
 
     private val _playlistIndex = MutableStateFlow(0)
 
-    val lastAdded =
-        _files
-            .map { item -> item.sortedByDescending { it.date } }
-            .stateInVM(emptyList())
+    val lastAdded = _files.map { item -> item.sortedByDescending { it.date } }.stateInVM(emptyList())
 
     private val _timestamps = dao.getTimestamps().stateInVM(emptyList())
 
@@ -220,6 +219,7 @@ class MainVM(
                 name = playlist.name,
                 image = playlist.image,
                 items = files,
+                favorite = playlist.favorite
             )
         }.stateInVM(UiPlaylist())
 
@@ -566,71 +566,10 @@ class MainVM(
                     }
                 }
             }
-        }
-    }
 
-    fun onMetadataEvent(event: MetadataEvent) {
-        // generate when statement of event parameter
-        when (event) {
-            is MetadataEvent.Album ->
-                _uiState.update {
-                    it.copy(
-                        metadata =
-                        it.metadata.copy(
-                            newAlbum = event.album,
-                        ),
-                    )
-                }
-
-            is MetadataEvent.Artist ->
-                _uiState.update {
-                    it.copy(
-                        metadata =
-                        it.metadata.copy(
-                            newArtist = event.artist,
-                        ),
-                    )
-                }
-
-            is MetadataEvent.Composer ->
-                _uiState.update {
-                    it.copy(
-                        metadata =
-                        it.metadata.copy(
-                            newComposer = event.composer,
-                        ),
-                    )
-                }
-
-            is MetadataEvent.Genre ->
-                _uiState.update {
-                    it.copy(
-                        metadata =
-                        it.metadata.copy(
-                            newGenre = event.genre,
-                        ),
-                    )
-                }
-
-            is MetadataEvent.Title ->
-                _uiState.update {
-                    it.copy(
-                        metadata =
-                        it.metadata.copy(
-                            newTitle = event.title,
-                        ),
-                    )
-                }
-
-            is MetadataEvent.Year ->
-                _uiState.update {
-                    it.copy(
-                        metadata =
-                        it.metadata.copy(
-                            newYear = event.year,
-                        ),
-                    )
-                }
+            is UiEvent.SavePlaylist -> sendEvent(SavePlaylist(event.playlist))
+            is UiEvent.SharePlaylist -> sendEvent(SharePlaylist(event.playlist))
+            is UiEvent.UpdateMetadata -> _uiState.update { it.copy(metadata = event.metadata) }
         }
     }
 
