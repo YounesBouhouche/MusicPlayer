@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -53,6 +54,13 @@ fun ListScreen(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
+                },
+                actions = {
+                    sortState?.let {
+                        IconButton(onClick = { onSortStateChange?.invoke(it.copy(expanded = true)) }) {
+                            Icon(Icons.AutoMirrored.Default.Sort, null)
+                        }
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = navigateUp) {

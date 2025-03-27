@@ -21,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.main.presentation.components.Dialog
-import younesbouhouche.musicplayer.main.domain.events.MetadataEvent
 import younesbouhouche.musicplayer.main.presentation.states.MusicMetadata
 
 @Composable
@@ -30,7 +29,7 @@ fun MetadataDialog(
     onDismissRequest: () -> Unit,
     okListener: () -> Unit,
     metadata: MusicMetadata,
-    updateMetadata: (MetadataEvent) -> Unit,
+    onMetadataChange: (MusicMetadata) -> Unit,
 ) {
     Dialog(
         visible = visible,
@@ -62,14 +61,14 @@ fun MetadataDialog(
                             OutlinedTextField(
                                 value = it.second,
                                 onValueChange = { value ->
-                                    updateMetadata(
+                                    onMetadataChange(
                                         when (it.first.first) {
-                                            R.string.title -> MetadataEvent.Title(value)
-                                            R.string.album -> MetadataEvent.Album(value)
-                                            R.string.artist -> MetadataEvent.Artist(value)
-                                            R.string.genre -> MetadataEvent.Genre(value)
-                                            R.string.composer -> MetadataEvent.Composer(value)
-                                            R.string.year -> MetadataEvent.Year(value)
+                                            R.string.title -> metadata.copy(newTitle = value)
+                                            R.string.album -> metadata.copy(newAlbum = value)
+                                            R.string.artist -> metadata.copy(newArtist = value)
+                                            R.string.genre -> metadata.copy(newGenre = value)
+                                            R.string.composer -> metadata.copy(newComposer = value)
+                                            R.string.year -> metadata.copy(newYear = value)
                                             else -> throw IllegalArgumentException("Unknown metadata field")
                                         },
                                     )

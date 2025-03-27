@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -45,7 +46,7 @@ fun SearchScreen(
     loading: Boolean = false,
     onSearchEvent: (SearchEvent) -> Unit,
     play: (Int) -> Unit,
-    sortButton: (@Composable () -> Unit)? = null,
+    sortButton: (@Composable RowScope.() -> Unit)? = null,
     showBottomSheet: (MusicCard) -> Unit,
 ) {
     val context = LocalContext.current
@@ -77,7 +78,7 @@ fun SearchScreen(
                             IconButton(onClick = { context.startActivity(Intent(context, SettingsActivity::class.java)) }) {
                                 Icon(Icons.Default.Settings, null)
                             }
-                            sortButton?.invoke()
+                            sortButton?.invoke(this)
                         }
                     },
                     onExpandedChange = { onSearchEvent(SearchEvent.UpdateExpanded(it)) },

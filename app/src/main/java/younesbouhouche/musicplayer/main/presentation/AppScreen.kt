@@ -7,8 +7,6 @@ import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -61,19 +59,16 @@ import androidx.window.core.layout.WindowWidthSizeClass
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.MainActivity
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.main.presentation.components.ItemBottomSheet
-import younesbouhouche.musicplayer.main.presentation.components.ListBottomSheet
-import younesbouhouche.musicplayer.main.presentation.components.PlaylistBottomSheet
-import younesbouhouche.musicplayer.main.presentation.components.QueueBottomSheet
-import younesbouhouche.musicplayer.main.presentation.util.composables.leftEdgeWidth
-import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
-import younesbouhouche.musicplayer.main.presentation.util.composables.rightEdgeWidth
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
 import younesbouhouche.musicplayer.main.domain.models.Routes
+import younesbouhouche.musicplayer.main.presentation.components.ItemBottomSheet
+import younesbouhouche.musicplayer.main.presentation.components.ListBottomSheet
+import younesbouhouche.musicplayer.main.presentation.components.PlaylistBottomSheet
+import younesbouhouche.musicplayer.main.presentation.components.QueueBottomSheet
 import younesbouhouche.musicplayer.main.presentation.dialogs.AddToPlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.CreatePlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.DetailsDialog
@@ -85,6 +80,9 @@ import younesbouhouche.musicplayer.main.presentation.dialogs.TimerDialog
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
 import younesbouhouche.musicplayer.main.presentation.states.ViewState
+import younesbouhouche.musicplayer.main.presentation.util.composables.leftEdgeWidth
+import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
+import younesbouhouche.musicplayer.main.presentation.util.composables.rightEdgeWidth
 import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
 import younesbouhouche.musicplayer.welcome.presentation.WelcomeScreen
 
@@ -305,13 +303,13 @@ fun AppScreen(
                             uiState.loading,
                             mainVM::onSearchEvent,
                             { mainVM.onPlayerEvent(PlayerEvent.Play(searchState.result, it)) },
-                            if (currentNavRoute != Routes.Home) {
-                                @Composable {
+                            {
+                                AnimatedVisibility(currentNavRoute != Routes.Home) {
                                     IconButton(onClick = { mainVM.onUiEvent(UiEvent.ShowSortSheet(currentNavRoute)) }) {
                                         Icon(Icons.AutoMirrored.Default.Sort, null)
                                     }
                                 }
-                            } else null
+                            }
                         ) {
                             mainVM.onUiEvent(UiEvent.ShowBottomSheet(it))
                         }
@@ -411,17 +409,6 @@ fun AppScreen(
             },
         )
     }
-    val savePlaylist =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.CreateDocument("audio/x-mpegurl"),
-        ) {
-            it?.let { uri ->
-                context.contentResolver.openOutputStream(uri)?.run {
-                    write(playlist.createM3UText().toByteArray())
-                    close()
-                }
-            }
-        }
     PlaylistBottomSheet(
         open = uiState.playlistBottomSheetVisible,
         state = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -453,7 +440,7 @@ fun AppScreen(
             )
         },
         savePlaylist = {
-            savePlaylist.launch("${playlist.name}.m3u")
+            mainVM.onUiEvent(UiEvent.SavePlaylist(playlist))
         },
     ) {
         context.startActivity(
@@ -531,7 +518,7 @@ fun AppScreen(
         { mainVM.onUiEvent(UiEvent.HideMetadataDialog) },
         { mainVM.onFilesEvent(FilesEvent.UpdateMetadata(uiState.metadata)) },
         uiState.metadata,
-        mainVM::onMetadataEvent,
+        { mainVM.onUiEvent(UiEvent.UpdateMetadata(it)) },
     )
     uiState.detailsFile?.let {
         DetailsDialog(
