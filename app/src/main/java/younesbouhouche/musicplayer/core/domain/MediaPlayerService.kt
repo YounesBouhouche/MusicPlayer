@@ -8,6 +8,7 @@ import android.os.Bundle
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.session.MediaSession
@@ -30,6 +31,14 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
     private var mediaSession: MediaSession? = null
     private var controller: MediaSession.ControllerInfo? = null
     private lateinit var customMediaNotificationProvider: CustomMediaNotificationProvider
+    private val loadControl = DefaultLoadControl.Builder()
+        .setBufferDurationsMs(
+            30_000,  // Min buffer before playback starts (30s)
+            120_000, // Max buffer (120s)
+            15_000,  // Play when buffer reaches (15s)
+            5_000    // Rebuffer threshold (5s)
+        )
+        .build()
 
     private val notificationCustomCmdButtons =
         NotificationCustomCmdButton.entries.map { command -> command.commandButton }
@@ -51,6 +60,7 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
                 with(
                     ExoPlayer
                         .Builder(this@MediaPlayerService)
+                        .setLoadControl(loadControl)
                         .setHandleAudioBecomingNoisy(true)
                         .setSkipSilenceEnabled(skipSilence)
                         .setAudioAttributes(
