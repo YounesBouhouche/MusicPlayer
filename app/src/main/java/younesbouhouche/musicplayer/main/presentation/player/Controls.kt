@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,11 +52,14 @@ import ir.mahozad.multiplatform.wavyslider.material3.WavySlider
 import soup.compose.material.motion.MaterialSharedAxisZ
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.presentation.components.PlayPauseAnimatedIcon
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.util.timeString
 import kotlin.math.roundToLong
 
+@OptIn(ExperimentalAnimationGraphicsApi::class)
 @Composable
 fun Controls(
     activeItem: MusicCard,
@@ -263,14 +267,9 @@ fun Controls(
                         containerColor = MaterialTheme.colorScheme.primary,
                     ),
             ) {
-                Icon(
-                    if (playerState.playState == PlayState.PLAYING) {
-                        Icons.Default.Pause
-                    } else {
-                        Icons.Default.PlayArrow
-                    },
-                    null,
-                    modifier = Modifier.size(40.dp),
+                PlayPauseAnimatedIcon(
+                    playerState.playState == PlayState.PLAYING,
+                    Modifier.size(40.dp)
                 )
             }
             AnimatedVisibility(visible = playerState.hasNextItem) {

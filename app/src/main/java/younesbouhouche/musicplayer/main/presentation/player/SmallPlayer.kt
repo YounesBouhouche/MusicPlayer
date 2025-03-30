@@ -41,6 +41,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.presentation.components.PlayPauseAnimatedIcon
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.util.timeString
@@ -135,13 +137,9 @@ fun SmallPlayer(
                     Icon(Icons.Default.SkipPrevious, null)
                 }
                 IconButton(onClick = { onPlayerEvent(PlayerEvent.PauseResume) }) {
-                    Icon(
-                        if (playerState.playState == PlayState.PAUSED) {
-                            Icons.Default.PlayArrow
-                        } else {
-                            Icons.Default.Pause
-                        },
-                        null,
+                    PlayPauseAnimatedIcon(
+                        playerState.playState == PlayState.PLAYING,
+                        Modifier.size(24.dp)
                     )
                 }
                 IconButton(onClick = { onPlayerEvent(PlayerEvent.Next) }) {
