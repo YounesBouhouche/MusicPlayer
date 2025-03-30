@@ -11,7 +11,13 @@ sealed class NavRoutes {
     data object Albums : NavRoutes()
 
     @Serializable
+    data class Album(val title: String) : NavRoutes()
+
+    @Serializable
     data object Artists : NavRoutes()
+
+    @Serializable
+    data class Artist(val name: String) : NavRoutes()
 
     @Serializable
     data object Playlists : NavRoutes()
