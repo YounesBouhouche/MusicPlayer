@@ -23,7 +23,7 @@ import younesbouhouche.musicplayer.main.presentation.util.SortState
 @Composable
 fun Albums(
     albums: List<Album>,
-    onClick: (Album) -> Unit,
+    onClick: (String) -> Unit,
     onLongClick: (Album) -> Unit,
     modifier: Modifier = Modifier,
     sortState: SortState<ListsSortType>,
@@ -37,11 +37,11 @@ fun Albums(
         modifier = modifier,
         singleLineItemContent = {
             MyListItem(
-                onClick = { onClick(it) },
+                onClick = { onClick(it.title) },
                 onLongClick = { onLongClick(it) },
                 headline = it.title,
                 supporting = pluralStringResource(R.plurals.item_s, it.items.size, it.items.size),
-                cover = it.cover?.asImageBitmap(),
+                cover = it.cover,
                 alternative = Icons.Default.Album,
                 modifier = Modifier.animateItem(),
                 trailingContent = {
@@ -60,7 +60,7 @@ fun Albums(
                 text = it.title,
                 cover = it.cover,
                 alternative = Icons.Default.Album,
-                onClick = { onClick(it) },
+                onClick = { onClick(it.title) },
                 onLongClick = { onLongClick(it) },
             )
         }

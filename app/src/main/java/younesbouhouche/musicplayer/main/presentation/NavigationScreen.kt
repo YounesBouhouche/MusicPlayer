@@ -118,6 +118,25 @@ fun NavigationScreen(
                 mainVM::onPlayerEvent,
             )
         }
+        composable<NavRoutes.Album> { entry ->
+            val route = entry.toRoute<NavRoutes.Album>()
+            val album by mainVM.getAlbumUi(route.title).collectAsState()
+            ListScreen(
+                files = album.items,
+                title = album.name,
+                sortState = listScreenSortState,
+                onSortStateChange = mainVM::onListScreenSortChange,
+                navigateUp = navController::navigateUp,
+                onPlay = { index, shuffle ->
+                    mainVM.onPlayerEvent(PlayerEvent.Play(album.items, index, shuffle))
+                },
+                onLongClick = {
+                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(album.items[it]))
+                },
+                cover = album.cover,
+                icon = Icons.Default.Album
+            )
+        }
         composable<NavRoutes.Artists> {
             Artists(
                 artistsSorted,
@@ -140,6 +159,25 @@ fun NavigationScreen(
                 artistsSortState,
                 mainVM::onArtistsSortChange,
                 mainVM::onPlayerEvent,
+            )
+        }
+        composable<NavRoutes.Artist> { entry ->
+            val route = entry.toRoute<NavRoutes.Artist>()
+            val artist by mainVM.getArtistUi(route.name).collectAsState()
+            ListScreen(
+                files = artist.items,
+                title = artist.name,
+                sortState = listScreenSortState,
+                onSortStateChange = mainVM::onListScreenSortChange,
+                navigateUp = navController::navigateUp,
+                onPlay = { index, shuffle ->
+                    mainVM.onPlayerEvent(PlayerEvent.Play(artist.items, index, shuffle))
+                },
+                onLongClick = {
+                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(artist.items[it]))
+                },
+                cover = artist.picture.takeIf { it.isNotEmpty() } ?: artist.cover,
+                icon = Icons.Default.Person
             )
         }
         composable<NavRoutes.Playlists> {

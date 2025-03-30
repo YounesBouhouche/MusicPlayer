@@ -580,4 +580,18 @@ class MainVM(
     fun onPlaylistEvent(event: PlaylistEvent) = viewModelScope.launch {
         filesRepo.onPlaylistEvent(event)
     }
+
+    fun getAlbumUi(title: String) = combine(_albums, _files, _listScreenSortState) { albums, files, sortState ->
+        val album = albums.firstOrNull { item -> item.title == title } ?: Album()
+        val files = files.filter { file -> file.album == album.title }.sortBy(sortState.sortType, sortState.ascending)
+        AlbumUi(album.title, files, album.cover)
+    }.stateInVM(AlbumUi())
+
+    fun getArtistUi(name: String) = combine(_artists, _files, _listScreenSortState) { artists, files, sortState ->
+        (artists.firstOrNull { item -> item.name == name } ?: Artist()).toArtistUi {
+            it.mapNotNull { id ->
+                files.firstOrNull { file -> file.id == id }
+            }.sortBy(sortState.sortType, sortState.ascending)
+        }
+    }.stateInVM(ArtistUi())
 }

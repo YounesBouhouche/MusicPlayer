@@ -1,17 +1,19 @@
-package younesbouhouche.musicplayer.core.domain.models
+package younesbouhouche.musicplayer.main.presentation.models
 
-data class Album(
-    val title: String = "",
-    val items: List<Long> = emptyList(),
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
+
+data class AlbumUi(
+    val name: String = "",
+    val items: List<MusicCard> = emptyList(),
     var cover: ByteArray? = null,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Album
+        other as AlbumUi
 
-        if (title != other.title) return false
+        if (name != other.name) return false
         if (items != other.items) return false
         if (!cover.contentEquals(other.cover)) return false
 
@@ -19,7 +21,7 @@ data class Album(
     }
 
     override fun hashCode(): Int {
-        var result = title.hashCode()
+        var result = name.hashCode()
         result = 31 * result + items.hashCode()
         result = 31 * result + (cover?.contentHashCode() ?: 0)
         return result

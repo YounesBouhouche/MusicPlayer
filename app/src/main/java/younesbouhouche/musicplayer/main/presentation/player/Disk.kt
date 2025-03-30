@@ -36,10 +36,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import coil.compose.SubcomposeAsyncImage
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import kotlin.math.absoluteValue
@@ -109,30 +109,26 @@ fun Disk(
                         ) {},
                     contentAlignment = Alignment.Center,
                 ) {
-                    if (cover != null) {
-                        Image(
-                            bitmap = cover!!.asImageBitmap(),
-                            null,
-                            contentScale = ContentScale.Crop,
-                            modifier =
-                                Modifier
-                                    .fillMaxSize(),
-                        )
-                    } else {
-                        Box(
-                            Modifier
-                                .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.secondary),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                Icons.Default.MusicNote,
-                                null,
-                                Modifier.fillMaxSize(.75f),
-                                tint = NavigationBarDefaults.containerColor,
-                            )
+                    SubcomposeAsyncImage(
+                        model = cover,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        error = {
+                            Box(Modifier
+                                .background(MaterialTheme.colorScheme.secondary)
+                                .fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.MusicNote,
+                                    null,
+                                    Modifier.fillMaxSize(.75f),
+                                    tint = NavigationBarDefaults.containerColor,
+                                )
+                            }
                         }
-                    }
+                    )
                 }
                 LargeFloatingActionButton(
                     onClick = { onPlayerEvent(PlayerEvent.UpdateFavorite(path, !fav)) },
