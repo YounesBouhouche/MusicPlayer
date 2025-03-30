@@ -137,6 +137,7 @@ fun AppScreen(
         }
     val state =
         rememberSaveable(
+            inputs = arrayOf(),
             saver =
                 AnchoredDraggableState.Saver(
                     tween(),
@@ -156,6 +157,7 @@ fun AppScreen(
         }
     val playlistState =
         rememberSaveable(
+            inputs = arrayOf(),
             saver =
                 AnchoredDraggableState.Saver(
                     tween(),
