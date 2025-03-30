@@ -178,7 +178,7 @@
     <plurals name="item_s">
         <item quantity="one">1 item</item>
         <item quantity="zero">no items</item>
-        <item quantity="other">%d items</item>
+        <item quantity="other">$d items</item>
     </plurals>
 
     <!-- Play Icon -->

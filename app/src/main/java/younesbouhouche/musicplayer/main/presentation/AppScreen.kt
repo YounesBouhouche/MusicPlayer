@@ -49,6 +49,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
@@ -389,7 +390,7 @@ fun AppScreen(
             onPlayerEvent = mainVM::onPlayerEvent,
             onUiEvent = mainVM::onUiEvent,
             title = uiState.listBottomSheetTitle,
-            text = uiState.listBottomSheetText,
+            text = pluralStringResource(R.plurals.item_s, size, size),
             cover = uiState.listBottomSheetImage,
             alternative = uiState.listBottomSheetIcon,
             state = rememberModalBottomSheetState(skipPartiallyExpanded = true),
