@@ -8,7 +8,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.pluralStringResource
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Artist
@@ -23,7 +22,7 @@ import younesbouhouche.musicplayer.main.presentation.util.SortState
 @Composable
 fun Artists(
     artists: List<Artist>,
-    onClick: (Artist) -> Unit,
+    onClick: (String) -> Unit,
     onLongClick: (Artist) -> Unit,
     modifier: Modifier = Modifier,
     sortState: SortState<ListsSortType>,
@@ -37,11 +36,11 @@ fun Artists(
         modifier = modifier,
         singleLineItemContent = {
             MyListItem(
-                onClick = { onClick(it) },
+                onClick = { onClick(it.name) },
                 onLongClick = { onLongClick(it) },
                 headline = it.name,
                 supporting = pluralStringResource(R.plurals.item_s, it.items.size, it.items.size),
-                cover = it.cover?.asImageBitmap(),
+                cover = it.picture.takeIf { it.isNotEmpty() } ?: it.cover,
                 alternative = Icons.Default.AccountCircle,
                 modifier = Modifier.animateItem(),
                 trailingContent = {
@@ -58,9 +57,9 @@ fun Artists(
             MyCard(
                 modifier = Modifier.animateItem(),
                 text = it.name,
-                cover = it.cover,
+                cover = it.picture.takeIf { it.isNotEmpty() } ?: it.cover,
                 alternative = Icons.Default.AccountCircle,
-                onClick = { onClick(it) },
+                onClick = { onClick(it.name) },
                 onLongClick = { onLongClick(it) },
             )
         }

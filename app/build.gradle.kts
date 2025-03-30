@@ -10,6 +10,7 @@ plugins {
 android {
     namespace = "younesbouhouche.musicplayer"
     compileSdk = 35
+    android.buildFeatures.buildConfig = true
 
     defaultConfig {
         applicationId = "younesbouhouche.musicplayer"
@@ -32,6 +33,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            buildConfigField("String", "BASE_URL", "\"https://api.deezer.com/\"")
+        }
+        debug {
+            buildConfigField("String", "BASE_URL", "\"https://api.deezer.com/\"")
         }
         create("benchmark") {
             initWith(buildTypes.getByName("release"))

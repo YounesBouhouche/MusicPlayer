@@ -11,6 +11,7 @@ import younesbouhouche.musicplayer.main.data.models.Queue
 import younesbouhouche.musicplayer.main.data.models.Timestamp
 import younesbouhouche.musicplayer.core.domain.models.ItemData
 import younesbouhouche.musicplayer.core.domain.models.Playlist
+import younesbouhouche.musicplayer.main.data.models.ArtistModel
 
 @Dao
 interface AppDao {
@@ -95,4 +96,10 @@ interface AppDao {
 
     @Query("UPDATE Queue SET `index`=:index WHERE id=0")
     suspend fun updateCurrentIndex(index: Int)
+
+    @Upsert
+    suspend fun upsertArtist(artist: ArtistModel)
+
+    @Query("SELECT * FROM ArtistModel WHERE name=:name")
+    suspend fun getArtist(name: String): ArtistModel?
 }

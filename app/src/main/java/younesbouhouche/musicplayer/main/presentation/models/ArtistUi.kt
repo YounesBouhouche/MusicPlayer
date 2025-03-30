@@ -1,20 +1,19 @@
-package younesbouhouche.musicplayer.core.domain.models
+package younesbouhouche.musicplayer.main.presentation.models
 
 import android.graphics.Bitmap
-import younesbouhouche.musicplayer.main.presentation.models.ArtistUi
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 
-data class Artist(
+data class ArtistUi(
     val name: String = "",
-    val items: List<Long> = emptyList(),
+    val items: List<MusicCard> = emptyList(),
     var cover: ByteArray? = null,
-    var picture: String = ""
+    var picture: String = "",
 ) {
-    fun toArtistUi(files: (List<Long>) -> List<MusicCard>) = ArtistUi(name, files(items), cover, picture)
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Artist
+        other as ArtistUi
 
         if (name != other.name) return false
         if (items != other.items) return false
