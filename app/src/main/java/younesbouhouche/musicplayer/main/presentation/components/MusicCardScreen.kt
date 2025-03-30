@@ -1,10 +1,10 @@
 package younesbouhouche.musicplayer.main.presentation.components
 
+import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.view.HapticFeedbackConstants
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,8 +33,8 @@ import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,8 +50,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toOffset
+import coil.compose.SubcomposeAsyncImage
 import com.kmpalette.color
 import com.kmpalette.rememberPaletteState
+import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.ReorderableLazyGridState
@@ -78,7 +80,8 @@ fun MusicCardScreen(
         onLongClick = onLongClick,
         headline = file.title,
         supporting = "${file.artist} - ${file.duration.timeString}",
-        cover = file.cover?.asImageBitmap(),
+        cover = file.cover,
+        fitIconToBounds = true,
         trailingContent = {
             trailingContent()
             IconButton(onClick = onLongClick) {
@@ -97,9 +100,7 @@ fun HomeMusicCard(
     onClick: () -> Unit,
 ) {
     val paletteState = rememberPaletteState()
-    LaunchedEffect(card.cover) {
-        card.cover?.let { paletteState.generate(it.asImageBitmap()) }
-    }
+    val scope = rememberCoroutineScope()
     AppTheme(
         paletteState.palette?.vibrantSwatch?.color ?: paletteState.palette?.dominantSwatch?.color
     ) {
@@ -107,14 +108,12 @@ fun HomeMusicCard(
             modifier.size(300.dp, 112.dp)
                 .clip(CardDefaults.shape)
                 .combinedClickable(onClick = onClick, onLongClick = onLongClick)) {
-            card.cover?.let {
-                Image(
-                    it.asImageBitmap(),
-                    null,
-                    Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
+            SubcomposeAsyncImage(
+                model = card.cover,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
             Row(
                 Modifier
                     .background(
@@ -131,29 +130,32 @@ fun HomeMusicCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    Modifier
+                SubcomposeAsyncImage(
+                    model = card.cover,
+                    contentDescription = "",
+                    modifier = Modifier
                         .size(80.dp)
-                        .background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.medium)
                         .clip(MaterialTheme.shapes.medium)
-                        .clipToBounds(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (card.cover == null)
-                        Icon(
-                            Icons.Default.MusicNote,
-                            null,
-                            Modifier.size(60.dp),
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    else
-                        Image(
-                            card.cover!!.asImageBitmap(),
-                            null,
-                            Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                }
+                        .background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.medium),
+                    contentScale = ContentScale.Crop,
+                    onSuccess = {
+                        scope.launch {
+                            paletteState.generate((it.result.drawable as BitmapDrawable).bitmap.asImageBitmap())
+                        }
+                    },
+                    error = {
+                        Box(Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Default.MusicNote,
+                                null,
+                                Modifier.size(60.dp),
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                )
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
                         card.title,
@@ -205,8 +207,9 @@ fun ReorderableCollectionItemScope.MusicCardScreen(
         onClick = onClick,
         headline = file.title,
         supporting = "${file.artist} - ${file.duration.timeString}",
-        cover = file.cover?.asImageBitmap(),
+        cover = file.cover,
         number = number,
+        fitIconToBounds = true,
         trailingContent = {
             val view = LocalView.current
             IconButton(onClick = onLongClick) {

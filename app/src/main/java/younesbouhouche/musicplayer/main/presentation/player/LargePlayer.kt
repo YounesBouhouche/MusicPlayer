@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,6 +40,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -86,6 +88,7 @@ fun LargePlayer(
     val context = LocalContext.current
     val playerDataStore = PlayerDataStore(context)
     val showVolumeSlider by playerDataStore.showVolumeSlider.collectAsState(initial = false)
+    val maxWidth = LocalView.current.width.toDp()
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.isScrollInProgress }.collect { isScrolling ->
             if (isScrolledByUser && !isScrolling) {
@@ -130,6 +133,7 @@ fun LargePlayer(
                     onUiEvent,
                     Modifier
                         .weight(1f)
+                        .sizeIn(maxHeight = maxWidth, maxWidth = maxWidth)
                         .aspectRatio(1f, true),
                 )
                 Spacer(Modifier.height(8.dp))

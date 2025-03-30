@@ -1,7 +1,5 @@
 package younesbouhouche.musicplayer.core.domain.models
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.annotation.OptIn
@@ -11,15 +9,13 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import okhttp3.internal.EMPTY_BYTE_ARRAY
 
 @Immutable
 data class MusicCard(
     var contentUri: Uri,
     var id: Long,
     var title: String,
-    var cover: Bitmap?,
-    var coverByteArray: ByteArray,
+    var cover: ByteArray,
     var artist: String,
     var albumId: Long,
     var album: String,
@@ -38,7 +34,7 @@ data class MusicCard(
         private var contentUri: Uri = Uri.EMPTY
         private var id: Long = -1
         private var title: String = ""
-        private var cover: Bitmap? = null
+        private var cover: ByteArray = ByteArray(0)
         private var coverByteArray: ByteArray = byteArrayOf()
         private var artist: String = ""
         private var albumId: Long = -1
@@ -59,9 +55,7 @@ data class MusicCard(
 
         fun setTitle(title: String) = apply { this.title = title }
 
-        fun setCover(cover: Bitmap?) = apply { this.cover = cover }
-
-        fun setCoverByteArray(coverByteArray: ByteArray) = apply { this.coverByteArray = coverByteArray }
+        fun setCover(cover: ByteArray) = apply { this.cover = cover }
 
         fun setArtist(artist: String) = apply { this.artist = artist }
 
@@ -93,7 +87,6 @@ data class MusicCard(
                 id,
                 title,
                 cover,
-                coverByteArray,
                 artist,
                 albumId,
                 album,
@@ -117,8 +110,7 @@ data class MusicCard(
 
         if (contentUri != other.contentUri) return false
         if (id != other.id) return false
-        if (cover != other.cover) return false
-        if (!coverByteArray.contentEquals(other.coverByteArray)) return false
+        if (!cover.contentEquals(other.cover)) return false
         if (title != other.title) return false
         if (artist != other.artist) return false
         if (albumId != other.albumId) return false
@@ -139,8 +131,7 @@ data class MusicCard(
     override fun hashCode(): Int {
         var result = contentUri.hashCode()
         result = 31 * result + id.hashCode()
-        result = 31 * result + (cover?.hashCode() ?: 0)
-        result = 31 * result + coverByteArray.contentHashCode()
+        result = 31 * result + (cover.hashCode())
         result = 31 * result + title.hashCode()
         result = 31 * result + artist.hashCode()
         result = 31 * result + albumId.hashCode()
@@ -164,10 +155,8 @@ data class MusicCard(
                     mediaMetadata.artworkUri?.let { uri ->
                         MediaMetadataRetriever().apply {
                             setDataSource(uri.toString())
-                        }.embeddedPicture?.let {
-                            BitmapFactory.decodeByteArray(it, 0, it.size)
-                        }
-                    }
+                        }.embeddedPicture
+                    } ?: ByteArray(0)
                 Builder()
                     .setContentUri(uri)
                     .setTitle("${mediaMetadata.title}")
@@ -175,7 +164,6 @@ data class MusicCard(
                     .setArtist("${mediaMetadata.artist}")
                     .setDuration(mediaMetadata.durationMs ?: 0L)
                     .setCover(cover)
-                    .setCoverByteArray(mediaMetadata.artworkData ?: EMPTY_BYTE_ARRAY)
                     .build()
             }
     }
@@ -194,7 +182,7 @@ data class MusicCard(
                     .setGenre(genre)
                     .setComposer(composer)
                     .setArtworkData(
-                        coverByteArray.takeIf { it.isNotEmpty() }
+                        cover.takeIf { it.isNotEmpty() }
                             ?: MediaItem.fromUri(contentUri).mediaMetadata.artworkData,
                         MediaMetadata.PICTURE_TYPE_MEDIA
                     )

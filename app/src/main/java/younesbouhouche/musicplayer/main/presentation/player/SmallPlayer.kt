@@ -1,5 +1,7 @@
 package younesbouhouche.musicplayer.main.presentation.player
 
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
@@ -7,7 +9,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,10 +20,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
@@ -35,11 +35,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.presentation.components.PlayPauseAnimatedIcon
@@ -54,6 +54,7 @@ fun SmallPlayer(
     playerState: PlayerState,
     onPlayerEvent: (PlayerEvent) -> Unit,
     modifier: Modifier = Modifier,
+    onSuccess: (Bitmap) -> Unit = {},
 ) {
     val item = queue[index]
     Box(modifier.height(80.dp).fillMaxWidth()) {
@@ -86,30 +87,41 @@ fun SmallPlayer(
                                 .using(SizeTransform(clip = false))
                         },
                     ) {
-                        if (queue.getOrNull(it)?.cover == null) {
-                            Box(
-                                Modifier.fillMaxSize()
-                                    .clip(MaterialTheme.shapes.medium).clipToBounds().background(
-                                        MaterialTheme.colorScheme.primary,
-                                        MaterialTheme.shapes.medium,
-                                    ),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Icon(
-                                    Icons.Default.MusicNote,
-                                    null,
-                                    Modifier.fillMaxSize(.8f),
-                                    MaterialTheme.colorScheme.surfaceContainer,
+                        SubcomposeAsyncImage(
+                            model = queue[it].cover,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize()
+                                .clip(MaterialTheme.shapes.medium).clipToBounds().background(
+                                    MaterialTheme.colorScheme.primary,
+                                    MaterialTheme.shapes.medium,
+                                ),
+                            contentScale = ContentScale.Crop,
+                            onSuccess = {
+                                onSuccess((it.result.drawable as BitmapDrawable).bitmap)
+                            },
+                            success = {
+                                SubcomposeAsyncImageContent(
+                                    Modifier.fillMaxSize().clip(MaterialTheme.shapes.medium)
                                 )
+                            },
+                            error = {
+                                Box(
+                                    Modifier.fillMaxSize()
+                                        .clip(MaterialTheme.shapes.medium).clipToBounds().background(
+                                            MaterialTheme.colorScheme.primary,
+                                            MaterialTheme.shapes.medium,
+                                        ),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Icon(
+                                        Icons.Default.MusicNote,
+                                        null,
+                                        Modifier.fillMaxSize(.8f),
+                                        MaterialTheme.colorScheme.surfaceContainer,
+                                    )
+                                }
                             }
-                        } else {
-                            Image(
-                                queue[it].cover!!.asImageBitmap(),
-                                null,
-                                Modifier.fillMaxSize().clip(MaterialTheme.shapes.medium).clipToBounds(),
-                                contentScale = ContentScale.Crop,
-                            )
-                        }
+                        )
                     }
                 }
                 Column(

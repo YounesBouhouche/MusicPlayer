@@ -49,12 +49,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.materialkolor.DynamicMaterialTheme
+import coil.compose.SubcomposeAsyncImage
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.main.presentation.components.HomeMusicCard
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
+import younesbouhouche.musicplayer.main.presentation.components.HomeMusicCard
 import younesbouhouche.musicplayer.main.presentation.components.LazyVerticalGridWithHeader
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 
@@ -86,7 +86,7 @@ fun Home(
                     tint = MaterialTheme.colorScheme.error,
                 ) { navigate(NavRoutes.FavoritesScreen) }
                 HeaderButton(
-                    stringResource(R.string.shuffle),
+                    stringResource(R.string.most_played),
                     Icons.AutoMirrored.Filled.TrendingUp,
                     tint = MaterialTheme.colorScheme.secondary,
                 ) { }
@@ -106,7 +106,7 @@ fun Home(
                     tint = MaterialTheme.colorScheme.primary,
                 ) { navigate(NavRoutes.HistoryScreen) }
                 HeaderButton(
-                    stringResource(R.string.most_played),
+                    stringResource(R.string.shuffle),
                     Icons.Default.Shuffle,
                     tint = MaterialTheme.colorScheme.tertiary,
                 ) { }
@@ -201,51 +201,43 @@ fun Home(
                         }
                     HorizontalMultiBrowseCarousel(
                         state = state,
+                        modifier = Modifier.fillMaxWidth(),
                         itemSpacing = 8.dp,
                         contentPadding = PaddingValues(8.dp),
                         preferredItemWidth = 200.dp,
-                        minSmallItemWidth = 50.dp,
-                        maxSmallItemWidth = 200.dp
+                        minSmallItemWidth = 200.dp,
+                        maxSmallItemWidth = 250.dp
                     ) {
                         artists.getOrNull(it)?.let {
-                            Column(
-                                Modifier
-                                    .alpha(carouselItemInfo.size / carouselItemInfo.maxSize),
+                            Column(Modifier
+                                .alpha(carouselItemInfo.size / carouselItemInfo.maxSize)
+                                .fillMaxWidth()
                             ) {
-                                AnimatedContent(
-                                    targetState = it.cover,
-                                    label = "",
-                                    modifier = Modifier.fillMaxSize(),
-                                ) { bitmap ->
-                                    Box(
-                                        Modifier
-                                            .clip(rememberMaskShape(CircleShape))
-                                            .size(200.dp)
-                                            .background(MaterialTheme.colorScheme.surfaceContainer)
-                                            .combinedClickable(
-                                                onLongClick = {
-                                                    showArtistBottomSheet(it)
-                                                },
-                                            ) { navigateToArtist(it) },
-                                        contentAlignment = Alignment.Center,
-                                    ) {
-                                        if (bitmap == null) {
+                                SubcomposeAsyncImage(
+                                    model = it.picture.takeIf { it.isNotEmpty() } ?: it.cover,
+                                    contentDescription = "",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .clip(rememberMaskShape(CircleShape))
+                                        .size(200.dp)
+                                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                                        .combinedClickable(
+                                            onLongClick = {
+                                                showArtistBottomSheet(it)
+                                            },
+                                        ) { navigateToArtist(it) },
+                                    error = {
+                                        Box(Modifier.fillMaxSize(),
+                                            contentAlignment = Alignment.Center) {
                                             Icon(
                                                 Icons.Default.Person,
                                                 null,
                                                 Modifier.size(120.dp),
                                                 MaterialTheme.colorScheme.onSurfaceVariant,
                                             )
-                                        } else {
-                                            Image(
-                                                bitmap = bitmap.asImageBitmap(),
-                                                contentDescription = null,
-                                                modifier = Modifier.fillMaxSize(),
-                                                contentScale = ContentScale.Crop,
-                                            )
                                         }
                                     }
-                                }
+                                )
                                 Text(
                                     it.name,
                                     Modifier

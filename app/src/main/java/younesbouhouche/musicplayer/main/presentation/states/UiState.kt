@@ -1,6 +1,5 @@
 package younesbouhouche.musicplayer.main.presentation.states
 
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
@@ -13,8 +12,7 @@ data class UiState(
     val bottomSheetVisible: Boolean = false,
     val listBottomSheetList: List<MusicCard>? = null,
     val listBottomSheetTitle: String = "",
-    val listBottomSheetText: String = "",
-    val listBottomSheetImage: Bitmap? = null,
+    val listBottomSheetImage: Any? = null,
     val listBottomSheetIcon: ImageVector = Icons.AutoMirrored.Default.PlaylistPlay,
     val listBottomSheetVisible: Boolean = false,
     val playlistBottomSheetVisible: Boolean = false,

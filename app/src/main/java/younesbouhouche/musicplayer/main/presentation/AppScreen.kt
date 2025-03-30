@@ -256,12 +256,7 @@ fun AppScreen(
     val bottomPadding = if (isCompact and isParent) (80.dp + navBarHeight) else 0.dp
     val playerPadding = (if (isPlaying) 74.dp else 0.dp)
     val pullToRefreshState = rememberPullToRefreshState()
-    val cutout =
-        if (isCompact) {
-            Modifier
-        } else {
-            Modifier.displayCutoutPadding()
-        }
+    val cutout = if (isCompact) Modifier else Modifier.displayCutoutPadding()
     AnimatedContent(targetState = granted, label = "") { isGranted ->
         if (isGranted) {
             Surface(
@@ -433,19 +428,7 @@ fun AppScreen(
             mainVM.onUiEvent(UiEvent.SavePlaylist(playlist))
         },
     ) {
-        context.startActivity(
-            Intent.createChooser(
-                Intent().apply {
-                    action = Intent.ACTION_SEND_MULTIPLE
-                    putParcelableArrayListExtra(
-                        Intent.EXTRA_STREAM,
-                        ArrayList(playlistFiles.map { it.contentUri }),
-                    )
-                    type = "audio/*"
-                },
-                null,
-            ),
-        )
+        context.shareFiles(playlistFiles)
     }
     QueueBottomSheet(
         uiState.queueSheetVisible,

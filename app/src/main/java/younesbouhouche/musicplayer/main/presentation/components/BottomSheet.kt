@@ -71,6 +71,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import younesbouhouche.musicplayer.R
@@ -206,30 +207,27 @@ fun ItemBottomSheet(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Box(Modifier.size(80.dp).padding(8.dp)) {
-                        Box(
-                            Modifier
+                        SubcomposeAsyncImage(
+                            model = cover,
+                            contentDescription = null,
+                            modifier = Modifier
                                 .fillMaxSize()
                                 .clip(MaterialTheme.shapes.medium)
                                 .clipToBounds()
                                 .background(MaterialTheme.colorScheme.primary),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            if (cover == null) {
-                                Icon(
-                                    Icons.Default.MusicNote,
-                                    null,
-                                    Modifier.fillMaxSize(.75f),
-                                    MaterialTheme.colorScheme.surface,
-                                )
-                            } else {
-                                Image(
-                                    cover!!.asImageBitmap(),
-                                    null,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop,
-                                )
+                            contentScale = ContentScale.Crop,
+                            error = {
+                                Box(Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        Icons.Default.MusicNote,
+                                        null,
+                                        Modifier.fillMaxSize(.75f),
+                                        MaterialTheme.colorScheme.surface,
+                                    )
+                                }
                             }
-                        }
+                        )
                         Text(
                             duration.timeString,
                             Modifier
@@ -479,7 +477,7 @@ fun ListBottomSheet(
     onUiEvent: (UiEvent) -> Unit,
     title: String,
     text: String,
-    cover: Bitmap? = null,
+    cover: Any? = null,
     alternative: ImageVector = Icons.AutoMirrored.Default.PlaylistPlay,
     state: SheetState,
     shareFiles: () -> Unit = {},
@@ -531,21 +529,20 @@ fun ListBottomSheet(
                         .clipToBounds(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    if (cover != null) {
-                        Image(
-                            bitmap = cover.asImageBitmap(),
-                            null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    } else {
-                        Icon(
-                            alternative,
-                            null,
-                            modifier = Modifier.fillMaxSize(),
-                            tint = MaterialTheme.colorScheme.secondary,
-                        )
-                    }
+                    SubcomposeAsyncImage(
+                        model = cover,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        error = {
+                            Icon(
+                                alternative,
+                                null,
+                                modifier = Modifier.fillMaxSize(),
+                                tint = MaterialTheme.colorScheme.secondary,
+                            )
+                        }
+                    )
                 }
                 Column(
                     Modifier

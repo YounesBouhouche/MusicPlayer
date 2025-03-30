@@ -152,15 +152,9 @@ class DialogRepoImpl(val context: Context): DialogRepo {
             with(MediaMetadataRetriever()) {
                 try {
                     setDataSource(context, uri)
-                    embeddedPicture?.let {
-                        BitmapFactory.decodeByteArray(
-                            embeddedPicture,
-                            0,
-                            embeddedPicture!!.size,
-                        )
-                    }
+                    embeddedPicture ?: ByteArray(0)
                 } catch (_: Exception) {
-                    null
+                    ByteArray(0)
                 }
             }
         _card.value = _card.value?.copy(cover = cover)

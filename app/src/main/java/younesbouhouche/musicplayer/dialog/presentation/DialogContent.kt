@@ -39,10 +39,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import coil.compose.SubcomposeAsyncImage
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
@@ -71,19 +73,14 @@ fun DialogContent(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(
-                    Modifier.size(64.dp)
+                SubcomposeAsyncImage(
+                    model = card?.cover,
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp)
                         .clip(MaterialTheme.shapes.small)
                         .background(MaterialTheme.colorScheme.surfaceContainer),
-                ) {
-                    card?.cover?.let {
-                        Image(
-                            it.asImageBitmap(),
-                            contentDescription = null,
-                            Modifier.fillMaxSize(),
-                        )
-                    }
-                }
+                    contentScale = ContentScale.Crop
+                )
                 Column(
                     Modifier
                         .fillMaxWidth()

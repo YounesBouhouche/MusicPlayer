@@ -36,8 +36,7 @@ sealed interface UiEvent {
     data class ShowListBottomSheet(
         val list: List<Long>,
         val title: String,
-        val text: String,
-        val image: Bitmap? = null,
+        val image: Any? = null,
         val icon: ImageVector,
     ) : UiEvent
 

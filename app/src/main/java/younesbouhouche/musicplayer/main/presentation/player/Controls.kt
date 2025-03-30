@@ -21,8 +21,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeDown
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.SkipNext
 import androidx.compose.material.icons.outlined.SkipPrevious
 import androidx.compose.material3.ButtonDefaults
@@ -50,7 +48,6 @@ import ir.mahozad.multiplatform.wavyslider.material3.WaveHeight
 import ir.mahozad.multiplatform.wavyslider.material3.WaveLength
 import ir.mahozad.multiplatform.wavyslider.material3.WavySlider
 import soup.compose.material.motion.MaterialSharedAxisZ
-import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.presentation.components.PlayPauseAnimatedIcon

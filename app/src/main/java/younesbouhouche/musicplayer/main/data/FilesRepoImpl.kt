@@ -2,12 +2,12 @@ package younesbouhouche.musicplayer.main.data
 
 import android.content.ContentUris
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.core.database.getStringOrNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,11 +17,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.internal.EMPTY_BYTE_ARRAY
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
-import younesbouhouche.musicplayer.main.presentation.util.saveUriImageToInternalStorage
+import younesbouhouche.musicplayer.core.domain.models.Album
+import younesbouhouche.musicplayer.core.domain.models.Artist
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.main.data.dao.AppDao
 import younesbouhouche.musicplayer.main.data.events.PlayerEvent.AddToQueue
 import younesbouhouche.musicplayer.main.data.events.PlayerEvent.Backward
@@ -50,29 +53,31 @@ import younesbouhouche.musicplayer.main.data.events.PlayerEvent.Stop
 import younesbouhouche.musicplayer.main.data.events.PlayerEvent.Swap
 import younesbouhouche.musicplayer.main.data.events.PlayerEvent.ToggleShuffle
 import younesbouhouche.musicplayer.main.data.events.PlayerEvent.UpdateFavorite
+import younesbouhouche.musicplayer.main.data.models.ArtistModel
+import younesbouhouche.musicplayer.main.data.util.getTag
+import younesbouhouche.musicplayer.main.data.util.getThumbnail
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent.AddFile
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent.LoadFiles
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent.RemoveFile
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
-import younesbouhouche.musicplayer.core.domain.models.Album
-import younesbouhouche.musicplayer.core.domain.models.Artist
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.core.domain.models.Playlist
-import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent.*
+import younesbouhouche.musicplayer.main.domain.repo.ArtistsRepo
 import younesbouhouche.musicplayer.main.domain.repo.FilesRepo
 import younesbouhouche.musicplayer.main.domain.repo.PlayerRepo
+import younesbouhouche.musicplayer.main.domain.util.onSuccess
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.util.getMimeType
+import younesbouhouche.musicplayer.main.presentation.util.saveUriImageToInternalStorage
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
-import kotlin.collections.first
+import kotlin.system.measureTimeMillis
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FilesRepoImpl(
     private val context: Context,
+    private val artistsRepo: ArtistsRepo,
     private val mediaMetadataRetriever: MediaMetadataRetriever,
     private val dao: AppDao,
     val player: PlayerRepo,
@@ -84,20 +89,11 @@ class FilesRepoImpl(
                 Album(
                     title = album.key,
                     items = album.value.map { it.id },
-                    cover = album.value.firstOrNull { it.cover != null }?.cover,
+                    cover = album.value.firstOrNull { it.cover.isNotEmpty() }?.cover,
                 )
             }
         }
-    private val _artists =
-        _files.mapLatest {
-            it.groupBy { it.artist }.map { artist ->
-                Artist(
-                    name = artist.key,
-                    items = artist.value.map { it.id },
-                    cover = artist.value.firstOrNull { it.cover != null }?.cover,
-                )
-            }
-        }
+    private val _artists = MutableStateFlow(emptyList<Artist>())
 
     private val _playlists = dao.getPlaylists()
 
@@ -136,6 +132,8 @@ class FilesRepoImpl(
                         MediaStore.Audio.Media.ALBUM,
                         MediaStore.Audio.Media.ARTIST,
                         MediaStore.Audio.Media.DATA,
+                        MediaStore.Audio.Media.COMPOSER,
+                        MediaStore.Audio.Media.GENRE,
                     ),
                     MediaStore.Audio.Media.IS_MUSIC + "!= 0",
                     null,
@@ -149,6 +147,8 @@ class FilesRepoImpl(
                 val albumIdColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
                 val albumColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
                 val pathColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+                val composerColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.COMPOSER)
+                val genreColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE)
                 while (crs.moveToNext()) {
                     val id = crs.getLong(idColumn)
                     val duration = crs.getLong(durationColumn)
@@ -157,6 +157,8 @@ class FilesRepoImpl(
                     val albumId = crs.getLong(albumIdColumn)
                     val album = crs.getString(albumColumn)
                     val path = crs.getString(pathColumn)
+                    val composer = crs.getStringOrNull(composerColumn) ?: ""
+                    val genre = crs.getStringOrNull(genreColumn) ?: ""
                     val date = Files.getLastModifiedTime(Paths.get(path)).toMillis()
                     val contentUri: Uri =
                         ContentUris.withAppendedId(
@@ -177,6 +179,8 @@ class FilesRepoImpl(
                             .setFavorite(getFavorite(path))
                             .setTimestamps(getTimestamps(path))
                             .setDuration(duration)
+                            .setComposer(composer)
+                            .setGenre(genre)
                             .build()
                 }
                 crs.close()
@@ -184,47 +188,69 @@ class FilesRepoImpl(
             return@withContext
         }
         _files.value = files
-        _files.value = getFilesMetadata(files)
+        _artists.value = files.groupBy { it.artist }.map { artist ->
+            Artist(
+                name = artist.key,
+                items = artist.value.map { it.id },
+                picture = ""
+            )
+        }
+        updateArtists()
+        updateFilesMetadata()
     }
 
-    override suspend fun getFilesMetadata(files: List<MusicCard>): List<MusicCard> {
-        return withContext(Dispatchers.IO) {
-            files.map { file ->
-                var lyrics = ""
-                var genre = ""
-                var composer = ""
-                try {
-                    AudioFileIO.read(File(file.path)).tag.let {
-                        lyrics = it.getFirst(FieldKey.LYRICS)
-                        genre = it.getFirst(FieldKey.GENRE)
-                        composer = it.getFirst(FieldKey.COMPOSER)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-                val result =
-                    with(mediaMetadataRetriever) {
-                        try {
-                            mediaMetadataRetriever.setDataSource(context, file.contentUri)
-                            embeddedPicture?.let {
-                                BitmapFactory.decodeByteArray(
-                                    embeddedPicture,
-                                    0,
-                                    embeddedPicture!!.size,
-                                )!! to embeddedPicture!!
+    suspend fun updateArtists() {
+        withContext(Dispatchers.Main) {
+            _artists.value.forEach { artist ->
+                withContext(Dispatchers.IO) {
+                    launch {
+                        println("Getting artist : ${artist.name}")
+                        var picture = ""
+                        val model = dao.getArtist(artist.name)
+                        if (model != null) picture = model.picture
+                        else if (artist.name != "<unknown>")
+                            artistsRepo.getArtist(artist.name).onSuccess {
+                                it.data.firstOrNull()?.let { data ->
+                                    picture = data.pictureBig
+                                    dao.upsertArtist(ArtistModel(artist.name, data.pictureBig))
+                                }
                             }
-                        } catch (_: Exception) {
-                            null
+                        _artists.value = _artists.value.map {
+                            if (it.name == artist.name)
+                                it.copy(
+                                    picture = picture
+                                )
+                            else it
                         }
                     }
-                file.copy(
-                    lyrics = lyrics,
-                    genre = genre,
-                    composer = composer,
-                    cover = result?.first,
-                    coverByteArray = result?.second ?: EMPTY_BYTE_ARRAY,
-                )
+                }
             }
+        }
+    }
+
+    override suspend fun updateFilesMetadata() {
+        withContext(Dispatchers.Main) {
+            val time = measureTimeMillis {
+                _files.value.forEach { file ->
+                    withContext(Dispatchers.IO) {
+                        launch {
+                            val lyrics = File(file.path).getTag(FieldKey.LYRICS)
+                            val cover = mediaMetadataRetriever.getThumbnail(context, file.contentUri)
+                            _files.value = _files.value.map {
+                                if (it.id == file.id) it.copy(lyrics = lyrics, cover = cover)
+                                else it
+                            }
+                            if (cover.isNotEmpty())
+                                _artists.value = _artists.value.map {
+                                    if ((it.name == file.artist) and (it.cover?.isEmpty() != false))
+                                        it.copy(cover = cover)
+                                    else it
+                                }
+                        }
+                    }
+                }
+            }
+            println("Time to update metadata: $time ms")
         }
     }
 
@@ -387,7 +413,7 @@ class FilesRepoImpl(
             is PlaylistEvent.DeletePlaylist -> dao.deletePlaylist(event.playlist)
 
             is PlaylistEvent.DeleteUiPlaylist ->
-                onPlaylistEvent(DeletePlaylist(event.playlist.toPlaylist()))
+                onPlaylistEvent(PlaylistEvent.DeletePlaylist(event.playlist.toPlaylist()))
 
             is PlaylistEvent.RenamePlaylist -> dao.updatePlaylistName(event.id, event.name)
 

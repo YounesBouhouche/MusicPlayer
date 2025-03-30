@@ -31,6 +31,8 @@ import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.Routes
 import younesbouhouche.musicplayer.main.domain.repo.FilesRepo
 import younesbouhouche.musicplayer.main.presentation.constants.Permissions
+import younesbouhouche.musicplayer.main.presentation.models.AlbumUi
+import younesbouhouche.musicplayer.main.presentation.models.ArtistUi
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
 import younesbouhouche.musicplayer.main.presentation.states.SearchState
@@ -409,7 +411,6 @@ class MainVM(
                     it.copy(
                         listBottomSheetList = event.list.toMusicCards(),
                         listBottomSheetTitle = event.title,
-                        listBottomSheetText = event.text,
                         listBottomSheetImage = event.image,
                         listBottomSheetIcon = event.icon,
                         listBottomSheetVisible = true,

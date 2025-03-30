@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Album
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -71,51 +72,46 @@ fun NavigationScreen(
     ) {
         composable<NavRoutes.Home> {
             Home(
-                navController::navigate,
-                recentlyAdded,
-                mostFivePlayed,
-                { list, index -> mainVM.onPlayerEvent(PlayerEvent.Play(list, index)) },
-                { mainVM.onUiEvent(UiEvent.ShowBottomSheet(it)) },
-                {
-                    mainVM.setListFiles(it.items)
-                    navController.navigate(NavRoutes.ListScreen(it.name))
+                navigate = navController::navigate,
+                recentlyAdded = recentlyAdded,
+                mostPlayed = mostFivePlayed,
+                play = { list, index -> mainVM.onPlayerEvent(PlayerEvent.Play(list, index)) },
+                showInfo = { mainVM.onUiEvent(UiEvent.ShowBottomSheet(it)) },
+                navigateToArtist = {
+                    navController.navigate(NavRoutes.Artist(it.name))
                 },
-                {
+                showArtistBottomSheet = {
                     mainVM.onUiEvent(
                         UiEvent.ShowListBottomSheet(
                             it.items,
                             it.name,
-                            "${it.items.size} item(s)",
-                            it.cover,
+                            it.picture.takeIf { it.isNotEmpty() } ?: it.cover,
                             Icons.Default.AccountCircle,
                         ),
                     )
                 },
-                mostPlayedArtists,
+                artists = mostPlayedArtists,
             )
         }
         composable<NavRoutes.Albums> {
             Albums(
-                albumsSorted,
-                {
-                    mainVM.setListFiles(it.items)
-                    navController.navigate(NavRoutes.ListScreen(it.title))
+                albums = albumsSorted,
+                onClick = {
+                    navController.navigate(NavRoutes.Album(it))
                 },
-                {
+                onLongClick = {
                     mainVM.onUiEvent(
                         UiEvent.ShowListBottomSheet(
                             it.items,
                             it.title,
-                            "${it.items.size} item(s)",
                             it.cover,
                             Icons.Default.Album,
                         ),
                     )
                 },
-                Modifier,
-                albumsSortState,
-                mainVM::onAlbumsSortChange,
-                mainVM::onPlayerEvent,
+                sortState = albumsSortState,
+                onSortStateChange = mainVM::onAlbumsSortChange,
+                onPlayerEvent = mainVM::onPlayerEvent,
             )
         }
         composable<NavRoutes.Album> { entry ->
@@ -141,15 +137,13 @@ fun NavigationScreen(
             Artists(
                 artistsSorted,
                 {
-                    mainVM.setListFiles(it.items)
-                    navController.navigate(NavRoutes.ListScreen(it.name))
+                    navController.navigate(NavRoutes.Artist(it))
                 },
                 {
                     mainVM.onUiEvent(
                         UiEvent.ShowListBottomSheet(
                             it.items,
                             it.name,
-                            "${it.items.size} item(s)",
                             it.cover,
                             Icons.Default.AccountCircle,
                         ),
@@ -212,17 +206,18 @@ fun NavigationScreen(
         composable<NavRoutes.ListScreen> { entry ->
             val route = entry.toRoute<NavRoutes.ListScreen>()
             ListScreen(
-                listScreenFiles,
-                route.title,
-                listScreenSortState,
-                mainVM::onListScreenSortChange,
-                navController::navigateUp,
-                {
+                files = listScreenFiles,
+                title = route.title,
+                sortState = listScreenSortState,
+                onSortStateChange = mainVM::onListScreenSortChange,
+                navigateUp = navController::navigateUp,
+                onPlay = { index, shuffle ->
+                    mainVM.onPlayerEvent(PlayerEvent.Play(listScreenFiles, index, shuffle))
+                },
+                onLongClick = {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(listScreenFiles[it]))
                 },
-            ) { index ->
-                mainVM.onPlayerEvent(PlayerEvent.Play(listScreenFiles, index))
-            }
+            )
         }
         composable<NavRoutes.PlaylistScreen> { entry ->
             PlaylistScreen(
@@ -248,71 +243,70 @@ fun NavigationScreen(
                 onLongClick = {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(playlist.items[it]))
                 },
-                onPlay = {
-                    mainVM.onPlayerEvent(PlayerEvent.Play(playlist.items))
-                },
-                onShuffle = {
-                    mainVM.onPlayerEvent(PlayerEvent.Play(playlist.items, shuffle = true))
+                onPlay = { index, shuffle ->
+                    mainVM.onPlayerEvent(PlayerEvent.Play(playlist.items, index, shuffle))
                 }
-            ) { index ->
-                mainVM.onPlayerEvent(PlayerEvent.Play(playlist.items, index))
-            }
+            )
         }
         composable<NavRoutes.FavoritesScreen> {
             ListScreen(
-                favoritesFiles,
-                stringResource(R.string.favorites),
-                listScreenSortState,
-                mainVM::onListScreenSortChange,
-                navController::navigateUp,
-                {
+                files = favoritesFiles,
+                title = stringResource(R.string.favorites),
+                sortState = listScreenSortState,
+                onSortStateChange = mainVM::onListScreenSortChange,
+                navigateUp = navController::navigateUp,
+                onPlay = { index, shuffle ->
+                    mainVM.onPlayerEvent(PlayerEvent.Play(favoritesFiles, index, shuffle))
+                },
+                onLongClick = {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(favoritesFiles[it]))
                 },
-            ) { index ->
-                mainVM.onPlayerEvent(PlayerEvent.Play(favoritesFiles, index))
-            }
+            )
         }
         composable<NavRoutes.MostPlayedScreen> {
             ListScreen(
-                mostFivePlayed,
-                stringResource(R.string.most_played),
-                null,
-                null,
-                navController::navigateUp,
-                {
+                files = mostFivePlayed,
+                title = stringResource(R.string.most_played),
+                sortState = null,
+                onSortStateChange = null,
+                navigateUp = navController::navigateUp,
+                onPlay = { index, shuffle ->
+                    mainVM.onPlayerEvent(PlayerEvent.Play(mostFivePlayed, index, shuffle))
+                },
+                onLongClick = {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(mostFivePlayed[it]))
                 },
-            ) { index ->
-                mainVM.onPlayerEvent(PlayerEvent.Play(mostFivePlayed, index))
-            }
+            )
         }
         composable<NavRoutes.HistoryScreen> {
             ListScreen(
-                history,
-                stringResource(R.string.history),
-                null,
-                null,
-                navController::navigateUp,
-                {
+                files = history,
+                title = stringResource(R.string.history),
+                sortState = null,
+                onSortStateChange = null,
+                navigateUp = navController::navigateUp,
+                onPlay = { index, shuffle ->
+                    mainVM.onPlayerEvent(PlayerEvent.Play(history, index, shuffle))
+                },
+                onLongClick = {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(history[it]))
                 },
-            ) { index ->
-                mainVM.onPlayerEvent(PlayerEvent.Play(history, index))
-            }
+            )
         }
         composable<NavRoutes.LastAddedScreen> {
             ListScreen(
-                lastAdded,
-                stringResource(R.string.last_added),
-                null,
-                null,
-                navController::navigateUp,
-                {
+                files = lastAdded,
+                title = stringResource(R.string.last_added),
+                sortState = null,
+                onSortStateChange = null,
+                navigateUp = navController::navigateUp,
+                onPlay = { index, shuffle ->
+                    mainVM.onPlayerEvent(PlayerEvent.Play(lastAdded, index, shuffle))
+                         },
+                onLongClick = {
                     mainVM.onUiEvent(UiEvent.ShowBottomSheet(lastAdded[it]))
                 },
-            ) { index ->
-                mainVM.onPlayerEvent(PlayerEvent.Play(lastAdded, index))
-            }
+            )
         }
     }
 }

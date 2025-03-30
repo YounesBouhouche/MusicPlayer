@@ -24,6 +24,6 @@ interface FilesRepo {
     suspend fun onPlayerEvent(event: PlayerEvent)
     suspend fun onPlaylistEvent(event: PlaylistEvent)
     suspend fun loadFiles()
-    suspend fun getFilesMetadata(files: List<MusicCard>): List<MusicCard>
+    suspend fun updateFilesMetadata()
     suspend fun isFavorite(path: String): Boolean
 }

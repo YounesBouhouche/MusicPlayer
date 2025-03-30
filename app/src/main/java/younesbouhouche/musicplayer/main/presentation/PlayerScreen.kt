@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -24,10 +24,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import com.kmpalette.color
 import com.kmpalette.rememberPaletteState
+import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.data.util.toBitmap
 import younesbouhouche.musicplayer.main.presentation.player.LargePlayer
 import younesbouhouche.musicplayer.main.presentation.player.SmallPlayer
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
@@ -57,12 +59,7 @@ fun PlayerScreen(
     val paletteState = rememberPaletteState()
     val context = LocalContext.current
     val matchPictureColors = PlayerDataStore(context).matchPictureColors.collectAsState(true).value
-    LaunchedEffect(queue.getOrNull(index)?.cover, matchPictureColors) {
-        if (matchPictureColors)
-            queue.getOrNull(index)?.cover?.let { paletteState.generate(it.asImageBitmap()) }
-        else
-            paletteState.reset()
-    }
+    val scope = rememberCoroutineScope()
     AppTheme(
         paletteState.palette?.vibrantSwatch?.color ?: paletteState.palette?.dominantSwatch?.color
     ) {
@@ -88,7 +85,14 @@ fun PlayerScreen(
                         .alpha(1f - progress)
                         .align(Alignment.TopStart)
                         .clickable { onUiEvent(UiEvent.SetViewState(ViewState.LARGE)) },
-                )
+                ) {
+                    if (matchPictureColors)
+                        scope.launch {
+                            paletteState.generate(it.asImageBitmap())
+                        }
+                    else
+                        paletteState.reset()
+                }
                 LargePlayer(
                     queue,
                     index,

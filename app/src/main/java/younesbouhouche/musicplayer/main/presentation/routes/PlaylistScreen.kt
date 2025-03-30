@@ -2,7 +2,6 @@ package younesbouhouche.musicplayer.main.presentation.routes
 
 import android.graphics.BitmapFactory
 import android.os.Build
-import android.os.Environment
 import android.view.HapticFeedbackConstants
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -89,9 +88,7 @@ fun PlaylistScreen(
     reorder: (Int, Int) -> Unit = { _, _ -> },
     onDismiss: (Int) -> Unit = {},
     onLongClick: (Int) -> Unit = {},
-    onPlay: () -> Unit = {},
-    onShuffle: () -> Unit = {},
-    onClick: (Int) -> Unit = {},
+    onPlay: (index: Int, shuffle: Boolean) -> Unit = { _, _ -> },
 ) {
     val context = LocalContext.current
     val file = playlist.image?.let { File(context.filesDir, it) }
@@ -150,7 +147,7 @@ fun PlaylistScreen(
                     enter = materialSharedAxisZIn(true),
                     exit = materialSharedAxisZOut(true),
                 ) {
-                    FloatingActionButton(onClick = onPlay) {
+                    FloatingActionButton(onClick = { onPlay(0, false) }) {
                         Icon(Icons.Default.PlayArrow, null)
                     }
                 }
@@ -227,7 +224,7 @@ fun PlaylistScreen(
                         }
                         Row(Modifier.fillMaxWidth().padding(bottom = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Button(
-                                onPlay,
+                                { onPlay(0, false) },
                                 Modifier.weight(1f)
                             ) {
                                 Icon(
@@ -239,7 +236,7 @@ fun PlaylistScreen(
                                 Text("Play")
                             }
                             OutlinedButton(
-                                onShuffle,
+                                { onPlay(0, true) },
                                 Modifier.weight(1f)
                             ) {
                                 Icon(
@@ -273,7 +270,7 @@ fun PlaylistScreen(
                         reorderableState = reorderableState,
                         onLongClick = { onLongClick(index) },
                     ) {
-                        onClick(index)
+                        onPlay(index, false)
                     }
                 }
             }
