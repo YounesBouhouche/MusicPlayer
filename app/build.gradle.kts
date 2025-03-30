@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.com.google.devtools.ksp)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.room)
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
@@ -22,6 +23,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                argument("room.schemaLocation", "$projectDir/schemas")
+            }
         }
     }
 
@@ -64,6 +70,10 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 //tasks.getByPath("preBuild").dependsOn("ktlintFormat")
@@ -119,4 +129,10 @@ dependencies {
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
     implementation(libs.koin.compose.viewmodel.navigation)
+    implementation(libs.androidx.collection)
+    implementation(libs.androidx.collection.ktx)
+    implementation(libs.disk.lru.cache)
+    implementation(libs.bundles.ktor)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+    implementation(libs.androidx.animation.graphics)
 }
