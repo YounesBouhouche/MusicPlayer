@@ -30,6 +30,7 @@ import younesbouhouche.musicplayer.main.presentation.components.SortSheet
 import younesbouhouche.musicplayer.main.presentation.util.composables.isScrollingUp
 import younesbouhouche.musicplayer.main.presentation.util.SortState
 import younesbouhouche.musicplayer.main.presentation.util.SortType
+import younesbouhouche.musicplayer.main.presentation.util.shareFiles
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

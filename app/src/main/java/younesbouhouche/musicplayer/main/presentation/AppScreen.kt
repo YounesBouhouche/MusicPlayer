@@ -83,6 +83,7 @@ import younesbouhouche.musicplayer.main.presentation.states.ViewState
 import younesbouhouche.musicplayer.main.presentation.util.composables.leftEdgeWidth
 import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.main.presentation.util.composables.rightEdgeWidth
+import younesbouhouche.musicplayer.main.presentation.util.shareFiles
 import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
 import younesbouhouche.musicplayer.welcome.presentation.WelcomeScreen
 
@@ -392,21 +393,7 @@ fun AppScreen(
             cover = uiState.listBottomSheetImage,
             alternative = uiState.listBottomSheetIcon,
             state = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            shareFiles = {
-                context.startActivity(
-                    Intent.createChooser(
-                        Intent().apply {
-                            action = Intent.ACTION_SEND_MULTIPLE
-                            putParcelableArrayListExtra(
-                                Intent.EXTRA_STREAM,
-                                ArrayList(map { it.contentUri }),
-                            )
-                            type = "audio/*"
-                        },
-                        null,
-                    ),
-                )
-            },
+            shareFiles = { context.shareFiles(this) },
         )
     }
     PlaylistBottomSheet(
