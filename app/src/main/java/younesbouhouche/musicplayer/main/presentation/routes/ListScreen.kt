@@ -30,7 +30,9 @@ import younesbouhouche.musicplayer.main.presentation.components.SortSheet
 import younesbouhouche.musicplayer.main.presentation.util.composables.isScrollingUp
 import younesbouhouche.musicplayer.main.presentation.util.SortState
 import younesbouhouche.musicplayer.main.presentation.util.SortType
+import younesbouhouche.musicplayer.main.presentation.util.composables.isScrollingUp
 import younesbouhouche.musicplayer.main.presentation.util.shareFiles
+import younesbouhouche.musicplayer.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,62 +48,166 @@ fun ListScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val state = rememberLazyListState()
-    Scaffold(
-        topBar = {
-            LargeTopAppBar(
-                title = {
-                    Text(
-                        text = title,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                },
-                actions = {
-                    sortState?.let {
-                        IconButton(onClick = { onSortStateChange?.invoke(it.copy(expanded = true)) }) {
-                            Icon(Icons.AutoMirrored.Default.Sort, null)
+    val context = LocalContext.current
+    val paletteState = rememberPaletteState()
+    val scope = rememberCoroutineScope()
+    AppTheme(
+        paletteState.palette?.vibrantSwatch?.color ?: paletteState.palette?.dominantSwatch?.color
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {},
+                    navigationIcon = {
+                        IconButton(onClick = navigateUp) {
+                            Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+                        }
+                    },
+                    actions = {
+                        sortState?.let {
+                            IconButton(onClick = { onSortStateChange?.invoke(it.copy(expanded = true)) }) {
+                                Icon(Icons.AutoMirrored.Default.Sort, null)
+                            }
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
+                )
+            },
+            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            floatingActionButton = {
+                AnimatedVisibility(
+                    visible = state.isScrollingUp() and files.isNotEmpty(),
+                    enter = materialSharedAxisZIn(true),
+                    exit = materialSharedAxisZOut(true),
+                ) {
+                    FloatingActionButton(onClick = { onPlay(0, false) }) {
+                        Icon(Icons.Default.PlayArrow, null)
+                    }
+                }
+            },
+        ) { paddingValues ->
+            LazyColumn(
+                state = state,
+                contentPadding = paddingValues
+            ) {
+                item {
+                    Column(
+                        Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                Modifier
+                                    .size(100.dp)
+                                    .background(
+                                        MaterialTheme.colorScheme.surfaceContainer,
+                                        MaterialTheme.shapes.medium
+                                    )
+                                    .clip(MaterialTheme.shapes.medium)
+                                    .clipToBounds(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                SubcomposeAsyncImage(
+                                    model = cover,
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+                                    onSuccess = {
+                                        scope.launch {
+                                            paletteState.generate(
+                                                (it.result.drawable as BitmapDrawable)
+                                                .bitmap
+                                                .asImageBitmap()
+                                            )
+                                        }
+                                    },
+                                    error = {
+                                        Box(
+                                            Modifier.fillMaxSize(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                icon,
+                                                null,
+                                                Modifier.size(64.dp),
+                                                MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                )
+                            }
+                            Column(
+                                Modifier.fillMaxWidth().weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    title,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    subtitle,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Row(
+                                    Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(
+                                        4.dp,
+                                        Alignment.Start
+                                    )
+                                ) {
+                                    IconButton({ context.shareFiles(files) }) {
+                                        Icon(Icons.Default.Share, null)
+                                    }
+                                }
+                            }
+                        }
+                        Row(
+                            Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button({ onPlay(0, false) }, Modifier.weight(1f)) {
+                                Icon(
+                                    Icons.Default.PlayArrow,
+                                    null,
+                                    Modifier.size(ButtonDefaults.IconSize)
+                                )
+                                Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+                                Text("Play")
+                            }
+                            OutlinedButton(
+                                { onPlay(0, true) },
+                                Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    Icons.Default.Shuffle,
+                                    null,
+                                    Modifier.size(ButtonDefaults.IconSize)
+                                )
+                                Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+                                Text("Shuffle")
+                            }
                         }
                     }
-                },
-                navigationIcon = {
-                    IconButton(onClick = navigateUp) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, null)
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-            )
-        },
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        floatingActionButton = {
-            AnimatedVisibility(
-                visible = state.isScrollingUp(),
-                enter = materialSharedAxisZIn(true),
-                exit = materialSharedAxisZOut(true),
-            ) {
-                FloatingActionButton(onClick = { onClick(0) }) {
-                    Icon(Icons.Default.PlayArrow, null)
                 }
-            }
-        },
-    ) { paddingValues ->
-        LazyVerticalGridWithHeader(
-            GridCells.Fixed(1),
-            modifier,
-            contentPadding = paddingValues,
-            statusBarSpace = false,
-            searchBarSpace = false
-        ) {
-            items(files, { it.id }) {
-                LazyMusicCardScreen(
-                    file = it,
-                    onLongClick = { onLongClick(files.indexOf(it)) },
-                ) {
-                    onClick(files.indexOf(it))
+                items(files, { it.id }) {
+                    LazyMusicCardScreen(
+                        file = it,
+                        onLongClick = { onLongClick(files.indexOf(it)) },
+                    ) {
+                        onPlay(files.indexOf(it), false)
+                    }
                 }
             }
         }
-    }
-    sortState?.let { state ->
-        SortSheet(state) { onSortStateChange?.invoke(it) }
+        sortState?.let { state ->
+            SortSheet(state) { onSortStateChange?.invoke(it) }
+        }
     }
 }
