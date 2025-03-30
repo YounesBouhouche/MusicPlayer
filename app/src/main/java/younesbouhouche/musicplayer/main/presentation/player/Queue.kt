@@ -188,7 +188,7 @@ fun Queue(
         )
         Scaffold(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            contentWindowInsets = WindowInsets(left = 8.dp, right = 8.dp),
             topBar = {
                 CenterAlignedTopAppBar(
                     colors =
