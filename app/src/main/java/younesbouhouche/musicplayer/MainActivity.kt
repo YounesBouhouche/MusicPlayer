@@ -88,6 +88,7 @@ class MainActivity : ComponentActivity() {
                                 "audio/x-mpegurl"
                             )
                         }
+                        is Event.Navigate -> navController.navigate(event.route)
                     }
                 }
                 AppTheme {
