@@ -1,14 +1,14 @@
 package younesbouhouche.musicplayer.main.presentation.routes
 
 import android.graphics.drawable.BitmapDrawable
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -40,17 +40,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.SubcomposeAsyncImage
 import com.kmpalette.color
 import com.kmpalette.rememberPaletteState
 import kotlinx.coroutines.launch
@@ -59,6 +55,7 @@ import soup.compose.material.motion.animation.materialSharedAxisZOut
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.components.LazyMusicCardScreen
+import younesbouhouche.musicplayer.main.presentation.components.MyImage
 import younesbouhouche.musicplayer.main.presentation.components.SortSheet
 import younesbouhouche.musicplayer.main.presentation.util.SortState
 import younesbouhouche.musicplayer.main.presentation.util.SortType
@@ -66,9 +63,9 @@ import younesbouhouche.musicplayer.main.presentation.util.composables.isScrollin
 import younesbouhouche.musicplayer.main.presentation.util.shareFiles
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
-fun ListScreen(
+fun SharedTransitionScope.ListScreen(
     files: List<MusicCard>,
     title: String,
     sortState: (SortState<SortType>)?,
@@ -76,7 +73,9 @@ fun ListScreen(
     navigateUp: () -> Unit,
     onLongClick: (Int) -> Unit,
     onPlay: (index: Int, shuffle: Boolean) -> Unit,
+    animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
+    key: String? = null,
     subtitle: String = pluralStringResource(R.plurals.item_s, files.size, files.size),
     cover: Any? = files.firstOrNull { it.cover.isNotEmpty() }?.cover,
     icon: ImageVector = Icons.AutoMirrored.Filled.List
@@ -135,45 +134,23 @@ fun ListScreen(
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Box(
-                                Modifier
-                                    .size(100.dp)
-                                    .background(
-                                        MaterialTheme.colorScheme.surfaceContainer,
-                                        MaterialTheme.shapes.medium
+                            MyImage(
+                                model = cover,
+                                icon = icon,
+                                modifier = Modifier
+                                    .sharedElement(
+                                        rememberSharedContentState(key = key ?: ""),
+                                        animatedVisibilityScope = animatedContentScope
                                     )
-                                    .clip(MaterialTheme.shapes.medium)
-                                    .clipToBounds(),
-                                contentAlignment = Alignment.Center
+                                    .size(100.dp)
                             ) {
-                                SubcomposeAsyncImage(
-                                    model = cover,
-                                    contentDescription = null,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop,
-                                    onSuccess = {
-                                        scope.launch {
-                                            paletteState.generate(
-                                                (it.result.drawable as BitmapDrawable)
-                                                .bitmap
-                                                .asImageBitmap()
-                                            )
-                                        }
-                                    },
-                                    error = {
-                                        Box(
-                                            Modifier.fillMaxSize(),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                icon,
-                                                null,
-                                                Modifier.size(64.dp),
-                                                MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        }
-                                    }
-                                )
+                                scope.launch {
+                                    paletteState.generate(
+                                        (it.result.drawable as BitmapDrawable)
+                                            .bitmap
+                                            .asImageBitmap()
+                                    )
+                                }
                             }
                             Column(
                                 Modifier.fillMaxWidth().weight(1f),

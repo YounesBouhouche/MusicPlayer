@@ -20,6 +20,7 @@ interface FilesRepo {
     fun getArtists(): Flow<List<Artist>>
     fun getPlaylists(): Flow<List<Playlist>>
     fun getState(): StateFlow<PlayerState>
+    fun getCurrentItem(): Flow<MusicCard?>
     suspend fun onFilesEvent(event: FilesEvent)
     suspend fun onPlayerEvent(event: PlayerEvent)
     suspend fun onPlaylistEvent(event: PlaylistEvent)

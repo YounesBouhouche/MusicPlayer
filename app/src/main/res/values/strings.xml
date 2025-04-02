@@ -206,4 +206,9 @@
     <!-- Path Name -->
     <string name="play_icon_top_path_name" translatable="false">upper</string>
     <string name="play_icon_bottom_path_name" translatable="false">bottom</string>
+    <string name="widget_description">Music Player Widget</string>
+    <string name="app_icon">App icon</string>
+    <string name="music_note">Music note</string>
+    <string name="track_title">Track title</string>
+    <string name="track_artist">Track artist</string>
 </resources>

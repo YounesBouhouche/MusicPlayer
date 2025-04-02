@@ -117,7 +117,7 @@
         </service>
 
         <receiver
-            android:name=".glance.domain.MyReceiver"
+            android:name=".glance.presentation.MyAppWidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

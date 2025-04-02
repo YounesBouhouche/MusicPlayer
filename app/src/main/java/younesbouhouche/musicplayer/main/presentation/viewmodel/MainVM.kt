@@ -89,8 +89,6 @@ class MainVM(
             ids.mapNotNull { id -> files.firstOrNull { it.id == id } }
         }.stateInVM(emptyList())
 
-    private val _listScreenFiles = MutableStateFlow(emptyList<MusicCard>())
-
     private val _searchState = MutableStateFlow(SearchState())
     val searchState =
         combine(_searchState, _files) { state, files ->
@@ -168,11 +166,6 @@ class MainVM(
         _mostPlayedArtists
             .stateInVM(emptyList())
 
-    val listScreenFiles =
-        combine(_listScreenFiles, _listScreenSortState) { files, sortState ->
-            files.sortBy(sortState.sortType, sortState.ascending)
-        }.stateInVM(emptyList())
-
     private val _favorites = dao.getFavorites()
     private val _favoritesFiles =
         combine(_files, _favorites) { files, favorites ->
@@ -237,10 +230,6 @@ class MainVM(
         filesRepo.onPlayerEvent(event)
     }
 
-    fun getAlbum(file: MusicCard): Album? = _albums.value.firstOrNull { it.title == file.album }
-
-    fun getArtist(file: MusicCard): Artist? = _artists.value.firstOrNull { it.name == file.artist }
-
     fun setGranted(intent: StartupEvent = StartupEvent.None) {
         viewModelScope.launch {
             _granted.value = true
@@ -285,10 +274,6 @@ class MainVM(
 
     fun setCurrentPlaylist(index: Int) {
         _playlistIndex.value = index
-    }
-
-    fun setListFiles(list: List<Long>) {
-        _listScreenFiles.value = list.mapNotNull { id -> _files.value.firstOrNull { it.id == id } }
     }
 
     fun onListScreenSortChange(state: SortState<SortType>) {
@@ -583,9 +568,9 @@ class MainVM(
     }
 
     fun getAlbumUi(title: String) = combine(_albums, _files, _listScreenSortState) { albums, files, sortState ->
-        val album = albums.firstOrNull { item -> item.title == title } ?: Album()
-        val files = files.filter { file -> file.album == album.title }.sortBy(sortState.sortType, sortState.ascending)
-        AlbumUi(album.title, files, album.cover)
+        val album = albums.firstOrNull { item -> item.name == title } ?: Album()
+        val files = files.filter { file -> file.album == album.name }.sortBy(sortState.sortType, sortState.ascending)
+        AlbumUi(album.name, files, album.cover)
     }.stateInVM(AlbumUi())
 
     fun getArtistUi(name: String) = combine(_artists, _files, _listScreenSortState) { artists, files, sortState ->

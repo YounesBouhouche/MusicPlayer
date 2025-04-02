@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.database.getStringOrNull
+import androidx.glance.appwidget.updateAll
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,8 +16,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jaudiotagger.audio.AudioFileIO
@@ -25,6 +29,7 @@ import younesbouhouche.musicplayer.core.domain.models.Album
 import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.domain.models.Playlist
+import younesbouhouche.musicplayer.glance.presentation.MyAppWidget
 import younesbouhouche.musicplayer.main.data.dao.AppDao
 import younesbouhouche.musicplayer.main.data.events.PlayerEvent.AddToQueue
 import younesbouhouche.musicplayer.main.data.events.PlayerEvent.Backward
@@ -54,6 +59,7 @@ import younesbouhouche.musicplayer.main.data.events.PlayerEvent.Swap
 import younesbouhouche.musicplayer.main.data.events.PlayerEvent.ToggleShuffle
 import younesbouhouche.musicplayer.main.data.events.PlayerEvent.UpdateFavorite
 import younesbouhouche.musicplayer.main.data.models.ArtistModel
+import younesbouhouche.musicplayer.main.data.models.Queue
 import younesbouhouche.musicplayer.main.data.util.getTag
 import younesbouhouche.musicplayer.main.data.util.getThumbnail
 import younesbouhouche.musicplayer.main.domain.events.FilesEvent
@@ -87,7 +93,7 @@ class FilesRepoImpl(
         _files.mapLatest {
             it.groupBy { it.album }.map { album ->
                 Album(
-                    title = album.key,
+                    name = album.key,
                     items = album.value.map { it.id },
                     cover = album.value.firstOrNull { it.cover.isNotEmpty() }?.cover,
                 )
@@ -116,6 +122,23 @@ class FilesRepoImpl(
     override fun getPlaylists(): Flow<List<Playlist>> = _playlists
 
     override fun getState(): StateFlow<PlayerState> = player.playerState.asStateFlow()
+
+    private val _queue = dao.getQueue().map { it ?: Queue() }
+
+    private val _queueList = _queue.map { it.items }
+
+    private val _queueIndex = _queue.map { it.index }
+
+    private val _queueFiles =
+        combine(_queueList, _files) { ids, files ->
+            ids.mapNotNull { id -> files.firstOrNull { it.id == id } }
+        }
+
+    override fun getCurrentItem(): Flow<MusicCard?> = combine(_queueFiles, _queueIndex) { list, index ->
+        list.getOrNull(index)
+    }.onEach {
+        MyAppWidget().updateAll(context)
+    }
 
     override suspend fun loadFiles() {
         val files = mutableListOf<MusicCard>()
@@ -252,6 +275,7 @@ class FilesRepoImpl(
             }
             println("Time to update metadata: $time ms")
         }
+        MyAppWidget().updateAll(context)
     }
 
     override suspend fun isFavorite(path: String): Boolean =
@@ -294,9 +318,10 @@ class FilesRepoImpl(
                 }
             }
         }
+        MyAppWidget().updateAll(context)
     }
 
-    override suspend fun onPlayerEvent(event: PlayerEvent) =
+    override suspend fun onPlayerEvent(event: PlayerEvent) {
         player.onPlayerEvent(
             when(event) {
                 is PlayerEvent.AddToQueue -> AddToQueue(event.items)
@@ -349,6 +374,8 @@ class FilesRepoImpl(
                 )
             }
         )
+        MyAppWidget().updateAll(context)
+    }
 
     override suspend fun onPlaylistEvent(event: PlaylistEvent) {
         when (event) {

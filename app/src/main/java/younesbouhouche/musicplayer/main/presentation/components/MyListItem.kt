@@ -1,5 +1,8 @@
 package younesbouhouche.musicplayer.main.presentation.components
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -124,7 +127,6 @@ fun MyListItem(
     cover: Any? = null,
     number: Int? = null,
     alternative: ImageVector = Icons.Default.MusicNote,
-    fitIconToBounds: Boolean = false,
     trailingContent: @Composable (RowScope.() -> Unit)? = null
 ) {
     MyListItem(
@@ -135,52 +137,66 @@ fun MyListItem(
         headline,
         supporting,
         {
-            Box(
-                Modifier
-                    .clip(if (fitIconToBounds) MaterialTheme.shapes.medium else CircleShape)
-                    .fillMaxSize()
-                    .background(if (fitIconToBounds) MaterialTheme.colorScheme.surfaceContainer else Color.Transparent),
-                contentAlignment = Alignment.Center
-            ) {
-                SubcomposeAsyncImage(
-                    model = cover,
-                    contentDescription = "",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    loading = {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(Modifier.fillMaxSize(.5f))
-                        }
-                    },
-                    error = {
-                        Box(Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = alternative,
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize(if (fitIconToBounds) .5f else 1f),
-                                tint =
-                                    if (fitIconToBounds) MaterialTheme.colorScheme.onSurfaceVariant
-                                    else LocalContentColor.current
-                            )
-                        }
-                    }
-                )
-            }
+            MyImage(
+                model = cover,
+                icon = alternative,
+                modifier = Modifier.fillMaxSize(),
+            )
         },
         number,
         trailingContent,
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun MyCard(
+fun SharedTransitionScope.MyListItem(
+    modifier: Modifier = Modifier,
+    background: Color = Color.Transparent,
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {},
+    headline: String,
+    supporting: String,
+    cover: Any? = null,
+    number: Int? = null,
+    alternative: ImageVector = Icons.Default.MusicNote,
+    animatedContentScope: AnimatedContentScope,
+    key: String,
+    trailingContent: @Composable (RowScope.() -> Unit)? = null
+) {
+    MyListItem(
+        modifier,
+        background,
+        onClick,
+        onLongClick,
+        headline,
+        supporting,
+        {
+            MyImage(
+                model = cover,
+                icon = alternative,
+                modifier = Modifier
+                    .sharedElement(
+                        rememberSharedContentState(key = key),
+                        animatedVisibilityScope = animatedContentScope
+                    )
+                    .fillMaxSize(),
+            )
+        },
+        number,
+        trailingContent,
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class)
+@Composable
+fun SharedTransitionScope.MyCard(
     modifier: Modifier = Modifier,
     text: String,
     cover: Any?,
     alternative: ImageVector,
+    animatedContentScope: AnimatedContentScope,
+    key: String,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
 ) {
@@ -196,23 +212,17 @@ fun MyCard(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        SubcomposeAsyncImage(
+        MyImage(
             model = cover,
-            contentDescription = "",
-            contentScale = ContentScale.Crop,
+            icon = alternative,
             modifier =
                 Modifier
-                    .clip(CircleShape)
-                    .clipToBounds()
+                    .sharedElement(
+                        rememberSharedContentState(key = key),
+                        animatedVisibilityScope = animatedContentScope
+                    )
                     .fillMaxWidth()
                     .aspectRatio(1f),
-            error = {
-                Icon(
-                    alternative,
-                    null,
-                    Modifier.fillMaxSize(),
-                )
-            }
         )
         Text(
             text,
