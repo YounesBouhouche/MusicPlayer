@@ -1,7 +1,9 @@
 package younesbouhouche.musicplayer.core.domain.models
 
+import kotlin.text.isNotEmpty
+
 data class Album(
-    val title: String = "",
+    val name: String = "",
     val items: List<Long> = emptyList(),
     var cover: ByteArray? = null,
 ) {
@@ -11,7 +13,7 @@ data class Album(
 
         other as Album
 
-        if (title != other.title) return false
+        if (name != other.name) return false
         if (items != other.items) return false
         if (!cover.contentEquals(other.cover)) return false
 
@@ -19,7 +21,7 @@ data class Album(
     }
 
     override fun hashCode(): Int {
-        var result = title.hashCode()
+        var result = name.hashCode()
         result = 31 * result + items.hashCode()
         result = 31 * result + (cover?.contentHashCode() ?: 0)
         return result

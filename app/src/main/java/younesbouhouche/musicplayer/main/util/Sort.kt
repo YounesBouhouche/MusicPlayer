@@ -52,12 +52,12 @@ fun List<MusicCard>.sortBy(sortType: PlaylistSortType, ascending: Boolean = true
 fun List<Album>.sortBy(sortType: ListsSortType, ascending: Boolean = true) =
     if (ascending) {
         when (sortType) {
-            ListsSortType.Name -> sortedBy { it.title }
+            ListsSortType.Name -> sortedBy { it.name }
             ListsSortType.Count -> sortedBy { it.items.size }
         }
     } else {
         when (sortType) {
-            ListsSortType.Name -> sortedByDescending { it.title }
+            ListsSortType.Name -> sortedByDescending { it.name }
             ListsSortType.Count -> sortedByDescending { it.items.size }
         }
     }
