@@ -187,7 +187,7 @@ fun Home(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.padding(vertical = 60.dp),
                     ) {
-                        Icon(Icons.Default.AccountCircle, null, Modifier.size(120.dp))
+                        Icon(Icons.Default.Person, null, Modifier.size(120.dp))
                         Text(
                             text = stringResource(R.string.no_enough_data),
                             textAlign = TextAlign.Center,
@@ -214,7 +214,7 @@ fun Home(
                                 .fillMaxWidth()
                             ) {
                                 SubcomposeAsyncImage(
-                                    model = it.picture.takeIf { it.isNotEmpty() } ?: it.cover,
+                                    model = it.getPicture(),
                                     contentDescription = "",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier

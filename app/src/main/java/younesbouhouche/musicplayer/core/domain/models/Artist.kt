@@ -1,6 +1,5 @@
 package younesbouhouche.musicplayer.core.domain.models
 
-import android.graphics.Bitmap
 import younesbouhouche.musicplayer.main.presentation.models.ArtistUi
 
 data class Artist(
@@ -10,6 +9,7 @@ data class Artist(
     var picture: String = ""
 ) {
     fun toArtistUi(files: (List<Long>) -> List<MusicCard>) = ArtistUi(name, files(items), cover, picture)
+    fun getPicture(): Any? = picture.takeIf { it.isNotEmpty() } ?: cover
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
