@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.glance.presentation
+package younesbouhouche.musicplayer.glance.presentation.util
 
 import android.graphics.drawable.Icon
 import androidx.compose.runtime.Composable
@@ -17,7 +17,6 @@ import androidx.glance.layout.ContentScale
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.size
 import androidx.media3.session.R
-import younesbouhouche.musicplayer.glance.presentation.util.toBitmap
 
 
 @Composable

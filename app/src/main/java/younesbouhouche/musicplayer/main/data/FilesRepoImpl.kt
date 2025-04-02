@@ -109,7 +109,12 @@ class FilesRepoImpl(
     private fun getTimestamps(path: String) =
         dao.getTimestamps(path).mapLatest { it?.times ?: emptyList() }
 
-    override fun init(scope: CoroutineScope, callback: () -> Unit) = player.init(scope, callback)
+    override fun init(scope: CoroutineScope, callback: () -> Unit) {
+        player.init(scope, callback)
+        player.playerState.onEach {
+            MyAppWidget().updateAll(context)
+        }
+    }
 
     override fun finalize() = player.finalize()
 
