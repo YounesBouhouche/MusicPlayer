@@ -2,9 +2,11 @@ package younesbouhouche.musicplayer.main.presentation.routes
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,35 +29,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
 import younesbouhouche.musicplayer.core.domain.models.Playlist
-import younesbouhouche.musicplayer.main.presentation.components.ItemsLazyVerticalGrid
-import younesbouhouche.musicplayer.main.presentation.components.ListsSortSheet
-import younesbouhouche.musicplayer.main.presentation.components.PlaylistListItem
-import younesbouhouche.musicplayer.main.presentation.util.composables.isScrollingUp
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
+import younesbouhouche.musicplayer.main.presentation.components.ItemsLazyVerticalGrid
+import younesbouhouche.musicplayer.main.presentation.components.ListsSortSheet
+import younesbouhouche.musicplayer.main.presentation.components.MyImage
+import younesbouhouche.musicplayer.main.presentation.components.PlaylistListItem
 import younesbouhouche.musicplayer.main.presentation.util.ListsSortType
 import younesbouhouche.musicplayer.main.presentation.util.SortState
+import younesbouhouche.musicplayer.main.presentation.util.composables.isScrollingUp
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
-fun Playlists(
+fun SharedTransitionScope.Playlists(
     playlists: List<Playlist>,
     onClick: (Int) -> Unit,
     onLongClick: (Int) -> Unit,
+    animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
     sortState: SortState<ListsSortType>,
     onSortStateChange: (SortState<ListsSortType>) -> Unit,
@@ -99,6 +100,7 @@ fun Playlists(
             singleLineItemContent = {
                 PlaylistListItem(
                     it,
+                    animatedContentScope,
                     { onClick(playlists.indexOf(it)) },
                     { onLongClick(playlists.indexOf(it)) },
                     { onPlayerEvent(PlayerEvent.PlayPaths(it.items.toList())) },
@@ -122,32 +124,18 @@ fun Playlists(
                         Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Box(
-                            Modifier.fillMaxWidth().aspectRatio(1f)
-                                .clip(MaterialTheme.shapes.large)
-                                .clipToBounds(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            if (it.image == null) {
-                                Icon(
-                                    Icons.AutoMirrored.Default.PlaylistPlay,
-                                    null,
-                                    Modifier.fillMaxSize(),
+                        MyImage(
+                            it.image?.let { image -> File(context.filesDir, image) },
+                            Icons.AutoMirrored.Default.PlaylistPlay,
+                            Modifier
+                                .sharedElement(
+                                    rememberSharedContentState(key = "playlist-${it.id}"),
+                                    animatedVisibilityScope = animatedContentScope
                                 )
-                            } else {
-                                val file = File(context.filesDir, it.image)
-                                val request =
-                                    ImageRequest.Builder(context)
-                                        .data(file)
-                                        .build()
-                                Image(
-                                    rememberAsyncImagePainter(request),
-                                    null,
-                                    Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop,
-                                )
-                            }
-                        }
+                                .fillMaxWidth()
+                                .aspectRatio(1f),
+                            shape = MaterialTheme.shapes.large
+                        )
                         Text(
                             it.name,
                             Modifier.fillMaxWidth(),

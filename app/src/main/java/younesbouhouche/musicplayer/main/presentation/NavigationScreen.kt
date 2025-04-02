@@ -1,5 +1,7 @@
 package younesbouhouche.musicplayer.main.presentation
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -31,6 +33,7 @@ import younesbouhouche.musicplayer.main.presentation.routes.PlaylistScreen
 import younesbouhouche.musicplayer.main.presentation.routes.Playlists
 import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun NavigationScreen(
     navController: NavHostController,
@@ -58,255 +61,252 @@ fun NavigationScreen(
     val mostPlayed by mainVM.mostPlayed.collectAsState()
     val mostFivePlayed = if (mostPlayed.size > 5) mostPlayed.subList(0, 5) else mostPlayed
 
-    val listScreenFiles by mainVM.listScreenFiles.collectAsState()
     val listScreenSortState by mainVM.listScreenSortState.collectAsState()
 
     val favoritesFiles by mainVM.favoritesFiles.collectAsState()
 
-    NavHost(
-        navController = navController,
-        startDestination = NavRoutes.Home,
-        enterTransition = { materialFadeThroughIn() },
-        exitTransition = { materialFadeThroughOut() },
-        modifier = modifier.fillMaxSize(),
-    ) {
-        composable<NavRoutes.Home> {
-            Home(
-                navigate = navController::navigate,
-                recentlyAdded = recentlyAdded,
-                mostPlayed = mostFivePlayed,
-                play = { list, index -> mainVM.onPlayerEvent(PlayerEvent.Play(list, index)) },
-                showInfo = { mainVM.onUiEvent(UiEvent.ShowBottomSheet(it)) },
-                navigateToArtist = {
-                    navController.navigate(NavRoutes.Artist(it.name))
-                },
-                showArtistBottomSheet = {
-                    mainVM.onUiEvent(
-                        UiEvent.ShowListBottomSheet(
-                            it.items,
-                            it.name,
-                            it.picture.takeIf { it.isNotEmpty() } ?: it.cover,
-                            Icons.Default.AccountCircle,
-                        ),
-                    )
-                },
-                artists = mostPlayedArtists,
-            )
-        }
-        composable<NavRoutes.Albums> {
-            Albums(
-                albums = albumsSorted,
-                onClick = {
-                    navController.navigate(NavRoutes.Album(it))
-                },
-                onLongClick = {
-                    mainVM.onUiEvent(
-                        UiEvent.ShowListBottomSheet(
-                            it.items,
-                            it.title,
-                            it.cover,
-                            Icons.Default.Album,
-                        ),
-                    )
-                },
-                sortState = albumsSortState,
-                onSortStateChange = mainVM::onAlbumsSortChange,
-                onPlayerEvent = mainVM::onPlayerEvent,
-            )
-        }
-        composable<NavRoutes.Album> { entry ->
-            val route = entry.toRoute<NavRoutes.Album>()
-            val album by mainVM.getAlbumUi(route.title).collectAsState()
-            ListScreen(
-                files = album.items,
-                title = album.name,
-                sortState = listScreenSortState,
-                onSortStateChange = mainVM::onListScreenSortChange,
-                navigateUp = navController::navigateUp,
-                onPlay = { index, shuffle ->
-                    mainVM.onPlayerEvent(PlayerEvent.Play(album.items, index, shuffle))
-                },
-                onLongClick = {
-                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(album.items[it]))
-                },
-                cover = album.cover,
-                icon = Icons.Default.Album
-            )
-        }
-        composable<NavRoutes.Artists> {
-            Artists(
-                artistsSorted,
-                {
-                    navController.navigate(NavRoutes.Artist(it))
-                },
-                {
-                    mainVM.onUiEvent(
-                        UiEvent.ShowListBottomSheet(
-                            it.items,
-                            it.name,
-                            it.cover,
-                            Icons.Default.AccountCircle,
-                        ),
-                    )
-                },
-                Modifier,
-                artistsSortState,
-                mainVM::onArtistsSortChange,
-                mainVM::onPlayerEvent,
-            )
-        }
-        composable<NavRoutes.Artist> { entry ->
-            val route = entry.toRoute<NavRoutes.Artist>()
-            val artist by mainVM.getArtistUi(route.name).collectAsState()
-            ListScreen(
-                files = artist.items,
-                title = artist.name,
-                sortState = listScreenSortState,
-                onSortStateChange = mainVM::onListScreenSortChange,
-                navigateUp = navController::navigateUp,
-                onPlay = { index, shuffle ->
-                    mainVM.onPlayerEvent(PlayerEvent.Play(artist.items, index, shuffle))
-                },
-                onLongClick = {
-                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(artist.items[it]))
-                },
-                cover = artist.picture.takeIf { it.isNotEmpty() } ?: artist.cover,
-                icon = Icons.Default.Person
-            )
-        }
-        composable<NavRoutes.Playlists> {
-            Playlists(
-                playlistsSorted,
-                {
-                    mainVM.setCurrentPlaylist(it)
-                    with(playlistsSorted[it]) {
-                        navController.navigate(NavRoutes.PlaylistScreen(name))
-                    }
-                },
-                { mainVM.onUiEvent(UiEvent.ShowPlaylistBottomSheet(it)) },
-                Modifier,
-                playlistsSortState,
-                mainVM::onPlaylistsSortChange,
-                mainVM::onPlayerEvent,
-                mainVM::onPlaylistEvent,
-                mainVM::onUiEvent,
-            )
-        }
-        composable<NavRoutes.Library> {
-            Library(
-                filesSorted,
-                Modifier.testTag("library_list"),
-                sortState,
-                mainVM::onLibrarySortChange,
-                mainVM::onUiEvent,
-            ) {
-                mainVM.onPlayerEvent(PlayerEvent.Play(filesSorted, it))
+    SharedTransitionLayout(modifier.fillMaxSize()) {
+        NavHost(
+            navController = navController,
+            startDestination = NavRoutes.Home,
+            enterTransition = { materialFadeThroughIn() },
+            exitTransition = { materialFadeThroughOut() },
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            composable<NavRoutes.Home> {
+                Home(
+                    navigate = navController::navigate,
+                    recentlyAdded = recentlyAdded,
+                    mostPlayed = mostFivePlayed,
+                    play = { list, index -> mainVM.onPlayerEvent(PlayerEvent.Play(list, index)) },
+                    showInfo = { mainVM.onUiEvent(UiEvent.ShowBottomSheet(it)) },
+                    navigateToArtist = {
+                        navController.navigate(NavRoutes.Artist(it.name))
+                    },
+                    showArtistBottomSheet = {
+                        mainVM.onUiEvent(
+                            UiEvent.ShowListBottomSheet(
+                                it.items,
+                                it.name,
+                                it.getPicture(),
+                                Icons.Default.Person,
+                            ),
+                        )
+                    },
+                    artists = mostPlayedArtists,
+                )
             }
-        }
-        composable<NavRoutes.ListScreen> { entry ->
-            val route = entry.toRoute<NavRoutes.ListScreen>()
-            ListScreen(
-                files = listScreenFiles,
-                title = route.title,
-                sortState = listScreenSortState,
-                onSortStateChange = mainVM::onListScreenSortChange,
-                navigateUp = navController::navigateUp,
-                onPlay = { index, shuffle ->
-                    mainVM.onPlayerEvent(PlayerEvent.Play(listScreenFiles, index, shuffle))
-                },
-                onLongClick = {
-                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(listScreenFiles[it]))
-                },
-            )
-        }
-        composable<NavRoutes.PlaylistScreen> { entry ->
-            PlaylistScreen(
-                playlist = playlist,
-                sortState = playlistSortState,
-                onSortStateChange = mainVM::onPlaylistScreenSortChange,
-                navigateUp = navController::navigateUp,
-                onRename = {
-                    mainVM.onUiEvent(UiEvent.ShowRenamePlaylistDialog(playlist.id, playlist.name))
-                },
-                onSetFavorite = {
-                    mainVM.onPlaylistEvent(PlaylistEvent.SetFavorite(playlist.id, it))
-                },
-                onShare = {
-                    mainVM.onUiEvent(UiEvent.SharePlaylist(playlist.toPlaylist()))
-                },
-                reorder = { from, to ->
-                    mainVM.onPlaylistEvent(PlaylistEvent.Reorder(playlist, from, to))
-                },
-                onDismiss = {
-                    mainVM.onPlaylistEvent(PlaylistEvent.RemoveAt(playlist, it))
-                },
-                onLongClick = {
-                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(playlist.items[it]))
-                },
-                onPlay = { index, shuffle ->
-                    mainVM.onPlayerEvent(PlayerEvent.Play(playlist.items, index, shuffle))
+            composable<NavRoutes.Albums> {
+                Albums(
+                    albums = albumsSorted,
+                    onClick = {
+                        navController.navigate(NavRoutes.Album(it))
+                    },
+                    onLongClick = {
+                        mainVM.onUiEvent(
+                            UiEvent.ShowListBottomSheet(
+                                it.items,
+                                it.name,
+                                it.cover,
+                                Icons.Default.Album,
+                            ),
+                        )
+                    },
+                    animatedContentScope = this,
+                    sortState = albumsSortState,
+                    onSortStateChange = mainVM::onAlbumsSortChange,
+                    onPlayerEvent = mainVM::onPlayerEvent,
+                )
+            }
+            composable<NavRoutes.Album> { entry ->
+                val route = entry.toRoute<NavRoutes.Album>()
+                val album by mainVM.getAlbumUi(route.title).collectAsState()
+                ListScreen(
+                    files = album.items,
+                    title = album.name,
+                    sortState = listScreenSortState,
+                    onSortStateChange = mainVM::onListScreenSortChange,
+                    navigateUp = navController::navigateUp,
+                    onPlay = { index, shuffle ->
+                        mainVM.onPlayerEvent(PlayerEvent.Play(album.items, index, shuffle))
+                    },
+                    onLongClick = {
+                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(album.items[it]))
+                    },
+                    animatedContentScope = this,
+                    key = "album-${album.name}",
+                    cover = album.cover,
+                    icon = Icons.Default.Album
+                )
+            }
+            composable<NavRoutes.Artists> {
+                Artists(
+                    artists = artistsSorted,
+                    onClick = {
+                        navController.navigate(NavRoutes.Artist(it))
+                    },
+                    onLongClick = {
+                        mainVM.onUiEvent(
+                            UiEvent.ShowListBottomSheet(
+                                it.items,
+                                it.name,
+                                it.getPicture(),
+                                Icons.Default.AccountCircle,
+                            ),
+                        )
+                    },
+                    animatedContentScope = this,
+                    modifier = Modifier,
+                    sortState = artistsSortState,
+                    onSortStateChange = mainVM::onArtistsSortChange,
+                    onPlayerEvent = mainVM::onPlayerEvent,
+                )
+            }
+            composable<NavRoutes.Artist> { entry ->
+                val route = entry.toRoute<NavRoutes.Artist>()
+                val artist by mainVM.getArtistUi(route.name).collectAsState()
+                ListScreen(
+                    files = artist.items,
+                    title = artist.name,
+                    sortState = listScreenSortState,
+                    onSortStateChange = mainVM::onListScreenSortChange,
+                    navigateUp = navController::navigateUp,
+                    onPlay = { index, shuffle ->
+                        mainVM.onPlayerEvent(PlayerEvent.Play(artist.items, index, shuffle))
+                    },
+                    onLongClick = {
+                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(artist.items[it]))
+                    },
+                    animatedContentScope = this,
+                    key = "artist-${artist.name}",
+                    cover = artist.getPicture(),
+                    icon = Icons.Default.Person
+                )
+            }
+            composable<NavRoutes.Playlists> {
+                Playlists(
+                    playlists = playlistsSorted,
+                    onClick = {
+                        mainVM.setCurrentPlaylist(it)
+                        with(playlistsSorted[it]) {
+                            navController.navigate(NavRoutes.PlaylistScreen(name))
+                        }
+                    },
+                    onLongClick = { mainVM.onUiEvent(UiEvent.ShowPlaylistBottomSheet(it)) },
+                    modifier = Modifier,
+                    sortState = playlistsSortState,
+                    onSortStateChange = mainVM::onPlaylistsSortChange,
+                    onPlayerEvent = mainVM::onPlayerEvent,
+                    onPlaylistEvent = mainVM::onPlaylistEvent,
+                    onUiEvent = mainVM::onUiEvent,
+                    animatedContentScope = this
+                )
+            }
+            composable<NavRoutes.Library> {
+                Library(
+                    filesSorted,
+                    Modifier.testTag("library_list"),
+                    sortState,
+                    mainVM::onLibrarySortChange,
+                    mainVM::onUiEvent,
+                ) {
+                    mainVM.onPlayerEvent(PlayerEvent.Play(filesSorted, it))
                 }
-            )
-        }
-        composable<NavRoutes.FavoritesScreen> {
-            ListScreen(
-                files = favoritesFiles,
-                title = stringResource(R.string.favorites),
-                sortState = listScreenSortState,
-                onSortStateChange = mainVM::onListScreenSortChange,
-                navigateUp = navController::navigateUp,
-                onPlay = { index, shuffle ->
-                    mainVM.onPlayerEvent(PlayerEvent.Play(favoritesFiles, index, shuffle))
-                },
-                onLongClick = {
-                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(favoritesFiles[it]))
-                },
-            )
-        }
-        composable<NavRoutes.MostPlayedScreen> {
-            ListScreen(
-                files = mostFivePlayed,
-                title = stringResource(R.string.most_played),
-                sortState = null,
-                onSortStateChange = null,
-                navigateUp = navController::navigateUp,
-                onPlay = { index, shuffle ->
-                    mainVM.onPlayerEvent(PlayerEvent.Play(mostFivePlayed, index, shuffle))
-                },
-                onLongClick = {
-                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(mostFivePlayed[it]))
-                },
-            )
-        }
-        composable<NavRoutes.HistoryScreen> {
-            ListScreen(
-                files = history,
-                title = stringResource(R.string.history),
-                sortState = null,
-                onSortStateChange = null,
-                navigateUp = navController::navigateUp,
-                onPlay = { index, shuffle ->
-                    mainVM.onPlayerEvent(PlayerEvent.Play(history, index, shuffle))
-                },
-                onLongClick = {
-                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(history[it]))
-                },
-            )
-        }
-        composable<NavRoutes.LastAddedScreen> {
-            ListScreen(
-                files = lastAdded,
-                title = stringResource(R.string.last_added),
-                sortState = null,
-                onSortStateChange = null,
-                navigateUp = navController::navigateUp,
-                onPlay = { index, shuffle ->
-                    mainVM.onPlayerEvent(PlayerEvent.Play(lastAdded, index, shuffle))
-                         },
-                onLongClick = {
-                    mainVM.onUiEvent(UiEvent.ShowBottomSheet(lastAdded[it]))
-                },
-            )
+            }
+            composable<NavRoutes.PlaylistScreen> { entry ->
+                PlaylistScreen(
+                    playlist = playlist,
+                    sortState = playlistSortState,
+                    onSortStateChange = mainVM::onPlaylistScreenSortChange,
+                    navigateUp = navController::navigateUp,
+                    animatedContentScope = this,
+                    onRename = {
+                        mainVM.onUiEvent(UiEvent.ShowRenamePlaylistDialog(playlist.id, playlist.name))
+                    },
+                    onSetFavorite = {
+                        mainVM.onPlaylistEvent(PlaylistEvent.SetFavorite(playlist.id, it))
+                    },
+                    onShare = {
+                        mainVM.onUiEvent(UiEvent.SharePlaylist(playlist.toPlaylist()))
+                    },
+                    reorder = { from, to ->
+                        mainVM.onPlaylistEvent(PlaylistEvent.Reorder(playlist, from, to))
+                    },
+                    onDismiss = {
+                        mainVM.onPlaylistEvent(PlaylistEvent.RemoveAt(playlist, it))
+                    },
+                    onLongClick = {
+                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(playlist.items[it]))
+                    },
+                    onPlay = { index, shuffle ->
+                        mainVM.onPlayerEvent(PlayerEvent.Play(playlist.items, index, shuffle))
+                    }
+                )
+            }
+            composable<NavRoutes.FavoritesScreen> {
+                ListScreen(
+                    files = favoritesFiles,
+                    title = stringResource(R.string.favorites),
+                    sortState = listScreenSortState,
+                    onSortStateChange = mainVM::onListScreenSortChange,
+                    navigateUp = navController::navigateUp,
+                    onPlay = { index, shuffle ->
+                        mainVM.onPlayerEvent(PlayerEvent.Play(favoritesFiles, index, shuffle))
+                    },
+                    animatedContentScope = this,
+                    onLongClick = {
+                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(favoritesFiles[it]))
+                    },
+                )
+            }
+            composable<NavRoutes.MostPlayedScreen> {
+                ListScreen(
+                    files = mostFivePlayed,
+                    title = stringResource(R.string.most_played),
+                    sortState = null,
+                    onSortStateChange = null,
+                    navigateUp = navController::navigateUp,
+                    onPlay = { index, shuffle ->
+                        mainVM.onPlayerEvent(PlayerEvent.Play(mostFivePlayed, index, shuffle))
+                    },
+                    animatedContentScope = this,
+                    onLongClick = {
+                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(mostFivePlayed[it]))
+                    },
+                )
+            }
+            composable<NavRoutes.HistoryScreen> {
+                ListScreen(
+                    files = history,
+                    title = stringResource(R.string.history),
+                    sortState = null,
+                    onSortStateChange = null,
+                    navigateUp = navController::navigateUp,
+                    onPlay = { index, shuffle ->
+                        mainVM.onPlayerEvent(PlayerEvent.Play(history, index, shuffle))
+                    },
+                    animatedContentScope = this,
+                    onLongClick = {
+                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(history[it]))
+                    },
+                )
+            }
+            composable<NavRoutes.LastAddedScreen> {
+                ListScreen(
+                    files = lastAdded,
+                    title = stringResource(R.string.last_added),
+                    sortState = null,
+                    onSortStateChange = null,
+                    navigateUp = navController::navigateUp,
+                    onPlay = { index, shuffle ->
+                        mainVM.onPlayerEvent(PlayerEvent.Play(lastAdded, index, shuffle))
+                             },
+                    animatedContentScope = this,
+                    onLongClick = {
+                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(lastAdded[it]))
+                    },
+                )
+            }
         }
     }
 }

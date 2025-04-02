@@ -1,8 +1,12 @@
 package younesbouhouche.musicplayer.main.presentation.routes
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,11 +23,13 @@ import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.presentation.util.ListsSortType
 import younesbouhouche.musicplayer.main.presentation.util.SortState
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun Artists(
+fun SharedTransitionScope.Artists(
     artists: List<Artist>,
     onClick: (String) -> Unit,
     onLongClick: (Artist) -> Unit,
+    animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
     sortState: SortState<ListsSortType>,
     onSortStateChange: (SortState<ListsSortType>) -> Unit,
@@ -40,8 +46,8 @@ fun Artists(
                 onLongClick = { onLongClick(it) },
                 headline = it.name,
                 supporting = pluralStringResource(R.plurals.item_s, it.items.size, it.items.size),
-                cover = it.picture.takeIf { it.isNotEmpty() } ?: it.cover,
-                alternative = Icons.Default.AccountCircle,
+                cover = it.getPicture(),
+                alternative = Icons.Default.Person,
                 modifier = Modifier.animateItem(),
                 trailingContent = {
                     IconButton(onClick = { onPlayerEvent(PlayerEvent.PlayIds(it.items)) }) {
@@ -51,16 +57,21 @@ fun Artists(
                         Icon(Icons.Default.MoreVert, null)
                     }
                 },
+                animatedContentScope = animatedContentScope,
+                key = "artist-${it.name}"
             )
         },
         itemContent = {
             MyCard(
                 modifier = Modifier.animateItem(),
                 text = it.name,
-                cover = it.picture.takeIf { it.isNotEmpty() } ?: it.cover,
-                alternative = Icons.Default.AccountCircle,
+                cover = it.getPicture(),
+                alternative = Icons.Default.Person,
                 onClick = { onClick(it.name) },
                 onLongClick = { onLongClick(it) },
+                animatedContentScope = animatedContentScope,
+                key = "artist-${it.name}"
+                ,
             )
         }
     )
