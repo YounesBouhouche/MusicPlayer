@@ -355,16 +355,10 @@ fun AppScreen(
             onPlayerEvent = mainVM::onPlayerEvent,
             onUiEvent = mainVM::onUiEvent,
             navigateToAlbum = {
-                mainVM.getAlbum(this)?.let {
-                    mainVM.setListFiles(it.items)
-                    navController.navigate(NavRoutes.ListScreen(it.title))
-                }
+                navController.navigate(NavRoutes.ListScreen(album))
             },
             navigateToArtist = {
-                mainVM.getArtist(this)?.let {
-                    mainVM.setListFiles(it.items)
-                    navController.navigate(NavRoutes.ListScreen(it.name))
-                }
+                navController.navigate(NavRoutes.ListScreen(artist))
             },
             shareFile = {
                 context.startActivity(
