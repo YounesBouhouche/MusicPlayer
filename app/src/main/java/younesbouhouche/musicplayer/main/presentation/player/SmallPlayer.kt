@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,15 +32,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.presentation.components.MyImage
 import younesbouhouche.musicplayer.main.presentation.components.PlayPauseAnimatedIcon
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
@@ -87,41 +82,13 @@ fun SmallPlayer(
                                 .using(SizeTransform(clip = false))
                         },
                     ) {
-                        SubcomposeAsyncImage(
-                            model = queue[it].cover,
-                            contentDescription = null,
+                        MyImage(
+                            model = queue.getOrNull(it)?.cover,
+                            icon = Icons.Default.MusicNote,
                             modifier = Modifier.fillMaxSize()
-                                .clip(MaterialTheme.shapes.medium).clipToBounds().background(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.shapes.medium,
-                                ),
-                            contentScale = ContentScale.Crop,
-                            onSuccess = {
-                                onSuccess((it.result.drawable as BitmapDrawable).bitmap)
-                            },
-                            success = {
-                                SubcomposeAsyncImageContent(
-                                    Modifier.fillMaxSize().clip(MaterialTheme.shapes.medium)
-                                )
-                            },
-                            error = {
-                                Box(
-                                    Modifier.fillMaxSize()
-                                        .clip(MaterialTheme.shapes.medium).clipToBounds().background(
-                                            MaterialTheme.colorScheme.primary,
-                                            MaterialTheme.shapes.medium,
-                                        ),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Icon(
-                                        Icons.Default.MusicNote,
-                                        null,
-                                        Modifier.fillMaxSize(.8f),
-                                        MaterialTheme.colorScheme.surfaceContainer,
-                                    )
-                                }
-                            }
-                        )
+                        ) {
+                            onSuccess((it.result.drawable as BitmapDrawable).bitmap)
+                        }
                     }
                 }
                 Column(
