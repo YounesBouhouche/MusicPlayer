@@ -9,9 +9,11 @@ import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.ui.graphics.vector.ImageVector
+import kotlinx.serialization.Serializable
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.ColsCount
 
+@Serializable
 data class SortState<T>(
     val sortType: T,
     val colsCount: ColsCount? = null,

@@ -81,7 +81,6 @@ fun MusicCardScreen(
         headline = file.title,
         supporting = "${file.artist} - ${file.duration.timeString}",
         cover = file.cover,
-        fitIconToBounds = true,
         trailingContent = {
             trailingContent()
             IconButton(onClick = onLongClick) {
@@ -209,7 +208,6 @@ fun ReorderableCollectionItemScope.MusicCardScreen(
         supporting = "${file.artist} - ${file.duration.timeString}",
         cover = file.cover,
         number = number,
-        fitIconToBounds = true,
         trailingContent = {
             val view = LocalView.current
             IconButton(onClick = onLongClick) {

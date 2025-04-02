@@ -29,7 +29,6 @@ import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.main.data.util.toBitmap
 import younesbouhouche.musicplayer.main.presentation.player.LargePlayer
 import younesbouhouche.musicplayer.main.presentation.player.SmallPlayer
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
@@ -77,11 +76,11 @@ fun PlayerScreen(
         ) {
             queue.getOrNull(index)?.run {
                 SmallPlayer(
-                    queue,
-                    index,
-                    playerState,
-                    onPlayerEvent,
-                    Modifier
+                    queue = queue,
+                    index = index,
+                    playerState = playerState,
+                    onPlayerEvent = onPlayerEvent,
+                    modifier = Modifier
                         .alpha(1f - progress)
                         .align(Alignment.TopStart)
                         .clickable { onUiEvent(UiEvent.SetViewState(ViewState.LARGE)) },
