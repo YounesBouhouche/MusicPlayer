@@ -1,10 +1,12 @@
 package younesbouhouche.musicplayer.glance.presentation
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.LocalContext
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.components.Scaffold
@@ -18,6 +20,7 @@ import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
+import androidx.glance.unit.ColorProvider
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.MainActivity
 import younesbouhouche.musicplayer.R
@@ -30,15 +33,22 @@ import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 
 
+@SuppressLint("RestrictedApi")
 @Composable
 fun MediumWidgetContent(
     card: MusicCard?,
     state: PlayerState,
     onPlayerEvent: suspend (PlayerEvent) -> Unit,
+    opacity: Float,
     modifier: GlanceModifier = GlanceModifier
 ) {
     val scope = rememberCoroutineScope()
-    Scaffold(modifier.clickable(actionStartActivity<MainActivity>())) {
+    val context = LocalContext.current
+    val background = GlanceTheme.colors.widgetBackground.getColor(context).copy(alpha = opacity)
+    Scaffold(
+        modifier.clickable(actionStartActivity<MainActivity>()),
+        backgroundColor = ColorProvider(background)
+    ) {
         Column(GlanceModifier.padding(8.dp).fillMaxSize()) {
             Row(
                 GlanceModifier.padding(8.dp).defaultWeight(),

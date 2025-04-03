@@ -3,6 +3,8 @@
     android:initialLayout="@layout/widget_placeholder"
     android:widgetCategory="home_screen"
     android:description="@string/widget_description"
+    android:configure="younesbouhouche.musicplayer.glance.presentation.ConfigActivity"
+    android:widgetFeatures="reconfigurable"
     android:resizeMode="horizontal|vertical">
 
 </appwidget-provider>

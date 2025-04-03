@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/material_dynamic_primary20"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:gravity="center"
         android:layout_weight="1">
+
         <ImageView
             android:id="@+id/cover_image"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:scaleType="centerCrop"
             android:src="@drawable/media_session_service_notification_ic_music_note"
-            android:contentDescription="@string/music_note"/>
+            android:contentDescription="@string/music_note"
+            app:tint="@color/black" />
     </LinearLayout>
 
     <TextView
@@ -25,7 +27,6 @@
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:textSize="20sp"
-        android:textColor="@color/material_dynamic_neutral90"
         android:paddingBottom="24dp"
         android:text="@string/track_title"/>
     <TextView
@@ -34,6 +35,5 @@
         android:textAlignment="center"
         android:textSize="16sp"
         android:text="@string/track_artist"
-        android:textColor="@color/material_dynamic_neutral90"
         android:paddingBottom="24dp"/>
 </LinearLayout>

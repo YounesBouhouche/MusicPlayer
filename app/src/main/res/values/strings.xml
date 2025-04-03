@@ -211,4 +211,7 @@
     <string name="music_note">Music note</string>
     <string name="track_title">Track title</string>
     <string name="track_artist">Track artist</string>
+    <string name="title_activity_config">ConfigActivity</string>
+    <string name="transparency">Transparency</string>
+    <string name="preview">Preview</string>
 </resources>

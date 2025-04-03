@@ -33,22 +33,30 @@
         android:theme="@style/Theme.MusicPlayer"
         tools:targetApi="tiramisu">
         <activity
-            android:name=".dialog.presentation.DialogActivity"
+            android:name=".glance.presentation.ConfigActivity"
             android:exported="true"
+            android:label="@string/title_activity_config"
+            android:theme="@style/Theme.MusicPlayer" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".dialog.presentation.DialogActivity"
             android:excludeFromRecents="true"
+            android:exported="true"
             android:label="@string/title_activity_dialog"
-            android:theme="@style/Theme.MusicPlayer.Dialog" >
+            android:theme="@style/Theme.MusicPlayer.Dialog">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="audio/*" />
                 <data android:scheme="file" />
                 <data android:scheme="content" />
             </intent-filter>
         </activity>
-
-
-
 
         <profileable android:shell="true" />
 
@@ -60,12 +68,11 @@
             android:name=".settings.presentation.PlaybackActivity"
             android:exported="false"
             android:theme="@style/Theme.MusicPlayer" />
-
         <activity
             android:name=".MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTop"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:theme="@style/Theme.MusicPlayer">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -104,7 +111,6 @@
                 <action android:name="androidx.media3.session.MediaSessionService" />
             </intent-filter>
         </service>
-
         <service
             android:name=".core.domain.DialogService"
             android:enabled="true"
@@ -127,6 +133,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/my_app_widget_info" />
         </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -137,6 +144,5 @@
                 android:resource="@xml/file_paths" />
         </provider>
     </application>
-
 
 </manifest>
