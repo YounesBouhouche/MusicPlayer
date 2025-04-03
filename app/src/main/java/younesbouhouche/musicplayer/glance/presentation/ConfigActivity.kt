@@ -113,7 +113,7 @@ class ConfigActivity : ComponentActivity() {
                                             MyAppWidget().updateAll(this@ConfigActivity)
                                             val resultValue =
                                                 Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                                                setResult(RESULT_OK, resultValue)
+                                            setResult(RESULT_OK, resultValue)
                                             finish()
                                         }
                                     },
