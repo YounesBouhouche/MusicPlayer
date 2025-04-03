@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import org.koin.compose.KoinContext
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.main.presentation.util.composables.SetSystemBarColors
@@ -56,7 +57,7 @@ class SettingsActivity : ComponentActivity() {
             KoinContext {
                 SetSystemBarColors(get())
                 val context = LocalContext.current
-                val dataStore = SettingsDataStore(LocalContext.current)
+                val dataStore by inject<SettingsDataStore>()
                 val language by dataStore.language.collectAsState(initial = "system")
                 val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
                 val listState = rememberLazyListState()
