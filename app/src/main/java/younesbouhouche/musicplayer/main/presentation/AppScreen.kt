@@ -355,10 +355,10 @@ fun AppScreen(
             onPlayerEvent = mainVM::onPlayerEvent,
             onUiEvent = mainVM::onUiEvent,
             navigateToAlbum = {
-                navController.navigate(NavRoutes.ListScreen(album))
+                navController.navigate(NavRoutes.Album(album))
             },
             navigateToArtist = {
-                navController.navigate(NavRoutes.ListScreen(artist))
+                navController.navigate(NavRoutes.Artist(artist))
             },
             shareFile = {
                 context.startActivity(

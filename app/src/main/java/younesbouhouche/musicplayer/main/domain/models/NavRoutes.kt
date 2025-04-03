@@ -26,9 +26,6 @@ sealed class NavRoutes {
     data object Library : NavRoutes()
 
     @Serializable
-    data class ListScreen(val title: String) : NavRoutes()
-
-    @Serializable
     data class PlaylistScreen(val title: String) : NavRoutes()
 
     @Serializable
