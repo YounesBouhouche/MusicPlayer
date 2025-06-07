@@ -5,7 +5,6 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.database.ContentObserver
-import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Handler
@@ -39,9 +38,6 @@ class DialogRepoImpl(val context: Context): DialogRepo {
     private lateinit var player: Player
     private val observer =
         object : ContentObserver(Handler(Looper.getMainLooper())) {
-            override fun onChange(selfChange: Boolean) {
-                super.onChange(selfChange)
-            }
         }
 
     override fun getState(): StateFlow<PlayerState> = _state
@@ -160,8 +156,8 @@ class DialogRepoImpl(val context: Context): DialogRepo {
         _card.value = _card.value?.copy(cover = cover)
     }
 
-    override fun seekTo(position: Long) {
-        player.seekTo(position)
+    override fun seekTo(ms: Long) {
+        player.seekTo(ms)
     }
 
     override fun pauseResume() {

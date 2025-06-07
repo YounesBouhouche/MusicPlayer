@@ -13,7 +13,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.glance.GlanceModifier
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 

@@ -10,7 +10,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.media3.common.Player
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.settings.data.dataFlow

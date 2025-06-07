@@ -15,6 +15,7 @@ import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionError
 import androidx.media3.session.SessionResult
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
@@ -77,6 +78,31 @@ class DialogService : MediaSessionService(), MediaSession.Callback {
             NotificationCustomCmdButton.REWIND.customAction -> {
                 session.player.seekBack()
             }
+            NotificationCustomCmdButton.FORWARD.customAction -> {
+                session.player.seekForward()
+            }
+            NotificationCustomCmdButton.REWIND_10S.customAction -> {
+                // Seek back 10 seconds
+                val currentPosition = session.player.currentPosition
+                val newPosition = (currentPosition - 10_000).coerceAtLeast(0)
+                session.player.seekTo(newPosition)
+            }
+            NotificationCustomCmdButton.FORWARD_10S.customAction -> {
+                // Seek forward 10 seconds
+                val currentPosition = session.player.currentPosition
+                val newPosition = (currentPosition + 10_000).coerceAtMost(session.player.duration)
+                session.player.seekTo(newPosition)
+            }
+            NotificationCustomCmdButton.LOOP.customAction -> {
+                // Toggle loop mode
+                session.player.repeatMode =
+                    if (session.player.repeatMode == ExoPlayer.REPEAT_MODE_OFF) {
+                        ExoPlayer.REPEAT_MODE_ALL
+                    } else {
+                        ExoPlayer.REPEAT_MODE_OFF
+                    }
+            }
+            else -> return Futures.immediateFuture(SessionResult(SessionError.ERROR_UNKNOWN))
         }
         return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
     }

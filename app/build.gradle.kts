@@ -101,7 +101,6 @@ dependencies {
     implementation(libs.material.motion.compose.navigation)
     implementation(libs.waveslider)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.retrofit)
     implementation(libs.jaudiotagger)
     implementation(libs.timber)
     implementation(libs.androidx.glance)
@@ -139,3 +138,4 @@ dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.androidx.animation.graphics)
 }
+

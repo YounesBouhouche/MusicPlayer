@@ -1,5 +1,6 @@
 package younesbouhouche.musicplayer.main.presentation.dialogs
 
+import android.content.ClipData
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,17 +12,19 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.main.presentation.components.Dialog
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.presentation.components.Dialog
 import younesbouhouche.musicplayer.main.presentation.util.timeString
 import java.time.Instant
 import java.time.LocalDateTime
@@ -91,7 +94,8 @@ fun Item(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val clipboardManager = LocalClipboardManager.current
+    val clipboardManager = LocalClipboard.current
+    val scope = rememberCoroutineScope()
     Column(
         modifier =
             modifier
@@ -102,7 +106,9 @@ fun Item(
                 .clip(MaterialTheme.shapes.extraSmall)
                 .clipToBounds()
                 .clickable {
-                    clipboardManager.setText(AnnotatedString(text))
+                    scope.launch {
+                        clipboardManager.setClipEntry(ClipEntry(ClipData.newPlainText("", text)))
+                    }
                 }
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),

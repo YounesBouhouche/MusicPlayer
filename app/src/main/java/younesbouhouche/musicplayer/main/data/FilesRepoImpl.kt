@@ -72,6 +72,7 @@ import younesbouhouche.musicplayer.main.domain.repo.ArtistsRepo
 import younesbouhouche.musicplayer.main.domain.repo.FilesRepo
 import younesbouhouche.musicplayer.main.domain.repo.PlayerRepo
 import younesbouhouche.musicplayer.main.domain.util.onSuccess
+import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.util.getMimeType
 import younesbouhouche.musicplayer.main.presentation.util.saveUriImageToInternalStorage
@@ -120,6 +121,8 @@ class FilesRepoImpl(
 
     override fun getFiles(): Flow<List<MusicCard>> = _files
 
+    override fun getQueue(): Flow<List<MusicCard>> = _queueFiles
+
     override fun getAlbums(): Flow<List<Album>> = _albums
 
     override fun getArtists(): Flow<List<Artist>> = _artists
@@ -133,6 +136,8 @@ class FilesRepoImpl(
     private val _queueList = _queue.map { it.items }
 
     private val _queueIndex = _queue.map { it.index }
+
+    override fun getIndex(): Flow<Int> = _queueIndex
 
     private val _queueFiles =
         combine(_queueList, _files) { ids, files ->
@@ -337,7 +342,11 @@ class FilesRepoImpl(
                 PlayerEvent.IncreaseVolume -> IncreaseVolume
                 PlayerEvent.Next -> Next
                 PlayerEvent.Pause -> Pause
-                PlayerEvent.PauseResume -> PauseResume
+                PlayerEvent.PauseResume -> {
+                    if (player.playerState.first().playState == PlayState.STOP)
+                        Play(_queueFiles.first(), _queueIndex.first())
+                    else PauseResume
+                }
                 is PlayerEvent.Play -> Play(event.items, event.index, event.shuffle)
                 is PlayerEvent.PlayIds ->
                     Play(

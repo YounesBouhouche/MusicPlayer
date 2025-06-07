@@ -9,6 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import androidx.core.content.ContextCompat
+import androidx.glance.appwidget.updateAll
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
@@ -27,6 +28,7 @@ import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.core.domain.MediaPlayerService
 import younesbouhouche.musicplayer.core.domain.models.ItemData
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.glance.presentation.MyAppWidget
 import younesbouhouche.musicplayer.main.data.dao.AppDao
 import younesbouhouche.musicplayer.main.data.events.PlayerEvent
 import younesbouhouche.musicplayer.main.data.models.Queue
@@ -120,7 +122,6 @@ class PlayerRepoImpl(
                 pitch = pitch.first(),
             )
         }
-//        onUiEvent(UiEvent.SetViewState(ViewState.SMALL))
         startTimeUpdate()
     }
 
@@ -142,10 +143,9 @@ class PlayerRepoImpl(
             PlayerEvent.Next -> player.seekToNext()
             PlayerEvent.Pause -> player.pause()
             PlayerEvent.PauseResume -> {
-                if (player.isPlaying) {
-                    player.pause()
-                } else {
-                    player.play()
+                if (this::player.isInitialized) {
+                    if (player.isPlaying) player.pause()
+                    else player.play()
                 }
             }
 
@@ -387,6 +387,7 @@ class PlayerRepoImpl(
                 }
                 scope.launch {
                     dao.updateCurrentIndex(player.currentMediaItemIndex)
+                    MyAppWidget().updateAll(context)
                 }
             }
             scope.launch {
@@ -453,6 +454,9 @@ class PlayerRepoImpl(
                                 playState = if (isPlaying) PlayState.PLAYING else PlayState.PAUSED
                             )
                         }
+                        scope.launch {
+                            MyAppWidget().updateAll(context)
+                        }
                     }
 
                     override fun onMediaItemTransition(
@@ -462,8 +466,9 @@ class PlayerRepoImpl(
                         super.onMediaItemTransition(mediaItem, reason)
                         scope.launch {
                             dao.updateCurrentIndex(player.currentMediaItemIndex)
+                            MyAppWidget().updateAll(context)
 //                            try {
-//                                dao.addTimestamp(queueFiles.value[player.currentMediaItemIndex].path)
+//                                dao.addTimestamp(player.value[player.currentMediaItemIndex].path)
 //                            } catch (e: Exception) {
 //                                e.printStackTrace()
 //                            }

@@ -16,6 +16,8 @@ interface FilesRepo {
     fun init(scope: CoroutineScope, callback: () -> Unit)
     fun finalize()
     fun getFiles(): Flow<List<MusicCard>>
+    fun getQueue(): Flow<List<MusicCard>>
+    fun getIndex(): Flow<Int>
     fun getAlbums(): Flow<List<Album>>
     fun getArtists(): Flow<List<Artist>>
     fun getPlaylists(): Flow<List<Playlist>>
