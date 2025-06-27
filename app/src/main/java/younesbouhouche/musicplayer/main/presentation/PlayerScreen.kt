@@ -1,11 +1,15 @@
 package younesbouhouche.musicplayer.main.presentation
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.gestures.animateTo
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -13,6 +17,7 @@ import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,13 +27,13 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
-import com.kmpalette.color
 import com.kmpalette.rememberPaletteState
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.main.data.PlayerDataStore
+import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.domain.models.QueueModel
 import younesbouhouche.musicplayer.main.presentation.player.LargePlayer
 import younesbouhouche.musicplayer.main.presentation.player.SmallPlayer
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
@@ -42,26 +47,25 @@ import kotlin.math.roundToInt
 @Composable
 fun PlayerScreen(
     modifier: Modifier = Modifier,
-    queue: List<MusicCard>,
-    index: Int,
+    queue: QueueModel,
     playerState: PlayerState,
     uiState: UiState,
     dragState: AnchoredDraggableState<ViewState>,
     playlistDragState: AnchoredDraggableState<PlaylistViewState>,
     progress: Float,
     playlistProgress: Float,
+    onPlaybackEvent: (PlaybackEvent) -> Unit,
     onPlayerEvent: (PlayerEvent) -> Unit,
     onUiEvent: (UiEvent) -> Unit,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
     val shape = MaterialTheme.shapes.large.copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize)
     val offset = if (dragState.offset.isNaN()) 0 else dragState.offset.roundToInt()
     val paletteState = rememberPaletteState()
     val context = LocalContext.current
     val matchPictureColors = PlayerDataStore(context).matchPictureColors.collectAsState(true).value
     val scope = rememberCoroutineScope()
-    AppTheme(
-        paletteState.palette?.vibrantSwatch?.color ?: paletteState.palette?.dominantSwatch?.color
-    ) {
+    AppTheme(paletteState.palette) {
         Box(
             Modifier
                 .then(modifier)
@@ -69,34 +73,53 @@ fun PlayerScreen(
                 .offset {
                     IntOffset(0, offset)
                 }
-                .anchoredDraggable(dragState, Orientation.Vertical)
+                .anchoredDraggable(
+                    dragState,
+                    Orientation.Vertical,
+                    flingBehavior = AnchoredDraggableDefaults.flingBehavior(
+                        state = dragState,
+                        animationSpec = tween(),
+                        positionalThreshold = { it * .5f },
+//                        decayAnimationSpec = splineBasedDecay(density),
+//                        velocityThreshold = { with(density) { 100.dp.toPx() } },
+                    ),
+                    interactionSource = interactionSource
+                )
                 .background(MaterialTheme.colorScheme.surfaceContainer, shape)
                 .clip(shape)
                 .clipToBounds(),
         ) {
-            queue.getOrNull(index)?.run {
+            queue.items.getOrNull(queue.index)?.run {
                 SmallPlayer(
                     queue = queue,
-                    index = index,
                     playerState = playerState,
-                    onPlayerEvent = onPlayerEvent,
+                    onPlaybackEvent = onPlaybackEvent,
                     modifier = Modifier
                         .alpha(1f - progress)
                         .align(Alignment.TopStart)
-                        .clickable { onUiEvent(UiEvent.SetViewState(ViewState.LARGE)) },
+                        .clickable {
+                            scope.launch {
+                                dragState.animateTo(ViewState.LARGE)
+                            }
+                        },
+                    {
+                        paletteState.reset()
+                    }
                 ) {
                     if (matchPictureColors)
                         scope.launch {
                             paletteState.generate(it.asImageBitmap())
                         }
-                    else
+                    else {
                         paletteState.reset()
+                    }
                 }
                 LargePlayer(
+                    dragState.settledValue == ViewState.LARGE,
                     queue,
-                    index,
                     playerState,
                     uiState,
+                    onPlaybackEvent,
                     onPlayerEvent,
                     uiState.lyricsVisible,
                     uiState.syncing,

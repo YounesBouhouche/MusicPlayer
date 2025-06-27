@@ -10,6 +10,7 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -70,6 +71,8 @@ import younesbouhouche.musicplayer.main.presentation.components.SwipeMusicCardLa
 import younesbouhouche.musicplayer.main.presentation.util.PlaylistSortType
 import younesbouhouche.musicplayer.main.presentation.util.SortState
 import younesbouhouche.musicplayer.main.presentation.util.composables.isScrollingUp
+import younesbouhouche.musicplayer.main.presentation.util.plus
+import younesbouhouche.musicplayer.settings.presentation.components.listItemShape
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 import java.io.File
 
@@ -116,9 +119,7 @@ fun SharedTransitionScope.PlaylistScreen(
         }
     val paletteState = rememberPaletteState()
     val scope = rememberCoroutineScope()
-    AppTheme(
-        paletteState.palette?.vibrantSwatch?.color ?: paletteState.palette?.dominantSwatch?.color
-    ) {
+    AppTheme(paletteState.palette) {
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -163,10 +164,12 @@ fun SharedTransitionScope.PlaylistScreen(
         ) { paddingValues ->
             LazyColumn(
                 state = state,
-                contentPadding = paddingValues
+                contentPadding = paddingValues + PaddingValues(12.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 item {
-                    Column(Modifier.fillMaxWidth().padding(16.dp),
+                    Column(
+                        Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         MyImage(
@@ -253,6 +256,8 @@ fun SharedTransitionScope.PlaylistScreen(
                         file = file,
                         reorderableState = reorderableState,
                         onLongClick = { onLongClick(index) },
+                        shape = listItemShape(index, playlist.items.size),
+                        background = MaterialTheme.colorScheme.surfaceContainerLow,
                     ) {
                         onPlay(index, false)
                     }

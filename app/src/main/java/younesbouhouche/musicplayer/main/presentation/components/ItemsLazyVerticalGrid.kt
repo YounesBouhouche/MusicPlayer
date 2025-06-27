@@ -3,9 +3,11 @@ package younesbouhouche.musicplayer.main.presentation.components
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,11 +22,13 @@ import soup.compose.material.motion.animation.materialSharedAxisZOut
 @Composable
 fun <T>ItemsLazyVerticalGrid(
     items: List<T>,
-    itemKey: (T) -> Any,
+    itemKey: (Int, T) -> Any,
     gridCount: Int,
     modifier: Modifier = Modifier,
-    singleLineItemContent: @Composable (LazyGridItemScope.(T) -> Unit),
-    itemContent: @Composable (LazyGridItemScope.(T) -> Unit),
+    contentPadding: PaddingValues = PaddingValues(),
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    singleLineItemContent: @Composable (LazyGridItemScope.(Int, T) -> Unit),
+    itemContent: @Composable (LazyGridItemScope.(Int, T) -> Unit),
 ) {
     var currentGridCount by remember { mutableIntStateOf(gridCount.coerceAtLeast(2)) }
     LaunchedEffect(gridCount) {
@@ -39,8 +43,10 @@ fun <T>ItemsLazyVerticalGrid(
             LazyVerticalGridWithHeader(
                 modifier = modifier,
                 columns = GridCells.Fixed(1),
+                contentPadding = contentPadding,
+                verticalArrangement = verticalArrangement
             ) {
-                items(items, itemKey, itemContent = singleLineItemContent)
+                itemsIndexed(items, itemKey, itemContent = singleLineItemContent)
             }
         else
             LazyVerticalGridWithHeader(
@@ -49,7 +55,7 @@ fun <T>ItemsLazyVerticalGrid(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                items(items, itemKey, itemContent = itemContent)
+                itemsIndexed(items, itemKey, itemContent = itemContent)
             }
     }
 }
@@ -57,7 +63,18 @@ fun <T>ItemsLazyVerticalGrid(
 @Composable
 fun <T>ItemsLazyVerticalGrid(
     items: List<T>,
-    itemKey: (T) -> Any,
+    itemKey: (Int, T) -> Any,
     modifier: Modifier = Modifier,
-    itemContent: @Composable (LazyGridItemScope.(T) -> Unit),
-) = ItemsLazyVerticalGrid(items, itemKey, 1, modifier, itemContent, itemContent)
+    contentPadding: PaddingValues = PaddingValues(),
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    itemContent: @Composable (LazyGridItemScope.(Int, T) -> Unit),
+) = ItemsLazyVerticalGrid(
+    items,
+    itemKey,
+    1,
+    modifier,
+    contentPadding,
+    verticalArrangement,
+    itemContent,
+    itemContent
+)

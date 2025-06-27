@@ -68,84 +68,82 @@ class ConfigActivity : ComponentActivity() {
         glanceId = GlanceAppWidgetManager(this).getGlanceIdBy(appWidgetId)
         val dataStore by inject<SettingsDataStore>()
         setContent {
-            KoinContext {
-                val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-                val opacity by dataStore.getOpacity(appWidgetId).collectAsState(1f)
-                var selectedOpacity by remember { mutableFloatStateOf(1f) }
-                val scope = rememberCoroutineScope()
-                LaunchedEffect(opacity) {
-                    selectedOpacity = opacity
-                }
-                SetSystemBarColors(dataStore = dataStore)
-                AppTheme {
-                    Scaffold(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .nestedScroll(scrollBehavior.nestedScrollConnection),
-                        topBar = {
-                            LargeTopAppBar(
-                                title = {
-                                    Text(
-                                        stringResource(id = R.string.settings),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                },
-                                navigationIcon = {
-                                    IconButton(onClick = {
-                                        val resultValue = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                                        setResult(RESULT_CANCELED, resultValue)
+            val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+            val opacity by dataStore.getOpacity(appWidgetId).collectAsState(1f)
+            var selectedOpacity by remember { mutableFloatStateOf(1f) }
+            val scope = rememberCoroutineScope()
+            LaunchedEffect(opacity) {
+                selectedOpacity = opacity
+            }
+            SetSystemBarColors(dataStore = dataStore)
+            AppTheme {
+                Scaffold(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .nestedScroll(scrollBehavior.nestedScrollConnection),
+                    topBar = {
+                        LargeTopAppBar(
+                            title = {
+                                Text(
+                                    stringResource(id = R.string.settings),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = {
+                                    val resultValue = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                                    setResult(RESULT_CANCELED, resultValue)
+                                    finish()
+                                }) {
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                                }
+                            },
+                            scrollBehavior = scrollBehavior,
+                        )
+                    },
+                    bottomBar = {
+                        Row(Modifier.padding(16.dp).fillMaxWidth()) {
+                            Button(
+                                {
+                                    scope.launch {
+                                        dataStore.setOpacity(appWidgetId, selectedOpacity)
+                                        MyAppWidget().updateAll(this@ConfigActivity)
+                                        val resultValue =
+                                            Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                                        setResult(RESULT_OK, resultValue)
                                         finish()
-                                    }) {
-                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                                     }
                                 },
-                                scrollBehavior = scrollBehavior,
+                                Modifier.fillMaxWidth()
+                            ) {
+                                Text(stringResource(R.string.ok))
+                            }
+                        }
+                    },
+                    contentWindowInsets = WindowInsets(left = 16.dp, right = 16.dp),
+                ) { paddingValues ->
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = paddingValues,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        settingsLabel({ stringResource(R.string.transparency) }) {
+                            "${(selectedOpacity * 100).roundToInt()}%"
+                        }
+                        item {
+                            Slider(
+                                value = selectedOpacity,
+                                onValueChange = { selectedOpacity = it },
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                             )
-                        },
-                        bottomBar = {
-                            Row(Modifier.padding(16.dp).fillMaxWidth()) {
-                                Button(
-                                    {
-                                        scope.launch {
-                                            dataStore.setOpacity(appWidgetId, selectedOpacity)
-                                            MyAppWidget().updateAll(this@ConfigActivity)
-                                            val resultValue =
-                                                Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                                            setResult(RESULT_OK, resultValue)
-                                            finish()
-                                        }
-                                    },
-                                    Modifier.fillMaxWidth()
-                                ) {
-                                    Text(stringResource(R.string.ok))
-                                }
-                            }
-                        },
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                    ) { paddingValues ->
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentPadding = paddingValues,
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            settingsLabel({ stringResource(R.string.transparency) }) {
-                                "${(selectedOpacity * 100).roundToInt()}%"
-                            }
-                            item {
-                                Slider(
-                                    value = selectedOpacity,
-                                    onValueChange = { selectedOpacity = it },
-                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-                                )
-                            }
-                            settingsLabel {
-                                stringResource(R.string.preview)
-                            }
-                            item {
-                                //LargeWidgetContent(null, PlayerState(), {}, selectedOpacity)
-                            }
+                        }
+                        settingsLabel {
+                            stringResource(R.string.preview)
+                        }
+                        item {
+                            //LargeWidgetContent(null, PlayerState(), {}, selectedOpacity)
                         }
                     }
                 }

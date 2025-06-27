@@ -74,7 +74,7 @@ fun DialogContent(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 SubcomposeAsyncImage(
-                    model = card?.cover,
+                    model = card?.coverUri,
                     contentDescription = null,
                     modifier = Modifier.size(64.dp)
                         .clip(MaterialTheme.shapes.small)

@@ -12,22 +12,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.domain.models.QueueModel
 
 @Composable
 fun Pager(
+    enabled: Boolean,
     lyricsVisible: Boolean,
     syncing: Boolean,
     playing: Boolean,
     pagerState: PagerState,
-    queue: List<MusicCard>,
-    index: Int,
+    queue: QueueModel,
     time: Long,
-    onPlayerEvent: (PlayerEvent) -> Unit,
+    onPlaybackEvent: (PlaybackEvent) -> Unit,
     onUiEvent: (UiEvent) -> Unit,
     modifier: Modifier = Modifier,
+    onUpdateFavorite: (String, Boolean) -> Unit,
 ) {
     AnimatedContent(
         targetState = lyricsVisible,
@@ -45,9 +46,9 @@ fun Pager(
         },
     ) { lyrics ->
         if (lyrics) {
-            Lyrics(queue[index].lyrics, syncing, time, onPlayerEvent, onUiEvent)
+            Lyrics(queue.items[queue.index].lyrics, syncing, time, onPlaybackEvent, onUiEvent)
         } else {
-            Disk(queue, index, playing, pagerState, onPlayerEvent)
+            Disk(enabled, queue, playing, pagerState, onUpdateFavorite)
         }
     }
 }

@@ -42,7 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.presentation.util.toMs
 
@@ -51,7 +51,7 @@ fun Lyrics(
     lyrics: String,
     syncing: Boolean,
     time: Long,
-    onPlayerEvent: (PlayerEvent) -> Unit,
+    onPlaybackEvent: (PlaybackEvent) -> Unit,
     onUiEvent: (UiEvent) -> Unit,
 ) {
     val timeRegex = Regex("\\[((\\d{2}:)?\\d{2}:\\d{2}([.:])\\d{2})]")
@@ -131,7 +131,7 @@ fun Lyrics(
                                     segments
                                         .getOrNull(index)
                                         ?.let {
-                                            onPlayerEvent(PlayerEvent.SeekTime(it))
+                                            onPlaybackEvent(PlaybackEvent.SeekTime(it))
                                         }
                                     onUiEvent(UiEvent.EnableSyncing)
                                 }

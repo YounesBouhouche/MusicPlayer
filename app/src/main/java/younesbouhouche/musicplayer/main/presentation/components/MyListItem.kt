@@ -18,13 +18,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,19 +29,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.SubcomposeAsyncImage
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MyListItem(
     modifier: Modifier = Modifier,
     background: Color = Color.Transparent,
+    shape: Shape = MaterialTheme.shapes.large,
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     headline: String,
@@ -55,10 +51,9 @@ fun MyListItem(
     trailingContent: @Composable (RowScope.() -> Unit)? = null,
 ) {
     Row(
-        modifier.combinedClickable(onLongClick = onLongClick, onClick = onClick)
-            .background(background, MaterialTheme.shapes.medium)
-            .clip(MaterialTheme.shapes.medium)
-            .clipToBounds(),
+        modifier.clip(shape)
+            .combinedClickable(onLongClick = onLongClick, onClick = onClick)
+            .background(background),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
@@ -120,6 +115,7 @@ fun MyListItem(
 fun MyListItem(
     modifier: Modifier = Modifier,
     background: Color = Color.Transparent,
+    shape: Shape = MaterialTheme.shapes.large,
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     headline: String,
@@ -132,6 +128,7 @@ fun MyListItem(
     MyListItem(
         modifier,
         background,
+        shape,
         onClick,
         onLongClick,
         headline,
@@ -153,6 +150,7 @@ fun MyListItem(
 fun SharedTransitionScope.MyListItem(
     modifier: Modifier = Modifier,
     background: Color = Color.Transparent,
+    shape: Shape = MaterialTheme.shapes.large,
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     headline: String,
@@ -167,6 +165,7 @@ fun SharedTransitionScope.MyListItem(
     MyListItem(
         modifier,
         background,
+        shape,
         onClick,
         onLongClick,
         headline,

@@ -49,7 +49,7 @@ import ir.mahozad.multiplatform.wavyslider.material3.WaveLength
 import ir.mahozad.multiplatform.wavyslider.material3.WavySlider
 import soup.compose.material.motion.MaterialSharedAxisZ
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.presentation.components.PlayPauseAnimatedIcon
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
@@ -62,7 +62,7 @@ fun Controls(
     activeItem: MusicCard,
     showVolumeSlider: Boolean,
     playerState: PlayerState,
-    onPlayerEvent: (PlayerEvent) -> Unit,
+    onPlaybackEvent: (PlaybackEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showRemaining by remember { mutableStateOf(false) }
@@ -124,7 +124,7 @@ fun Controls(
                 },
                 onValueChangeFinished = {
                     dragging = false
-                    onPlayerEvent(PlayerEvent.SeekTime((sliderValue * activeItem.duration).roundToLong()))
+                    onPlaybackEvent(PlaybackEvent.SeekTime((sliderValue * activeItem.duration).roundToLong()))
                 },
                 waveLength = SliderDefaults.WaveLength * 2,
                 waveHeight = waveHeight,
@@ -192,7 +192,7 @@ fun Controls(
                 ) {
                     IconButton(
                         onClick = {
-                            onPlayerEvent(PlayerEvent.DecreaseVolume)
+                            onPlaybackEvent(PlaybackEvent.DecreaseVolume)
                         },
                         enabled = playerState.volume > 0f,
                         colors = IconButtonDefaults.iconButtonColors(
@@ -211,12 +211,12 @@ fun Controls(
                             ),
                         value = playerState.volume,
                         onValueChange = {
-                            onPlayerEvent(PlayerEvent.SetVolume(it))
+                            onPlaybackEvent(PlaybackEvent.SetVolume(it))
                         },
                     )
                     IconButton(
                         onClick = {
-                            onPlayerEvent(PlayerEvent.IncreaseVolume)
+                            onPlaybackEvent(PlaybackEvent.IncreaseVolume)
                         },
                         enabled = playerState.volume < 1f,
                         colors = IconButtonDefaults.iconButtonColors(
@@ -239,7 +239,7 @@ fun Controls(
         ) {
             AnimatedVisibility(visible = playerState.hasPrevItem) {
                 FilledIconButton(
-                    onClick = { onPlayerEvent(PlayerEvent.Previous) },
+                    onClick = { onPlaybackEvent(PlaybackEvent.Previous) },
                     modifier = Modifier.size(80.dp),
                     colors = nextPrevColors,
                 ) {
@@ -251,7 +251,7 @@ fun Controls(
                 }
             }
             FilledIconButton(
-                onClick = { onPlayerEvent(PlayerEvent.PauseResume) },
+                onClick = { onPlaybackEvent(PlaybackEvent.PauseResume) },
                 modifier =
                     Modifier
                         .height(100.dp)
@@ -271,7 +271,7 @@ fun Controls(
             }
             AnimatedVisibility(visible = playerState.hasNextItem) {
                 FilledIconButton(
-                    onClick = { onPlayerEvent(PlayerEvent.Next) },
+                    onClick = { onPlaybackEvent(PlaybackEvent.Next) },
                     modifier = Modifier.size(80.dp),
                     colors = nextPrevColors,
                 ) {

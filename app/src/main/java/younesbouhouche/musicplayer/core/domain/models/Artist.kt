@@ -10,6 +10,11 @@ data class Artist(
 ) {
     fun toArtistUi(files: (List<Long>) -> List<MusicCard>) = ArtistUi(name, files(items), cover, picture)
     fun getPicture(): Any? = picture.takeIf { it.isNotEmpty() } ?: cover
+
+    fun search(query: String): Boolean {
+        return name.contains(query, ignoreCase = true)
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -31,4 +36,5 @@ data class Artist(
         result = 31 * result + picture.hashCode()
         return result
     }
+
 }

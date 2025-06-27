@@ -14,4 +14,7 @@ data class Playlist(
     val favorite: Boolean = false,
 ) {
     fun createM3UText() = "#EXTINF:$name\n#EXTM3U\n" + items.joinToString("\n")
+    fun search(query: String): Boolean {
+        return name.contains(query, ignoreCase = true)
+    }
 }

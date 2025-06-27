@@ -1,21 +1,25 @@
 package younesbouhouche.musicplayer.core.domain.models
 
-import android.media.MediaMetadataRetriever
+import android.content.Context
 import android.net.Uri
-import androidx.annotation.OptIn
+import android.util.Log
 import androidx.compose.runtime.Immutable
+import androidx.core.content.FileProvider
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import androidx.media3.common.util.UnstableApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.io.File
+import androidx.core.net.toUri
 
 @Immutable
 data class MusicCard(
     var contentUri: Uri,
     var id: Long,
     var title: String,
-    var cover: ByteArray,
+    var cover: ByteArray?,
+    var coverUri: Uri?,
+    var coverPath: String,
     var artist: String,
     var albumId: Long,
     var album: String,
@@ -26,15 +30,17 @@ data class MusicCard(
     var size: Long,
     var date: Long,
     var duration: Long,
-    var favorite: Flow<Boolean>,
+    var favorite: Boolean,
     var timestamps: Flow<List<Long>>,
 ) {
     @Suppress("unused")
     class Builder {
         private var contentUri: Uri = Uri.EMPTY
+        private var coverUri: Uri? = null
         private var id: Long = -1
         private var title: String = ""
         private var cover: ByteArray = ByteArray(0)
+        private var coverPath: String = ""
         private var coverByteArray: ByteArray = byteArrayOf()
         private var artist: String = ""
         private var albumId: Long = -1
@@ -46,16 +52,18 @@ data class MusicCard(
         private var size: Long = 0L
         private var date: Long = 0
         private var duration: Long = -1
-        private var favorite: Flow<Boolean> = MutableStateFlow(false)
+        private var favorite: Boolean = false
         private var timestamps: Flow<List<Long>> = MutableStateFlow(emptyList())
 
         fun setContentUri(contentUri: Uri) = apply { this.contentUri = contentUri }
+        fun setCoverUri(coverUri: Uri?) = apply { this.coverUri = coverUri }
 
         fun setId(id: Long) = apply { this.id = id }
 
         fun setTitle(title: String) = apply { this.title = title }
 
         fun setCover(cover: ByteArray) = apply { this.cover = cover }
+        fun setCoverPath(coverPath: String) = apply { this.coverPath = coverPath }
 
         fun setArtist(artist: String) = apply { this.artist = artist }
 
@@ -77,7 +85,7 @@ data class MusicCard(
 
         fun setDuration(duration: Long) = apply { this.duration = duration }
 
-        fun setFavorite(favorite: Flow<Boolean>) = apply { this.favorite = favorite }
+        fun setFavorite(favorite: Boolean) = apply { this.favorite = favorite }
 
         fun setTimestamps(timestamps: Flow<List<Long>>) = apply { this.timestamps = timestamps }
 
@@ -87,6 +95,8 @@ data class MusicCard(
                 id,
                 title,
                 cover,
+                coverUri,
+                coverPath,
                 artist,
                 albumId,
                 album,
@@ -110,7 +120,7 @@ data class MusicCard(
 
         if (contentUri != other.contentUri) return false
         if (id != other.id) return false
-        if (!cover.contentEquals(other.cover)) return false
+        if (coverUri != other.coverUri) return false
         if (title != other.title) return false
         if (artist != other.artist) return false
         if (albumId != other.albumId) return false
@@ -131,7 +141,6 @@ data class MusicCard(
     override fun hashCode(): Int {
         var result = contentUri.hashCode()
         result = 31 * result + id.hashCode()
-        result = 31 * result + (cover.hashCode())
         result = 31 * result + title.hashCode()
         result = 31 * result + artist.hashCode()
         result = 31 * result + albumId.hashCode()
@@ -147,27 +156,6 @@ data class MusicCard(
         return result
     }
 
-    companion object {
-        @OptIn(UnstableApi::class)
-        fun fromUri(uri: Uri) =
-            with(MediaItem.fromUri(uri)) {
-                val cover =
-                    mediaMetadata.artworkUri?.let { uri ->
-                        MediaMetadataRetriever().apply {
-                            setDataSource(uri.toString())
-                        }.embeddedPicture
-                    } ?: ByteArray(0)
-                Builder()
-                    .setContentUri(uri)
-                    .setTitle("${mediaMetadata.title}")
-                    .setAlbum("${mediaMetadata.albumTitle}")
-                    .setArtist("${mediaMetadata.artist}")
-                    .setDuration(mediaMetadata.durationMs ?: 0L)
-                    .setCover(cover)
-                    .build()
-            }
-    }
-
     fun toMediaItem() =
         MediaItem
             .Builder()
@@ -181,12 +169,35 @@ data class MusicCard(
                     .setArtist(artist)
                     .setGenre(genre)
                     .setComposer(composer)
-                    .setArtworkData(
-                        cover.takeIf { it.isNotEmpty() }
-                            ?: MediaItem.fromUri(contentUri).mediaMetadata.artworkData,
-                        MediaMetadata.PICTURE_TYPE_MEDIA
-                    )
+//                    .setArtworkData(
+//                        cover.takeIf { it.isNotEmpty() }
+//                            ?: MediaItem.fromUri(contentUri).mediaMetadata.artworkData,
+//                        MediaMetadata.PICTURE_TYPE_MEDIA
+//                    )
                     .build(),
             )
             .build()
+}
+
+
+fun Context.getCoverContentUri(coverPath: String): Uri? {
+    return try {
+        val file = File(coverPath)
+        if (file.exists()) {
+            FileProvider.getUriForFile(
+                this,
+                "$packageName.fileprovider",
+                file
+            )
+        } else null
+    } catch (e: Exception) {
+        Log.e("MediaRepository", "Error creating content URI for: $coverPath", e)
+        null
+    }
+}
+
+fun Context.getCoverUri(coverPath: String): Uri? {
+    if (coverPath.isEmpty()) return null
+    val file = File(coverPath)
+    return if (file.exists()) { "file://${file.absolutePath}".toUri() } else null
 }

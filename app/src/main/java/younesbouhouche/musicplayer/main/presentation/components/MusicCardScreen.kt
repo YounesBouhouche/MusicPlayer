@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,21 +36,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toOffset
-import coil.compose.SubcomposeAsyncImage
-import com.kmpalette.color
 import com.kmpalette.rememberPaletteState
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableCollectionItemScope
@@ -68,19 +65,21 @@ fun MusicCardScreen(
     modifier: Modifier = Modifier,
     number: Int? = null,
     background: Color = Color.Transparent,
+    shape: Shape = MaterialTheme.shapes.large,
     trailingContent: @Composable RowScope.() -> Unit = {},
-    onLongClick: () -> Unit,
+    onLongClick: () -> Unit = {},
     onClick: () -> Unit,
 ) {
     MyListItem(
         modifier = modifier,
         number = number,
         background = background,
+        shape = shape,
         onClick = onClick,
         onLongClick = onLongClick,
         headline = file.title,
         supporting = "${file.artist} - ${file.duration.timeString}",
-        cover = file.cover,
+        cover = file.coverUri,
         trailingContent = {
             trailingContent()
             IconButton(onClick = onLongClick) {
@@ -100,18 +99,15 @@ fun HomeMusicCard(
 ) {
     val paletteState = rememberPaletteState()
     val scope = rememberCoroutineScope()
-    AppTheme(
-        paletteState.palette?.vibrantSwatch?.color ?: paletteState.palette?.dominantSwatch?.color
-    ) {
+    AppTheme(paletteState.palette) {
         Box(
             modifier.size(300.dp, 112.dp)
-                .clip(CardDefaults.shape)
+                .clip(MaterialTheme.shapes.large)
                 .combinedClickable(onClick = onClick, onLongClick = onLongClick)) {
-            SubcomposeAsyncImage(
-                model = card.cover,
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
+            MyImage(
+                model = card.coverUri,
+                icon = Icons.Default.MusicNote,
+                modifier = Modifier.fillMaxSize().blur(10.dp),
             )
             Row(
                 Modifier
@@ -119,8 +115,8 @@ fun HomeMusicCard(
                         Brush
                             .horizontalGradient(
                                 listOf(
-                                    MaterialTheme.colorScheme.surfaceContainer,
-                                    MaterialTheme.colorScheme.surfaceContainer.copy(.2f)
+                                    MaterialTheme.colorScheme.primaryContainer,
+                                    MaterialTheme.colorScheme.primaryContainer.copy(.2f)
                                 )
                             )
                     )
@@ -129,31 +125,18 @@ fun HomeMusicCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                SubcomposeAsyncImage(
-                    model = card.cover,
-                    contentDescription = "",
+                MyImage(
+                    model = card.coverUri,
+                    icon = Icons.Default.MusicNote,
                     modifier = Modifier
-                        .size(80.dp)
-                        .clip(MaterialTheme.shapes.medium)
-                        .background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.medium),
-                    contentScale = ContentScale.Crop,
+                        .size(80.dp),
+                    background = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = .5f),
+                    shape = MaterialTheme.shapes.medium,
                     onSuccess = {
                         scope.launch {
                             paletteState.generate((it.result.drawable as BitmapDrawable).bitmap.asImageBitmap())
                         }
                     },
-                    error = {
-                        Box(Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Default.MusicNote,
-                                null,
-                                Modifier.size(60.dp),
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
                 )
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
@@ -195,18 +178,19 @@ fun ReorderableCollectionItemScope.MusicCardScreen(
     modifier: Modifier = Modifier,
     number: Int? = null,
     background: Color = Color.Transparent,
+    shape: Shape = MaterialTheme.shapes.large,
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {},
 ) {
     MyListItem(
-        modifier =
-            modifier.background(background, MaterialTheme.shapes.medium)
-                .clip(MaterialTheme.shapes.medium).clipToBounds(),
+        modifier = modifier,
         onLongClick = onLongClick,
         onClick = onClick,
+        background = background,
+        shape = shape,
         headline = file.title,
         supporting = "${file.artist} - ${file.duration.timeString}",
-        cover = file.cover,
+        cover = file.coverUri,
         number = number,
         trailingContent = {
             val view = LocalView.current
@@ -250,6 +234,7 @@ fun LazyItemScope.LazyMusicCardScreen(
     modifier: Modifier = Modifier,
     number: Int? = null,
     background: Color = Color.Transparent,
+    shape: Shape = MaterialTheme.shapes.large,
     reorderableState: ReorderableLazyListState? = null,
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {},
@@ -259,6 +244,7 @@ fun LazyItemScope.LazyMusicCardScreen(
             file = file,
             number = number,
             background = background,
+            shape = shape,
             onClick = onClick,
             onLongClick = onLongClick,
             modifier = modifier.animateItem(),
@@ -273,6 +259,7 @@ fun LazyItemScope.LazyMusicCardScreen(
                 file = file,
                 number = number,
                 background = background,
+                shape = shape,
                 onClick = onClick,
                 onLongClick = onLongClick,
             )
@@ -285,6 +272,7 @@ fun LazyItemScope.LazyMusicCardScreen(
 fun LazyGridItemScope.LazyMusicCardScreen(
     file: MusicCard,
     modifier: Modifier = Modifier,
+    shape: Shape = MaterialTheme.shapes.large,
     number: Int? = null,
     background: Color = Color.Transparent,
     reorderableState: ReorderableLazyGridState? = null,
@@ -296,6 +284,7 @@ fun LazyGridItemScope.LazyMusicCardScreen(
             file = file,
             number = number,
             background = background,
+            shape = shape,
             onClick = onClick,
             onLongClick = onLongClick,
             modifier = modifier.animateItem(),
@@ -310,6 +299,7 @@ fun LazyGridItemScope.LazyMusicCardScreen(
                 file = file,
                 number = number,
                 background = background,
+                shape = shape,
                 onClick = onClick,
                 onLongClick = onLongClick,
             )
@@ -324,7 +314,7 @@ fun LazyItemScope.SwipeMusicCardLazyItem(
     modifier: Modifier = Modifier,
     number: Int? = null,
     background: Color = MaterialTheme.colorScheme.errorContainer,
-    swipingItemBackground: Color = MaterialTheme.colorScheme.surface,
+    shape: Shape = MaterialTheme.shapes.large,
     reorderableState: ReorderableLazyListState? = null,
     onLongClick: () -> Unit = {},
     onClick: () -> Unit = {},
@@ -342,7 +332,7 @@ fun LazyItemScope.SwipeMusicCardLazyItem(
         if (state.dismissDirection == SwipeToDismissBoxValue.Settled) {
             Color.Transparent
         } else {
-            background
+            MaterialTheme.colorScheme.errorContainer
         }
     SwipeToDismissBox(
         state = state,
@@ -352,7 +342,8 @@ fun LazyItemScope.SwipeMusicCardLazyItem(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .background(boxBackground, MaterialTheme.shapes.medium)
+                        .clip(shape)
+                        .background(boxBackground)
                         .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.CenterEnd,
             ) {
@@ -373,7 +364,8 @@ fun LazyItemScope.SwipeMusicCardLazyItem(
             file,
             Modifier,
             number,
-            swipingItemBackground,
+            background,
+            shape,
             reorderableState,
             onLongClick,
             onClick,

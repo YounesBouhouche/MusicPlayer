@@ -1,19 +1,18 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.test)
     alias(libs.plugins.jetbrains.kotlin.android)
 }
+
 
 android {
     namespace = "younesbouhouche.musicplayer.benchmark"
     compileSdk = 34
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     defaultConfig {
@@ -34,7 +33,14 @@ android {
             proguardFiles("benchmark-rules.pro")
         }
     }
-
+    kotlin {
+        // Extension level
+        compilerOptions {
+            jvmTarget = JvmTarget.fromTarget("21")
+            languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.fromVersion("2.1")
+            apiVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.fromVersion("2.1")
+        }
+    }
     targetProjectPath = ":app"
     experimentalProperties["android.experimental.self-instrumenting"] = true
 }
@@ -44,6 +50,7 @@ dependencies {
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.uiautomator)
     implementation(libs.androidx.benchmark.macro.junit4)
+    implementation(libs.androidx.core.ktx)
 }
 
 androidComponents {

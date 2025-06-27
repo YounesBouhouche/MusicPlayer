@@ -26,10 +26,10 @@ sealed class NavRoutes {
     data object Library : NavRoutes()
 
     @Serializable
-    data class PlaylistScreen(val title: String) : NavRoutes()
+    data class Playlist(val playlistId: Int) : NavRoutes()
 
     @Serializable
-    data object FavoritesScreen : NavRoutes()
+    data object Favorites : NavRoutes()
 
     @Serializable
     data object MostPlayedScreen : NavRoutes()

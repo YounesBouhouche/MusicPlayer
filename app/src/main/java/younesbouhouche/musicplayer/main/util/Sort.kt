@@ -1,5 +1,6 @@
 package younesbouhouche.musicplayer.main.util
 
+import kotlinx.coroutines.flow.Flow
 import younesbouhouche.musicplayer.core.domain.models.Album
 import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
@@ -76,7 +77,6 @@ fun List<Artist>.sortBy(sortType: ListsSortType, ascending: Boolean = true) =
             ListsSortType.Count -> sortedByDescending { it.items.size }
         }
     }
-
 
 @JvmName("sortByPlaylist")
 fun List<Playlist>.sortBy(sortType: ListsSortType, ascending: Boolean = true) =

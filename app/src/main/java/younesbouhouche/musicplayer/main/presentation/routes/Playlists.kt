@@ -11,6 +11,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,15 +31,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
+import younesbouhouche.musicplayer.main.presentation.components.EmptyContainer
 import younesbouhouche.musicplayer.main.presentation.components.ItemsLazyVerticalGrid
 import younesbouhouche.musicplayer.main.presentation.components.ListsSortSheet
 import younesbouhouche.musicplayer.main.presentation.components.MyImage
@@ -46,6 +50,7 @@ import younesbouhouche.musicplayer.main.presentation.components.PlaylistListItem
 import younesbouhouche.musicplayer.main.presentation.util.ListsSortType
 import younesbouhouche.musicplayer.main.presentation.util.SortState
 import younesbouhouche.musicplayer.main.presentation.util.composables.isScrollingUp
+import younesbouhouche.musicplayer.settings.presentation.components.listItemShape
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -84,7 +89,7 @@ fun SharedTransitionScope.Playlists(
                         close()
                     }
                     if (name.isNotBlank() and items.isNotEmpty()) {
-                        onPlaylistEvent(PlaylistEvent.CreateNewPlaylist(name, items))
+                        onPlaylistEvent(PlaylistEvent.CreateNew(name, items, null))
                     }
                 } catch (_: Exception) {
                 }
@@ -92,62 +97,71 @@ fun SharedTransitionScope.Playlists(
         }
     val state = rememberLazyListState()
     Box(modifier.fillMaxSize()) {
-        ItemsLazyVerticalGrid(
-            items = playlists,
-            itemKey = { it.id },
-            gridCount = sortState.colsCount?.count ?: 1,
-            modifier = modifier,
-            singleLineItemContent = {
-                PlaylistListItem(
-                    it,
-                    animatedContentScope,
-                    { onClick(playlists.indexOf(it)) },
-                    { onLongClick(playlists.indexOf(it)) },
-                    { onPlayerEvent(PlayerEvent.PlayPaths(it.items.toList())) },
-                    Modifier.animateItem(),
-                )
-            },
-            itemContent = {
-                Box(
-                    Modifier
-                        .animateItem()
-                        .fillMaxWidth()
-                        .clip(MaterialTheme.shapes.extraLarge)
-                        .clipToBounds()
-                        .combinedClickable(
-                            onClick = { onClick(playlists.indexOf(it)) },
-                            onLongClick = { onLongClick(playlists.indexOf(it)) },
-                        )
-                        .padding(8.dp),
-                ) {
-                    Column(
-                        Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
+        EmptyContainer(
+            playlists.isEmpty(),
+            Icons.AutoMirrored.Filled.PlaylistPlay,
+            stringResource(R.string.empty_playlists)
+        ) {
+            ItemsLazyVerticalGrid(
+                items = playlists,
+                itemKey = { _, it -> it.id },
+                gridCount = sortState.colsCount?.count ?: 1,
+                modifier = modifier,
+                contentPadding = PaddingValues(12.dp),
+                singleLineItemContent = { index, it ->
+                    PlaylistListItem(
+                        it,
+                        animatedContentScope,
+                        { onClick(it.id) },
+                        { onLongClick(it.id) },
+                        { onPlayerEvent(PlayerEvent.PlayPlaylist(it.id)) },
+                        Modifier.animateItem(),
+                        shape = listItemShape(index, playlists.size),
+                        background = MaterialTheme.colorScheme.surfaceContainerLow,
+                    )
+                },
+                itemContent = { _, it ->
+                    Box(
+                        Modifier
+                            .animateItem()
+                            .fillMaxWidth()
+                            .clip(MaterialTheme.shapes.extraLarge)
+                            .clipToBounds()
+                            .combinedClickable(
+                                onClick = { onClick(it.id) },
+                                onLongClick = { onLongClick(playlists.indexOf(it)) },
+                            )
+                            .padding(8.dp),
                     ) {
-                        MyImage(
-                            it.image?.let { image -> File(context.filesDir, image) },
-                            Icons.AutoMirrored.Default.PlaylistPlay,
-                            Modifier
-                                .sharedElement(
-                                    rememberSharedContentState(key = "playlist-${it.id}"),
-                                    animatedVisibilityScope = animatedContentScope
-                                )
-                                .fillMaxWidth()
-                                .aspectRatio(1f),
-                            shape = MaterialTheme.shapes.large
-                        )
-                        Text(
-                            it.name,
+                        Column(
                             Modifier.fillMaxWidth(),
-                            style = MaterialTheme.typography.titleMedium,
-                            textAlign = TextAlign.Center,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            MyImage(
+                                it.image?.let { image -> File(context.filesDir, image) },
+                                Icons.AutoMirrored.Default.PlaylistPlay,
+                                Modifier
+                                    .sharedElement(
+                                        rememberSharedContentState(key = "playlist-${it.id}"),
+                                        animatedVisibilityScope = animatedContentScope
+                                    )
+                                    .fillMaxWidth()
+                                    .aspectRatio(1f),
+                                shape = MaterialTheme.shapes.large
+                            )
+                            Text(
+                                it.name,
+                                Modifier.fillMaxWidth(),
+                                style = MaterialTheme.typography.titleMedium,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                     }
                 }
-            }
-        )
+            )
+        }
         AnimatedVisibility(
             modifier =
                 Modifier

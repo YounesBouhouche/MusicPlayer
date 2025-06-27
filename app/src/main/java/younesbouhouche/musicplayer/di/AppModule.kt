@@ -1,73 +1,49 @@
 package younesbouhouche.musicplayer.di
 
-import android.content.Context
-import android.media.AudioManager
-import android.media.MediaMetadataRetriever
-import androidx.room.Room
-import io.ktor.client.engine.cio.CIO
-import org.koin.android.ext.koin.androidContext
-import org.koin.core.module.dsl.viewModelOf
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.accept
+import io.ktor.client.request.header
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import org.koin.dsl.module
-import younesbouhouche.musicplayer.main.data.ArtistsRepoImpl
-import younesbouhouche.musicplayer.main.data.FilesRepoImpl
-import younesbouhouche.musicplayer.main.data.PlayerDataStore
-import younesbouhouche.musicplayer.main.data.PlayerRepoImpl
-import younesbouhouche.musicplayer.main.data.ThumbnailCache
-import younesbouhouche.musicplayer.main.data.dao.AppDao
-import younesbouhouche.musicplayer.main.data.db.AppDatabase
-import younesbouhouche.musicplayer.main.data.networking.HttpClientFactory
-import younesbouhouche.musicplayer.main.domain.repo.ArtistsRepo
-import younesbouhouche.musicplayer.main.domain.repo.FilesRepo
-import younesbouhouche.musicplayer.main.domain.repo.PlayerRepo
-import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
-import younesbouhouche.musicplayer.settings.data.SettingsDataStore
+import timber.log.Timber
+import younesbouhouche.musicplayer.BuildConfig
+import younesbouhouche.musicplayer.main.data.networking.constructUrl
 
 val appModule = module {
-    viewModelOf(::MainVM)
-    single<AppDatabase> {
-        Room
-            .databaseBuilder(androidContext(), AppDatabase::class.java, "files.db")
-            .build()
+    single<HttpClient> {
+        HttpClient {
+            defaultRequest {
+                header(HttpHeaders.Accept, ContentType.Application.Json)
+                url(constructUrl(BuildConfig.BASE_URL))
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+            }
+            install(Logging) {
+                level = LogLevel.ALL
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        Timber.tag("HttpClient").i(message)
+                    }
+                }
+            }
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                    encodeDefaults = true
+                })
+            }
+        }
     }
-
-    single<AppDao> {
-        get<AppDatabase>().dao
-    }
-
-    single { SettingsDataStore(androidContext()) }
-
-    single { PlayerDataStore(androidContext()) }
-
-    single { MediaMetadataRetriever() }
-
-    single { androidContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager }
-
-    single<PlayerRepo> {
-        PlayerRepoImpl(
-            androidContext(),
-            get(),
-            get(),
-            get()
-        )
-    }
-
-    single<ThumbnailCache> {
-        ThumbnailCache(androidContext())
-    }
-
-    single { HttpClientFactory.create(CIO.create()) }
-
-    single<ArtistsRepo> {
-        ArtistsRepoImpl(get())
-    }
-
-    single<FilesRepo> {
-        FilesRepoImpl(
-            androidContext(),
-            get(),
-            get(),
-            get(),
-            get(),
-        )
-    }
+    includes(databaseModule, repoModule, viewModelModule, utilsModule, useCaseModule)
 }

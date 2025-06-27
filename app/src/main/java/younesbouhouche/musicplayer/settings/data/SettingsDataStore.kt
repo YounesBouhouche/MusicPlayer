@@ -10,6 +10,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import younesbouhouche.musicplayer.settings.domain.models.ColorScheme
+import younesbouhouche.musicplayer.settings.domain.models.Language
+import younesbouhouche.musicplayer.settings.domain.models.Theme
 
 class SettingsDataStore(private val context: Context) {
     companion object {
@@ -21,11 +24,14 @@ class SettingsDataStore(private val context: Context) {
         val EXTRA_DARK_KEY = booleanPreferencesKey("extra_dark")
     }
 
-    val theme = dataFlow(context.dataStore, THEME_KEY, "system")
-    val colorTheme = dataFlow(context.dataStore, COLOR_THEME_KEY, "blue")
+    val theme = dataFlow(context.dataStore, THEME_KEY, Theme.SYSTEM.name)
+        .map { themeName -> Theme.fromString(themeName) }
+    val colorTheme = dataFlow(context.dataStore, COLOR_THEME_KEY, ColorScheme.GREEN.name)
+        .map { schemeName -> ColorScheme.fromString(schemeName) }
     val dynamicColors = dataFlow(context.dataStore, DYNAMIC_KEY, true)
     val extraDark = dataFlow(context.dataStore, EXTRA_DARK_KEY, false)
-    val language = dataFlow(context.dataStore, LANGUAGE_KEY, "system")
+    val language = dataFlow(context.dataStore, LANGUAGE_KEY, Language.SYSTEM.name)
+        .map { lang -> Language.fromString(lang) }
     fun getOpacity(id: Int) = dataFlow(context.dataStore, floatPreferencesKey("opacity_${id}"), 1f)
 
     @Composable
@@ -33,9 +39,9 @@ class SettingsDataStore(private val context: Context) {
         val isSystemInDarkTheme = isSystemInDarkTheme()
         return theme.map {
             when (it) {
-                "light" -> false
-                "dark" -> true
-                else -> isSystemInDarkTheme
+                Theme.LIGHT -> false
+                Theme.DARK -> true
+                Theme.SYSTEM -> isSystemInDarkTheme
             }
         }
     }

@@ -10,55 +10,50 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.kmpalette.color
+import com.kmpalette.palette.graphics.Palette
 import com.materialkolor.DynamicMaterialTheme
 import com.materialkolor.rememberDynamicColorScheme
 import younesbouhouche.musicplayer.settings.data.SettingsDataStore
+import younesbouhouche.musicplayer.settings.domain.models.ColorScheme
+import younesbouhouche.musicplayer.settings.domain.models.Theme
 
 @Composable
 internal fun AppTheme(
-    seedColor: Color? = null,
+    primary: Color? = null,
+    secondary: Color? = null,
+    tertiary: Color? = null,
     content: @Composable() () -> Unit,
 ) {
     val datastore = SettingsDataStore(LocalContext.current)
-    val theme by datastore.theme.collectAsState(initial = "system")
+    val theme by datastore.theme.collectAsState(initial = Theme.SYSTEM)
     val extraDark by datastore.extraDark.collectAsState(initial = false)
     val isDark =
         when (theme) {
-            "light" -> false
-            "dark" -> true
-            else -> isSystemInDarkTheme()
+            Theme.SYSTEM -> isSystemInDarkTheme()
+            Theme.LIGHT -> false
+            Theme.DARK -> true
         }
-    val colorTheme by datastore.colorTheme.collectAsState(initial = "green")
+    val colorTheme by datastore.colorTheme.collectAsState(initial = ColorScheme.BLUE)
     val dynamicColor = datastore.dynamicColors.collectAsState(initial = false).value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-    val lightColors =
-        when (colorTheme) {
-            "blue" -> BlueColors.lightScheme
-            "green" -> GreenColors.lightScheme
-            "red" -> RedColors.lightScheme
-            "orange" -> OrangeColors.lightScheme
-            "purple" -> PurpleColors.lightScheme
-            else -> BlueColors.lightScheme
-        }
-    val darkColors =
-        when (colorTheme) {
-            "blue" -> BlueColors.darkScheme
-            "green" -> GreenColors.darkScheme
-            "red" -> RedColors.darkScheme
-            "orange" -> OrangeColors.darkScheme
-            "purple" -> PurpleColors.darkScheme
-            else -> BlueColors.darkScheme
-        }
     val colorScheme =
         when {
-            seedColor != null -> rememberDynamicColorScheme(seedColor = seedColor, isDark, extraDark)
+            primary != null ->
+                rememberDynamicColorScheme(
+                    primary = primary,
+                    secondary = secondary,
+                    tertiary = tertiary,
+                    isDark =  isDark,
+                    isAmoled = extraDark
+                )
             dynamicColor && isDark -> {
                 dynamicDarkColorScheme(LocalContext.current)
             }
             dynamicColor && !isDark -> {
                 dynamicLightColorScheme(LocalContext.current)
             }
-            isDark -> darkColors
-            else -> lightColors
+            isDark -> colorTheme.darkScheme
+            else -> colorTheme.lightScheme
         }
     DynamicMaterialTheme(
         primary = colorScheme.primary,
@@ -71,3 +66,15 @@ internal fun AppTheme(
         content = content
     )
 }
+
+
+@Composable
+internal fun AppTheme(
+    palette: Palette? = null,
+    content: @Composable() () -> Unit,
+) = AppTheme(
+    palette?.vibrantSwatch?.color ?: palette?.dominantSwatch?.color,
+    palette?.dominantSwatch?.color,
+    palette?.mutedSwatch?.color,
+    content
+)

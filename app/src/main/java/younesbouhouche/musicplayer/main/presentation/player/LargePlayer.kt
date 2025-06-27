@@ -1,10 +1,13 @@
 package younesbouhouche.musicplayer.main.presentation.player
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -44,26 +48,28 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.main.presentation.util.composables.isCompact
-import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
-import younesbouhouche.musicplayer.main.presentation.util.composables.toDp
 import younesbouhouche.musicplayer.main.data.PlayerDataStore
+import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.domain.models.QueueModel
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
 import younesbouhouche.musicplayer.main.presentation.states.UiState
+import younesbouhouche.musicplayer.main.presentation.util.composables.isCompact
+import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
+import younesbouhouche.musicplayer.main.presentation.util.composables.toDp
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LargePlayer(
-    queue: List<MusicCard>,
-    index: Int,
+    expanded: Boolean,
+    queue: QueueModel,
     playerState: PlayerState,
     uiState: UiState,
+    onPlaybackEvent: (PlaybackEvent) -> Unit,
     onPlayerEvent: (PlayerEvent) -> Unit,
     lyrics: Boolean,
     syncing: Boolean,
@@ -73,8 +79,9 @@ fun LargePlayer(
     playlistDragEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val activeItem = queue[index]
-    val pagerState = rememberPagerState(index) { queue.count() }
+    val scope = rememberCoroutineScope()
+    val activeItem = queue.items[queue.index]
+    val pagerState = rememberPagerState(queue.index) { queue.items.count() }
     val navBarHeight = navBarHeight
     var height by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
@@ -92,15 +99,15 @@ fun LargePlayer(
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.isScrollInProgress }.collect { isScrolling ->
             if (isScrolledByUser && !isScrolling) {
-                if (pagerState.settledPage != index) {
-                    onPlayerEvent(PlayerEvent.Seek(pagerState.settledPage, 0))
+                if (pagerState.settledPage != queue.index) {
+                    onPlaybackEvent(PlaybackEvent.Seek(pagerState.settledPage, 0))
                 }
             }
             isScrolledByUser = isScrolling && isDragged
         }
     }
-    LaunchedEffect(key1 = index) {
-        launch { pagerState.animateScrollToPage(index) }
+    LaunchedEffect(key1 = queue.index) {
+        launch { pagerState.animateScrollToPage(queue.index) }
     }
     val containerModifier =
         Modifier
@@ -122,26 +129,28 @@ fun LargePlayer(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Pager(
+                    expanded,
                     lyrics,
                     syncing,
                     playing,
                     pagerState,
                     queue,
-                    index,
                     playerState.time,
-                    onPlayerEvent,
+                    onPlaybackEvent,
                     onUiEvent,
                     Modifier
                         .weight(1f)
                         .sizeIn(maxHeight = maxWidth, maxWidth = maxWidth)
-                        .aspectRatio(1f, true),
-                )
+                        .aspectRatio(1f, true)
+                ) { path, favorite ->
+                    onPlayerEvent(PlayerEvent.UpdateFavorite(path, favorite))
+                }
                 Spacer(Modifier.height(8.dp))
                 Controls(
                     activeItem,
                     showVolumeSlider,
                     playerState,
-                    onPlayerEvent,
+                    onPlaybackEvent,
                     Modifier.fillMaxWidth(),
                 )
                 Spacer(Modifier.height(12.dp))
@@ -149,26 +158,28 @@ fun LargePlayer(
         } else {
             Row(containerModifier.statusBarsPadding(), verticalAlignment = Alignment.CenterVertically) {
                 Pager(
+                    expanded,
                     lyrics,
                     syncing,
                     playing,
                     pagerState,
                     queue,
-                    index,
                     playerState.time,
-                    onPlayerEvent,
+                    onPlaybackEvent,
                     onUiEvent,
                     Modifier
                         .fillMaxSize()
                         .weight(1f)
-                        .aspectRatio(1f, true),
-                )
+                        .aspectRatio(1f, true)
+                ) { path, favorite ->
+                    onPlayerEvent(PlayerEvent.UpdateFavorite(path, favorite))
+                }
                 VerticalDivider(Modifier.fillMaxHeight())
                 Controls(
                     activeItem,
                     uiState.showVolumeSlider,
                     playerState,
-                    onPlayerEvent,
+                    onPlaybackEvent,
                     Modifier.weight(1f),
                 )
             }
@@ -181,14 +192,13 @@ fun LargePlayer(
             }
         Queue(
             queue,
-            index,
-            playerState,
-            lyrics,
-            playlistState.settledValue == PlaylistViewState.COLLAPSED,
-            onPlayerEvent,
-            onUiEvent,
-            playlistProgress,
-            Modifier
+            playerState = playerState,
+            lyrics = lyrics,
+            playlistHidden = playlistState.settledValue == PlaylistViewState.COLLAPSED,
+            onPlaybackEvent = onPlaybackEvent,
+            onUiEvent = onUiEvent,
+            progress = playlistProgress,
+            modifier = Modifier
                 .fillMaxWidth()
                 .height(height.toDp() + 72.dp)
                 .offset {
@@ -197,8 +207,28 @@ fun LargePlayer(
                         playlistOffset.roundToInt(),
                     )
                 }
-                .anchoredDraggable(playlistState, Orientation.Vertical, playlistDragEnabled),
-        )
+                .anchoredDraggable(
+                    playlistState,
+                    Orientation.Vertical,
+                    playlistDragEnabled,
+                    flingBehavior = AnchoredDraggableDefaults.flingBehavior(
+                        playlistState,
+                        { it * .5f },
+                        tween(),
+            //                        splineBasedDecay(density),
+            //                        { with(density) { 100.dp.toPx() } }
+                    )
+                ),
+            onCollapse = {
+                scope.launch {
+                    playlistState.animateTo(PlaylistViewState.COLLAPSED)
+                }
+            }
+        ) {
+            scope.launch {
+                playlistState.animateTo(PlaylistViewState.EXPANDED)
+            }
+        }
     }
 }
 

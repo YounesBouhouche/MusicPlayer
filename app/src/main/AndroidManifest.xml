@@ -18,6 +18,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
 
     <application
         android:name=".di.App"
@@ -49,9 +51,7 @@
             android:theme="@style/Theme.MusicPlayer.Dialog">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="audio/*" />
                 <data android:scheme="file" />
                 <data android:scheme="content" />
@@ -61,11 +61,11 @@
         <profileable android:shell="true" />
 
         <activity
-            android:name=".settings.presentation.PlayerActivity"
+            android:name=".settings.presentation.routes.player.PlayerActivity"
             android:exported="false"
             android:theme="@style/Theme.MusicPlayer" />
         <activity
-            android:name=".settings.presentation.PlaybackActivity"
+            android:name=".settings.presentation.routes.playback.PlaybackActivity"
             android:exported="false"
             android:theme="@style/Theme.MusicPlayer" />
         <activity
@@ -76,8 +76,11 @@
             android:theme="@style/Theme.MusicPlayer">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.APP_MUSIC" />
             </intent-filter>
 
             <meta-data
@@ -85,7 +88,7 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".settings.presentation.AboutActivity"
+            android:name=".settings.presentation.routes.about.AboutActivity"
             android:exported="false"
             android:theme="@style/Theme.MusicPlayer" />
         <activity
@@ -93,11 +96,11 @@
             android:exported="false"
             android:theme="@style/Theme.MusicPlayer" />
         <activity
-            android:name=".settings.presentation.LanguageActivity"
+            android:name=".settings.presentation.routes.language.LanguageActivity"
             android:exported="false"
             android:theme="@style/Theme.MusicPlayer" />
         <activity
-            android:name=".settings.presentation.ThemeActivity"
+            android:name=".settings.presentation.routes.theme.ThemeActivity"
             android:exported="false"
             android:theme="@style/Theme.MusicPlayer" />
 

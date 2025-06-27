@@ -5,18 +5,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.ui.graphics.vector.ImageVector
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.domain.models.LoadingState
 
 data class UiState(
-    val loading: Boolean = false,
-    val bottomSheetItem: MusicCard? = null,
+    val showAppName: Boolean = false,
+    val loading: LoadingState = LoadingState(),
+    val bottomSheetItem: Long? = null,
     val bottomSheetVisible: Boolean = false,
+    val playlistId: Int = -1,
+    val sheetPlaylistId: Int = -1,
+    val playlistBottomSheetVisible: Boolean = false,
     val listBottomSheetList: List<MusicCard>? = null,
     val listBottomSheetTitle: String = "",
     val listBottomSheetImage: Any? = null,
     val listBottomSheetIcon: ImageVector = Icons.AutoMirrored.Default.PlaylistPlay,
     val listBottomSheetVisible: Boolean = false,
-    val playlistBottomSheetVisible: Boolean = false,
-    val viewState: ViewState = ViewState.HIDDEN,
     val playlistViewState: PlaylistViewState = PlaylistViewState.COLLAPSED,
     val speedDialog: Boolean = false,
     val timerDialog: Boolean = false,
@@ -25,7 +28,7 @@ data class UiState(
     val newPlaylistImage: Uri? = null,
     val newPlaylistItems: List<String> = emptyList(),
     val addToPlaylistDialog: Boolean = false,
-    val addToPlaylistIndex: Int = 0,
+    val addToPlaylistSelected: Set<Int> = emptySet(),
     val addToPlaylistItems: List<String> = emptyList(),
     val metadataDialog: Boolean = false,
     val detailsDialog: Boolean = false,

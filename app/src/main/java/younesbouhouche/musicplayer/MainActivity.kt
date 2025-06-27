@@ -30,80 +30,83 @@ import younesbouhouche.musicplayer.main.presentation.util.isRouteParent
 import younesbouhouche.musicplayer.main.presentation.util.requestPermission
 import younesbouhouche.musicplayer.main.presentation.util.shareFile
 import younesbouhouche.musicplayer.main.presentation.util.toStartupEvent
-import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
+import younesbouhouche.musicplayer.main.presentation.viewmodel.MainViewModel
+import younesbouhouche.musicplayer.main.presentation.viewmodel.SearchVM
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 
 
 class MainActivity : ComponentActivity() {
-    private lateinit var mainVM: MainVM
+    private lateinit var mainVM: MainViewModel
+    private lateinit var searchVM: SearchVM
     private val permission = Permissions.audioPermission
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val isGranted = isPermissionGranted(permission)
         val startupEvent = intent.getStringExtra("type").toStartupEvent()
         setContent {
-            KoinContext {
-                SetSystemBarColors(dataStore = get())
-                mainVM = koinViewModel<MainVM>()
-                val granted by mainVM.granted.collectAsState()
-                val navController = rememberNavController()
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
-                val isParent = currentRoute.isRouteParent
-                var savePlaylist: Playlist? = null
-                val launcher =
-                    rememberLauncherForActivityResult(
-                        ActivityResultContracts.RequestPermission(),
-                    ) { isGranted: Boolean ->
-                        if (isGranted) mainVM.setGranted(startupEvent)
-                    }
-                LaunchedEffect(Unit) {
+            SetSystemBarColors(dataStore = get())
+            mainVM = koinViewModel<MainViewModel>()
+            searchVM = koinViewModel<SearchVM>()
+            val granted by mainVM.granted.collectAsState()
+            val navController = rememberNavController()
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+            val isParent = currentRoute.isRouteParent
+            var savePlaylist: Playlist? = null
+            val launcher =
+                rememberLauncherForActivityResult(
+                    ActivityResultContracts.RequestPermission(),
+                ) { isGranted: Boolean ->
                     if (isGranted) mainVM.setGranted(startupEvent)
                 }
-                val savePlaylistDialog =
-                    rememberLauncherForActivityResult(
-                        contract = ActivityResultContracts.CreateDocument("audio/x-mpegurl"),
-                    ) {
-                        it?.let { uri ->
-                            savePlaylist?.let { playlist ->
-                                contentResolver.openOutputStream(uri)?.run {
-                                    write(playlist.createM3UText().toByteArray())
-                                    close()
-                                }
+            LaunchedEffect(Unit) {
+                if (isGranted) mainVM.setGranted(startupEvent)
+            }
+            val savePlaylistDialog =
+                rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.CreateDocument("audio/x-mpegurl"),
+                ) {
+                    it?.let { uri ->
+                        savePlaylist?.let { playlist ->
+                            contentResolver.openOutputStream(uri)?.run {
+                                write(playlist.createM3UText().toByteArray())
+                                close()
                             }
                         }
                     }
-                CollectEvents { event ->
-                    when (event) {
-                        is Event.SavePlaylist -> {
-                            savePlaylist = event.playlist
-                            savePlaylistDialog.launch("${event.playlist.name}.m3u")
-                        }
-                        is Event.SharePlaylist -> {
-                            shareFile(
-                                createTempFile(
-                                    "${event.playlist.name}.m3u",
-                                    event.playlist.createM3UText()
-                                ),
-                                "audio/x-mpegurl"
-                            )
-                        }
-                        is Event.Navigate -> navController.navigate(event.route)
+                }
+            CollectEvents { event ->
+                when (event) {
+                    is Event.SavePlaylist -> {
+                        savePlaylist = event.playlist
+                        savePlaylistDialog.launch("${event.playlist.name}.m3u")
                     }
+                    is Event.SharePlaylist -> {
+                        shareFile(
+                            createTempFile(
+                                "${event.playlist.name}.m3u",
+                                event.playlist.createM3UText()
+                            ),
+                            "audio/x-mpegurl"
+                        )
+                    }
+                    is Event.Navigate -> navController.navigate(event.route)
+                    else -> return@CollectEvents
                 }
-                AppTheme {
-                    AppScreen(
-                        granted,
-                        {
-                            requestPermission(permission, { mainVM.setGranted(startupEvent) }) {
-                                launcher.launch(permission)
-                            }
-                        },
-                        mainVM,
-                        navController,
-                        isParent,
-                    )
-                }
+            }
+            AppTheme {
+                AppScreen(
+                    granted,
+                    {
+                        requestPermission(permission, { mainVM.setGranted(startupEvent) }) {
+                            launcher.launch(permission)
+                        }
+                    },
+                    mainVM,
+                    searchVM,
+                    navController,
+                    isParent,
+                )
             }
         }
     }

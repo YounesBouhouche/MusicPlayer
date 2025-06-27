@@ -28,7 +28,7 @@ import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.glance.presentation.util.IconButton
 import younesbouhouche.musicplayer.glance.presentation.util.MyImage
 import younesbouhouche.musicplayer.glance.presentation.util.WidgetText
-import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 
@@ -38,7 +38,7 @@ import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 fun SmallWidgetContent(
     card: MusicCard?,
     state: PlayerState,
-    onPlayerEvent: suspend (PlayerEvent) -> Unit,
+    onEvent: suspend (PlaybackEvent) -> Unit,
     opacity: Float,
     modifier: GlanceModifier = GlanceModifier
 ) {
@@ -53,7 +53,7 @@ fun SmallWidgetContent(
             GlanceModifier.padding(8.dp).fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            MyImage(card?.cover)
+            MyImage(card?.coverUri, opacity = opacity)
             Spacer(GlanceModifier.width(16.dp))
             Column(GlanceModifier.fillMaxWidth().defaultWeight()) {
                 WidgetText(
@@ -79,7 +79,7 @@ fun SmallWidgetContent(
                 contentColor = GlanceTheme.colors.onPrimary
             ) {
                 scope.launch {
-                    onPlayerEvent(PlayerEvent.PauseResume)
+                    onEvent(PlaybackEvent.PauseResume)
                 }
             }
         }

@@ -8,9 +8,9 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -29,7 +29,6 @@ import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,23 +39,24 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import coil.compose.SubcomposeAsyncImage
-import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.domain.models.QueueModel
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Disk(
-    queue: List<MusicCard>,
-    index: Int,
+    enabled: Boolean,
+    queue: QueueModel,
     playing: Boolean,
     pagerState: PagerState,
-    onPlayerEvent: (PlayerEvent) -> Unit,
+    onUpdateFavorite: (String, Boolean) -> Unit,
 ) {
     HorizontalPager(
         state = pagerState,
         modifier = Modifier.fillMaxSize(),
-        key = { queue[it].id },
+        snapPosition = SnapPosition.Center,
+        key = { queue.items[it].id },
+        userScrollEnabled = enabled
     ) { page ->
         val transition = rememberInfiniteTransition(label = "Playing animation")
         val animatedScale by transition.animateFloat(
@@ -70,7 +70,7 @@ fun Disk(
             label = "Scale animation",
         )
         val diskScale by animateFloatAsState(
-            targetValue = if (playing and (index == page)) animatedScale else 1f,
+            targetValue = if (playing and (queue.index == page)) animatedScale else 1f,
             label = "",
         )
         val pageOffset =
@@ -79,8 +79,7 @@ fun Disk(
                     pagerState
                         .currentPageOffsetFraction
             ).absoluteValue
-        with(queue[page]) {
-            val fav by favorite.collectAsState(false)
+        with(queue.items[page]) {
             Box(
                 modifier =
                     Modifier
@@ -104,13 +103,13 @@ fun Disk(
                         .clipToBounds()
                         .combinedClickable(
                             onDoubleClick = {
-                                onPlayerEvent(PlayerEvent.UpdateFavorite(path, true))
+                                onUpdateFavorite(path, true)
                             },
                         ) {},
                     contentAlignment = Alignment.Center,
                 ) {
                     SubcomposeAsyncImage(
-                        model = cover,
+                        model = coverUri,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
@@ -131,7 +130,7 @@ fun Disk(
                     )
                 }
                 LargeFloatingActionButton(
-                    onClick = { onPlayerEvent(PlayerEvent.UpdateFavorite(path, !fav)) },
+                    onClick = { onUpdateFavorite(path, !favorite) },
                     modifier =
                         Modifier
                             .align(Alignment.BottomStart)
@@ -140,7 +139,7 @@ fun Disk(
                                 (-12).dp,
                             ),
                 ) {
-                    AnimatedContent(targetState = fav, label = "") {
+                    AnimatedContent(targetState = favorite, label = "") {
                         if (it) {
                             Icon(
                                 Icons.Default.Favorite,

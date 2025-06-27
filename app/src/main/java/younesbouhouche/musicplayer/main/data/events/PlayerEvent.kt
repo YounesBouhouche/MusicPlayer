@@ -39,12 +39,12 @@ sealed interface PlayerEvent {
     data class SetRepeatMode(val repeatMode: Int) : PlayerEvent
 
     data class SetSpeed(
-        @FloatRange(from = 0.0, fromInclusive = false) val speed: Float,
+        @field:FloatRange(from = 0.0, fromInclusive = false) val speed: Float,
     ) :
         PlayerEvent
 
     data class SetPitch(
-        @FloatRange(from = 0.0, fromInclusive = false) val pitch: Float,
+        @field:FloatRange(from = 0.0, fromInclusive = false) val pitch: Float,
     ) :
         PlayerEvent
 

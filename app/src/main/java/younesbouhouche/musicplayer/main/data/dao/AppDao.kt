@@ -82,8 +82,17 @@ interface AppDao {
     @Query("SELECT * from Playlist")
     fun getPlaylists(): Flow<List<Playlist>>
 
+    @Query("SELECT * from Playlist WHERE favorite=true")
+    fun getFavoritePlaylists(): Flow<List<Playlist>>
+
+    @Query("SELECT * from Playlist WHERE id=:id")
+    suspend fun getPlaylist(id: Int): Playlist?
+
     @Delete
     suspend fun deletePlaylist(playlist: Playlist)
+
+    @Query("DELETE FROM Playlist WHERE id=:id")
+    suspend fun deletePlaylistById(id: Int)
 
     @Query("SELECT * from Queue WHERE id=0")
     fun getQueue(): Flow<Queue?>

@@ -3,15 +3,19 @@ package younesbouhouche.musicplayer.main.presentation.routes
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Album
 import younesbouhouche.musicplayer.main.presentation.components.ItemsLazyVerticalGrid
@@ -21,6 +25,7 @@ import younesbouhouche.musicplayer.main.presentation.components.MyListItem
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.presentation.util.ListsSortType
 import younesbouhouche.musicplayer.main.presentation.util.SortState
+import younesbouhouche.musicplayer.settings.presentation.components.listItemShape
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -36,10 +41,12 @@ fun SharedTransitionScope.Albums(
 ) {
     ItemsLazyVerticalGrid(
         items = albums,
-        itemKey = { it.name },
+        itemKey = { _, it -> it.name },
         gridCount = sortState.colsCount?.count ?: 1,
         modifier = modifier,
-        singleLineItemContent = {
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+        contentPadding = PaddingValues(12.dp),
+        singleLineItemContent = { index, it ->
             MyListItem(
                 onClick = { onClick(it.name) },
                 onLongClick = { onLongClick(it) },
@@ -50,6 +57,7 @@ fun SharedTransitionScope.Albums(
                 modifier = Modifier.animateItem(),
                 animatedContentScope = animatedContentScope,
                 key = "album-${it.name}",
+                shape = listItemShape(index, albums.size),
                 trailingContent = {
                     IconButton(onClick = { onPlayerEvent(PlayerEvent.PlayIds(it.items)) }) {
                         Icon(Icons.Outlined.PlayArrow, null)
@@ -58,9 +66,10 @@ fun SharedTransitionScope.Albums(
                         Icon(Icons.Default.MoreVert, null)
                     }
                 },
+                background = MaterialTheme.colorScheme.surfaceContainerLow,
             )
         },
-        itemContent = {
+        itemContent = { _, it ->
             MyCard(
                 modifier = Modifier.animateItem(),
                 text = it.name,

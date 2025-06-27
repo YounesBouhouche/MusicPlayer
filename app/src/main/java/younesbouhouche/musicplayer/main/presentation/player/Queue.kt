@@ -7,10 +7,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -63,29 +63,31 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.main.presentation.components.SwipeMusicCardLazyItem
-import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.main.data.PlayerDataStore
-import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.TimerType
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.main.domain.models.QueueModel
+import younesbouhouche.musicplayer.main.presentation.components.SwipeMusicCardLazyItem
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
+import younesbouhouche.musicplayer.main.presentation.util.plus
 import younesbouhouche.musicplayer.main.presentation.util.timeString
 import younesbouhouche.musicplayer.main.presentation.util.timerString
+import younesbouhouche.musicplayer.settings.presentation.components.listItemShape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Queue(
-    queue: List<MusicCard>,
-    index: Int,
+    queue: QueueModel,
     playerState: PlayerState,
     lyrics: Boolean,
     playlistHidden: Boolean,
-    onPlayerEvent: (PlayerEvent) -> Unit,
+    onPlaybackEvent: (PlaybackEvent) -> Unit,
     onUiEvent: (UiEvent) -> Unit,
     progress: Float,
     modifier: Modifier = Modifier,
+    onCollapse: () -> Unit,
+    onExpand: () -> Unit,
 ) {
     val context = LocalContext.current
     val playerDataStore = PlayerDataStore(context)
@@ -99,7 +101,7 @@ fun Queue(
     val listState = rememberLazyListState()
     val reorderableState =
         rememberReorderableLazyListState(listState) { from, to ->
-            onPlayerEvent(PlayerEvent.Swap(from.index, to.index))
+            onPlaybackEvent(PlaybackEvent.Swap(from.index, to.index))
             view.performHapticFeedback(
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     HapticFeedbackConstants.SEGMENT_FREQUENT_TICK
@@ -115,8 +117,8 @@ fun Queue(
                 if (showRepeatButton)
                     FilledToggleIconButton(
                         playerState.repeatMode != Player.REPEAT_MODE_OFF,
-                        { onPlayerEvent(PlayerEvent.CycleRepeatMode) },
-                        { onPlayerEvent(PlayerEvent.SetRepeatMode(Player.REPEAT_MODE_OFF)) },
+                        { onPlaybackEvent(PlaybackEvent.CycleRepeatMode) },
+                        { onPlaybackEvent(PlaybackEvent.SetRepeatMode(Player.REPEAT_MODE_OFF)) },
                         if (playerState.repeatMode == Player.REPEAT_MODE_ONE) {
                             Icons.Default.RepeatOne
                         } else {
@@ -126,28 +128,28 @@ fun Queue(
                 if (showShuffleButton)
                     FilledToggleIconButton(
                         playerState.shuffle,
-                        { onPlayerEvent(PlayerEvent.ToggleShuffle) },
+                        { onPlaybackEvent(PlaybackEvent.ToggleShuffle) },
                         icon = Icons.Default.Shuffle,
                     )
                 if (showSpeedButton)
                     FilledToggleIconButton(
                         playerState.speed != 1f,
                         { onUiEvent(UiEvent.ShowSpeedDialog) },
-                        { onPlayerEvent(PlayerEvent.ResetSpeed) },
+                        { onPlaybackEvent(PlaybackEvent.ResetSpeed) },
                         Icons.Default.Speed,
                     )
                 if (showPitchButton)
                     FilledToggleIconButton(
                         playerState.pitch != 1f,
                         { onUiEvent(UiEvent.ShowPitchDialog) },
-                        { onPlayerEvent(PlayerEvent.SetPitch(1f)) },
+                        { onPlaybackEvent(PlaybackEvent.SetPitch(1f)) },
                         Icons.Default.RecordVoiceOver,
                     )
                 if (showTimerButton)
                     FilledToggleIconButton(
                         playerState.timer != TimerType.Disabled,
                         { onUiEvent(UiEvent.ShowTimerDialog) },
-                        { onPlayerEvent(PlayerEvent.SetTimer(TimerType.Disabled)) },
+                        { onPlaybackEvent(PlaybackEvent.SetTimer(TimerType.Disabled)) },
                     ) {
                         AnimatedContent(targetState = playerState.timer, label = "") {
                             when (it) {
@@ -174,9 +176,7 @@ fun Queue(
                     )
             },
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { onUiEvent(UiEvent.ExpandPlaylist) },
-                ) {
+                FloatingActionButton(onClick = onExpand) {
                     Icon(Icons.AutoMirrored.Filled.PlaylistPlay, null)
                 }
             },
@@ -200,7 +200,7 @@ fun Queue(
                     },
                     navigationIcon = {
                         IconButton(
-                            onClick = { onUiEvent(UiEvent.CollapsePlaylist) },
+                            onClick = onCollapse,
                             modifier = Modifier.padding(start = 12.dp),
                         ) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
@@ -230,15 +230,13 @@ fun Queue(
                     .zIndex(if (playlistHidden) 1f else 2f),
         ) { paddingValues ->
             LazyColumn(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = paddingValues + WindowInsets.navigationBars.asPaddingValues(),
                 state = listState,
             ) {
-                items(queue, key = { it.id }) { card ->
+                items(queue.items, key = { it.id }) { card ->
                     val item by rememberUpdatedState(card)
-                    val idx = queue.indexOf(card)
+                    val index = queue.items.indexOf(card)
                     val dismissState =
                         rememberSwipeToDismissBoxState(
                             confirmValueChange = { value ->
@@ -247,7 +245,7 @@ fun Queue(
                             positionalThreshold = { it / 1.5f },
                         )
                     if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
-                        onPlayerEvent(PlayerEvent.Remove(queue.indexOf(item)))
+                        onPlaybackEvent(PlaybackEvent.Remove(queue.items.indexOf(item)))
                         LaunchedEffect(Unit) {
                             launch { dismissState.reset() }
                         }
@@ -255,21 +253,16 @@ fun Queue(
                     SwipeMusicCardLazyItem(
                         state = dismissState,
                         file = item,
-                        number = idx + 1,
+                        number = index + 1,
                         reorderableState = reorderableState,
                         onLongClick = {
-                            onUiEvent(UiEvent.ShowBottomSheet(item))
+                            onUiEvent(UiEvent.ShowBottomSheet(item.id))
                         },
-                        swipingItemBackground =
-                            if (index == idx) {
-                                MaterialTheme.colorScheme.background
-                            } else {
-                                MaterialTheme.colorScheme.surfaceContainer
-                            },
-                    ) { onPlayerEvent(PlayerEvent.Seek(idx, 0L)) }
-                }
-                item {
-                    Spacer(Modifier.height(navBarHeight))
+                        background = MaterialTheme.colorScheme.surfaceContainerLow,
+                        shape = listItemShape(index, queue.items.size)
+                    ) {
+                        onPlaybackEvent(PlaybackEvent.Seek(index, 0L))
+                    }
                 }
             }
         }

@@ -28,7 +28,7 @@ import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.glance.presentation.util.IconButton
 import younesbouhouche.musicplayer.glance.presentation.util.MyImage
 import younesbouhouche.musicplayer.glance.presentation.util.WidgetText
-import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 
@@ -38,7 +38,7 @@ import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 fun MediumWidgetContent(
     card: MusicCard?,
     state: PlayerState,
-    onPlayerEvent: suspend (PlayerEvent) -> Unit,
+    onEvent: suspend (PlaybackEvent) -> Unit,
     opacity: Float,
     modifier: GlanceModifier = GlanceModifier
 ) {
@@ -54,7 +54,7 @@ fun MediumWidgetContent(
                 GlanceModifier.padding(8.dp).defaultWeight(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                MyImage(card?.cover, size = 80.dp)
+                MyImage(card?.coverUri, size = 80.dp, opacity = opacity)
                 Spacer(GlanceModifier.width(16.dp))
                 Column(GlanceModifier.fillMaxWidth().defaultWeight()) {
                     WidgetText(
@@ -84,7 +84,7 @@ fun MediumWidgetContent(
                     contentColor = GlanceTheme.colors.onTertiary
                 ) {
                     scope.launch {
-                        onPlayerEvent(PlayerEvent.Previous)
+                        onEvent(PlaybackEvent.Previous)
                     }
                 }
                 Spacer(GlanceModifier.width(12.dp))
@@ -97,7 +97,7 @@ fun MediumWidgetContent(
                     contentColor = GlanceTheme.colors.onPrimary
                 ) {
                     scope.launch {
-                        onPlayerEvent(PlayerEvent.PauseResume)
+                        onEvent(PlaybackEvent.PauseResume)
                     }
                 }
                 Spacer(GlanceModifier.width(12.dp))
@@ -108,7 +108,7 @@ fun MediumWidgetContent(
                     contentColor = GlanceTheme.colors.onTertiary
                 ) {
                     scope.launch {
-                        onPlayerEvent(PlayerEvent.Next)
+                        onEvent(PlaybackEvent.Next)
                     }
                 }
             }

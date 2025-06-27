@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -5,7 +7,7 @@ plugins {
     alias(libs.plugins.com.google.devtools.ksp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.room)
-    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
+    id("org.jlleitschuh.gradle.ktlint") version "12.3.0"
 }
 
 android {
@@ -52,12 +54,16 @@ android {
             proguardFiles("benchmark-rules.pro")
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.fromTarget("21")
+            languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.fromVersion("2.2")
+            apiVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.fromVersion("2.2")
+        }
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     buildFeatures {
         compose = true

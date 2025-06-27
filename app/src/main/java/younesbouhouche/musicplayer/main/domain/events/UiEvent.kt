@@ -1,23 +1,16 @@
 package younesbouhouche.musicplayer.main.domain.events
 
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.ui.graphics.vector.ImageVector
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.main.domain.models.Routes
 import younesbouhouche.musicplayer.main.presentation.states.MusicMetadata
-import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
-import younesbouhouche.musicplayer.main.presentation.states.ViewState
 
 sealed interface UiEvent {
     data object ShowSpeedDialog : UiEvent
 
     data object HideSpeedDialog : UiEvent
-
-    data class SetViewState(val viewState: ViewState) : UiEvent
-
-    data class SetPlaylistViewState(val playlistViewState: PlaylistViewState) : UiEvent
 
     data object ExpandPlaylist : UiEvent
 
@@ -25,7 +18,8 @@ sealed interface UiEvent {
 
     data class SharePlaylist(val playlist: Playlist): UiEvent
 
-    data class ShowBottomSheet(val item: MusicCard) : UiEvent
+    data class SetPlaylist(val id: Int) : UiEvent
+    data class ShowBottomSheet(val id: Long) : UiEvent
 
     data object HideBottomSheet : UiEvent
 
@@ -60,11 +54,7 @@ sealed interface UiEvent {
 
     data class UpdateSelectedPlaylist(val index: Int) : UiEvent
 
-    data class ShowPlaylistBottomSheet(val index: Int) : UiEvent
-
     data class SavePlaylist(val playlist: Playlist): UiEvent
-
-    data object HidePlaylistBottomSheet : UiEvent
 
     data class ShowMetadataDialog(val metadata: MusicMetadata) : UiEvent
 

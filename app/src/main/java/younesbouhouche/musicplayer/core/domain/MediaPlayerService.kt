@@ -1,19 +1,11 @@
 package younesbouhouche.musicplayer.core.domain
 
-import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_IMMUTABLE
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Intent
 import android.os.Bundle
-import androidx.media3.common.AudioAttributes
-import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Player.COMMAND_SET_REPEAT_MODE
 import androidx.media3.common.Player.COMMAND_SET_SHUFFLE_MODE
-import androidx.media3.exoplayer.DefaultLoadControl
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSession.ConnectionResult
 import androidx.media3.session.MediaSession.ConnectionResult.AcceptedResultBuilder
@@ -27,85 +19,66 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.main.data.PlayerDataStore
-import younesbouhouche.musicplayer.main.domain.repo.FilesRepo
+import younesbouhouche.musicplayer.core.domain.commands.CustomCommandHandler
+import younesbouhouche.musicplayer.core.domain.player.PlayerFactory
+import younesbouhouche.musicplayer.core.domain.player.PlayerManager
+import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
+import younesbouhouche.musicplayer.core.domain.player.QueueManager
+import younesbouhouche.musicplayer.core.domain.session.MediaSessionManager
+import younesbouhouche.musicplayer.main.domain.repo.MediaRepository
+import younesbouhouche.musicplayer.main.presentation.states.PlayState
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
-    private var player: ExoPlayer? = null
-    private var mediaSession: MediaSession? = null
-    private var controller: MediaSession.ControllerInfo? = null
-    private lateinit var customMediaNotificationProvider: CustomMediaNotificationProvider
-    private val loadControl = DefaultLoadControl.Builder()
-        .setBufferDurationsMs(
-            30_000,  // Min buffer before playback starts (30s)
-            120_000, // Max buffer (120s)
-            15_000,  // Play when buffer reaches (15s)
-            5_000    // Rebuffer threshold (5s)
-        )
-        .build()
-    private val repo by inject<FilesRepo>()
-
-    private val notificationCustomCmdButtons =
+    private val playerFactory by inject<PlayerFactory>()
+    private val playerManager by inject<PlayerManager>()
+    private val stateManager by inject<PlayerStateManager>()
+    private val sessionManager by inject<MediaSessionManager>()
+    private val queueManager by inject<QueueManager>()
+    private val mediaRepository by inject<MediaRepository>()
+    private lateinit var commandHandler: CustomCommandHandler
+    private lateinit var notificationProvider: CustomMediaNotificationProvider
+    val notificationCustomCmdButtons =
         NotificationCustomCmdButton.entries.map { command -> command.commandButton }
 
-    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = mediaSession
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
+        sessionManager.getSession()
 
     override fun onCreate() {
         super.onCreate()
-        val pendingIntent =
-            PendingIntent.getActivity(
-                this,
-                0,
-                packageManager.getLaunchIntentForPackage(packageName),
-                FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT,
-            )
-        CoroutineScope(Dispatchers.IO).launch {
-            val skipSilence = PlayerDataStore(this@MediaPlayerService).skipSilence.first()
+
+        notificationProvider = CustomMediaNotificationProvider(this)
+        notificationProvider.setSmallIcon(R.drawable.media3_notification_small_icon)
+
+        serviceScope.launch {
             withContext(Dispatchers.Main) {
-                // Initialize custom notification provider first
-                customMediaNotificationProvider = CustomMediaNotificationProvider(this@MediaPlayerService)
-                customMediaNotificationProvider.setSmallIcon(R.drawable.media3_notification_small_icon)
+                // First initialize the player with PlayerManager
+                val player = playerManager.initialize(serviceScope)
 
-                with(
-                    ExoPlayer
-                        .Builder(this@MediaPlayerService)
-                        .setLoadControl(loadControl)
-                        .setHandleAudioBecomingNoisy(true)
-                        .setSkipSilenceEnabled(skipSilence)
-                        .setAudioAttributes(
-                            AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).build(),
-                            true,
-                        )
-                        .build(),
-                ) {
-                    setSeekParameters(SeekParameters(1000L, 1000L))
-                    player = this
+                // Create command handler with this player
+                commandHandler = CustomCommandHandler(player)
 
-                    // Create media session with the custom commands
-                    mediaSession =
-                        MediaSession
-                            .Builder(this@MediaPlayerService, this)
-                            .setId("MusicPlayerMediaPlayerService")
-                            .setSessionActivity(pendingIntent)
-                            .setCustomLayout(notificationCustomCmdButtons)
-                            .build()
 
-                    // Register available commands for the custom buttons
-                    player?.addListener(object : Player.Listener {
-                        override fun onAvailableCommandsChanged(commands: Player.Commands) {
-                            mediaSession?.setCustomLayout(notificationCustomCmdButtons)
-                        }
-                    })
-                }
+                // Set up player listeners for notification updates
+                player.addListener(object : Player.Listener {
+                    override fun onAvailableCommandsChanged(commands: Player.Commands) {
+                        sessionManager.updateCustomLayout(notificationCustomCmdButtons)
+                    }
+                })
 
-                // Set the notification provider after the session is created
-                setMediaNotificationProvider(customMediaNotificationProvider)
+                sessionManager.createSession(this@MediaPlayerService, player)
+
+                // Set the notification provider
+                setMediaNotificationProvider(notificationProvider)
             }
         }
     }
@@ -116,38 +89,14 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
         customCommand: SessionCommand,
         args: Bundle,
     ): ListenableFuture<SessionResult> {
-        when (customCommand.customAction) {
-            CUSTOM_COMMAND_REWIND_10S_ACTION_ID -> {
-                // Seek back 10 seconds
-                val currentPosition = session.player.currentPosition
-                val newPosition = (currentPosition - 10_000).coerceAtLeast(0)
-                session.player.seekTo(newPosition)
-            }
-            CUSTOM_COMMAND_FORWARD_10S_ACTION_ID -> {
-                // Seek forward 10 seconds
-                val currentPosition = session.player.currentPosition
-                val duration = session.player.duration
-                val newPosition = (currentPosition + 10_000).coerceAtMost(if (duration > 0) duration else currentPosition)
-                session.player.seekTo(newPosition)
-            }
-            CUSTOM_COMMAND_LOOP_ACTION_ID -> {
-                // Toggle repeat mode
-                val currentRepeatMode = session.player.repeatMode
-                val newRepeatMode = when (currentRepeatMode) {
-                    Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ONE
-                    Player.REPEAT_MODE_ONE -> Player.REPEAT_MODE_ALL
-                    Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_OFF
-                    else -> Player.REPEAT_MODE_OFF
-                }
-                session.player.repeatMode = newRepeatMode
-            }
-        }
+        commandHandler.handleCommand(customCommand.customAction)
         return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        val player = mediaSession?.player!!
-        if (!player.playWhenReady || player.mediaItemCount == 0) stopSelf()
+        playerFactory.getPlayerOrNull()?.let { player ->
+            if (!player.playWhenReady || player.mediaItemCount == 0) stopSelf()
+        }
     }
 
     override fun onConnect(
@@ -195,7 +144,7 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
     ) {
         super.onPostConnect(session, controller)
         if (notificationCustomCmdButtons.isNotEmpty()) {
-            mediaSession!!.setCustomLayout(notificationCustomCmdButtons)
+            sessionManager.updateCustomLayout(notificationCustomCmdButtons)
         }
     }
 
@@ -204,15 +153,42 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
         controller: MediaSession.ControllerInfo,
     ): ListenableFuture<MediaItemsWithStartPosition> {
         val settable = SettableFuture.create<MediaItemsWithStartPosition>()
-        CoroutineScope(Dispatchers.Main).launch {
-            val resumptionPlaylist = MediaItemsWithStartPosition(
-                repo.getQueue().first().map {
-                    it.toMediaItem()
-                },
-                repo.getIndex().first(),
-                repo.getState().first().time,
-            )
-            settable.set(resumptionPlaylist)
+        serviceScope.launch {
+            try {
+                // Get the saved queue
+                val queue = queueManager.getQueue().first()
+                if (queue == null || queue.items.isEmpty()) {
+                    settable.set(MediaItemsWithStartPosition(emptyList(), 0, 0))
+                    return@launch
+                }
+
+                // Get saved playback position and state
+                val currentIndex = queueManager.getCurrentIndex() ?: 0
+                val position = stateManager.playerState.value.time
+                val isPlaying = stateManager.playerState.value.playState == PlayState.PLAYING
+
+                // Reconstruct media items from IDs
+                val mediaItems = queue.items.mapNotNull {
+                    mediaRepository.getUriById(it)?.let { uri -> MediaItem.fromUri(uri) }
+                }
+
+                // Set the resumption state
+                val resumptionPlaylist = MediaItemsWithStartPosition(
+                    mediaItems,
+                    currentIndex,
+                    position
+                )
+
+                settable.set(resumptionPlaylist)
+
+                // Restore playback state after items are set
+                withContext(Dispatchers.Main) {
+                    playerManager.setPlayWhenReady(isPlaying)
+                }
+            } catch (_: Exception) {
+                // Log error but still return empty state to avoid crashes
+                settable.set(MediaItemsWithStartPosition(emptyList(), 0, 0))
+            }
         }
         return settable
     }
@@ -222,19 +198,15 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
         controller: MediaSession.ControllerInfo,
         mediaItems: MutableList<MediaItem>,
     ): ListenableFuture<MutableList<MediaItem>> {
-        this.controller = controller
-        this.mediaSession = mediaSession
+        sessionManager.setSession(mediaSession)
         val updatedItems = mediaItems.map { it.buildUpon().setUri(it.mediaId).build() }.toMutableList()
         return Futures.immediateFuture(updatedItems)
     }
 
     override fun onDestroy() {
-        mediaSession?.run {
-            player.release()
-            release()
-            mediaSession = null
-        }
+        serviceScope.cancel()
+        sessionManager.release()
+        playerFactory.releasePlayer()
         super.onDestroy()
     }
 }
-

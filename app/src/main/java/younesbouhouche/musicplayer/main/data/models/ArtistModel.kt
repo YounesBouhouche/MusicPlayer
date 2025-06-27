@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class ArtistModel(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = false)
     val name: String,
     val picture: String
 )

@@ -153,7 +153,7 @@ class DialogRepoImpl(val context: Context): DialogRepo {
                     ByteArray(0)
                 }
             }
-        _card.value = _card.value?.copy(cover = cover)
+        _card.value = _card.value?.copy(coverUri = null)
     }
 
     override fun seekTo(ms: Long) {

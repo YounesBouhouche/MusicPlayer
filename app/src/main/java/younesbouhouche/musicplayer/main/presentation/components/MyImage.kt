@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -19,9 +20,11 @@ import coil.compose.SubcomposeAsyncImage
 @Composable
 fun MyImage(
     model: Any?,
-    icon: ImageVector,
+    icon: ImageVector?,
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.medium,
+    background: Color = MaterialTheme.colorScheme.surfaceContainer,
+    onError: ((AsyncImagePainter.State.Error) -> Unit)? = null,
     onSuccess: ((AsyncImagePainter.State.Success) -> Unit)? = null,
 ) {
     SubcomposeAsyncImage(
@@ -29,7 +32,7 @@ fun MyImage(
         contentDescription = "",
         modifier = modifier
             .clip(shape)
-            .background(MaterialTheme.colorScheme.surfaceContainer),
+            .background(background),
         contentScale = ContentScale.Crop,
         loading = {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -37,15 +40,18 @@ fun MyImage(
             }
         },
         error = {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(.6f),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            icon?.let {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = it,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(.6f),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         },
+        onError = onError,
         onSuccess = onSuccess
     )
 }

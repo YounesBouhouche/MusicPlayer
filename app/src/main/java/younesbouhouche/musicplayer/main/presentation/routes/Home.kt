@@ -1,8 +1,6 @@
 package younesbouhouche.musicplayer.main.presentation.routes
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +21,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
@@ -42,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -84,7 +80,7 @@ fun Home(
                     stringResource(R.string.favorites),
                     Icons.Default.Favorite,
                     tint = MaterialTheme.colorScheme.error,
-                ) { navigate(NavRoutes.FavoritesScreen) }
+                ) { navigate(NavRoutes.Favorites) }
                 HeaderButton(
                     stringResource(R.string.most_played),
                     Icons.AutoMirrored.Filled.TrendingUp,
@@ -132,7 +128,11 @@ fun Home(
                     contentPadding = PaddingValues(horizontal = 8.dp)
                 ) {
                     itemsIndexed(recentlyAdded, { index, item -> item.id }) { index, item ->
-                        HomeMusicCard(item, Modifier.animateItem(), onLongClick = { showInfo(item) }) {
+                        HomeMusicCard(
+                            item,
+                            Modifier.animateItem(),
+                            onLongClick = { showInfo(item) }
+                        ) {
                             play(recentlyAdded, index)
                         }
                     }
@@ -166,88 +166,74 @@ fun Home(
         item {
             Spacer(Modifier.height(16.dp))
         }
-        item {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp, 24.dp),
-            ) {
-                Text(
-                    stringResource(R.string.most_played_artists),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
+        if (!artists.isEmpty()) {
+            item {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp, 24.dp),
+                ) {
+                    Text(
+                        stringResource(R.string.most_played_artists),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+                }
             }
-        }
-        item {
-            AnimatedContent(targetState = artists, label = "") { artistsList ->
-                if (artistsList.isEmpty()) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.padding(vertical = 60.dp),
-                    ) {
-                        Icon(Icons.Default.Person, null, Modifier.size(120.dp))
-                        Text(
-                            text = stringResource(R.string.no_enough_data),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+            item {
+                val state =
+                    rememberCarouselState {
+                        minOf(5, artists.size)
                     }
-                } else {
-                    val state =
-                        rememberCarouselState {
-                            minOf(5, artists.size)
-                        }
-                    HorizontalMultiBrowseCarousel(
-                        state = state,
-                        modifier = Modifier.fillMaxWidth(),
-                        itemSpacing = 8.dp,
-                        contentPadding = PaddingValues(8.dp),
-                        preferredItemWidth = 200.dp,
-                        minSmallItemWidth = 200.dp,
-                        maxSmallItemWidth = 250.dp
-                    ) {
-                        artists.getOrNull(it)?.let {
-                            Column(Modifier
+                HorizontalMultiBrowseCarousel(
+                    state = state,
+                    modifier = Modifier.fillMaxWidth(),
+                    itemSpacing = 8.dp,
+                    contentPadding = PaddingValues(16.dp, 8.dp),
+                    preferredItemWidth = 200.dp,
+                    minSmallItemWidth = 200.dp,
+                    maxSmallItemWidth = 250.dp
+                ) { index ->
+                    artists.getOrNull(index)?.let {
+                        Column(
+                            Modifier
                                 .alpha(carouselItemInfo.size / carouselItemInfo.maxSize)
                                 .fillMaxWidth()
                             ) {
-                                SubcomposeAsyncImage(
-                                    model = it.getPicture(),
-                                    contentDescription = "",
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .clip(rememberMaskShape(CircleShape))
-                                        .size(200.dp)
-                                        .background(MaterialTheme.colorScheme.surfaceContainer)
-                                        .combinedClickable(
-                                            onLongClick = {
-                                                showArtistBottomSheet(it)
-                                            },
-                                        ) { navigateToArtist(it) },
-                                    error = {
-                                        Box(Modifier.fillMaxSize(),
-                                            contentAlignment = Alignment.Center) {
-                                            Icon(
-                                                Icons.Default.Person,
-                                                null,
-                                                Modifier.size(120.dp),
-                                                MaterialTheme.colorScheme.onSurfaceVariant,
-                                            )
-                                        }
+                            SubcomposeAsyncImage(
+                                model = it.getPicture(),
+                                contentDescription = "",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .clip(rememberMaskShape(CircleShape))
+                                    .size(200.dp)
+                                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                                    .combinedClickable(
+                                        onLongClick = {
+                                            showArtistBottomSheet(it)
+                                        },
+                                    ) { navigateToArtist(it) },
+                                error = {
+                                    Box(Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center) {
+                                        Icon(
+                                            Icons.Default.Person,
+                                            null,
+                                            Modifier.size(120.dp),
+                                            MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
                                     }
-                                )
-                                Text(
-                                    it.name,
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    overflow = TextOverflow.Ellipsis,
-                                    textAlign = TextAlign.Center,
-                                    maxLines = 1,
-                                )
-                            }
+                                }
+                            )
+                            Text(
+                                it.name,
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                overflow = TextOverflow.Ellipsis,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                            )
                         }
                     }
                 }
@@ -263,7 +249,7 @@ private fun RowScope.HeaderButton(
     tint: Color = MaterialTheme.colorScheme.primary,
     onClick: () -> Unit,
 ) {
-    AppTheme(seedColor = tint) {
+    AppTheme(primary = tint) {
         ExtendedFloatingActionButton(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             text = {

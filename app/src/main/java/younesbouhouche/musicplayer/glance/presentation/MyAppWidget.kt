@@ -12,9 +12,14 @@ import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
+import kotlinx.coroutines.flow.map
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.java.KoinJavaComponent.inject
-import younesbouhouche.musicplayer.main.domain.repo.FilesRepo
+import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
+import younesbouhouche.musicplayer.core.domain.player.QueueManager
+import younesbouhouche.musicplayer.main.domain.repo.MediaRepository
+import younesbouhouche.musicplayer.main.domain.repo.PlaybackRepository
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.settings.data.SettingsDataStore
@@ -31,21 +36,32 @@ class MyAppWidget : GlanceAppWidget(), KoinComponent {
         provideContent {
             GlanceTheme {
                 val appWidgetId = LocalGlanceId.current.toString().filter { it.isDigit() }.toInt()
-                val repo: FilesRepo by inject(FilesRepo::class.java)
+                val playbackRepository by inject<PlaybackRepository>()
+                val mediaRepository by inject<MediaRepository>()
+                val stateManager by inject<PlayerStateManager>()
+                val queueManager by inject<QueueManager>()
                 val dataStore: SettingsDataStore by inject(SettingsDataStore::class.java)
                 val opacity by dataStore.getOpacity(appWidgetId).collectAsState(1f)
-                val state = repo.getState().collectAsState(PlayerState()).value
-                val currentItem = repo.getCurrentItem().collectAsState(null).value.takeIf {
+                val state = stateManager.playerState.collectAsState(PlayerState()).value
+                val currentItem = queueManager
+                    .getCurrentItem()
+                    .map { id ->
+                        id?.let {
+                            mediaRepository.suspendGetMediaById(it)
+                        }
+                    }
+                    .collectAsState(null).value.takeIf {
                     state.playState != PlayState.STOP
                 }
                 val size = LocalSize.current
                 if (size.height > MEDIUM.height)
-                    LargeWidgetContent(currentItem, state, repo::onPlayerEvent, opacity)
+                    LargeWidgetContent(currentItem, state, playbackRepository::onEvent, opacity)
                 else if (size.height > SMALL.height)
-                    MediumWidgetContent(currentItem, state, repo::onPlayerEvent, opacity)
+                    MediumWidgetContent(currentItem, state, playbackRepository::onEvent, opacity)
                 else
-                    SmallWidgetContent(currentItem, state, repo::onPlayerEvent, opacity)
+                    SmallWidgetContent(currentItem, state, playbackRepository::onEvent, opacity)
             }
         }
     }
 }
+

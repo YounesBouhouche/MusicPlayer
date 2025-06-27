@@ -7,7 +7,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -17,45 +19,50 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import org.koin.compose.viewmodel.koinViewModel
 import soup.compose.material.motion.animation.materialFadeThroughIn
 import soup.compose.material.motion.animation.materialFadeThroughOut
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
+import younesbouhouche.musicplayer.main.domain.events.PlaylistsUiEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
 import younesbouhouche.musicplayer.main.presentation.routes.Albums
 import younesbouhouche.musicplayer.main.presentation.routes.Artists
+import younesbouhouche.musicplayer.main.presentation.routes.FavoritesScreen
 import younesbouhouche.musicplayer.main.presentation.routes.Home
 import younesbouhouche.musicplayer.main.presentation.routes.Library
 import younesbouhouche.musicplayer.main.presentation.routes.ListScreen
 import younesbouhouche.musicplayer.main.presentation.routes.PlaylistScreen
 import younesbouhouche.musicplayer.main.presentation.routes.Playlists
-import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
+import younesbouhouche.musicplayer.main.presentation.viewmodel.FavoritesViewModel
+import younesbouhouche.musicplayer.main.presentation.viewmodel.MainViewModel
 
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationScreen(
     navController: NavHostController,
-    mainVM: MainVM,
+    mainVM: MainViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val filesSorted by mainVM.filesSorted.collectAsState()
+    val favoritesViewModel = koinViewModel<FavoritesViewModel>()
+    val files by mainVM.files.collectAsState()
     val lastAdded by mainVM.lastAdded.collectAsState()
     val recentlyAdded = if (lastAdded.size > 5) lastAdded.subList(0, 5) else lastAdded
     val sortState by mainVM.sortState.collectAsState()
     val mostPlayedArtists by mainVM.mostPlayedArtists.collectAsState()
 
-    val albumsSorted by mainVM.albumsSorted.collectAsState()
+    val albums by mainVM.albums.collectAsState()
     val albumsSortState by mainVM.albumsSortState.collectAsState()
 
-    val artistsSorted by mainVM.artistsSorted.collectAsState()
+    val artists by mainVM.artists.collectAsState()
     val artistsSortState by mainVM.artistsSortState.collectAsState()
 
-    val playlistsSorted by mainVM.playlistsSorted.collectAsState()
+    val playlists by mainVM.playlists.collectAsState()
     val playlistsSortState by mainVM.playlistsSortState.collectAsState()
     val playlistSortState by mainVM.playlistSortState.collectAsState()
-    val playlist by mainVM.uiPlaylist.collectAsState()
 
     val history by mainVM.history.collectAsState()
     val mostPlayed by mainVM.mostPlayed.collectAsState()
@@ -63,7 +70,7 @@ fun NavigationScreen(
 
     val listScreenSortState by mainVM.listScreenSortState.collectAsState()
 
-    val favoritesFiles by mainVM.favoritesFiles.collectAsState()
+    val favorites by mainVM.favorites.collectAsState()
 
     SharedTransitionLayout(modifier.fillMaxSize()) {
         NavHost(
@@ -78,8 +85,8 @@ fun NavigationScreen(
                     navigate = navController::navigate,
                     recentlyAdded = recentlyAdded,
                     mostPlayed = mostFivePlayed,
-                    play = { list, index -> mainVM.onPlayerEvent(PlayerEvent.Play(list, index)) },
-                    showInfo = { mainVM.onUiEvent(UiEvent.ShowBottomSheet(it)) },
+                    play = { list, index -> mainVM.onPlaybackEvent(PlaybackEvent.Play(list, index)) },
+                    showInfo = { mainVM.onUiEvent(UiEvent.ShowBottomSheet(it.id)) },
                     navigateToArtist = {
                         navController.navigate(NavRoutes.Artist(it.name))
                     },
@@ -98,7 +105,7 @@ fun NavigationScreen(
             }
             composable<NavRoutes.Albums> {
                 Albums(
-                    albums = albumsSorted,
+                    albums = albums,
                     onClick = {
                         navController.navigate(NavRoutes.Album(it))
                     },
@@ -128,10 +135,10 @@ fun NavigationScreen(
                     onSortStateChange = mainVM::onListScreenSortChange,
                     navigateUp = navController::navigateUp,
                     onPlay = { index, shuffle ->
-                        mainVM.onPlayerEvent(PlayerEvent.Play(album.items, index, shuffle))
+                        mainVM.onPlaybackEvent(PlaybackEvent.Play(album.items, index))
                     },
                     onLongClick = {
-                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(album.items[it]))
+                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(album.items[it].id))
                     },
                     animatedContentScope = this,
                     key = "album-${album.name}",
@@ -141,7 +148,7 @@ fun NavigationScreen(
             }
             composable<NavRoutes.Artists> {
                 Artists(
-                    artists = artistsSorted,
+                    artists = artists,
                     onClick = {
                         navController.navigate(NavRoutes.Artist(it))
                     },
@@ -172,10 +179,10 @@ fun NavigationScreen(
                     onSortStateChange = mainVM::onListScreenSortChange,
                     navigateUp = navController::navigateUp,
                     onPlay = { index, shuffle ->
-                        mainVM.onPlayerEvent(PlayerEvent.Play(artist.items, index, shuffle))
+                        mainVM.onPlaybackEvent(PlaybackEvent.Play(artist.items, index))
                     },
                     onLongClick = {
-                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(artist.items[it]))
+                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(artist.items[it].id))
                     },
                     animatedContentScope = this,
                     key = "artist-${artist.name}",
@@ -185,17 +192,17 @@ fun NavigationScreen(
             }
             composable<NavRoutes.Playlists> {
                 Playlists(
-                    playlists = playlistsSorted,
+                    playlists = playlists,
                     onClick = {
-                        mainVM.setCurrentPlaylist(it)
-                        with(playlistsSorted[it]) {
-                            navController.navigate(NavRoutes.PlaylistScreen(name))
-                        }
+                        navController.navigate(NavRoutes.Playlist(it))
                     },
-                    onLongClick = { mainVM.onUiEvent(UiEvent.ShowPlaylistBottomSheet(it)) },
-                    modifier = Modifier,
+                    onLongClick = {
+                        mainVM.onPlaylistsEvent(PlaylistsUiEvent.ShowBottomSheet(it))
+                                  },
                     sortState = playlistsSortState,
-                    onSortStateChange = mainVM::onPlaylistsSortChange,
+                    onSortStateChange = {
+                        mainVM.onPlaylistsEvent(PlaylistsUiEvent.SetSortState(it))
+                    },
                     onPlayerEvent = mainVM::onPlayerEvent,
                     onPlaylistEvent = mainVM::onPlaylistEvent,
                     onUiEvent = mainVM::onUiEvent,
@@ -204,20 +211,25 @@ fun NavigationScreen(
             }
             composable<NavRoutes.Library> {
                 Library(
-                    filesSorted,
+                    files,
                     Modifier.testTag("library_list"),
                     sortState,
                     mainVM::onLibrarySortChange,
                     mainVM::onUiEvent,
                 ) {
-                    mainVM.onPlayerEvent(PlayerEvent.Play(filesSorted, it))
+                    mainVM.onPlaybackEvent(PlaybackEvent.Play(files, it))
                 }
             }
-            composable<NavRoutes.PlaylistScreen> { entry ->
+            composable<NavRoutes.Playlist> { entry ->
+                val route = entry.toRoute<NavRoutes.Playlist>()
+                LaunchedEffect(route.playlistId) {
+                    mainVM.onUiEvent(UiEvent.SetPlaylist(route.playlistId))
+                }
+                val playlist by mainVM.playlist.collectAsState()
                 PlaylistScreen(
                     playlist = playlist,
                     sortState = playlistSortState,
-                    onSortStateChange = mainVM::onPlaylistScreenSortChange,
+                    onSortStateChange = mainVM::onPlaylistSortChange,
                     navigateUp = navController::navigateUp,
                     animatedContentScope = this,
                     onRename = {
@@ -236,28 +248,28 @@ fun NavigationScreen(
                         mainVM.onPlaylistEvent(PlaylistEvent.RemoveAt(playlist, it))
                     },
                     onLongClick = {
-                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(playlist.items[it]))
+                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(playlist.items[it].id))
                     },
                     onPlay = { index, shuffle ->
-                        mainVM.onPlayerEvent(PlayerEvent.Play(playlist.items, index, shuffle))
+                        mainVM.onPlaybackEvent(PlaybackEvent.Play(playlist.items, index))
                     }
                 )
             }
-            composable<NavRoutes.FavoritesScreen> {
-                ListScreen(
-                    files = favoritesFiles,
-                    title = stringResource(R.string.favorites),
-                    sortState = listScreenSortState,
-                    onSortStateChange = mainVM::onListScreenSortChange,
-                    navigateUp = navController::navigateUp,
-                    onPlay = { index, shuffle ->
-                        mainVM.onPlayerEvent(PlayerEvent.Play(favoritesFiles, index, shuffle))
+            composable<NavRoutes.Favorites> {
+                FavoritesScreen(
+                    favoritesViewModel,
+                    onBack = {
+                        navController.navigateUp()
                     },
-                    animatedContentScope = this,
-                    onLongClick = {
-                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(favoritesFiles[it]))
+                    onPlaylistClick = {
+                        navController.navigate(NavRoutes.Playlist(it))
                     },
-                )
+                    onPlayPlaylist = {
+                        mainVM.onPlayerEvent(PlayerEvent.PlayPlaylist(it))
+                    }
+                ) { list, index ->
+                    mainVM.onPlaybackEvent(PlaybackEvent.Play(list, index))
+                }
             }
             composable<NavRoutes.MostPlayedScreen> {
                 ListScreen(
@@ -267,11 +279,11 @@ fun NavigationScreen(
                     onSortStateChange = null,
                     navigateUp = navController::navigateUp,
                     onPlay = { index, shuffle ->
-                        mainVM.onPlayerEvent(PlayerEvent.Play(mostFivePlayed, index, shuffle))
+                        mainVM.onPlaybackEvent(PlaybackEvent.Play(mostFivePlayed, index))
                     },
                     animatedContentScope = this,
                     onLongClick = {
-                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(mostFivePlayed[it]))
+                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(mostFivePlayed[it].id))
                     },
                 )
             }
@@ -283,11 +295,11 @@ fun NavigationScreen(
                     onSortStateChange = null,
                     navigateUp = navController::navigateUp,
                     onPlay = { index, shuffle ->
-                        mainVM.onPlayerEvent(PlayerEvent.Play(history, index, shuffle))
+                        mainVM.onPlaybackEvent(PlaybackEvent.Play(history, index))
                     },
                     animatedContentScope = this,
                     onLongClick = {
-                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(history[it]))
+                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(history[it].id))
                     },
                 )
             }
@@ -299,11 +311,11 @@ fun NavigationScreen(
                     onSortStateChange = null,
                     navigateUp = navController::navigateUp,
                     onPlay = { index, shuffle ->
-                        mainVM.onPlayerEvent(PlayerEvent.Play(lastAdded, index, shuffle))
+                        mainVM.onPlaybackEvent(PlaybackEvent.Play(lastAdded, index))
                              },
                     animatedContentScope = this,
                     onLongClick = {
-                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(lastAdded[it]))
+                        mainVM.onUiEvent(UiEvent.ShowBottomSheet(lastAdded[it].id))
                     },
                 )
             }

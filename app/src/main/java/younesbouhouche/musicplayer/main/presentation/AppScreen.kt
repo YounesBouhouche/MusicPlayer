@@ -9,10 +9,8 @@ import android.graphics.drawable.Icon
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
@@ -60,9 +58,10 @@ import androidx.window.core.layout.WindowWidthSizeClass
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.MainActivity
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.main.domain.events.FilesEvent
+import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
+import younesbouhouche.musicplayer.main.domain.events.PlaylistsUiEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
 import younesbouhouche.musicplayer.main.domain.models.Routes
@@ -81,11 +80,14 @@ import younesbouhouche.musicplayer.main.presentation.dialogs.TimerDialog
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
 import younesbouhouche.musicplayer.main.presentation.states.ViewState
+import younesbouhouche.musicplayer.main.presentation.util.Event
+import younesbouhouche.musicplayer.main.presentation.util.composables.CollectEvents
 import younesbouhouche.musicplayer.main.presentation.util.composables.leftEdgeWidth
 import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.main.presentation.util.composables.rightEdgeWidth
 import younesbouhouche.musicplayer.main.presentation.util.shareFiles
-import younesbouhouche.musicplayer.main.presentation.viewmodel.MainVM
+import younesbouhouche.musicplayer.main.presentation.viewmodel.MainViewModel
+import younesbouhouche.musicplayer.main.presentation.viewmodel.SearchVM
 import younesbouhouche.musicplayer.welcome.presentation.WelcomeScreen
 
 @OptIn(
@@ -97,7 +99,8 @@ import younesbouhouche.musicplayer.welcome.presentation.WelcomeScreen
 fun AppScreen(
     granted: Boolean,
     onPermissionRequest: () -> Unit,
-    mainVM: MainVM,
+    mainVM: MainViewModel,
+    searchVM: SearchVM,
     navController: NavHostController,
     isParent: Boolean,
 ) {
@@ -113,70 +116,40 @@ fun AppScreen(
         } ?: Routes.Home
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val queueFiles by mainVM.queueFiles.collectAsState()
-    val queueIndex by mainVM.queueIndex.collectAsState()
-    val searchState by mainVM.searchState.collectAsState()
+    val queue by mainVM.queue.collectAsState()
+    val searchState by searchVM.searchState.collectAsState()
     val playerState by mainVM.playerState.collectAsState()
     val uiState by mainVM.uiState.collectAsState()
+    val bottomSheetItem by mainVM.bottomSheetItem.collectAsState()
     val playlists by mainVM.playlists.collectAsState()
     val isPlaying = playerState.playState != PlayState.STOP
     var height by remember { mutableIntStateOf(0) }
+    val playlist by mainVM.sheetPlaylist.collectAsState()
     val navBarHeight = navBarHeight
     val density = LocalDensity.current
-    val playlist by mainVM.bottomSheetPlaylist.collectAsState()
-    val playlistFiles by mainVM.bottomSheetPlaylistFiles.collectAsState()
     val isCompact =
         currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
     val offset =
         with(density) {
-            height - ((if (isParent and isCompact and !searchState.expanded) 160.dp else 80.dp) + navBarHeight).roundToPx()
+            height - ((if (isParent and isCompact and !searchState.expanded) 160.dp else 80.dp) +
+                    navBarHeight).roundToPx()
         }
     val playlistOffset =
         with(density) {
             height - (72.dp + navBarHeight).roundToPx()
         }
-    val state =
-        rememberSaveable(
-            inputs = arrayOf(),
-            saver =
-                AnchoredDraggableState.Saver(
-                    tween(),
-                    splineBasedDecay(density),
-                    { it * .5f },
-                    { with(density) { 100.dp.toPx() } },
-                ),
-        ) {
-            AnchoredDraggableState(
-                initialValue = ViewState.HIDDEN,
-                anchors = DraggableAnchors {},
-                snapAnimationSpec = tween(),
-                decayAnimationSpec = splineBasedDecay(density),
-                positionalThreshold = { it * .5f },
-                velocityThreshold = { with(density) { 100.dp.toPx() } },
-            )
-        }
+    val state = rememberSaveable(inputs = arrayOf(), saver = AnchoredDraggableState.Saver()) {
+        AnchoredDraggableState(initialValue = ViewState.HIDDEN, anchors = DraggableAnchors {})
+    }
     val playlistState =
-        rememberSaveable(
-            inputs = arrayOf(),
-            saver =
-                AnchoredDraggableState.Saver(
-                    tween(),
-                    splineBasedDecay(density),
-                    { it * .5f },
-                    { with(density) { 100.dp.toPx() } },
-                ),
-        ) {
+        rememberSaveable(inputs = arrayOf(), saver = AnchoredDraggableState.Saver()) {
             AnchoredDraggableState(
                 initialValue = PlaylistViewState.COLLAPSED,
                 anchors =
                     DraggableAnchors {
                         PlaylistViewState.COLLAPSED at playlistOffset.toFloat()
                         PlaylistViewState.EXPANDED at 0f
-                    },
-                snapAnimationSpec = tween(),
-                decayAnimationSpec = splineBasedDecay(density),
-                positionalThreshold = { it * .5f },
-                velocityThreshold = { with(density) { 100.dp.toPx() } },
+                    }
             )
         }
     LaunchedEffect(key1 = offset) {
@@ -196,18 +169,15 @@ fun AppScreen(
             },
         )
     }
-    LaunchedEffect(key1 = state.settledValue) {
-        mainVM.onUiEvent(UiEvent.SetViewState(state.settledValue))
-    }
-    LaunchedEffect(key1 = playlistState.settledValue) {
-        mainVM.onUiEvent(UiEvent.SetPlaylistViewState(playlistState.settledValue))
-    }
-    LaunchedEffect(key1 = uiState.viewState) {
-        if ((uiState.viewState == ViewState.HIDDEN) and (playerState.playState != PlayState.STOP)) {
-            mainVM.onPlayerEvent(PlayerEvent.Stop)
+    LaunchedEffect(key1 = state.targetValue) {
+        if (
+            (state.targetValue == ViewState.HIDDEN)
+                and (state.settledValue != ViewState.HIDDEN)
+                and (playerState.playState != PlayState.STOP)
+            ) {
+            mainVM.onPlaybackEvent(PlaybackEvent.Stop)
         }
         launch {
-            state.animateTo(uiState.viewState)
             playlistState.snapTo(PlaylistViewState.COLLAPSED)
         }
     }
@@ -244,12 +214,15 @@ fun AppScreen(
             else -> 1f
         }
     LaunchedEffect(smallPlayerProgress) {
-        mainVM.onPlayerEvent(PlayerEvent.SetPlayerVolume(smallPlayerProgress))
+//        if (state.settledValue != ViewState.HIDDEN)
+//            mainVM.onPlaybackEvent(PlaybackEvent.SetPlayerVolume(smallPlayerProgress))
     }
     val playlistProgress =
         when (playlistState.settledValue) {
-            PlaylistViewState.COLLAPSED -> playlistState.progress(PlaylistViewState.COLLAPSED, PlaylistViewState.EXPANDED)
-            PlaylistViewState.EXPANDED -> 1f - playlistState.progress(PlaylistViewState.EXPANDED, PlaylistViewState.COLLAPSED)
+            PlaylistViewState.COLLAPSED ->
+                playlistState.progress(PlaylistViewState.COLLAPSED, PlaylistViewState.EXPANDED)
+            PlaylistViewState.EXPANDED ->
+                1f - playlistState.progress(PlaylistViewState.EXPANDED, PlaylistViewState.COLLAPSED)
         }
     val startPadding = if (isCompact) 0.dp else (80.dp + leftEdgeWidth) * (1f - progress)
     val endPadding = if (isCompact) 0.dp else (rightEdgeWidth * (1f - progress))
@@ -271,9 +244,9 @@ fun AppScreen(
                     .pullToRefresh(
                         state = pullToRefreshState,
                         enabled = isParent and (state.settledValue != ViewState.LARGE),
-                        isRefreshing = uiState.loading,
+                        isRefreshing = false,
                         onRefresh = {
-                            mainVM.onFilesEvent(FilesEvent.LoadFiles)
+                            mainVM.onReload()
                         },
                     ),
             ) {
@@ -299,30 +272,55 @@ fun AppScreen(
                     ) {
                         SearchScreen(
                             searchState,
+                            uiState.showAppName,
                             uiState.loading,
-                            mainVM::onSearchEvent,
-                            { mainVM.onPlayerEvent(PlayerEvent.Play(searchState.result, it)) },
+                            searchVM::onSearchEvent,
+                            {
+                                mainVM.onPlaybackEvent(
+                                    PlaybackEvent.Play(
+                                        searchState.result.files,
+                                        it
+                                    )
+                                )
+                            },
+                            {
+                                navController.navigate(NavRoutes.Album(it.name))
+                            },
+                            {
+                                navController.navigate(NavRoutes.Artist(it.name))
+                            },
+                            {
+                                navController.navigate(NavRoutes.Playlist(it.id))
+                            },
+                            Modifier,
                             {
                                 AnimatedVisibility(currentNavRoute != Routes.Home) {
-                                    IconButton(onClick = { mainVM.onUiEvent(UiEvent.ShowSortSheet(currentNavRoute)) }) {
-                                        Icon(Icons.AutoMirrored.Default.Sort, null)
+                                    IconButton(onClick = {
+                                        mainVM.onUiEvent(
+                                            UiEvent.ShowSortSheet(currentNavRoute)
+                                        )
+                                    }) {
+                                        Icon(
+                                            Icons.AutoMirrored.Default.Sort,
+                                            null
+                                        )
                                     }
                                 }
                             }
                         ) {
-                            mainVM.onUiEvent(UiEvent.ShowBottomSheet(it))
+                            mainVM.onUiEvent(UiEvent.ShowBottomSheet(it.id))
                         }
                     }
                     PlayerScreen(
                         Modifier.padding(start = startPadding, end = endPadding),
-                        queueFiles,
-                        queueIndex,
+                        queue,
                         playerState,
                         uiState,
                         state,
                         playlistState,
                         progress,
                         playlistProgress,
+                        mainVM::onPlaybackEvent,
                         mainVM::onPlayerEvent,
                         mainVM::onUiEvent,
                     )
@@ -339,20 +337,23 @@ fun AppScreen(
                             restoreState = true
                         }
                     }
-                    Indicator(pullToRefreshState, uiState.loading, Modifier.align(Alignment.TopCenter))
+                    Indicator(pullToRefreshState, false, Modifier.align(Alignment.TopCenter))
                 }
             }
         } else {
             WelcomeScreen(onPermissionRequest)
         }
     }
-    uiState.bottomSheetItem?.run {
+    bottomSheetItem?.run {
         ItemBottomSheet(
             open = uiState.bottomSheetVisible,
             state = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             onDismissRequest = { mainVM.onUiEvent(UiEvent.HideBottomSheet) },
             file = this,
-            onPlayerEvent = mainVM::onPlayerEvent,
+            onPlaybackEvent = mainVM::onPlaybackEvent,
+            onUpdateFavorite = { path, favorite ->
+                mainVM.onPlayerEvent(PlayerEvent.UpdateFavorite(path, favorite))
+            },
             onUiEvent = mainVM::onUiEvent,
             navigateToAlbum = {
                 navController.navigate(NavRoutes.Album(album))
@@ -378,7 +379,7 @@ fun AppScreen(
         ListBottomSheet(
             open = uiState.listBottomSheetVisible,
             list = this,
-            onPlayerEvent = mainVM::onPlayerEvent,
+            onPlaybackEvent = mainVM::onPlaybackEvent,
             onUiEvent = mainVM::onUiEvent,
             title = uiState.listBottomSheetTitle,
             text = pluralStringResource(R.plurals.item_s, size, size),
@@ -391,14 +392,14 @@ fun AppScreen(
     PlaylistBottomSheet(
         open = uiState.playlistBottomSheetVisible,
         state = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        onDismissRequest = { mainVM.onUiEvent(UiEvent.HidePlaylistBottomSheet) },
+        onDismissRequest = { mainVM.onPlaylistsEvent(PlaylistsUiEvent.HidePlaylistBottomSheet) },
         id = playlist.id,
         title = playlist.name,
         cover = playlist.image,
-        files = playlistFiles,
-        onPlayerEvent = mainVM::onPlayerEvent,
+        files = playlist.items,
+        onPlaybackEvent = mainVM::onPlaybackEvent,
         onUiEvent = mainVM::onUiEvent,
-        delete = { mainVM.onPlaylistEvent(PlaylistEvent.DeletePlaylist(playlist)) },
+        delete = { mainVM.onPlaylistEvent(PlaylistEvent.DeletePlaylist(playlist.toPlaylist())) },
         addToHomeScreen = {
             val manager = context.getSystemService(Context.SHORTCUT_SERVICE) as ShortcutManager
             manager.requestPinShortcut(
@@ -419,18 +420,26 @@ fun AppScreen(
             )
         },
         savePlaylist = {
-            mainVM.onUiEvent(UiEvent.SavePlaylist(playlist))
+            mainVM.onUiEvent(UiEvent.SavePlaylist(playlist.toPlaylist()))
         },
     ) {
-        context.shareFiles(playlistFiles)
+        context.shareFiles(playlist.items)
     }
     QueueBottomSheet(
         uiState.queueSheetVisible,
         rememberModalBottomSheetState(),
         { mainVM.onUiEvent(UiEvent.HideQueueBottomSheet) },
-        { mainVM.onPlayerEvent(PlayerEvent.Stop) },
-        { mainVM.onUiEvent(UiEvent.ShowCreatePlaylistDialog(queueFiles.map { it.path })) },
-        { mainVM.onUiEvent(UiEvent.ShowAddToPlaylistDialog(queueFiles.map { it.path })) },
+        { mainVM.onPlaybackEvent(PlaybackEvent.Stop) },
+        {
+            mainVM.onUiEvent(
+                UiEvent.ShowCreatePlaylistDialog(queue.items.map { it.path })
+            )
+        },
+        {
+            mainVM.onUiEvent(
+                UiEvent.ShowAddToPlaylistDialog(queue.items.map { it.path })
+            )
+        }
     )
     RenamePlaylistDialog(
         uiState.renamePlaylistDialogVisible,
@@ -449,19 +458,19 @@ fun AppScreen(
         uiState.speedDialog,
         { mainVM.onUiEvent(UiEvent.HideSpeedDialog) },
         playerState.speed,
-        { mainVM.onPlayerEvent(PlayerEvent.SetSpeed(it)) },
+        { mainVM.onPlaybackEvent(PlaybackEvent.SetSpeed(it)) },
     )
     PitchDialog(
         uiState.pitchDialog,
         { mainVM.onUiEvent(UiEvent.HidePitchDialog) },
         playerState.pitch,
-        { mainVM.onPlayerEvent(PlayerEvent.SetPitch(it)) },
+        { mainVM.onPlaybackEvent(PlaybackEvent.SetPitch(it)) },
     )
     TimerDialog(
         uiState.timerDialog,
         playerState.timer,
         { mainVM.onUiEvent(UiEvent.HideTimerDialog) },
-        { mainVM.onPlayerEvent(PlayerEvent.SetTimer(it)) },
+        { mainVM.onPlaybackEvent(PlaybackEvent.SetTimer(it)) },
     )
     CreatePlaylistDialog(
         uiState.newPlaylistDialog,
@@ -475,15 +484,29 @@ fun AppScreen(
     AddToPlaylistDialog(
         uiState.addToPlaylistDialog,
         playlists,
-        uiState.addToPlaylistIndex,
-        { mainVM.onUiEvent(UiEvent.UpdateSelectedPlaylist(it)) },
-        { mainVM.onUiEvent(UiEvent.HideAddToPlaylistDialog) },
-        { mainVM.onPlaylistEvent(PlaylistEvent.AddToPlaylist(uiState.addToPlaylistIndex, uiState.addToPlaylistItems)) },
+        uiState.addToPlaylistSelected,
+        {
+            mainVM.onUiEvent(UiEvent.UpdateSelectedPlaylist(it))
+        },
+        {
+            mainVM.onUiEvent(UiEvent.ShowCreatePlaylistDialog(emptyList()))
+        },
+        {
+            mainVM.onUiEvent(UiEvent.HideAddToPlaylistDialog)
+        },
+        {
+            mainVM.onPlaylistEvent(
+                PlaylistEvent.AddToPlaylist(
+                    uiState.addToPlaylistSelected.map { playlists[it].id }.toSet(),
+                    uiState.addToPlaylistItems
+                )
+            )
+        }
     )
     MetadataDialog(
         uiState.metadataDialog,
         { mainVM.onUiEvent(UiEvent.HideMetadataDialog) },
-        { mainVM.onFilesEvent(FilesEvent.UpdateMetadata(uiState.metadata)) },
+        { /*mainVM.onFilesEvent(FilesEvent.UpdateMetadata(uiState.metadata))*/ },
         uiState.metadata,
         { mainVM.onUiEvent(UiEvent.UpdateMetadata(it)) },
     )
@@ -494,7 +517,7 @@ fun AppScreen(
             it,
         )
     }
-    BackHandler(uiState.viewState == ViewState.LARGE) {
+    BackHandler(state.settledValue == ViewState.LARGE) {
         scope.launch {
             if (uiState.playlistViewState == PlaylistViewState.EXPANDED) {
                 playlistState.animateTo(PlaylistViewState.COLLAPSED)
@@ -502,5 +525,12 @@ fun AppScreen(
                 state.animateTo(ViewState.SMALL)
             }
         }
+    }
+    CollectEvents { event ->
+        if (event is Event.ExpandPlayer)
+            if (state.settledValue == ViewState.HIDDEN)
+                scope.launch {
+                    state.animateTo(ViewState.SMALL)
+                }
     }
 }

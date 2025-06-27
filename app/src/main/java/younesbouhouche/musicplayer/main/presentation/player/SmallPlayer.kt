@@ -30,12 +30,13 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
+import younesbouhouche.musicplayer.main.domain.models.QueueModel
 import younesbouhouche.musicplayer.main.presentation.components.MyImage
 import younesbouhouche.musicplayer.main.presentation.components.PlayPauseAnimatedIcon
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
@@ -44,14 +45,14 @@ import younesbouhouche.musicplayer.main.presentation.util.timeString
 
 @Composable
 fun SmallPlayer(
-    queue: List<MusicCard>,
-    index: Int,
+    queue: QueueModel,
     playerState: PlayerState,
-    onPlayerEvent: (PlayerEvent) -> Unit,
+    onPlaybackEvent: (PlaybackEvent) -> Unit,
     modifier: Modifier = Modifier,
+    onError: () -> Unit = {},
     onSuccess: (Bitmap) -> Unit = {},
 ) {
-    val item = queue[index]
+    val item = queue.items[queue.index]
     Box(modifier.height(80.dp).fillMaxWidth()) {
         Column(Modifier.fillMaxSize()) {
             Row(
@@ -69,7 +70,7 @@ fun SmallPlayer(
                     contentAlignment = Alignment.Center,
                 ) {
                     AnimatedContent(
-                        targetState = index,
+                        targetState = queue.index,
                         label = "",
                         transitionSpec = {
                             (
@@ -81,11 +82,14 @@ fun SmallPlayer(
                             )
                                 .using(SizeTransform(clip = false))
                         },
-                    ) {
+                    ) { index ->
                         MyImage(
-                            model = queue.getOrNull(it)?.cover,
+                            model = queue.items.getOrNull(index)?.coverUri,
                             icon = Icons.Default.MusicNote,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
+                            onError = {
+                                onError()
+                            }
                         ) {
                             onSuccess((it.result.drawable as BitmapDrawable).bitmap)
                         }
@@ -112,16 +116,16 @@ fun SmallPlayer(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
-                IconButton(onClick = { onPlayerEvent(PlayerEvent.Previous) }) {
+                IconButton(onClick = { onPlaybackEvent(PlaybackEvent.Previous) }) {
                     Icon(Icons.Default.SkipPrevious, null)
                 }
-                IconButton(onClick = { onPlayerEvent(PlayerEvent.PauseResume) }) {
+                IconButton(onClick = { onPlaybackEvent(PlaybackEvent.PauseResume) }) {
                     PlayPauseAnimatedIcon(
                         playerState.playState == PlayState.PLAYING,
                         Modifier.size(24.dp)
                     )
                 }
-                IconButton(onClick = { onPlayerEvent(PlayerEvent.Next) }) {
+                IconButton(onClick = { onPlaybackEvent(PlaybackEvent.Next) }) {
                     Icon(Icons.Default.SkipNext, null)
                 }
             }
