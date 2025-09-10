@@ -12,13 +12,13 @@ plugins {
 
 android {
     namespace = "younesbouhouche.musicplayer"
-    compileSdk = 35
+    compileSdk = 36
     android.buildFeatures.buildConfig = true
 
     defaultConfig {
         applicationId = "younesbouhouche.musicplayer"
         minSdk = 30
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 

@@ -26,7 +26,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -54,7 +53,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.window.core.layout.WindowWidthSizeClass
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.MainActivity
 import younesbouhouche.musicplayer.R
@@ -82,6 +80,7 @@ import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
 import younesbouhouche.musicplayer.main.presentation.states.ViewState
 import younesbouhouche.musicplayer.main.presentation.util.Event
 import younesbouhouche.musicplayer.main.presentation.util.composables.CollectEvents
+import younesbouhouche.musicplayer.main.presentation.util.composables.isCompact
 import younesbouhouche.musicplayer.main.presentation.util.composables.leftEdgeWidth
 import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.main.presentation.util.composables.rightEdgeWidth
@@ -127,8 +126,6 @@ fun AppScreen(
     val playlist by mainVM.sheetPlaylist.collectAsState()
     val navBarHeight = navBarHeight
     val density = LocalDensity.current
-    val isCompact =
-        currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
     val offset =
         with(density) {
             height - ((if (isParent and isCompact and !searchState.expanded) 160.dp else 80.dp) +

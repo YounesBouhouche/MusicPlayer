@@ -197,7 +197,7 @@ fun Home(
                     artists.getOrNull(index)?.let {
                         Column(
                             Modifier
-                                .alpha(carouselItemInfo.size / carouselItemInfo.maxSize)
+                                .alpha(carouselItemDrawInfo.size / carouselItemDrawInfo.maxSize)
                                 .fillMaxWidth()
                             ) {
                             SubcomposeAsyncImage(

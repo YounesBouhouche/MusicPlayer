@@ -192,7 +192,7 @@ fun Queue(
             topBar = {
                 CenterAlignedTopAppBar(
                     colors =
-                        TopAppBarDefaults.centerAlignedTopAppBarColors().copy(
+                        TopAppBarDefaults.topAppBarColors().copy(
                             containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         ),
                     title = {
@@ -238,12 +238,9 @@ fun Queue(
                     val item by rememberUpdatedState(card)
                     val index = queue.items.indexOf(card)
                     val dismissState =
-                        rememberSwipeToDismissBoxState(
-                            confirmValueChange = { value ->
-                                value == SwipeToDismissBoxValue.EndToStart
-                            },
-                            positionalThreshold = { it / 1.5f },
-                        )
+                        rememberSwipeToDismissBoxState {
+                            it / 1.5f
+                        }
                     if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
                         onPlaybackEvent(PlaybackEvent.Remove(queue.items.indexOf(item)))
                         LaunchedEffect(Unit) {

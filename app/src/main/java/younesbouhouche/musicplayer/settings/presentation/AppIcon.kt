@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -50,13 +48,13 @@ fun AppIcon(modifier: Modifier = Modifier) {
                         interactionSource = null,
                     ) {
                         angle += 30f
-                        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                        view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
                     }
                     .rotate(animatedAngle),
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.surfaceContainer),
         )
         Icon(
-            Icons.Default.MusicNote,
+            ImageVector.vectorResource(R.drawable.media3_notification_small_icon),
             null,
             Modifier.fillMaxSize(.5f),
             MaterialTheme.colorScheme.onSurface,

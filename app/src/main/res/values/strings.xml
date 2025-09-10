@@ -230,7 +230,7 @@
     <string name="folders_desc">Exclude folders</string>
     <string name="storage">Storage</string>
     <string name="storage_desc">Customize app cache size</string>
-    <string name="playback_desc">Skip silence, gapless playbacks ...</string>
+    <string name="playback_desc">Skip silence, gapless playbacks …</string>
     <string name="about_desc">Contact developer, support project</string>
     <string name="appearance">Appearance</string>
     <string name="colors">Colors</string>

@@ -238,13 +238,9 @@ fun SharedTransitionScope.PlaylistScreen(
                     }
                 }
                 itemsIndexed(playlist.items, { index, file -> file.id }) { index, file ->
-                    val dismissState =
-                        rememberSwipeToDismissBoxState(
-                            confirmValueChange = { value ->
-                                value == SwipeToDismissBoxValue.EndToStart
-                            },
-                            positionalThreshold = { it / 1.5f },
-                        )
+                    val dismissState = rememberSwipeToDismissBoxState {
+                        it / 1.5f
+                    }
                     if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
                         onDismiss(index)
                         LaunchedEffect(Unit) {

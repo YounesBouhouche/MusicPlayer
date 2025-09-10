@@ -79,6 +79,7 @@ fun LargePlayer(
     playlistDragEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
+
     val scope = rememberCoroutineScope()
     val activeItem = queue.items[queue.index]
     val pagerState = rememberPagerState(queue.index) { queue.items.count() }

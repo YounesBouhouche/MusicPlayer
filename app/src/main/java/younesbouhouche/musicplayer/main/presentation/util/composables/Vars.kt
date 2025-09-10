@@ -3,11 +3,9 @@ package younesbouhouche.musicplayer.main.presentation.util.composables
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.window.core.layout.WindowWidthSizeClass
 
 val leftEdgeWidth
     @Composable
@@ -27,4 +25,4 @@ val navBarHeight
 
 val isCompact
     @Composable
-    get() = currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
+    get() = true
