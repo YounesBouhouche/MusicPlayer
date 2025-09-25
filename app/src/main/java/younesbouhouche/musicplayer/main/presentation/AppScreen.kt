@@ -1,110 +1,111 @@
 package younesbouhouche.musicplayer.main.presentation
 
-import android.content.Context
 import android.content.Intent
-import android.content.Intent.ACTION_VIEW
-import android.content.pm.ShortcutInfo
-import android.content.pm.ShortcutManager
-import android.graphics.drawable.Icon
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.AnchoredDraggableState
-import androidx.compose.foundation.gestures.DraggableAnchors
-import androidx.compose.foundation.gestures.animateTo
-import androidx.compose.foundation.gestures.snapTo
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.displayCutoutPadding
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
-import androidx.compose.material3.pulltorefresh.pullToRefresh
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.MainActivity
+import androidx.navigation.toRoute
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
-import younesbouhouche.musicplayer.main.domain.events.PlaylistsUiEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
 import younesbouhouche.musicplayer.main.domain.models.Routes
-import younesbouhouche.musicplayer.main.presentation.components.ItemBottomSheet
-import younesbouhouche.musicplayer.main.presentation.components.ListBottomSheet
-import younesbouhouche.musicplayer.main.presentation.components.PlaylistBottomSheet
-import younesbouhouche.musicplayer.main.presentation.components.QueueBottomSheet
+import younesbouhouche.musicplayer.main.presentation.components.MusicCardBottomSheet
 import younesbouhouche.musicplayer.main.presentation.dialogs.AddToPlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.CreatePlaylistDialog
-import younesbouhouche.musicplayer.main.presentation.dialogs.DetailsDialog
-import younesbouhouche.musicplayer.main.presentation.dialogs.MetadataDialog
-import younesbouhouche.musicplayer.main.presentation.dialogs.PitchDialog
-import younesbouhouche.musicplayer.main.presentation.dialogs.RenamePlaylistDialog
-import younesbouhouche.musicplayer.main.presentation.dialogs.SpeedDialog
-import younesbouhouche.musicplayer.main.presentation.dialogs.TimerDialog
+import younesbouhouche.musicplayer.main.presentation.routes.AlbumScreen
+import younesbouhouche.musicplayer.main.presentation.routes.AlbumsScreen
+import younesbouhouche.musicplayer.main.presentation.routes.ArtistScreen
+import younesbouhouche.musicplayer.main.presentation.routes.ArtistsScreen
+import younesbouhouche.musicplayer.main.presentation.routes.HomeScreen
+import younesbouhouche.musicplayer.main.presentation.routes.LibraryScreen
+import younesbouhouche.musicplayer.main.presentation.routes.PlaylistScreen
+import younesbouhouche.musicplayer.main.presentation.routes.PlaylistsScreen
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
-import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
-import younesbouhouche.musicplayer.main.presentation.states.ViewState
-import younesbouhouche.musicplayer.main.presentation.util.Event
-import younesbouhouche.musicplayer.main.presentation.util.composables.CollectEvents
-import younesbouhouche.musicplayer.main.presentation.util.composables.isCompact
-import younesbouhouche.musicplayer.main.presentation.util.composables.leftEdgeWidth
-import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
-import younesbouhouche.musicplayer.main.presentation.util.composables.rightEdgeWidth
-import younesbouhouche.musicplayer.main.presentation.util.shareFiles
+import younesbouhouche.musicplayer.main.presentation.util.containerClip
+import younesbouhouche.musicplayer.main.presentation.util.intUpDownTransSpec
+import younesbouhouche.musicplayer.main.presentation.util.isRouteParent
 import younesbouhouche.musicplayer.main.presentation.viewmodel.MainViewModel
 import younesbouhouche.musicplayer.main.presentation.viewmodel.SearchVM
-import younesbouhouche.musicplayer.welcome.presentation.WelcomeScreen
 
-@OptIn(
-    ExperimentalFoundationApi::class,
-    ExperimentalMaterial3Api::class,
-    ExperimentalComposeUiApi::class,
-)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AppScreen(
-    granted: Boolean,
-    onPermissionRequest: () -> Unit,
     mainVM: MainViewModel,
     searchVM: SearchVM,
     navController: NavHostController,
-    isParent: Boolean,
+    modifier: Modifier = Modifier
 ) {
+    val searchState by searchVM.searchState.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val isParent = currentRoute.isRouteParent
+    var bottomSheetFile by remember { mutableStateOf<MusicCard?>(null) }
+    var viewHeight by remember { mutableIntStateOf(0) }
+    val albums by mainVM.albums.collectAsState()
+    val artists by mainVM.artists.collectAsState()
+    val playlists by mainVM.playlists.collectAsState()
+    val queue by mainVM.queue.collectAsState()
+    val playerState by mainVM.playerState.collectAsState()
+    val files by mainVM.files.collectAsState()
+    val favorites by mainVM.favorites.collectAsState()
+    val history by mainVM.history.collectAsState()
+    val padding by animateDpAsState(if (isParent) 8.dp else 0.dp)
+    val albumsSortState by mainVM.albumsSortState.collectAsState()
+    val artistsSortState by mainVM.artistsSortState.collectAsState()
+    val playlistsSortState by mainVM.playlistsSortState.collectAsState()
+    val listScreenSortState by mainVM.listScreenSortState.collectAsState()
+    val playlistSortState by mainVM.playlistSortState.collectAsState()
+    val librarySortState by mainVM.sortState.collectAsState()
+    val playlist by mainVM.playlist.collectAsState()
+    val smallPlayerExpanded = playerState.playState != PlayState.STOP
+    val uiState by mainVM.uiState.collectAsState()
+    val context = LocalContext.current
     val currentNavRoute =
         currentRoute?.let { route ->
             Routes
@@ -112,422 +113,319 @@ fun AppScreen(
                 .firstOrNull {
                     it.destination.javaClass.kotlin.qualifiedName?.contains(route) == true
                 }
-        } ?: Routes.Home
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val queue by mainVM.queue.collectAsState()
-    val searchState by searchVM.searchState.collectAsState()
-    val playerState by mainVM.playerState.collectAsState()
-    val uiState by mainVM.uiState.collectAsState()
-    val bottomSheetItem by mainVM.bottomSheetItem.collectAsState()
-    val playlists by mainVM.playlists.collectAsState()
-    val isPlaying = playerState.playState != PlayState.STOP
-    var height by remember { mutableIntStateOf(0) }
-    val playlist by mainVM.sheetPlaylist.collectAsState()
-    val navBarHeight = navBarHeight
-    val density = LocalDensity.current
-    val offset =
-        with(density) {
-            height - ((if (isParent and isCompact and !searchState.expanded) 160.dp else 80.dp) +
-                    navBarHeight).roundToPx()
-        }
-    val playlistOffset =
-        with(density) {
-            height - (72.dp + navBarHeight).roundToPx()
-        }
-    val state = rememberSaveable(inputs = arrayOf(), saver = AnchoredDraggableState.Saver()) {
-        AnchoredDraggableState(initialValue = ViewState.HIDDEN, anchors = DraggableAnchors {})
-    }
-    val playlistState =
-        rememberSaveable(inputs = arrayOf(), saver = AnchoredDraggableState.Saver()) {
-            AnchoredDraggableState(
-                initialValue = PlaylistViewState.COLLAPSED,
-                anchors =
-                    DraggableAnchors {
-                        PlaylistViewState.COLLAPSED at playlistOffset.toFloat()
-                        PlaylistViewState.EXPANDED at 0f
-                    }
-            )
-        }
-    LaunchedEffect(key1 = offset) {
-        val snap = state.settledValue == ViewState.HIDDEN
-        state.updateAnchors(
-            DraggableAnchors {
-                ViewState.HIDDEN at height.toFloat()
-                ViewState.SMALL at offset.toFloat()
-                ViewState.LARGE at 0f
-            },
-        )
-        if (snap) launch { state.snapTo(ViewState.HIDDEN) }
-        playlistState.updateAnchors(
-            DraggableAnchors {
-                PlaylistViewState.COLLAPSED at playlistOffset.toFloat()
-                PlaylistViewState.EXPANDED at 0f
-            },
-        )
-    }
-    LaunchedEffect(key1 = state.targetValue) {
-        if (
-            (state.targetValue == ViewState.HIDDEN)
-                and (state.settledValue != ViewState.HIDDEN)
-                and (playerState.playState != PlayState.STOP)
-            ) {
-            mainVM.onPlaybackEvent(PlaybackEvent.Stop)
-        }
-        launch {
-            playlistState.snapTo(PlaylistViewState.COLLAPSED)
-        }
-    }
-    LaunchedEffect(key1 = uiState.playlistViewState) {
-        launch { playlistState.animateTo(uiState.playlistViewState) }
-    }
-    LaunchedEffect(key1 = playerState.playState) {
-        if ((playerState.playState != PlayState.STOP) and (state.settledValue == ViewState.HIDDEN)) {
-            launch {
-                playlistState.snapTo(PlaylistViewState.COLLAPSED)
-                state.animateTo(ViewState.SMALL)
             }
-        }
-    }
-    LaunchedEffect(key1 = playerState.playState) {
-        if (playerState.playState == PlayState.STOP) {
-            launch { state.animateTo(ViewState.HIDDEN) }
-        }
-    }
-    val progress =
-        when {
-            playerState.playState == PlayState.STOP -> 0f
-            state.offset == 0f -> 1f
-            state.settledValue == ViewState.SMALL -> state.progress(ViewState.SMALL, ViewState.LARGE)
-            state.settledValue == ViewState.LARGE -> 1f - state.progress(ViewState.LARGE, ViewState.SMALL)
-            else -> 0f
-        }
-    val smallPlayerProgress =
-        when {
-            playerState.playState == PlayState.STOP -> 0f
-            state.offset == 0f -> 1f
-            state.settledValue == ViewState.HIDDEN -> state.progress(ViewState.HIDDEN, ViewState.SMALL)
-            state.settledValue == ViewState.SMALL -> 1f - state.progress(ViewState.SMALL, ViewState.HIDDEN)
-            else -> 1f
-        }
-    LaunchedEffect(smallPlayerProgress) {
-//        if (state.settledValue != ViewState.HIDDEN)
-//            mainVM.onPlaybackEvent(PlaybackEvent.SetPlayerVolume(smallPlayerProgress))
-    }
-    val playlistProgress =
-        when (playlistState.settledValue) {
-            PlaylistViewState.COLLAPSED ->
-                playlistState.progress(PlaylistViewState.COLLAPSED, PlaylistViewState.EXPANDED)
-            PlaylistViewState.EXPANDED ->
-                1f - playlistState.progress(PlaylistViewState.EXPANDED, PlaylistViewState.COLLAPSED)
-        }
-    val startPadding = if (isCompact) 0.dp else (80.dp + leftEdgeWidth) * (1f - progress)
-    val endPadding = if (isCompact) 0.dp else (rightEdgeWidth * (1f - progress))
-    val bottomPadding = if (isCompact and isParent) (80.dp + navBarHeight) else 0.dp
-    val playerPadding = (if (isPlaying) 74.dp else 0.dp)
-    val pullToRefreshState = rememberPullToRefreshState()
-    val cutout = if (isCompact) Modifier else Modifier.displayCutoutPadding()
-    AnimatedContent(targetState = granted, label = "") { isGranted ->
-        if (isGranted) {
-            Surface(
-                modifier =
+    Surface(modifier.fillMaxSize()) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .onGloballyPositioned {
+                    viewHeight = it.size.height
+                }
+                .onSizeChanged {
+                    viewHeight = it.height
+                }
+        ) {
+            Column(
                 Modifier
-                    .onGloballyPositioned { height = it.size.height }
-                    .onSizeChanged { height = it.height }
                     .fillMaxSize()
-                    .semantics {
-                        testTagsAsResourceId = true
-                    }
-                    .pullToRefresh(
-                        state = pullToRefreshState,
-                        enabled = isParent and (state.settledValue != ViewState.LARGE),
-                        isRefreshing = false,
-                        onRefresh = {
-                            mainVM.onReload()
-                        },
-                    ),
+                    .background(
+                        Brush.verticalGradient(
+                            0.0f to MaterialTheme.colorScheme.surfaceContainerLow,
+                            1.0f to MaterialTheme.colorScheme.surface,
+                        )
+                    )
             ) {
-                Box(Modifier.fillMaxSize()) {
-                    NavigationScreen(
-                        navController,
-                        mainVM,
-                        Modifier
-                            .padding(
-                                bottom = bottomPadding + playerPadding,
-                                start = startPadding,
-                            )
-                            .then(cutout),
-                    )
-                    AnimatedVisibility(
-                        visible = isParent,
-                        enter = slideInVertically { -it },
-                        exit = slideOutVertically { -it },
-                        modifier =
-                            Modifier
-                                .padding(start = startPadding)
-                                .then(cutout),
-                    ) {
-                        SearchScreen(
-                            searchState,
-                            uiState.showAppName,
-                            uiState.loading,
-                            searchVM::onSearchEvent,
-                            {
-                                mainVM.onPlaybackEvent(
-                                    PlaybackEvent.Play(
-                                        searchState.result.files,
-                                        it
-                                    )
+                AnimatedVisibility(isParent) {
+                    SearchScreen(
+                        searchState,
+                        searchVM::onSearchEvent,
+                        onShowBottomSheet = {
+                            bottomSheetFile = it
+                        },
+                        onAlbumClick = {
+                            navController.navigate(NavRoutes.Album(it.name))
+                        },
+                        onArtistClick = {
+                            navController.navigate(NavRoutes.Artist(it.name))
+                        },
+                        onPlaylistClick = {
+                            navController.navigate(NavRoutes.Playlist(it.id))
+                        },
+                        onPlay = {
+                            mainVM.onPlaybackEvent(
+                                PlaybackEvent.Play(
+                                    searchState.result.files,
+                                    it,
+                                    shuffle = false
                                 )
-                            },
-                            {
-                                navController.navigate(NavRoutes.Album(it.name))
-                            },
-                            {
-                                navController.navigate(NavRoutes.Artist(it.name))
-                            },
-                            {
-                                navController.navigate(NavRoutes.Playlist(it.id))
-                            },
-                            Modifier,
-                            {
-                                AnimatedVisibility(currentNavRoute != Routes.Home) {
-                                    IconButton(onClick = {
-                                        mainVM.onUiEvent(
-                                            UiEvent.ShowSortSheet(currentNavRoute)
-                                        )
-                                    }) {
-                                        Icon(
-                                            Icons.AutoMirrored.Default.Sort,
-                                            null
-                                        )
-                                    }
-                                }
-                            }
-                        ) {
-                            mainVM.onUiEvent(UiEvent.ShowBottomSheet(it.id))
-                        }
-                    }
-                    PlayerScreen(
-                        Modifier.padding(start = startPadding, end = endPadding),
-                        queue,
-                        playerState,
-                        uiState,
-                        state,
-                        playlistState,
-                        progress,
-                        playlistProgress,
-                        mainVM::onPlaybackEvent,
-                        mainVM::onPlayerEvent,
-                        mainVM::onUiEvent,
+                            )
+                        },
                     )
-                    NavBar(
-                        visible = isParent and (!searchState.expanded),
-                        progress = progress,
-                        route = currentNavRoute
+                }
+                AnimatedVisibility(
+                    uiState.loading.isLoading() and isParent,
+                    enter = expandVertically(expandFrom = Alignment.Top),
+                    exit = shrinkVertically(shrinkTowards = Alignment.Top),
+                ) {
+                    Row(Modifier
+                        .padding(8.dp)
+                        .clip(MaterialTheme.shapes.extraLarge)
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        navController.navigate(it) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
+                        CircularWavyProgressIndicator(
+                            progress = {
+                                uiState.loading.getValue()
+                            },
+                            Modifier.size(40.dp),
+                            stroke =
+                                Stroke(
+                                    width = with(LocalDensity.current) { 3.dp.toPx() },
+                                    cap = StrokeCap.Round,
+                                ),
+                            trackStroke =
+                                Stroke(
+                                    width = with(LocalDensity.current) { 3.dp.toPx() },
+                                    cap = StrokeCap.Round,
+                                ),
+                        )
+                        AnimatedContent(
+                            uiState.loading.step,
+                            transitionSpec = intUpDownTransSpec,
+                        ) { step ->
+                            Text(
+                                stringResource(
+                                    when(step) {
+                                        0 -> R.string.loading_files
+                                        1 -> R.string.loading_thumbnails
+                                        2 -> R.string.loading_artists
+                                        else -> R.string.loading
+                                    },
+                                    uiState.loading.progress,
+                                    uiState.loading.progressMax,
+                                ),
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.SemiBold
+                            )
                         }
                     }
-                    Indicator(pullToRefreshState, false, Modifier.align(Alignment.TopCenter))
+                }
+                NavHost(
+                    navController,
+                    NavRoutes.Home,
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = padding)
+                        .containerClip()
+                ) {
+                    composable<NavRoutes.Home> {
+                        HomeScreen(favorites, history) { list, index ->
+                            mainVM.onPlaybackEvent(PlaybackEvent.Play(list, index))
+                        }
+                    }
+                    composable<NavRoutes.Albums> {
+                        AlbumsScreen(
+                            albums,
+                            albumsSortState,
+                            mainVM::onAlbumsSortChange
+                        ) { album ->
+                            navController.navigate(NavRoutes.Album(album.name))
+                        }
+                    }
+                    composable<NavRoutes.Album> { entry ->
+                        val route = entry.toRoute<NavRoutes.Album>()
+                        val album by mainVM.getAlbumUi(route.title).collectAsState()
+                        AlbumScreen(
+                            album,
+                            listScreenSortState,
+                            mainVM::onListScreenSortChange,
+                            onShowBottomSheet = {
+                                bottomSheetFile = it
+                            }
+                        ) { index, shuffle ->
+                            mainVM.onPlaybackEvent(PlaybackEvent.Play(
+                                album.items,
+                                index,
+                                shuffle = shuffle
+                            ))
+                        }
+                    }
+                    composable<NavRoutes.Artists> {
+                        ArtistsScreen(
+                            artists,
+                            artistsSortState,
+                            mainVM::onArtistsSortChange
+                        ) { artist ->
+                            navController.navigate(NavRoutes.Artist(artist.name))
+                        }
+                    }
+                    composable<NavRoutes.Artist> { entry ->
+                        val route = entry.toRoute<NavRoutes.Artist>()
+                        val artist by mainVM.getArtistUi(route.name).collectAsState()
+                        ArtistScreen(
+                            artist,
+                            listScreenSortState,
+                            mainVM::onListScreenSortChange,
+                            onShowBottomSheet = {
+                                bottomSheetFile = it
+                            }
+                        ) { index, shuffle ->
+                            mainVM.onPlaybackEvent(PlaybackEvent.Play(artist.items, index, shuffle = shuffle))
+                        }
+                    }
+                    composable<NavRoutes.Playlists> {
+                         PlaylistsScreen(
+                             playlists,
+                             smallPlayerExpanded,
+                             playlistsSortState,
+                             mainVM::onPlaylistsSortChange,
+                             onCreatePlaylist = {
+                                 mainVM.onUiEvent(UiEvent.ShowCreatePlaylistDialog(emptyList()))
+                             }
+                         ) { playlist ->
+                             navController.navigate(NavRoutes.Playlist(playlist.id))
+                         }
+                    }
+                    composable<NavRoutes.Playlist> { entry ->
+                        val id = entry.toRoute<NavRoutes.Playlist>().playlistId
+                        LaunchedEffect(id) {
+                            mainVM.getPlaylist(id)
+                        }
+                        PlaylistScreen(
+                            playlist,
+                            smallPlayerExpanded,
+                            playlistSortState,
+                            mainVM::onPlaylistSortChange,
+                            onShowBottomSheet = {
+                                bottomSheetFile = it
+                            },
+                            onReorder = { from, to ->
+                                mainVM.onPlaylistEvent(PlaylistEvent.Reorder(playlist, from, to))
+                            }
+                        ) { index, shuffle ->
+                            mainVM.onPlaybackEvent(
+                                PlaybackEvent.Play(
+                                    playlist.items,
+                                    index,
+                                    shuffle = shuffle
+                                )
+                            )
+                        }
+                    }
+                    composable<NavRoutes.Library> {
+                        LibraryScreen(
+                            files,
+                            librarySortState,
+                            mainVM::onLibrarySortChange,
+                            onShowBottomSheet = {
+                                bottomSheetFile = it
+                            }
+                        ) { file ->
+                            mainVM.onPlaybackEvent(PlaybackEvent.Play(listOf(file)))
+                        }
+                    }
                 }
             }
-        } else {
-            WelcomeScreen(onPermissionRequest)
+            NavigationWithPlayer(
+                viewHeight,
+                queue,
+                playerState,
+                mainVM::onPlayerEvent,
+                mainVM::onPlaybackEvent,
+                currentNavRoute,
+            ) {
+                navController.navigate(it)
+            }
         }
-    }
-    bottomSheetItem?.run {
-        ItemBottomSheet(
-            open = uiState.bottomSheetVisible,
-            state = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            onDismissRequest = { mainVM.onUiEvent(UiEvent.HideBottomSheet) },
-            file = this,
-            onPlaybackEvent = mainVM::onPlaybackEvent,
-            onUpdateFavorite = { path, favorite ->
-                mainVM.onPlayerEvent(PlayerEvent.UpdateFavorite(path, favorite))
+        MusicCardBottomSheet(
+            bottomSheetFile,
+            {
+                bottomSheetFile = null
             },
-            onUiEvent = mainVM::onUiEvent,
-            navigateToAlbum = {
-                navController.navigate(NavRoutes.Album(album))
+            {
+                bottomSheetFile?.let {
+                    mainVM.onPlaybackEvent(PlaybackEvent.AddToQueue(listOf(it)))
+                }
             },
-            navigateToArtist = {
-                navController.navigate(NavRoutes.Artist(artist))
-            },
-            shareFile = {
-                context.startActivity(
-                    Intent.createChooser(
-                        Intent(Intent.ACTION_SEND).apply {
-                            putExtra(Intent.EXTRA_STREAM, contentUri)
-                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            type = "audio/*"
-                        },
-                        "Share",
-                    ),
-                )
-            },
-        )
-    }
-    uiState.listBottomSheetList?.run {
-        ListBottomSheet(
-            open = uiState.listBottomSheetVisible,
-            list = this,
-            onPlaybackEvent = mainVM::onPlaybackEvent,
-            onUiEvent = mainVM::onUiEvent,
-            title = uiState.listBottomSheetTitle,
-            text = pluralStringResource(R.plurals.item_s, size, size),
-            cover = uiState.listBottomSheetImage,
-            alternative = uiState.listBottomSheetIcon,
-            state = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            shareFiles = { context.shareFiles(this) },
-        )
-    }
-    PlaylistBottomSheet(
-        open = uiState.playlistBottomSheetVisible,
-        state = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        onDismissRequest = { mainVM.onPlaylistsEvent(PlaylistsUiEvent.HidePlaylistBottomSheet) },
-        id = playlist.id,
-        title = playlist.name,
-        cover = playlist.image,
-        files = playlist.items,
-        onPlaybackEvent = mainVM::onPlaybackEvent,
-        onUiEvent = mainVM::onUiEvent,
-        delete = { mainVM.onPlaylistEvent(PlaylistEvent.DeletePlaylist(playlist.toPlaylist())) },
-        addToHomeScreen = {
-            val manager = context.getSystemService(Context.SHORTCUT_SERVICE) as ShortcutManager
-            manager.requestPinShortcut(
-                ShortcutInfo
-                    .Builder(context, "playlist-${playlist.id}")
-                    .setIcon(Icon.createWithResource(context, R.drawable.baseline_playlist_play_24))
-                    .setShortLabel(playlist.name)
-                    .setLongLabel(playlist.name)
-                    .setIntent(
-                        Intent(context, MainActivity::class.java).apply {
-                            action = ACTION_VIEW
-                            putExtra("type", "playlist")
-                            putExtra("id", playlist.id)
-                        },
+            {
+                bottomSheetFile?.let {
+                    mainVM.onUiEvent(
+                        UiEvent.ShowAddToPlaylistDialog(listOf(it.path))
                     )
-                    .build(),
-                null,
-            )
-        },
-        savePlaylist = {
-            mainVM.onUiEvent(UiEvent.SavePlaylist(playlist.toPlaylist()))
-        },
-    ) {
-        context.shareFiles(playlist.items)
-    }
-    QueueBottomSheet(
-        uiState.queueSheetVisible,
-        rememberModalBottomSheetState(),
-        { mainVM.onUiEvent(UiEvent.HideQueueBottomSheet) },
-        { mainVM.onPlaybackEvent(PlaybackEvent.Stop) },
-        {
-            mainVM.onUiEvent(
-                UiEvent.ShowCreatePlaylistDialog(queue.items.map { it.path })
-            )
-        },
-        {
-            mainVM.onUiEvent(
-                UiEvent.ShowAddToPlaylistDialog(queue.items.map { it.path })
-            )
+                }
+            },
+            onToggleFavorite = {
+                bottomSheetFile?.let {
+                    bottomSheetFile = it.copy(favorite = !it.favorite)
+                    mainVM.onPlayerEvent(PlayerEvent.UpdateFavorite(it.path, !it.favorite))
+                }
+            },
+            onShare = {
+                bottomSheetFile?.let {
+                    context.startActivity(
+                        Intent.createChooser(
+                            Intent(Intent.ACTION_SEND).apply {
+                                putExtra(Intent.EXTRA_STREAM, it.contentUri)
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                type = "audio/*"
+                            },
+                            "Share",
+                        ),
+                    )
+                }
+            }
+        ) {
+            bottomSheetFile?.let {
+                mainVM.onPlaybackEvent(PlaybackEvent.Play(listOf(it)))
+            }
         }
-    )
-    RenamePlaylistDialog(
-        uiState.renamePlaylistDialogVisible,
-        {
-            mainVM.onUiEvent(UiEvent.HideRenamePlaylistDialog)
-        },
-        {
-            mainVM.onPlaylistEvent(PlaylistEvent.RenamePlaylist(uiState.renamePlaylistId, uiState.renamePlaylistName))
-        },
-        uiState.renamePlaylistName,
-        {
-            mainVM.onUiEvent(UiEvent.UpdateRenamePlaylistName(it))
-        },
-    )
-    SpeedDialog(
-        uiState.speedDialog,
-        { mainVM.onUiEvent(UiEvent.HideSpeedDialog) },
-        playerState.speed,
-        { mainVM.onPlaybackEvent(PlaybackEvent.SetSpeed(it)) },
-    )
-    PitchDialog(
-        uiState.pitchDialog,
-        { mainVM.onUiEvent(UiEvent.HidePitchDialog) },
-        playerState.pitch,
-        { mainVM.onPlaybackEvent(PlaybackEvent.SetPitch(it)) },
-    )
-    TimerDialog(
-        uiState.timerDialog,
-        playerState.timer,
-        { mainVM.onUiEvent(UiEvent.HideTimerDialog) },
-        { mainVM.onPlaybackEvent(PlaybackEvent.SetTimer(it)) },
-    )
-    CreatePlaylistDialog(
-        uiState.newPlaylistDialog,
-        uiState.newPlaylistName,
-        { mainVM.onUiEvent(UiEvent.UpdateNewPlaylistName(it)) },
-        uiState.newPlaylistImage,
-        { mainVM.onUiEvent(UiEvent.UpdateNewPlaylistImage(it)) },
-        { mainVM.onUiEvent(UiEvent.HideNewPlaylistDialog) },
-        { mainVM.onPlaylistEvent(PlaylistEvent.CreateNew(uiState.newPlaylistName, uiState.newPlaylistItems, uiState.newPlaylistImage)) },
-    )
-    AddToPlaylistDialog(
-        uiState.addToPlaylistDialog,
-        playlists,
-        uiState.addToPlaylistSelected,
-        {
-            mainVM.onUiEvent(UiEvent.UpdateSelectedPlaylist(it))
-        },
-        {
-            mainVM.onUiEvent(UiEvent.ShowCreatePlaylistDialog(emptyList()))
-        },
-        {
-            mainVM.onUiEvent(UiEvent.HideAddToPlaylistDialog)
-        },
-        {
+        CreatePlaylistDialog(
+            visible = uiState.newPlaylistDialog,
+            playlistName = uiState.newPlaylistName,
+            onNameChange = {
+                mainVM.onUiEvent(UiEvent.UpdateNewPlaylistName(it))
+                           },
+            image = uiState.newPlaylistImage,
+            onImageChange = {
+                mainVM.onUiEvent(UiEvent.UpdateNewPlaylistImage(it))
+            },
+            onDismissRequest = {
+                mainVM.onUiEvent(UiEvent.HideNewPlaylistDialog)
+            },
+        ) {
+            mainVM.onPlaylistEvent(
+                PlaylistEvent.CreateNew(
+                    uiState.newPlaylistName,
+                    emptyList(),
+                    uiState.newPlaylistImage
+                )
+            )
+            mainVM.onUiEvent(UiEvent.HideNewPlaylistDialog)
+        }
+        AddToPlaylistDialog(
+            uiState.addToPlaylistDialog,
+            playlists,
+            uiState.addToPlaylistSelected,
+            {
+                mainVM.onUiEvent(UiEvent.UpdateSelectedPlaylist(it))
+            },
+            {
+                mainVM.onUiEvent(UiEvent.ShowCreatePlaylistDialog(emptyList()))
+            },
+            {
+                mainVM.onUiEvent(UiEvent.HideAddToPlaylistDialog)
+            }
+        ) {
             mainVM.onPlaylistEvent(
                 PlaylistEvent.AddToPlaylist(
-                    uiState.addToPlaylistSelected.map { playlists[it].id }.toSet(),
+                    uiState.addToPlaylistSelected,
                     uiState.addToPlaylistItems
                 )
             )
+            mainVM.onUiEvent(UiEvent.HideAddToPlaylistDialog)
         }
-    )
-    MetadataDialog(
-        uiState.metadataDialog,
-        { mainVM.onUiEvent(UiEvent.HideMetadataDialog) },
-        { /*mainVM.onFilesEvent(FilesEvent.UpdateMetadata(uiState.metadata))*/ },
-        uiState.metadata,
-        { mainVM.onUiEvent(UiEvent.UpdateMetadata(it)) },
-    )
-    uiState.detailsFile?.let {
-        DetailsDialog(
-            uiState.detailsDialog,
-            { mainVM.onUiEvent(UiEvent.DismissDetails) },
-            it,
-        )
-    }
-    BackHandler(state.settledValue == ViewState.LARGE) {
-        scope.launch {
-            if (uiState.playlistViewState == PlaylistViewState.EXPANDED) {
-                playlistState.animateTo(PlaylistViewState.COLLAPSED)
-            } else {
-                state.animateTo(ViewState.SMALL)
-            }
-        }
-    }
-    CollectEvents { event ->
-        if (event is Event.ExpandPlayer)
-            if (state.settledValue == ViewState.HIDDEN)
-                scope.launch {
-                    state.animateTo(ViewState.SMALL)
-                }
     }
 }

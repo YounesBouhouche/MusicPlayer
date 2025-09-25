@@ -1,66 +1,76 @@
 package younesbouhouche.musicplayer.main.presentation
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.displayCutoutPadding
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.main.presentation.util.composables.isCompact
-import younesbouhouche.musicplayer.main.presentation.util.composables.leftEdgeWidth
-import younesbouhouche.musicplayer.main.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
 import younesbouhouche.musicplayer.main.domain.models.Routes
-import kotlin.math.roundToInt
 
 @Composable
 fun BoxScope.NavBar(
-    visible: Boolean,
-    progress: Float,
-    route: Routes,
-    navigate: (NavRoutes) -> Unit,
+    route: Routes?,
+    playing: Boolean,
+    modifier: Modifier = Modifier,
+    navigate: (NavRoutes) -> Unit
 ) {
-    val navBarHeight = navBarHeight
-    val leftEdgeWidth = leftEdgeWidth
-    if (isCompact) {
-        AnimatedVisibility(
-            modifier =
-                Modifier
-                    .align(Alignment.BottomStart)
-                    .offset {
-                        IntOffset(
-                            0,
-                            ((80 + navBarHeight.roundToPx()) * progress).roundToInt().dp.roundToPx(),
-                        )
-                    },
-            visible = visible,
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it },
+    val topCorner by animateDpAsState(if (playing) 8.dp else 60.dp)
+    val bottomCorner by animateDpAsState(if (playing) 40.dp else 60.dp)
+    Box(
+        modifier.fillMaxWidth()
+            .padding(16.dp)
+            .navigationBarsPadding()
+            .align(Alignment.BottomCenter)
+    ) {
+        Surface(
+            Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surfaceContainer,
+            shape = RoundedCornerShape(
+                topCorner,
+                topCorner,
+                bottomCorner,
+                bottomCorner
+            ),
+            shadowElevation = 8.dp
         ) {
-            NavigationBar {
+            NavigationBar(
+                Modifier.padding(0.dp, 2.dp).fillMaxWidth(),
+                containerColor = Color.Transparent,
+                windowInsets = WindowInsets()
+            ) {
                 Routes.entries.forEach { screen ->
+                    val selected = route == screen
+                    val weight by animateFloatAsState(if (selected) 1.4f else 1f)
                     NavigationBarItem(
-                        modifier = Modifier.testTag("nav_${screen.name.lowercase()}"),
-                        selected = route == screen,
+                        selected = selected,
                         alwaysShowLabel = false,
+                        modifier = Modifier.weight(weight),
                         icon = {
-                            Icon(screen.icon, null)
+                            Icon(
+                                screen.icon,
+                                null,
+                            )
                         },
                         label = {
                             Text(
@@ -72,38 +82,15 @@ fun BoxScope.NavBar(
                         onClick = {
                             navigate(screen.destination)
                         },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            indicatorColor = MaterialTheme.colorScheme.primary.copy(.2f),
+                        )
                     )
                 }
-            }
-        }
-    } else {
-        NavigationRail(
-            modifier =
-                Modifier
-                    .align(Alignment.TopStart)
-                    .displayCutoutPadding()
-                    .offset {
-                        IntOffset(
-                            (-(80 + leftEdgeWidth.roundToPx()) * progress).roundToInt().dp.roundToPx(),
-                            0,
-                        )
-                    },
-            windowInsets = WindowInsets.systemBars,
-        ) {
-            Routes.entries.forEach { screen ->
-                NavigationRailItem(
-                    selected = screen == route,
-                    alwaysShowLabel = false,
-                    icon = {
-                        Icon(screen.icon, null)
-                    },
-                    label = {
-                        Text(stringResource(screen.title))
-                    },
-                    onClick = {
-                        navigate(screen.destination)
-                    },
-                )
             }
         }
     }

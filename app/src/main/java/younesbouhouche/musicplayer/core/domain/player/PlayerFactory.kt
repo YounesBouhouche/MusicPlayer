@@ -43,7 +43,7 @@ class PlayerFactory(
      */
     @OptIn(UnstableApi::class)
     @Synchronized
-    fun getPlayerOrNull(): Player? = exoPlayer
+    fun getPlayerOrNull(): Player = exoPlayer ?: createNewPlayer(false).also { exoPlayer = it }
 
     /**
      * Creates a new ExoPlayer instance with proper configuration

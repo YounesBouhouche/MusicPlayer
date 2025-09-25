@@ -260,4 +260,24 @@
     <string name="favorites_empty_message">All your favorites will appear here</string>
     <string name="favorite">Favorite</string>
     <string name="play">Play</string>
+    <string name="now_playing">Now Playing</string>
+    <string name="sort">Sort</string>
+    <string name="view">View</string>
+    <string name="sort_and_view"><![CDATA[Sort & view]]></string>
+    <string name="next_up">Next Up</string>
+    <string name="grid">Grid</string>
+    <string name="descending">Descending</string>
+    <string name="ascending">Ascending</string>
+    <string name="sort_by">Sort by</string>
+    <string name="order">Order</string>
+    <string name="unknown">Unknown</string>
+    <string name="edit_tags">Edit</string>
+    <string name="permission_text">We need your permission to access your media files so you can enjoy your favorite songs and playlists. Please grant access to continue using all features of the app.</string>
+    <string name="permission_required">Permission Required</string>
+    <string name="let_s_get_started">Let\'s get started!</string>
+    <string name="import_playlist">Import playlist</string>
+    <string name="add_items">Add items</string>
+    <string name="favorites_subtitles">Your favorite songs at a glance</string>
+    <string name="watch_your_recently_played_songs">Watch your recently played songs</string>
+    <string name="welcome_back">Hi,\nWelcome Back</string>
 </resources>

@@ -1,6 +1,7 @@
 package younesbouhouche.musicplayer.main.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,8 +23,11 @@ fun MyImage(
     model: Any?,
     icon: ImageVector?,
     modifier: Modifier = Modifier,
+    iconTint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     shape: Shape = MaterialTheme.shapes.medium,
     background: Color = MaterialTheme.colorScheme.surfaceContainer,
+    fraction: Float = .5f,
+    onClick: (() -> Unit)? = null,
     onError: ((AsyncImagePainter.State.Error) -> Unit)? = null,
     onSuccess: ((AsyncImagePainter.State.Success) -> Unit)? = null,
 ) {
@@ -32,7 +36,8 @@ fun MyImage(
         contentDescription = "",
         modifier = modifier
             .clip(shape)
-            .background(background),
+            .background(background)
+            .clickable(onClick != null) { onClick?.invoke() },
         contentScale = ContentScale.Crop,
         loading = {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -45,13 +50,13 @@ fun MyImage(
                     Icon(
                         imageVector = it,
                         contentDescription = null,
-                        modifier = Modifier.fillMaxSize(.6f),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        modifier = Modifier.fillMaxSize(fraction),
+                        tint = iconTint
                     )
                 }
             }
         },
         onError = onError,
-        onSuccess = onSuccess
+        onSuccess = onSuccess,
     )
 }

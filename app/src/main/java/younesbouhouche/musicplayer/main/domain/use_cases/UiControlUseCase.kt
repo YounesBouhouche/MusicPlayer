@@ -108,10 +108,10 @@ class UiControlUseCase(val mediaRepository: MediaRepository) {
             is UiEvent.UpdateSelectedPlaylist ->
                 uiStateUpdate {
                     it.copy(addToPlaylistSelected =
-                        if (event.index in it.addToPlaylistSelected)
-                            it.addToPlaylistSelected - event.index
+                        if (event.id in it.addToPlaylistSelected)
+                            it.addToPlaylistSelected - event.id
                         else
-                            it.addToPlaylistSelected + event.index
+                            it.addToPlaylistSelected + event.id
                     )
                 }
 

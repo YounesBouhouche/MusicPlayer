@@ -9,7 +9,9 @@ data class ArtistUi(
     var cover: ByteArray? = null,
     var picture: String = "",
 ) {
-    fun getPicture(): Any? = picture.takeIf { it.isNotEmpty() } ?: cover
+    fun getPicture(): Any? = picture.takeIf { it.isNotEmpty() }
+        ?: cover
+        ?: items.firstOrNull { it.cover != null }?.cover
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

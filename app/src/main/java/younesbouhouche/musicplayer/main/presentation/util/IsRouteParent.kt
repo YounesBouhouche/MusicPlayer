@@ -4,7 +4,7 @@ import younesbouhouche.musicplayer.main.domain.models.Routes
 
 
 val String?.isRouteParent
-    get() = let { route ->
+    get() = this?.let { route ->
         Routes.entries.map { it.destination.javaClass.kotlin.qualifiedName }.contains(route)
-    } != false
+    } ?: true
 

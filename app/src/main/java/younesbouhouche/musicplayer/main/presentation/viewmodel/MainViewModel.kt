@@ -76,7 +76,7 @@ class MainViewModel(
     getQueueUseCase: GetQueueUseCase,
     getSortedPlaylistsUseCase: GetSortedPlaylistsUseCase,
     val getPlaylistUseCase: GetPlaylistUseCase,
-    getSortedPlaylistUseCase: GetSortedPlaylistUseCase,
+    val getSortedPlaylistUseCase: GetSortedPlaylistUseCase,
     val setFavoriteUseCase: SetFavoriteUseCase,
     stateManager: PlayerStateManager,
     val mediaRepository: MediaRepository
@@ -168,7 +168,7 @@ class MainViewModel(
         }
     }
 
-    fun onReload() = viewModelScope.launch {
+    fun onReload() = viewModelScope.launch(Dispatchers.IO) {
         refreshUseCase()
     }
 
@@ -205,24 +205,26 @@ class MainViewModel(
         }
     }
 
-    fun onPlayerEvent(event: PlayerEvent) = viewModelScope.launch {
-        when(event) {
-            PlayerEvent.PlayFavorites ->
-                onPlaybackEvent(PlaybackEvent.Play(favorites.first()))
-            is PlayerEvent.PlayIds ->
-                onPlaybackEvent(
-                    PlaybackEvent.Play(getMediaByIdUseCase(event.items).first())
-                )
-            PlayerEvent.PlayMostPlayed ->
-                onPlaybackEvent(PlaybackEvent.Play(mostPlayed.first()))
-            is PlayerEvent.PlayPlaylist ->
-                getPlaylistUseCase(event.id)?.let { list ->
-                    onPlaybackEvent(PlaybackEvent.Play(list))
-                }
-            is PlayerEvent.UpdateFavorite ->
-                setFavoriteUseCase(event.path, event.favorite)
+    fun onPlayerEvent(event: PlayerEvent) {
+        viewModelScope.launch {
+            when(event) {
+                PlayerEvent.PlayFavorites ->
+                    onPlaybackEvent(PlaybackEvent.Play(favorites.first()))
+                is PlayerEvent.PlayIds ->
+                    onPlaybackEvent(
+                        PlaybackEvent.Play(getMediaByIdUseCase(event.items).first())
+                    )
+                PlayerEvent.PlayMostPlayed ->
+                    onPlaybackEvent(PlaybackEvent.Play(mostPlayed.first()))
+                is PlayerEvent.PlayPlaylist ->
+                    getPlaylistUseCase(event.id)?.let { list ->
+                        onPlaybackEvent(PlaybackEvent.Play(list))
+                    }
+                is PlayerEvent.UpdateFavorite ->
+                    setFavoriteUseCase(event.path, event.favorite)
 
-            else -> {}
+                else -> {}
+            }
         }
     }
 
@@ -277,6 +279,10 @@ class MainViewModel(
         _artistsSortState.value = state
     }
 
+    fun onPlaylistsSortChange(state: SortState<ListsSortType>) {
+        _playlistsSortState.value = state
+    }
+
     fun onPlaylistSortChange(state: SortState<PlaylistSortType>) {
         _playlistSortState.value = state
     }
@@ -294,5 +300,9 @@ class MainViewModel(
             }.sortBy(sortState.sortType, sortState.ascending)
         }
     }.stateInVM(ArtistUi())
+
+    fun getPlaylist(id: Int) = _uiState.update {
+        it.copy(playlistId = id)
+    }
 
 }

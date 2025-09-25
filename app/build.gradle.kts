@@ -143,5 +143,6 @@ dependencies {
     implementation(libs.bundles.ktor)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.androidx.animation.graphics)
+    implementation("com.mohamedrejeb.dnd:compose-dnd:0.3.0")
 }
 

@@ -12,22 +12,14 @@ import androidx.core.content.ContextCompat
 fun Activity.requestPermission(
     permission: String,
     onGranted: () -> Unit,
-    onDenied: () -> Unit
-) {
-    when {
-        ContextCompat.checkSelfPermission(this, permission) ==
-                PackageManager.PERMISSION_GRANTED -> onGranted()
-        ActivityCompat.shouldShowRequestPermissionRationale(
-            this,
-            permission,
-        ) -> {
-            startActivity(
-                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.fromParts("package", packageName, null)
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                },
-            )
-        }
-        else -> onDenied()
-    }
+    onDenied: () -> Unit,
+    onRequest: () -> Unit,
+) = when {
+    ContextCompat.checkSelfPermission(this, permission) ==
+            PackageManager.PERMISSION_GRANTED -> onGranted()
+    ActivityCompat.shouldShowRequestPermissionRationale(
+        this,
+        permission,
+    ) -> onDenied()
+    else -> onRequest()
 }

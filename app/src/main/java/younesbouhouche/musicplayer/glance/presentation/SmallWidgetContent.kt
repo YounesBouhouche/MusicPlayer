@@ -22,7 +22,7 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.unit.ColorProvider
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.MainActivity
+import younesbouhouche.musicplayer.main.presentation.MainActivity
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.glance.presentation.util.IconButton

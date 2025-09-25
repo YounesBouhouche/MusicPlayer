@@ -1,75 +1,67 @@
 package younesbouhouche.musicplayer.main.presentation
 
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.animateTo
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.shape.ZeroCornerSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import com.kmpalette.rememberPaletteState
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.main.data.PlayerDataStore
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
-import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
-import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.QueueModel
-import younesbouhouche.musicplayer.main.presentation.player.LargePlayer
-import younesbouhouche.musicplayer.main.presentation.player.SmallPlayer
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
-import younesbouhouche.musicplayer.main.presentation.states.PlaylistViewState
-import younesbouhouche.musicplayer.main.presentation.states.UiState
 import younesbouhouche.musicplayer.main.presentation.states.ViewState
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PlayerScreen(
-    modifier: Modifier = Modifier,
     queue: QueueModel,
     playerState: PlayerState,
-    uiState: UiState,
-    dragState: AnchoredDraggableState<ViewState>,
-    playlistDragState: AnchoredDraggableState<PlaylistViewState>,
+    offset: Int,
+    viewHeight: Int,
     progress: Float,
-    playlistProgress: Float,
+    state: PlayerState,
+    dragState: AnchoredDraggableState<ViewState>,
+    modifier: Modifier = Modifier,
+    onSetFavorite: (String, Boolean) -> Unit,
     onPlaybackEvent: (PlaybackEvent) -> Unit,
-    onPlayerEvent: (PlayerEvent) -> Unit,
-    onUiEvent: (UiEvent) -> Unit,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val shape = MaterialTheme.shapes.large.copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize)
-    val offset = if (dragState.offset.isNaN()) 0 else dragState.offset.roundToInt()
-    val paletteState = rememberPaletteState()
-    val context = LocalContext.current
-    val matchPictureColors = PlayerDataStore(context).matchPictureColors.collectAsState(true).value
+    val density = LocalDensity.current
+    val height = with(density) {
+        80.dp + ((viewHeight - 80.dp.toPx().roundToInt()) * progress).toDp()
+    }
+    val viewHeightDp = with(density) {
+        viewHeight.toDp()
+    }
+    val largeCorner = 32.dp * (1f - progress)
+    val smallCorner = 8.dp * (1f - progress)
+    val palette = rememberPaletteState {  }
     val scope = rememberCoroutineScope()
-    AppTheme(paletteState.palette) {
+    AppTheme(palette.palette) {
         Box(
-            Modifier
-                .then(modifier)
-                .fillMaxSize()
+            modifier.fillMaxWidth()
+                .padding(16.dp * (1f - progress))
+                .height(height)
                 .offset {
                     IntOffset(0, offset)
                 }
@@ -79,55 +71,51 @@ fun PlayerScreen(
                     flingBehavior = AnchoredDraggableDefaults.flingBehavior(
                         state = dragState,
                         animationSpec = tween(),
-                        positionalThreshold = { it * .5f },
-//                        decayAnimationSpec = splineBasedDecay(density),
-//                        velocityThreshold = { with(density) { 100.dp.toPx() } },
+                        positionalThreshold = { it * .5f }
                     ),
-                    interactionSource = interactionSource
                 )
-                .background(MaterialTheme.colorScheme.surfaceContainer, shape)
-                .clip(shape)
-                .clipToBounds(),
+                .clip(RoundedCornerShape(
+                    topStart = largeCorner,
+                    topEnd = largeCorner,
+                    bottomStart = smallCorner,
+                    bottomEnd = smallCorner
+                ))
+                .background(MaterialTheme.colorScheme.primaryContainer),
         ) {
-            queue.items.getOrNull(queue.index)?.run {
-                SmallPlayer(
-                    queue = queue,
-                    playerState = playerState,
-                    onPlaybackEvent = onPlaybackEvent,
-                    modifier = Modifier
-                        .alpha(1f - progress)
-                        .align(Alignment.TopStart)
-                        .clickable {
-                            scope.launch {
-                                dragState.animateTo(ViewState.LARGE)
-                            }
-                        },
-                    {
-                        paletteState.reset()
-                    }
-                ) {
-                    if (matchPictureColors)
+            SmallPlayerScreen(
+                queue.items.getOrNull(queue.index),
+                state.playState,
+                Modifier
+                    .alpha(1f - progress)
+                    .height(80.dp),
+                progress < 1f,
+                onPlaybackEvent,
+                {
+                    it?.asImageBitmap()?.let { image ->
                         scope.launch {
-                            paletteState.generate(it.asImageBitmap())
+                            palette.generate(image)
                         }
-                    else {
-                        paletteState.reset()
-                    }
+                    } ?: palette.reset()
                 }
-                LargePlayer(
-                    dragState.settledValue == ViewState.LARGE,
+            ) {
+                scope.launch {
+                    dragState.animateTo(ViewState.LARGE)
+                }
+            }
+            if (progress > 0f) {
+                LargePlayerScreen(
                     queue,
                     playerState,
-                    uiState,
-                    onPlaybackEvent,
-                    onPlayerEvent,
-                    uiState.lyricsVisible,
-                    uiState.syncing,
-                    onUiEvent,
-                    playlistDragState,
-                    playlistProgress,
-                    dragState.settledValue == ViewState.LARGE,
-                    Modifier.alpha(progress),
+                    Modifier
+                        .alpha(progress)
+                        .requiredHeight(viewHeightDp),
+                    {
+                        scope.launch {
+                            dragState.animateTo(ViewState.SMALL)
+                        }
+                    },
+                    onSetFavorite,
+                    onPlaybackEvent
                 )
             }
         }

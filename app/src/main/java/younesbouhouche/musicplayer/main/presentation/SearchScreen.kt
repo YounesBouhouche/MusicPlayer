@@ -1,371 +1,364 @@
 package younesbouhouche.musicplayer.main.presentation
 
 import android.content.Intent
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.material.icons.filled.Album
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AppBarRow
+import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProgressIndicatorDefaults
-import androidx.compose.material3.SearchBar
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberSearchBarState
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import soup.compose.material.motion.animation.materialSharedAxisZ
-import soup.compose.material.motion.animation.materialSharedAxisZIn
-import soup.compose.material.motion.animation.materialSharedAxisZOut
+import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Album
 import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.domain.models.Playlist
-import younesbouhouche.musicplayer.core.domain.models.SearchFilter
+import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
 import younesbouhouche.musicplayer.main.domain.events.SearchEvent
-import younesbouhouche.musicplayer.main.domain.models.LoadingState
-import younesbouhouche.musicplayer.main.presentation.components.EmptyContainer
-import younesbouhouche.musicplayer.main.presentation.components.LazyMusicCardScreen
-import younesbouhouche.musicplayer.main.presentation.components.MyListItem
+import younesbouhouche.musicplayer.main.presentation.components.ListItem
+import younesbouhouche.musicplayer.main.presentation.components.MusicCardListItem
 import younesbouhouche.musicplayer.main.presentation.states.SearchState
-import younesbouhouche.musicplayer.main.presentation.util.intUpDownTransSpec
 import younesbouhouche.musicplayer.main.presentation.util.plus
+import younesbouhouche.musicplayer.main.presentation.util.searchBarIconButtonColors
+import younesbouhouche.musicplayer.main.presentation.util.topAppBarIconButtonColors
 import younesbouhouche.musicplayer.settings.presentation.SettingsActivity
 import younesbouhouche.musicplayer.settings.presentation.components.listItemShape
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SearchScreen(
-    state: SearchState,
-    showAppName: Boolean,
-    loadingState: LoadingState,
-    onSearchEvent: (SearchEvent) -> Unit,
-    onPlay: (Int) -> Unit,
+    searchState: SearchState,
+    onAction: (SearchEvent) -> Unit,
+    onShowBottomSheet: (MusicCard) -> Unit,
     onAlbumClick: (Album) -> Unit,
     onArtistClick: (Artist) -> Unit,
     onPlaylistClick: (Playlist) -> Unit,
-    modifier: Modifier = Modifier,
-    sortButton: (@Composable RowScope.() -> Unit)? = null,
-    showBottomSheet: (MusicCard) -> Unit,
+    onPlay: (Int) -> Unit,
 ) {
     val context = LocalContext.current
-    val padding by animateDpAsState(targetValue = if (state.expanded) 0.dp else 8.dp, label = "")
-    val loadingValue = (
-            loadingState.step
-                    + (loadingState.progress / loadingState.progressMax.toFloat())
-            ) / loadingState.stepsCount
-    val animatedProgress by animateFloatAsState(
-        targetValue = loadingValue,
-        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
-    )
-    val isLoading = loadingValue < 1f
-    Box(modifier) {
-        SearchBar(
-            inputField = {
-                SearchBarDefaults.InputField(
-                    query = state.query,
-                    onQueryChange = { onSearchEvent(SearchEvent.UpdateQuery(it)) },
-                    onSearch = { onSearchEvent(SearchEvent.UpdateQuery(it)) },
-                    expanded = state.expanded,
-                    placeholder = {
-                        AnimatedContent(showAppName) {
-                            if (it)
-                                AppNameLabel(modifier = Modifier.fillMaxWidth())
-                            else
-                                AnimatedContent(isLoading) { loading ->
-                                    if (loading)
-                                        AnimatedContent(
-                                            loadingState.step,
-                                            transitionSpec = intUpDownTransSpec,
-                                            modifier = Modifier.padding(start = 3.dp)
-                                        ) { step ->
-                                            Text(
-                                                stringResource(
-                                                    when(step) {
-                                                            0 -> R.string.loading_files
-                                                            1 -> R.string.loading_thumbnails
-                                                            2 -> R.string.loading_artists
-                                                            else -> R.string.loading
-                                                        },
-                                                    loadingState.progress,
-                                                    loadingState.progressMax
-                                                )
-                                            )
-                                        }
-                                    else Text(stringResource(R.string.search))
-                                }
-                        }
-                    },
-                    leadingIcon = {
-                        AnimatedContent(
-                            isLoading,
-                            transitionSpec = {
-                                materialSharedAxisZ(true)
-                            }
+    val state = rememberSearchBarState()
+    val textFieldState = rememberTextFieldState()
+    val scope = rememberCoroutineScope()
+    val settingsLabel = stringResource(R.string.settings)
+    LaunchedEffect(state.currentValue) {
+        if (state.currentValue == SearchBarValue.Collapsed) {
+            onAction(SearchEvent.ClearQuery)
+            textFieldState.clearText()
+        }
+    }
+    LaunchedEffect(textFieldState.text) {
+        if (textFieldState.text.isEmpty())
+            onAction(SearchEvent.ClearQuery)
+    }
+    val inputField =
+        @Composable {
+            SearchBarDefaults.InputField(
+                searchBarState = state,
+                textFieldState = textFieldState,
+                leadingIcon = if (state.currentValue == SearchBarValue.Expanded) {
+                    {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier.padding(end = 8.dp)
                         ) {
-                            if (it)
-                                CircularProgressIndicator(
-                                    progress = { animatedProgress },
-                                    modifier = Modifier.size(32.dp),
-                                    strokeWidth = 3.dp
-                                )
-                            else {
-                                if (state.expanded) {
-                                    IconButton(onClick = { onSearchEvent(SearchEvent.Collapse) }) {
-                                        Icon(Icons.AutoMirrored.Default.ArrowBack, null)
-                                    }
-                                } else {
-                                    IconButton(onClick = { onSearchEvent(SearchEvent.Expand) }) {
-                                        Icon(Icons.Default.Search, null)
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    trailingIcon = {
-                        AnimatedVisibility(
-                            !isLoading,
-                            enter = materialSharedAxisZIn(true),
-                            exit = materialSharedAxisZOut(true),
-                        ) {
-                            Row {
-                                IconButton(onClick = {
-                                    context.startActivity(Intent(
-                                        context,
-                                        SettingsActivity::class.java
-                                    )) }) {
-                                    Icon(Icons.Default.Settings, null)
-                                }
-                                sortButton?.invoke(this)
-                            }
-                        }
-                    },
-                    onExpandedChange = { onSearchEvent(SearchEvent.UpdateExpanded(it)) },
-                )
-            },
-            expanded = state.expanded,
-            onExpandedChange = { onSearchEvent(SearchEvent.UpdateExpanded(it)) },
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(padding),
-        ) {
-            LazyRow(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                contentPadding = PaddingValues(8.dp)
-            ) {
-                items(SearchFilter.entries) {
-                    FilterChip(
-                        selected = it in state.result.filters,
-                        onClick = { onSearchEvent(SearchEvent.ToggleFilter(it)) },
-                        label = { Text(stringResource(it.label)) },
-                        leadingIcon = { Icon(it.icon, null) },
-                    )
-                }
-            }
-            EmptyContainer(
-                state.query.isBlank(),
-                Icons.Default.Search,
-                stringResource(R.string.type_to_search),
-                Modifier
-                    .weight(1f)
-                    .imePadding()
-            ) {
-
-                EmptyContainer(
-                    state.result.isEmpty(),
-                    Icons.Default.Search,
-                    stringResource(R.string.empty_result),
-                    Modifier.fillMaxSize()
-                ) {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = WindowInsets.navigationBars.asPaddingValues() +
-                                PaddingValues(bottom = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
-                    ) {
-                        resultHolder(
-                            label = R.string.files,
-                            items = state.result.files,
-                            leadingSpace = true,
-                            expanded = state.filesExpanded,
-                            onExpandedChange = {
-                                onSearchEvent(
-                                    SearchEvent.UpdateResultExpanded(files = it)
-                                )
-                                               },
-                        ) { index, file ->
-                            LazyMusicCardScreen(
-                                file = file,
-                                modifier = Modifier
-                                    .padding(horizontal = 12.dp)
-                                    .animateItem(),
-                                shape = expandableListItem(index, state.result.files.size),
-                                background = MaterialTheme.colorScheme.surface,
-                                onLongClick = {
-                                    showBottomSheet(file)
-                                }
+                            ExpressiveIconButton(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                size = IconButtonDefaults.mediumIconSize,
+                                colors = searchBarIconButtonColors()
                             ) {
-                                onPlay(index)
+                                scope.launch {
+                                    state.animateToCollapsed()
+                                }
                             }
                         }
-                        resultHolder(
-                            label = R.string.albums,
-                            items = state.result.albums,
-                            expanded = state.albumsExpanded,
-                            onExpandedChange = {
-                                onSearchEvent(
-                                    SearchEvent.UpdateResultExpanded(albums = it)
-                                )
-                            }
-                        ) { index, album ->
-                            MyListItem(
-                                headline = album.name,
-                                supporting = pluralStringResource(
-                                    R.plurals.item_s,
-                                    album.items.size,
-                                    album.items.size
-                                ),
-                                shape = expandableListItem(index, state.result.albums.size),
-                                background = MaterialTheme.colorScheme.surface,
-                                cover = album.cover,
-                                alternative = Icons.Default.Album,
-                                modifier = Modifier.padding(horizontal = 12.dp).animateItem(),
-                                onClick = {
-                                    onAlbumClick(album)
+                    }
+                } else null,
+                trailingIcon = if (state.currentValue == SearchBarValue.Expanded) {
+                    {
+                        AnimatedVisibility(
+                            visible = textFieldState.text.isNotEmpty(),
+                            enter = expandHorizontally(expandFrom = Alignment.End),
+                            exit = shrinkHorizontally(shrinkTowards = Alignment.End),
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                modifier = Modifier.padding(horizontal = 4.dp)
+                            ) {
+                                ExpressiveIconButton(
+                                    Icons.Default.Clear,
+                                    size = IconButtonDefaults.mediumIconSize,
+                                    colors = searchBarIconButtonColors()
+                                ) {
+                                    textFieldState.clearText()
                                 }
-                            )
+                                ExpressiveIconButton(
+                                    Icons.Default.Search,
+                                    size = IconButtonDefaults.mediumIconSize,
+                                    colors = IconButtonDefaults.filledTonalIconButtonColors()
+                                ) {
+                                    onAction(SearchEvent.UpdateQuery("${textFieldState.text}"))
+                                }
+                            }
                         }
-                        resultHolder(
-                            label = R.string.artists,
-                            items = state.result.artists,
-                            expanded = state.artistsExpanded,
-                            onExpandedChange = {
-                                onSearchEvent(
-                                    SearchEvent.UpdateResultExpanded(artists = it)
-                                )
-                            }
-                        ) { index, artist ->
-                            MyListItem(
-                                headline = artist.name,
-                                supporting = pluralStringResource(
-                                    R.plurals.item_s,
-                                    artist.items.size,
-                                    artist.items.size
-                                ),
-                                cover = artist.getPicture(),
-                                alternative = Icons.Default.Person,
-                                shape = expandableListItem(index, state.result.artists.size),
-                                background = MaterialTheme.colorScheme.surface,
-                                modifier = Modifier.padding(horizontal = 12.dp).animateItem(),
-                                onClick = {
-                                    onArtistClick(artist)
-                                }
-                            )
-                        }
-                        resultHolder(
-                            label = R.string.playlists,
-                            items = state.result.playlists,
-                            expanded = state.playlistsExpanded,
-                            onExpandedChange = {
-                                onSearchEvent(
-                                    SearchEvent.UpdateResultExpanded(playlists = it)
-                                )
-                            }
-                        ) { index, playlist ->
-                            MyListItem(
-                                headline = playlist.name,
-                                supporting = pluralStringResource(
-                                    R.plurals.item_s,
-                                    playlist.items.size,
-                                    playlist.items.size
-                                ),
-                                cover = playlist.image,
-                                alternative = Icons.AutoMirrored.Filled.PlaylistPlay,
-                                shape = expandableListItem(index, state.result.playlists.size),
-                                background = MaterialTheme.colorScheme.surface,
-                                modifier = Modifier.padding(horizontal = 12.dp).animateItem(),
-                                onClick = {
-                                    onPlaylistClick(playlist)
-                                }
+                    }
+                } else null,
+                onSearch = {
+                    onAction(SearchEvent.UpdateQuery("${textFieldState.text}"))
+                },
+                placeholder = {
+                    Text(
+                        stringResource(R.string.search_placeholder),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                },
+            )
+        }
+    AppBarWithSearch(
+        state = state,
+        inputField = inputField,
+        colors = SearchBarDefaults.appBarWithSearchColors(
+            appBarContainerColor = Color.Transparent
+        ),
+        contentPadding = PaddingValues(8.dp, 8.dp),
+        navigationIcon = {
+            AppBarRow(
+                maxItemCount = 1,
+                overflowIndicator = {
+                    TooltipBox(
+                        positionProvider =
+                            TooltipDefaults.rememberTooltipPositionProvider(
+                                TooltipAnchorPosition.Above
+                            ),
+                        tooltip = { PlainTooltip { Text(stringResource(R.string.more)) } },
+                        state = rememberTooltipState(),
+                    ) {
+                        IconButton(onClick = { it.show() }) {
+                            Icon(
+                                imageVector = Icons.Filled.MoreVert,
+                                contentDescription = "Overflow",
                             )
                         }
                     }
+                },
+            ) {
+                clickableItem(
+                    onClick = {},
+                    icon = {
+                        Icon(imageVector = Icons.Default.MusicNote, contentDescription = null)
+                    },
+                    label = settingsLabel,
+                )
+            }
+        },
+        actions = {
+            AppBarRow(
+                maxItemCount = 1,
+                overflowIndicator = {
+                    TooltipBox(
+                        positionProvider =
+                            TooltipDefaults.rememberTooltipPositionProvider(
+                                TooltipAnchorPosition.Above
+                            ),
+                        tooltip = { PlainTooltip { Text(stringResource(R.string.more)) } },
+                        state = rememberTooltipState(),
+                    ) {
+                        IconButton(onClick = { it.show() }) {
+                            Icon(
+                                imageVector = Icons.Filled.MoreVert,
+                                contentDescription = "Overflow",
+                            )
+                        }
+                    }
+                },
+            ) {
+                clickableItem(
+                    onClick = {
+                        context.startActivity(Intent(context, SettingsActivity::class.java))
+                    },
+                    icon = {
+                        Icon(imageVector = Icons.Default.Settings, contentDescription = null)
+                    },
+                    label = settingsLabel,
+                )
+            }
+        }
+    )
+    ExpandedFullScreenSearchBar(
+        state = state,
+        inputField = inputField,
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = WindowInsets.navigationBars.asPaddingValues() +
+                    PaddingValues(bottom = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
+        ) {
+            resultHolder(
+                label = R.string.files,
+                items = searchState.result.files,
+                leadingSpace = true,
+                expanded = searchState.filesExpanded,
+                onExpandedChange = {
+                    onAction(SearchEvent.UpdateResultExpanded(files = it))
+                },
+            ) { index, file ->
+                MusicCardListItem(
+                    file = file,
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .animateItem(),
+                    shape = expandableListItem(index, searchState.result.files.size),
+                    onLongClick = {
+                        onShowBottomSheet(file)
+                    }
+                ) {
+                    onPlay(index)
                 }
+            }
+            resultHolder(
+                label = R.string.albums,
+                items = searchState.result.albums,
+                expanded = searchState.albumsExpanded,
+                onExpandedChange = {
+                    onAction(SearchEvent.UpdateResultExpanded(albums = it))
+                }
+            ) { index, album ->
+                ListItem(
+                    headline = album.name,
+                    supporting = pluralStringResource(
+                        R.plurals.item_s,
+                        album.items.size,
+                        album.items.size
+                    ),
+                    shape = expandableListItem(index, searchState.result.albums.size),
+                    background = MaterialTheme.colorScheme.surface,
+                    cover = album.cover,
+                    icon = Icons.Default.Album,
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .animateItem(),
+                    onClick = {
+                        onAlbumClick(album)
+                    }
+                )
+            }
+            resultHolder(
+                label = R.string.artists,
+                items = searchState.result.artists,
+                expanded = searchState.artistsExpanded,
+                onExpandedChange = {
+                    onAction(SearchEvent.UpdateResultExpanded(artists = it))
+                }
+            ) { index, artist ->
+                ListItem(
+                    headline = artist.name,
+                    supporting = pluralStringResource(
+                        R.plurals.item_s,
+                        artist.items.size,
+                        artist.items.size
+                    ),
+                    shape = expandableListItem(index, searchState.result.artists.size),
+                    background = MaterialTheme.colorScheme.surface,
+                    cover = artist.cover,
+                    icon = Icons.Default.Person,
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .animateItem(),
+                    onClick = {
+                        onArtistClick(artist)
+                    }
+                )
+            }
+            resultHolder(
+                label = R.string.playlists,
+                items = searchState.result.playlists,
+                expanded = searchState.playlistsExpanded,
+                onExpandedChange = {
+                    onAction(SearchEvent.UpdateResultExpanded(playlists = it))
+                }
+            ) { index, playlist ->
+                ListItem(
+                    headline = playlist.name,
+                    supporting = pluralStringResource(
+                        R.plurals.item_s,
+                        playlist.items.size,
+                        playlist.items.size
+                    ),
+                    shape = expandableListItem(index, searchState.result.playlists.size),
+                    background = MaterialTheme.colorScheme.surface,
+                    cover = playlist.image,
+                    icon = Icons.Default.Person,
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .animateItem(),
+                    onClick = {
+                        onPlaylistClick(playlist)
+                    }
+                )
             }
         }
     }
 }
 
-@Composable
-fun AppNameLabel(modifier: Modifier = Modifier) {
-    Row(
-        modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
-    ) {
-        Text(
-            text = stringResource(R.string.app_name_first),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Text(
-            text = stringResource(R.string.app_name_second),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-    }
-}
 
 @Composable
 fun expandableListItem(index: Int, itemsCount: Int) = listItemShape(

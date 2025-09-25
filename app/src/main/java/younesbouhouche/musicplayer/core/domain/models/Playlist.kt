@@ -1,8 +1,13 @@
 package younesbouhouche.musicplayer.core.domain.models
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import coil.request.ImageRequest
 import younesbouhouche.musicplayer.main.data.events.PlayerEvent
+import java.io.File
 
 @Entity
 data class Playlist(
@@ -17,4 +22,11 @@ data class Playlist(
     fun search(query: String): Boolean {
         return name.contains(query, ignoreCase = true)
     }
+}
+
+@Composable
+fun Playlist.getPictureRequest() = with(LocalContext.current) {
+    ImageRequest.Builder(this)
+        .data(image?.let { File(filesDir, it) })
+        .build()
 }

@@ -55,7 +55,7 @@ class PlayerManager(
     @OptIn(UnstableApi::class)
     fun initialize(scope: CoroutineScope): Player {
         // Get or create the singleton player from factory
-        val exoPlayer = playerFactory.getPlayerOrNull() ?: throw IllegalStateException()
+        val exoPlayer = playerFactory.getPlayerOrNull()
         exoPlayer.apply {
             //setSeekParameters(SeekParameters(1000L, 1000L))
             addListener(

@@ -52,7 +52,7 @@ sealed interface UiEvent {
 
     data object HideAddToPlaylistDialog : UiEvent
 
-    data class UpdateSelectedPlaylist(val index: Int) : UiEvent
+    data class UpdateSelectedPlaylist(val id: Int) : UiEvent
 
     data class SavePlaylist(val playlist: Playlist): UiEvent
 
