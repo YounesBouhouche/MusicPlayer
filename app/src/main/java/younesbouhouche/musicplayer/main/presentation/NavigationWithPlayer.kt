@@ -82,12 +82,6 @@ fun BoxScope.NavigationWithPlayer(
         )
         state.snapTo(ViewState.SMALL)
     }
-    NavBar(
-        route,
-        playerState.playState != PlayState.STOP,
-        Modifier.offset { IntOffset(0, navigationBarOffset) },
-        navigate = navigate
-    )
     AnimatedVisibility(playerState.playState != PlayState.STOP) {
         PlayerScreen(
             queue,
@@ -103,6 +97,12 @@ fun BoxScope.NavigationWithPlayer(
             onPlaybackEvent = onPlaybackEvent
         )
     }
+    NavBar(
+        route,
+        playerState.playState != PlayState.STOP,
+        Modifier.offset { IntOffset(0, navigationBarOffset) },
+        navigate = navigate
+    )
     BackHandler(state.currentValue == ViewState.LARGE) {
         scope.launch {
             state.animateTo(ViewState.SMALL)

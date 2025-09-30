@@ -1,5 +1,6 @@
 package younesbouhouche.musicplayer.main.presentation
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
@@ -8,7 +9,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import soup.compose.material.motion.animation.materialSharedAxisZ
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
 import younesbouhouche.musicplayer.main.domain.models.Routes
 
@@ -67,10 +68,16 @@ fun BoxScope.NavBar(
                         alwaysShowLabel = false,
                         modifier = Modifier.weight(weight),
                         icon = {
-                            Icon(
-                                screen.icon,
-                                null,
-                            )
+                            AnimatedContent(
+                                selected,
+                                transitionSpec = { materialSharedAxisZ(true) }
+                            ) {
+                                Icon(
+                                    if (it) screen.selectedIcon
+                                    else screen.unselectedIcon,
+                                    null,
+                                )
+                            }
                         },
                         label = {
                             Text(

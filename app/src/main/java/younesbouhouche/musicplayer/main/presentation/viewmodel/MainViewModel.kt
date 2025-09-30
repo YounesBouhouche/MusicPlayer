@@ -22,7 +22,6 @@ import younesbouhouche.musicplayer.core.domain.util.stateInVM
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
-import younesbouhouche.musicplayer.main.domain.events.PlaylistsUiEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.QueueModel
 import younesbouhouche.musicplayer.main.domain.repo.MediaRepository
@@ -76,7 +75,7 @@ class MainViewModel(
     getQueueUseCase: GetQueueUseCase,
     getSortedPlaylistsUseCase: GetSortedPlaylistsUseCase,
     val getPlaylistUseCase: GetPlaylistUseCase,
-    val getSortedPlaylistUseCase: GetSortedPlaylistUseCase,
+    getSortedPlaylistUseCase: GetSortedPlaylistUseCase,
     val setFavoriteUseCase: SetFavoriteUseCase,
     stateManager: PlayerStateManager,
     val mediaRepository: MediaRepository
@@ -97,11 +96,6 @@ class MainViewModel(
         state.copy(loading = loading)
     }.stateInVM(UiState())
 
-    private val _files = mediaRepository.getAllMedia()
-
-    val bottomSheetItem = combine(_uiState.map { it.bottomSheetItem }, _files) { id, files ->
-        files.firstOrNull { it.id == id }
-    }.stateInVM(null)
     private val _sortState = MutableStateFlow(SortState(SortType.Title))
     val sortState = _sortState.stateInVM(SortState(SortType.Title))
     private val _albumsSortState = MutableStateFlow(
@@ -131,10 +125,6 @@ class MainViewModel(
     val playlists = getSortedPlaylistsUseCase(_playlistsSortState).stateInVM(emptyList())
     val playlist = getSortedPlaylistUseCase(
             _uiState.map { it.playlistId },
-            _playlistSortState
-        ).stateInVM(UiPlaylist())
-    val sheetPlaylist = getSortedPlaylistUseCase(
-            _uiState.map { it.sheetPlaylistId },
             _playlistSortState
         ).stateInVM(UiPlaylist())
     val albums = getAlbumsUseCase(_albumsSortState).stateInVM(emptyList())
@@ -168,41 +158,8 @@ class MainViewModel(
         }
     }
 
-    fun onReload() = viewModelScope.launch(Dispatchers.IO) {
-        refreshUseCase()
-    }
-
     fun onPlaylistEvent(event: PlaylistEvent) = viewModelScope.launch {
         playlistControlUseCase(event)
-    }
-
-    fun onPlaylistsEvent(event: PlaylistsUiEvent) {
-        when(event) {
-            PlaylistsUiEvent.HidePlaylistBottomSheet ->
-                _uiState.update {
-                    it.copy(playlistBottomSheetVisible = false)
-                }
-
-            is PlaylistsUiEvent.ShowBottomSheet -> {
-                viewModelScope.launch {
-                    _uiState.update {
-                        it.copy(sheetPlaylistId = event.id, playlistBottomSheetVisible = true)
-                    }
-                }
-            }
-
-            is PlaylistsUiEvent.SetPlaylistSortState -> {
-                _playlistSortState.value = event.state
-            }
-            is PlaylistsUiEvent.SetSortState -> {
-                _playlistsSortState.value = event.state
-            }
-            is PlaylistsUiEvent.SetSheetVisible -> {
-                _playlistsSortState.update {
-                    it.copy(expanded = event.visible)
-                }
-            }
-        }
     }
 
     fun onPlayerEvent(event: PlayerEvent) {

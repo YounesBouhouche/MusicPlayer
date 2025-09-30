@@ -8,7 +8,7 @@ import younesbouhouche.musicplayer.main.domain.repo.MediaRepository
 class GetLastAddedUseCase(val mediaRepository: MediaRepository) {
     operator fun invoke(): Flow<List<MusicCard>> {
         return mediaRepository.getAllMedia().map { files ->
-            files.sortedByDescending { it.date }
+            files.sortedByDescending { it.date }.take(10)
         }
     }
 }

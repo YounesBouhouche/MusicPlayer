@@ -280,4 +280,13 @@
     <string name="favorites_subtitles">Your favorite songs at a glance</string>
     <string name="watch_your_recently_played_songs">Watch your recently played songs</string>
     <string name="welcome_back">Hi,\nWelcome Back</string>
+    <string name="listen_to_your_recently_added_songs">Listen to your recently added songs</string>
+    <string name="all">All</string>
+    <string name="your_library_is_empty">Your library is empty</string>
+    <string name="empty_favorites_text">See something you like? Tap the heart icon to save it here.</string>
+    <string name="top_artists">Top Artists</string>
+    <string name="top_artists_text">Based on your history</string>
+    <string name="empty_playlists_text">You don\'t have any playlists yet</string>
+    <string name="welcome_text">Pick up where you left off</string>
+    <string name="end">End</string>
 </resources>

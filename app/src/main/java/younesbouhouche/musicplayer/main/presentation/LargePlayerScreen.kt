@@ -6,7 +6,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -62,6 +61,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -100,12 +100,20 @@ fun LargePlayerScreen(
     onPlaybackEvent: (PlaybackEvent) -> Unit
 ) {
     var queueSheetVisible by remember { mutableStateOf(false) }
+    var timerVisible by remember { mutableStateOf(false) }
     val currentItem = queue.items.getOrNull(queue.index)
     val pagerState = rememberPagerState {
         queue.items.size
     }
     var sliderValue by remember { mutableFloatStateOf(0f) }
     var dragging by remember { mutableStateOf(false) }
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect {
+            if (pagerState.currentPage != pagerState.settledPage) {
+                onPlaybackEvent(PlaybackEvent.Seek(it))
+            }
+        }
+    }
     LaunchedEffect(queue) {
         pagerState.animateScrollToPage(queue.index)
     }
@@ -366,7 +374,9 @@ fun LargePlayerScreen(
                             when(it) {
                                 0 -> onPlaybackEvent(PlaybackEvent.ToggleShuffle)
                                 1 -> onPlaybackEvent(PlaybackEvent.CycleRepeatMode)
-                                else -> Unit
+                                else -> {
+                                    timerVisible = true
+                                }
                             }
                         },
                         shapes =
@@ -392,6 +402,16 @@ fun LargePlayerScreen(
             }
         }
     }
+    TimerSheet(
+        timerVisible,
+        {
+            timerVisible = false
+        },
+        playerState.timer,
+        {
+            onPlaybackEvent(PlaybackEvent.SetTimer(it))
+        }
+    )
     AppTheme {
         QueueSheet(
             queueSheetVisible,

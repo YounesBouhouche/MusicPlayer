@@ -29,8 +29,8 @@ import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -78,7 +78,6 @@ import younesbouhouche.musicplayer.main.presentation.components.MusicCardListIte
 import younesbouhouche.musicplayer.main.presentation.states.SearchState
 import younesbouhouche.musicplayer.main.presentation.util.plus
 import younesbouhouche.musicplayer.main.presentation.util.searchBarIconButtonColors
-import younesbouhouche.musicplayer.main.presentation.util.topAppBarIconButtonColors
 import younesbouhouche.musicplayer.settings.presentation.SettingsActivity
 import younesbouhouche.musicplayer.settings.presentation.components.listItemShape
 
@@ -86,6 +85,7 @@ import younesbouhouche.musicplayer.settings.presentation.components.listItemShap
 @Composable
 fun SearchScreen(
     searchState: SearchState,
+    onExpandDrawer: () -> Unit,
     onAction: (SearchEvent) -> Unit,
     onShowBottomSheet: (MusicCard) -> Unit,
     onAlbumClick: (Album) -> Unit,
@@ -97,7 +97,6 @@ fun SearchScreen(
     val state = rememberSearchBarState()
     val textFieldState = rememberTextFieldState()
     val scope = rememberCoroutineScope()
-    val settingsLabel = stringResource(R.string.settings)
     LaunchedEffect(state.currentValue) {
         if (state.currentValue == SearchBarValue.Collapsed) {
             onAction(SearchEvent.ClearQuery)
@@ -120,7 +119,7 @@ fun SearchScreen(
                             modifier = Modifier.padding(end = 8.dp)
                         ) {
                             ExpressiveIconButton(
-                                Icons.AutoMirrored.Filled.ArrowBack,
+                                Icons.AutoMirrored.Default.ArrowBack,
                                 size = IconButtonDefaults.mediumIconSize,
                                 colors = searchBarIconButtonColors()
                             ) {
@@ -201,11 +200,11 @@ fun SearchScreen(
                 },
             ) {
                 clickableItem(
-                    onClick = {},
+                    onClick = onExpandDrawer,
                     icon = {
-                        Icon(imageVector = Icons.Default.MusicNote, contentDescription = null)
+                        Icon(imageVector = Icons.Default.Menu, contentDescription = null)
                     },
-                    label = settingsLabel,
+                    label = "Menu",
                 )
             }
         },
@@ -237,7 +236,7 @@ fun SearchScreen(
                     icon = {
                         Icon(imageVector = Icons.Default.Settings, contentDescription = null)
                     },
-                    label = settingsLabel,
+                    label = "Settings",
                 )
             }
         }

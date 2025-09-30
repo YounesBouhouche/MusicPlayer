@@ -13,10 +13,12 @@ import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.core.domain.models.getPictureRequest
+import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
+import younesbouhouche.musicplayer.main.presentation.components.EmptyContainer
 import younesbouhouche.musicplayer.main.presentation.components.GridScreen
 import younesbouhouche.musicplayer.main.presentation.components.ListItem
 import younesbouhouche.musicplayer.main.presentation.components.MyImage
@@ -56,12 +60,14 @@ fun PlaylistsScreen(
     onSortStateChange: (SortState<ListsSortType>) -> Unit,
     modifier: Modifier = Modifier,
     onCreatePlaylist: () -> Unit = {},
+    onImportPlaylist: () -> Unit = {},
+    onPlay: (Playlist) -> Unit = {},
     onClick: (Playlist) -> Unit = {},
 ) {
     var expanded by remember { mutableStateOf(false) }
     val menu = listOf(
         Triple(R.string.create_playlist, Icons.Default.Add, onCreatePlaylist),
-        Triple(R.string.import_playlist, Icons.Default.FileDownload) {},
+        Triple(R.string.import_playlist, Icons.Default.FileDownload, onImportPlaylist),
     )
     val bottomInset by animateDpAsState(
         if (smallPlayerExpanded) 200.dp else 120.dp
@@ -110,74 +116,91 @@ fun PlaylistsScreen(
             }
         }
     ) { paddingValues ->
-        GridScreen(
-            playlists,
-            sortState,
-            {
-                onSortStateChange(sortState.copy(expanded = true))
-            },
-            { playlist ->
-                ListItem(
-                    { onClick(playlist) },
-                    leadingContent = {
-                        MyImage(
-                            playlist.getPictureRequest(),
-                            Icons.AutoMirrored.Filled.PlaylistPlay,
-                            Modifier.size(68.dp),
-                        )
-                    },
-                    modifier = Modifier.animateItem()
-                ) {
-                    Column(
-                        Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
+        EmptyContainer(
+            playlists.isEmpty(),
+            Icons.AutoMirrored.Filled.PlaylistPlay,
+            stringResource(R.string.empty_playlists_text),
+        ) {
+            GridScreen(
+                playlists,
+                sortState,
+                {
+                    onSortStateChange(sortState.copy(expanded = true))
+                },
+                { playlist ->
+                    ListItem(
+                        { onClick(playlist) },
+                        leadingContent = {
+                            MyImage(
+                                playlist.getPictureRequest(),
+                                Icons.AutoMirrored.Filled.PlaylistPlay,
+                                Modifier.size(68.dp),
+                            )
+                        },
+                        modifier = Modifier.animateItem(),
+                        trailingContent = {
+                            ExpressiveIconButton(
+                                Icons.Default.PlayArrow,
+                                size = IconButtonDefaults.mediumIconSize,
+                                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                                )
+                            ) {
+                                onPlay(playlist)
+                            }
+                        }
                     ) {
-                        Text(
-                            playlist.name,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            pluralStringResource(
-                                R.plurals.item_s,
-                                playlist.items.size,
-                                playlist.items.size
-                            ),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        Column(
+                            Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
+                        ) {
+                            Text(
+                                playlist.name,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                pluralStringResource(
+                                    R.plurals.item_s,
+                                    playlist.items.size,
+                                    playlist.items.size
+                                ),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
-                }
-            },
-            { playlist ->
-                PictureCard(
-                    playlist.getPictureRequest(),
-                    Icons.AutoMirrored.Filled.PlaylistPlay,
-                    {
-                        onClick(playlist)
-                    },
-                    Modifier.animateItem()
-                ) {
-                    Column(
-                        Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
+                },
+                { playlist ->
+                    PictureCard(
+                        playlist.getPictureRequest(),
+                        Icons.AutoMirrored.Filled.PlaylistPlay,
+                        {
+                            onClick(playlist)
+                        },
+                        Modifier.animateItem()
                     ) {
-                        Text(
-                            playlist.name,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        Column(
+                            Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
+                        ) {
+                            Text(
+                                playlist.name,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
-                }
-            },
-            Modifier
-                .fillMaxSize()
-                .padding(),
-            { it.id },
-            paddingValues
-        )
+                },
+                Modifier
+                    .fillMaxSize()
+                    .padding(),
+                { it.id },
+                paddingValues
+            )
+        }
     }
     SortBottomSheet(
         sortState,

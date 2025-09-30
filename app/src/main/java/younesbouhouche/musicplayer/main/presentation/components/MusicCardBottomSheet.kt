@@ -1,6 +1,8 @@
 package younesbouhouche.musicplayer.main.presentation.components
 
+import android.content.ClipData
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +20,6 @@ import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.AddToQueue
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Category
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MusicNote
@@ -41,12 +42,16 @@ import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.presentation.util.ExpressiveButton
@@ -67,6 +72,8 @@ fun MusicCardBottomSheet(
     onShare: () -> Unit,
     onPlay: () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    val clipboard = LocalClipboard.current
     file?.let {
         val data = listOf(
             (R.string.artist to Icons.Default.Person) to file.artist,
@@ -186,12 +193,22 @@ fun MusicCardBottomSheet(
                         verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         data.forEachIndexed { index, (iconPair, value) ->
                             val (res, icon) = iconPair
+                            val text = stringResource(res)
                             Row(
                                 Modifier
                                     .containerClip(
                                         MaterialTheme.colorScheme.surfaceContainerLowest,
                                         expressiveRectShape(index, data.size)
                                     )
+                                    .clickable {
+                                        scope.launch {
+                                            clipboard.setClipEntry(
+                                                ClipEntry(
+                                                    ClipData.newPlainText(text, value)
+                                                )
+                                            )
+                                        }
+                                    }
                                     .padding(16.dp)
                                     .fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
@@ -203,7 +220,7 @@ fun MusicCardBottomSheet(
                                     verticalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     Text(
-                                        stringResource(res),
+                                        text,
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )

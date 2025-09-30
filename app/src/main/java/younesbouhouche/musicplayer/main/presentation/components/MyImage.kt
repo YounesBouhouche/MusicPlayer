@@ -4,7 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MyImage(
     model: Any?,
@@ -25,7 +27,7 @@ fun MyImage(
     modifier: Modifier = Modifier,
     iconTint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     shape: Shape = MaterialTheme.shapes.medium,
-    background: Color = MaterialTheme.colorScheme.surfaceContainer,
+    background: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     fraction: Float = .5f,
     onClick: (() -> Unit)? = null,
     onError: ((AsyncImagePainter.State.Error) -> Unit)? = null,
@@ -41,7 +43,7 @@ fun MyImage(
         contentScale = ContentScale.Crop,
         loading = {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(Modifier.fillMaxSize(.5f))
+                CircularWavyProgressIndicator(Modifier.fillMaxSize(.5f))
             }
         },
         error = {

@@ -1,10 +1,9 @@
 package younesbouhouche.musicplayer.main.presentation.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.IconButtonDefaults
@@ -25,11 +23,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -43,7 +39,7 @@ fun ListItem(
     horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(12.dp),
     leadingContent: (@Composable RowScope.() -> Unit)? = null,
     trailingContent: (@Composable RowScope.() -> Unit)? = null,
-    content: @Composable RowScope.() -> Unit,
+    content: @Composable () -> Unit,
 ) {
     Row(modifier
         .clip(shape)
@@ -54,7 +50,9 @@ fun ListItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         leadingContent?.invoke(this)
-        content()
+        Box(Modifier.weight(1f)) {
+            content()
+        }
         trailingContent?.invoke(this)
         onLongClick?.let {
             ExpressiveIconButton(
@@ -102,7 +100,6 @@ fun ListItem(
     },
     trailingContent = trailingContent
 ) {
-
     Column(
         Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)

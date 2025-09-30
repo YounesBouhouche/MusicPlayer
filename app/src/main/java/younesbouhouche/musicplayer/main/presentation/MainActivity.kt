@@ -20,6 +20,7 @@ import org.koin.android.ext.android.get
 import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.presentation.constants.Permissions
 import younesbouhouche.musicplayer.main.presentation.states.StartupEvent
 import younesbouhouche.musicplayer.main.presentation.util.Event
@@ -27,6 +28,7 @@ import younesbouhouche.musicplayer.main.presentation.util.composables.CollectEve
 import younesbouhouche.musicplayer.main.presentation.util.composables.SetSystemBarColors
 import younesbouhouche.musicplayer.main.presentation.util.createTempFile
 import younesbouhouche.musicplayer.main.presentation.util.isPermissionGranted
+import younesbouhouche.musicplayer.main.presentation.util.parsePlaylistFile
 import younesbouhouche.musicplayer.main.presentation.util.requestPermission
 import younesbouhouche.musicplayer.main.presentation.util.shareFile
 import younesbouhouche.musicplayer.main.presentation.util.toStartupEvent
@@ -71,6 +73,16 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+            val importPlaylistLauncher =
+                rememberLauncherForActivityResult(
+                    ActivityResultContracts.OpenDocument()
+                ) { uri: Uri? ->
+                    uri?.let {
+                        val content = contentResolver.openInputStream(uri)?.bufferedReader()?.readText() ?: return@let
+                        val (name, items) = content.parsePlaylistFile()
+                        mainVM.onPlaylistEvent(PlaylistEvent.CreateNew(name, items, null))
+                    }
+                }
             CollectEvents { event ->
                 when (event) {
                     is Event.SavePlaylist -> {
@@ -89,6 +101,11 @@ class MainActivity : ComponentActivity() {
                     }
 
                     is Event.Navigate -> navController.navigate(event.route)
+
+                    Event.LaunchPlaylistDialog -> {
+                        importPlaylistLauncher.launch(arrayOf("audio/x-mpegurl", "audio/x-scpls", "text/plain"))
+                    }
+
                     else -> return@CollectEvents
                 }
             }

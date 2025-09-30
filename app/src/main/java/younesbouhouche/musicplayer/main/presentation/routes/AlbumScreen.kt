@@ -1,11 +1,13 @@
 package younesbouhouche.musicplayer.main.presentation.routes
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.components.ListScreen
 import younesbouhouche.musicplayer.main.presentation.models.AlbumUi
@@ -30,5 +32,6 @@ fun AlbumScreen(
     onPlay = onPlay,
     sortState = sortState,
     onSortStateChange = onSortStateChange,
-    onShowBottomSheet = onShowBottomSheet
+    onShowBottomSheet = onShowBottomSheet,
+    contentPadding = PaddingValues(bottom = 260.dp)
 )

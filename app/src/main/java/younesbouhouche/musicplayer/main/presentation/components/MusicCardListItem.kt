@@ -93,7 +93,7 @@ fun MusicCardListItem(
         }
     ) {
         Column(
-            Modifier.weight(1f),
+            Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(

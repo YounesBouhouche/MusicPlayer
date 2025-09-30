@@ -20,6 +20,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -57,6 +58,12 @@ fun PlayerScreen(
     val smallCorner = 8.dp * (1f - progress)
     val palette = rememberPaletteState {  }
     val scope = rememberCoroutineScope()
+    val shape = RoundedCornerShape(
+        topStart = largeCorner,
+        topEnd = largeCorner,
+        bottomStart = smallCorner,
+        bottomEnd = smallCorner
+    )
     AppTheme(palette.palette) {
         Box(
             modifier.fillMaxWidth()
@@ -74,12 +81,8 @@ fun PlayerScreen(
                         positionalThreshold = { it * .5f }
                     ),
                 )
-                .clip(RoundedCornerShape(
-                    topStart = largeCorner,
-                    topEnd = largeCorner,
-                    bottomStart = smallCorner,
-                    bottomEnd = smallCorner
-                ))
+                .shadow(8.dp, shape)
+                .clip(shape)
                 .background(MaterialTheme.colorScheme.primaryContainer),
         ) {
             SmallPlayerScreen(

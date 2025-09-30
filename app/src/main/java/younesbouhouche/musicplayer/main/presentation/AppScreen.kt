@@ -16,11 +16,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +52,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
+import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
@@ -67,9 +73,11 @@ import younesbouhouche.musicplayer.main.presentation.routes.LibraryScreen
 import younesbouhouche.musicplayer.main.presentation.routes.PlaylistScreen
 import younesbouhouche.musicplayer.main.presentation.routes.PlaylistsScreen
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
+import younesbouhouche.musicplayer.main.presentation.util.Event
 import younesbouhouche.musicplayer.main.presentation.util.containerClip
 import younesbouhouche.musicplayer.main.presentation.util.intUpDownTransSpec
 import younesbouhouche.musicplayer.main.presentation.util.isRouteParent
+import younesbouhouche.musicplayer.main.presentation.util.sendEvent
 import younesbouhouche.musicplayer.main.presentation.viewmodel.MainViewModel
 import younesbouhouche.musicplayer.main.presentation.viewmodel.SearchVM
 
@@ -94,6 +102,8 @@ fun AppScreen(
     val playerState by mainVM.playerState.collectAsState()
     val files by mainVM.files.collectAsState()
     val favorites by mainVM.favorites.collectAsState()
+    val lastAdded by mainVM.lastAdded.collectAsState()
+    val mostPlayedArtists by mainVM.mostPlayedArtists.collectAsState()
     val history by mainVM.history.collectAsState()
     val padding by animateDpAsState(if (isParent) 8.dp else 0.dp)
     val albumsSortState by mainVM.albumsSortState.collectAsState()
@@ -106,6 +116,8 @@ fun AppScreen(
     val smallPlayerExpanded = playerState.playState != PlayState.STOP
     val uiState by mainVM.uiState.collectAsState()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val currentNavRoute =
         currentRoute?.let { route ->
             Routes
@@ -115,229 +127,257 @@ fun AppScreen(
                 }
             }
     Surface(modifier.fillMaxSize()) {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .onGloballyPositioned {
-                    viewHeight = it.size.height
-                }
-                .onSizeChanged {
-                    viewHeight = it.height
-                }
-        ) {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            0.0f to MaterialTheme.colorScheme.surfaceContainerLow,
-                            1.0f to MaterialTheme.colorScheme.surface,
-                        )
-                    )
-            ) {
-                AnimatedVisibility(isParent) {
-                    SearchScreen(
-                        searchState,
-                        searchVM::onSearchEvent,
-                        onShowBottomSheet = {
-                            bottomSheetFile = it
-                        },
-                        onAlbumClick = {
-                            navController.navigate(NavRoutes.Album(it.name))
-                        },
-                        onArtistClick = {
-                            navController.navigate(NavRoutes.Artist(it.name))
-                        },
-                        onPlaylistClick = {
-                            navController.navigate(NavRoutes.Playlist(it.id))
-                        },
-                        onPlay = {
-                            mainVM.onPlaybackEvent(
-                                PlaybackEvent.Play(
-                                    searchState.result.files,
-                                    it,
-                                    shuffle = false
-                                )
-                            )
-                        },
-                    )
-                }
-                AnimatedVisibility(
-                    uiState.loading.isLoading() and isParent,
-                    enter = expandVertically(expandFrom = Alignment.Top),
-                    exit = shrinkVertically(shrinkTowards = Alignment.Top),
-                ) {
-                    Row(Modifier
-                        .padding(8.dp)
-                        .clip(MaterialTheme.shapes.extraLarge)
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        CircularWavyProgressIndicator(
-                            progress = {
-                                uiState.loading.getValue()
-                            },
-                            Modifier.size(40.dp),
-                            stroke =
-                                Stroke(
-                                    width = with(LocalDensity.current) { 3.dp.toPx() },
-                                    cap = StrokeCap.Round,
-                                ),
-                            trackStroke =
-                                Stroke(
-                                    width = with(LocalDensity.current) { 3.dp.toPx() },
-                                    cap = StrokeCap.Round,
-                                ),
-                        )
-                        AnimatedContent(
-                            uiState.loading.step,
-                            transitionSpec = intUpDownTransSpec,
-                        ) { step ->
-                            Text(
-                                stringResource(
-                                    when(step) {
-                                        0 -> R.string.loading_files
-                                        1 -> R.string.loading_thumbnails
-                                        2 -> R.string.loading_artists
-                                        else -> R.string.loading
-                                    },
-                                    uiState.loading.progress,
-                                    uiState.loading.progressMax,
-                                ),
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
-                }
-                NavHost(
-                    navController,
-                    NavRoutes.Home,
-                    Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = padding)
-                        .containerClip()
-                ) {
-                    composable<NavRoutes.Home> {
-                        HomeScreen(favorites, history) { list, index ->
-                            mainVM.onPlaybackEvent(PlaybackEvent.Play(list, index))
-                        }
-                    }
-                    composable<NavRoutes.Albums> {
-                        AlbumsScreen(
-                            albums,
-                            albumsSortState,
-                            mainVM::onAlbumsSortChange
-                        ) { album ->
-                            navController.navigate(NavRoutes.Album(album.name))
-                        }
-                    }
-                    composable<NavRoutes.Album> { entry ->
-                        val route = entry.toRoute<NavRoutes.Album>()
-                        val album by mainVM.getAlbumUi(route.title).collectAsState()
-                        AlbumScreen(
-                            album,
-                            listScreenSortState,
-                            mainVM::onListScreenSortChange,
-                            onShowBottomSheet = {
-                                bottomSheetFile = it
-                            }
-                        ) { index, shuffle ->
-                            mainVM.onPlaybackEvent(PlaybackEvent.Play(
-                                album.items,
-                                index,
-                                shuffle = shuffle
-                            ))
-                        }
-                    }
-                    composable<NavRoutes.Artists> {
-                        ArtistsScreen(
-                            artists,
-                            artistsSortState,
-                            mainVM::onArtistsSortChange
-                        ) { artist ->
-                            navController.navigate(NavRoutes.Artist(artist.name))
-                        }
-                    }
-                    composable<NavRoutes.Artist> { entry ->
-                        val route = entry.toRoute<NavRoutes.Artist>()
-                        val artist by mainVM.getArtistUi(route.name).collectAsState()
-                        ArtistScreen(
-                            artist,
-                            listScreenSortState,
-                            mainVM::onListScreenSortChange,
-                            onShowBottomSheet = {
-                                bottomSheetFile = it
-                            }
-                        ) { index, shuffle ->
-                            mainVM.onPlaybackEvent(PlaybackEvent.Play(artist.items, index, shuffle = shuffle))
-                        }
-                    }
-                    composable<NavRoutes.Playlists> {
-                         PlaylistsScreen(
-                             playlists,
-                             smallPlayerExpanded,
-                             playlistsSortState,
-                             mainVM::onPlaylistsSortChange,
-                             onCreatePlaylist = {
-                                 mainVM.onUiEvent(UiEvent.ShowCreatePlaylistDialog(emptyList()))
-                             }
-                         ) { playlist ->
-                             navController.navigate(NavRoutes.Playlist(playlist.id))
-                         }
-                    }
-                    composable<NavRoutes.Playlist> { entry ->
-                        val id = entry.toRoute<NavRoutes.Playlist>().playlistId
-                        LaunchedEffect(id) {
-                            mainVM.getPlaylist(id)
-                        }
-                        PlaylistScreen(
-                            playlist,
-                            smallPlayerExpanded,
-                            playlistSortState,
-                            mainVM::onPlaylistSortChange,
-                            onShowBottomSheet = {
-                                bottomSheetFile = it
-                            },
-                            onReorder = { from, to ->
-                                mainVM.onPlaylistEvent(PlaylistEvent.Reorder(playlist, from, to))
-                            }
-                        ) { index, shuffle ->
-                            mainVM.onPlaybackEvent(
-                                PlaybackEvent.Play(
-                                    playlist.items,
-                                    index,
-                                    shuffle = shuffle
-                                )
-                            )
-                        }
-                    }
-                    composable<NavRoutes.Library> {
-                        LibraryScreen(
-                            files,
-                            librarySortState,
-                            mainVM::onLibrarySortChange,
-                            onShowBottomSheet = {
-                                bottomSheetFile = it
-                            }
-                        ) { file ->
-                            mainVM.onPlaybackEvent(PlaybackEvent.Play(listOf(file)))
-                        }
-                    }
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                ModalDrawerSheet {
+
                 }
             }
-            NavigationWithPlayer(
-                viewHeight,
-                queue,
-                playerState,
-                mainVM::onPlayerEvent,
-                mainVM::onPlaybackEvent,
-                currentNavRoute,
+        ) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .onGloballyPositioned {
+                        viewHeight = it.size.height
+                    }
+                    .onSizeChanged {
+                        viewHeight = it.height
+                    }
             ) {
-                navController.navigate(it)
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                0.0f to MaterialTheme.colorScheme.surfaceContainerLow,
+                                1.0f to MaterialTheme.colorScheme.surface,
+                            )
+                        )
+                ) {
+                    AnimatedVisibility(isParent) {
+                        SearchScreen(
+                            searchState,
+                            onExpandDrawer = {
+                                scope.launch {
+                                    drawerState.open()
+                                }
+                            },
+                            onAction = searchVM::onSearchEvent,
+                            onShowBottomSheet = {
+                                bottomSheetFile = it
+                            },
+                            onAlbumClick = {
+                                navController.navigate(NavRoutes.Album(it.name))
+                            },
+                            onArtistClick = {
+                                navController.navigate(NavRoutes.Artist(it.name))
+                            },
+                            onPlaylistClick = {
+                                navController.navigate(NavRoutes.Playlist(it.id))
+                            },
+                            onPlay = {
+                                mainVM.onPlaybackEvent(
+                                    PlaybackEvent.Play(
+                                        searchState.result.files,
+                                        it,
+                                        shuffle = false
+                                    )
+                                )
+                            },
+                        )
+                    }
+                    AnimatedVisibility(
+                        uiState.loading.isLoading() and isParent,
+                        enter = expandVertically(expandFrom = Alignment.Top),
+                        exit = shrinkVertically(shrinkTowards = Alignment.Top),
+                    ) {
+                        Row(Modifier
+                            .padding(8.dp)
+                            .clip(MaterialTheme.shapes.extraLarge)
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            CircularWavyProgressIndicator(
+                                progress = {
+                                    uiState.loading.getValue()
+                                },
+                                Modifier.size(40.dp),
+                                stroke =
+                                    Stroke(
+                                        width = with(LocalDensity.current) { 3.dp.toPx() },
+                                        cap = StrokeCap.Round,
+                                    ),
+                                trackStroke =
+                                    Stroke(
+                                        width = with(LocalDensity.current) { 3.dp.toPx() },
+                                        cap = StrokeCap.Round,
+                                    ),
+                            )
+                            AnimatedContent(
+                                uiState.loading.step,
+                                transitionSpec = intUpDownTransSpec,
+                            ) { step ->
+                                Text(
+                                    stringResource(
+                                        when(step) {
+                                            0 -> R.string.loading_files
+                                            1 -> R.string.loading_thumbnails
+                                            2 -> R.string.loading_artists
+                                            else -> R.string.loading
+                                        },
+                                        uiState.loading.progress,
+                                        uiState.loading.progressMax,
+                                    ),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+                    }
+                    NavHost(
+                        navController,
+                        NavRoutes.Home,
+                        Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = padding)
+                            .containerClip()
+                    ) {
+                        composable<NavRoutes.Home> {
+                            HomeScreen(
+                                mostPlayedArtists,
+                                lastAdded,
+                                favorites,
+                                history,
+                                onArtistClick = { artist ->
+                                    navController.navigate(NavRoutes.Artist(artist.name))
+                                }
+                            ) { list, index ->
+                                mainVM.onPlaybackEvent(PlaybackEvent.Play(list, index))
+                            }
+                        }
+                        composable<NavRoutes.Albums> {
+                            AlbumsScreen(
+                                albums,
+                                albumsSortState,
+                                mainVM::onAlbumsSortChange
+                            ) { album ->
+                                navController.navigate(NavRoutes.Album(album.name))
+                            }
+                        }
+                        composable<NavRoutes.Album> { entry ->
+                            val route = entry.toRoute<NavRoutes.Album>()
+                            val album by mainVM.getAlbumUi(route.title).collectAsState()
+                            AlbumScreen(
+                                album,
+                                listScreenSortState,
+                                mainVM::onListScreenSortChange,
+                                onShowBottomSheet = {
+                                    bottomSheetFile = it
+                                }
+                            ) { index, shuffle ->
+                                mainVM.onPlaybackEvent(PlaybackEvent.Play(
+                                    album.items,
+                                    index,
+                                    shuffle = shuffle
+                                ))
+                            }
+                        }
+                        composable<NavRoutes.Artists> {
+                            ArtistsScreen(
+                                artists,
+                                artistsSortState,
+                                mainVM::onArtistsSortChange
+                            ) { artist ->
+                                navController.navigate(NavRoutes.Artist(artist.name))
+                            }
+                        }
+                        composable<NavRoutes.Artist> { entry ->
+                            val route = entry.toRoute<NavRoutes.Artist>()
+                            val artist by mainVM.getArtistUi(route.name).collectAsState()
+                            ArtistScreen(
+                                artist,
+                                listScreenSortState,
+                                mainVM::onListScreenSortChange,
+                                onShowBottomSheet = {
+                                    bottomSheetFile = it
+                                }
+                            ) { index, shuffle ->
+                                mainVM.onPlaybackEvent(PlaybackEvent.Play(artist.items, index, shuffle = shuffle))
+                            }
+                        }
+                        composable<NavRoutes.Playlists> {
+                             PlaylistsScreen(
+                                 playlists,
+                                 smallPlayerExpanded,
+                                 playlistsSortState,
+                                 mainVM::onPlaylistsSortChange,
+                                 onCreatePlaylist = {
+                                     mainVM.onUiEvent(UiEvent.ShowCreatePlaylistDialog(emptyList()))
+                                 },
+                                 onImportPlaylist = {
+                                    mainVM.sendEvent(Event.LaunchPlaylistDialog)
+                                 },
+                                 onPlay = {
+                                     mainVM.onPlayerEvent(PlayerEvent.PlayPlaylist(it.id))
+                                 }
+                             ) { playlist ->
+                                 navController.navigate(NavRoutes.Playlist(playlist.id))
+                             }
+                        }
+                        composable<NavRoutes.Playlist> { entry ->
+                            val id = entry.toRoute<NavRoutes.Playlist>().playlistId
+                            LaunchedEffect(id) {
+                                mainVM.getPlaylist(id)
+                            }
+                            PlaylistScreen(
+                                playlist,
+                                smallPlayerExpanded,
+                                playlistSortState,
+                                mainVM::onPlaylistSortChange,
+                                onShowBottomSheet = {
+                                    bottomSheetFile = it
+                                },
+                                onReorder = { from, to ->
+                                    mainVM.onPlaylistEvent(PlaylistEvent.Reorder(playlist, from, to))
+                                }
+                            ) { index, shuffle ->
+                                mainVM.onPlaybackEvent(
+                                    PlaybackEvent.Play(
+                                        playlist.items,
+                                        index,
+                                        shuffle = shuffle
+                                    )
+                                )
+                            }
+                        }
+                        composable<NavRoutes.Library> {
+                            LibraryScreen(
+                                files,
+                                librarySortState,
+                                mainVM::onLibrarySortChange,
+                                onShowBottomSheet = {
+                                    bottomSheetFile = it
+                                }
+                            ) { file ->
+                                mainVM.onPlaybackEvent(PlaybackEvent.Play(listOf(file)))
+                            }
+                        }
+                    }
+                }
+                NavigationWithPlayer(
+                    viewHeight,
+                    queue,
+                    playerState,
+                    mainVM::onPlayerEvent,
+                    mainVM::onPlaybackEvent,
+                    currentNavRoute,
+                ) {
+                    navController.navigate(it)
+                }
             }
         }
         MusicCardBottomSheet(

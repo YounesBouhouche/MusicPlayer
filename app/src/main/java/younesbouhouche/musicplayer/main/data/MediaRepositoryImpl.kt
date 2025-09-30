@@ -191,7 +191,7 @@ class MediaRepositoryImpl(
             Artist(
                 name = artist.key,
                 items = artist.value.map { it.id },
-                picture = ""
+                cover = artist.value.firstOrNull { it.coverUri != null }?.coverUri
             )
         }
         _artists.value = artists
