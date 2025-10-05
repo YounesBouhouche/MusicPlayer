@@ -80,6 +80,7 @@ import younesbouhouche.musicplayer.main.presentation.util.isRouteParent
 import younesbouhouche.musicplayer.main.presentation.util.sendEvent
 import younesbouhouche.musicplayer.main.presentation.viewmodel.MainViewModel
 import younesbouhouche.musicplayer.main.presentation.viewmodel.SearchVM
+import younesbouhouche.musicplayer.main.util.navigateTo
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -168,13 +169,13 @@ fun AppScreen(
                                 bottomSheetFile = it
                             },
                             onAlbumClick = {
-                                navController.navigate(NavRoutes.Album(it.name))
+                                navController.navigateTo(NavRoutes.Album(it.name))
                             },
                             onArtistClick = {
-                                navController.navigate(NavRoutes.Artist(it.name))
+                                navController.navigateTo(NavRoutes.Artist(it.name))
                             },
                             onPlaylistClick = {
-                                navController.navigate(NavRoutes.Playlist(it.id))
+                                navController.navigateTo(NavRoutes.Playlist(it.id))
                             },
                             onPlay = {
                                 mainVM.onPlaybackEvent(
@@ -253,7 +254,7 @@ fun AppScreen(
                                 favorites,
                                 history,
                                 onArtistClick = { artist ->
-                                    navController.navigate(NavRoutes.Artist(artist.name))
+                                    navController.navigateTo(NavRoutes.Artist(artist.name))
                                 }
                             ) { list, index ->
                                 mainVM.onPlaybackEvent(PlaybackEvent.Play(list, index))
@@ -265,7 +266,7 @@ fun AppScreen(
                                 albumsSortState,
                                 mainVM::onAlbumsSortChange
                             ) { album ->
-                                navController.navigate(NavRoutes.Album(album.name))
+                                navController.navigateTo(NavRoutes.Album(album.name))
                             }
                         }
                         composable<NavRoutes.Album> { entry ->
@@ -292,7 +293,7 @@ fun AppScreen(
                                 artistsSortState,
                                 mainVM::onArtistsSortChange
                             ) { artist ->
-                                navController.navigate(NavRoutes.Artist(artist.name))
+                                navController.navigateTo(NavRoutes.Artist(artist.name))
                             }
                         }
                         composable<NavRoutes.Artist> { entry ->
@@ -325,7 +326,7 @@ fun AppScreen(
                                      mainVM.onPlayerEvent(PlayerEvent.PlayPlaylist(it.id))
                                  }
                              ) { playlist ->
-                                 navController.navigate(NavRoutes.Playlist(playlist.id))
+                                 navController.navigateTo(NavRoutes.Playlist(playlist.id))
                              }
                         }
                         composable<NavRoutes.Playlist> { entry ->
@@ -343,6 +344,9 @@ fun AppScreen(
                                 },
                                 onReorder = { from, to ->
                                     mainVM.onPlaylistEvent(PlaylistEvent.Reorder(playlist, from, to))
+                                },
+                                onRemove = {
+                                    mainVM.onPlaylistEvent(PlaylistEvent.RemoveAt(playlist, it))
                                 }
                             ) { index, shuffle ->
                                 mainVM.onPlaybackEvent(
@@ -376,7 +380,7 @@ fun AppScreen(
                     mainVM::onPlaybackEvent,
                     currentNavRoute,
                 ) {
-                    navController.navigate(it)
+                    navController.navigateTo(it)
                 }
             }
         }

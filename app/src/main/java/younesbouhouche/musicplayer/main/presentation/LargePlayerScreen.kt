@@ -8,6 +8,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -92,6 +93,7 @@ import kotlin.math.roundToLong
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun LargePlayerScreen(
+    expanded: Boolean,
     queue: QueueModel,
     playerState: PlayerState,
     modifier: Modifier = Modifier,
@@ -107,9 +109,10 @@ fun LargePlayerScreen(
     }
     var sliderValue by remember { mutableFloatStateOf(0f) }
     var dragging by remember { mutableStateOf(false) }
+    val pagerIsDragged by pagerState.interactionSource.collectIsDraggedAsState()
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect {
-            if (pagerState.currentPage != pagerState.settledPage) {
+            if ((pagerState.currentPage != pagerState.settledPage) and pagerIsDragged) {
                 onPlaybackEvent(PlaybackEvent.Seek(it))
             }
         }

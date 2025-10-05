@@ -40,3 +40,5 @@ sealed class NavRoutes {
     @Serializable
     data object LastAddedScreen : NavRoutes()
 }
+
+fun NavRoutes.isParent() = Routes.entries.any { it.destination == this }

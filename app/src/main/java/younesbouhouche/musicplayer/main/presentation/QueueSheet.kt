@@ -142,6 +142,9 @@ fun QueueSheet(
                                         item,
                                         active = index == queue.index,
                                         shape = expressiveRectShape(index, queue.items.size),
+                                        onDismiss = {
+                                            onPlaybackEvent(PlaybackEvent.Remove(index))
+                                        }
                                     ) {
                                         onPlaybackEvent(PlaybackEvent.Seek(index))
                                     }

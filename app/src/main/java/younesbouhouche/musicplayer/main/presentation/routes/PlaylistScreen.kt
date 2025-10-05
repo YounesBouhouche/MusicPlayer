@@ -59,6 +59,7 @@ fun PlaylistScreen(
     onSortStateChange: (SortState<PlaylistSortType>) -> Unit,
     modifier: Modifier = Modifier,
     onShowBottomSheet: (MusicCard) -> Unit = {},
+    onRemove: (index: Int) -> Unit = {},
     onReorder: (from: Int, to: Int) -> Unit = { _, _ -> },
     onPlay: (index: Int, shuffle: Boolean) -> Unit = { _, _ -> },
 ) {
@@ -130,6 +131,9 @@ fun PlaylistScreen(
                         card,
                         shape = expressiveRectShape(index, playlist.items.size),
                         modifier = Modifier.animateItem(),
+                        onDismiss = {
+                            onRemove(index)
+                        },
                         leadingContent = {
                             AnimatedVisibility(
                                 enableReorder,

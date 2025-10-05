@@ -58,10 +58,10 @@ class PlaylistRepositoryImpl(
             is PlaylistEvent.DeleteUiPlaylist -> dao.deletePlaylistById(event.playlist.id)
             is PlaylistEvent.RemoveAt -> {
                 val playlist = dao.getPlaylist(event.playlist.id) ?: return
-                if (event.id < 0 || event.id >= playlist.items.size) return
+                if (event.index < 0 || event.index >= playlist.items.size) return
                 dao.upsertPlaylist(
                     playlist.copy(items = playlist.items.toMutableList().apply {
-                        removeAt(event.id)
+                        removeAt(event.index)
                     })
                 )
             }

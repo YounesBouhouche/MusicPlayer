@@ -11,7 +11,7 @@ sealed interface PlaylistEvent {
 
     data class Reorder(val playlist: UiPlaylist, val from: Int, val to: Int) : PlaylistEvent
 
-    data class RemoveAt(val playlist: UiPlaylist, val id: Int) : PlaylistEvent
+    data class RemoveAt(val playlist: UiPlaylist, val index: Int) : PlaylistEvent
 
     data class DeleteUiPlaylist(val playlist: UiPlaylist) : PlaylistEvent
 
