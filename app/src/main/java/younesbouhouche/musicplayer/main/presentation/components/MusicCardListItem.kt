@@ -8,6 +8,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -79,7 +81,11 @@ fun MusicCardListItem(
         state,
         backgroundContent = {
             if (onDismiss != null)
-                AnimatedVisibility(state.progress > 0f) {
+                AnimatedVisibility(
+                    state.progress < 1f,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
                     Box(
                         Modifier
                             .clip(itemShape)
@@ -99,14 +105,14 @@ fun MusicCardListItem(
         onDismiss = {
             onDismiss?.invoke()
         },
-        modifier = modifier,
+        modifier = modifier.scale(scale).shadow(shadow, shape),
         enableDismissFromStartToEnd = false,
         enableDismissFromEndToStart = onDismiss != null,
         gesturesEnabled = onDismiss != null
     ) {
         ListItem(
             onClick,
-            modifier.scale(scale).shadow(shadow, shape),
+            Modifier.fillMaxWidth(),
             onLongClick,
             shape = itemShape,
             background =
@@ -126,7 +132,7 @@ fun MusicCardListItem(
                         else MaterialTheme.shapes.large,
                     background =
                         if (active) MaterialTheme.colorScheme.onPrimaryContainer.copy(0.3f)
-                        else MaterialTheme.colorScheme.surface.copy(0.8f)
+                        else MaterialTheme.colorScheme.surface.copy(0.5f)
                     ,
                 )
             },

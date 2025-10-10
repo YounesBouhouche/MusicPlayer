@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,11 +19,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Favorite
@@ -44,11 +48,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import my.nanihadesuka.compose.LazyColumnScrollbar
+import my.nanihadesuka.compose.ScrollbarSettings
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
@@ -58,6 +65,7 @@ import younesbouhouche.musicplayer.main.presentation.util.SortBottomSheet
 import younesbouhouche.musicplayer.main.presentation.util.SortState
 import younesbouhouche.musicplayer.main.presentation.util.SortType
 import younesbouhouche.musicplayer.main.presentation.util.expressiveRectShape
+import kotlin.text.compareTo
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -72,14 +80,9 @@ fun LibraryScreen(
     val filesGrouped = files.groupBy(sortState.sortType.groupBy)
     val favoriteFilesGrouped = files.filter { it.favorite }.groupBy(sortState.sortType.groupBy)
     var isFavoritesVisible by remember { mutableStateOf(true) }
-    Column(
-        modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
+    Column(modifier.fillMaxWidth()) {
         Row(
-            Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+            Modifier.padding(16.dp).fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -204,48 +207,83 @@ private fun ItemsList(
     onShowBottomSheet: (MusicCard) -> Unit = {},
     onClick: (MusicCard) -> Unit = {},
 ) {
+    val state = rememberLazyListState()
     EmptyContainer(
         items.isEmpty(),
         emptyIcon,
-        emptyText
+        emptyText,
+        modifier
     ) {
-        LazyColumn(
-            modifier = modifier,
-            contentPadding = PaddingValues(bottom = 260.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items.forEach { key, list ->
-                stickyHeader {
-                    Text(
-                        key,
-                        Modifier
-                            .background(MaterialTheme.colorScheme.surface)
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-                itemsIndexed(list, { index, it -> it.id }) { index, it ->
-                    MusicCardListItem(
-                        it,
-                        modifier = Modifier.padding(horizontal = 8.dp).animateItem(),
-                        shape = expressiveRectShape(index, list.size),
-                        trailingContent = {
-                            ExpressiveIconButton(
-                                Icons.Default.MoreVert,
-                                widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow,
-                                size = IconButtonDefaults.mediumIconSize,
-                                colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                                )
-                            ) {
-                                onShowBottomSheet(it)
-                            }
-                        }
+        LazyColumnScrollbar(
+            state,
+            modifier = Modifier.fillMaxSize(),
+            indicatorContent = { index, isThumbSelected ->
+                val key = items.entries.fold(0 to "") { (count, result), (k, list) ->
+                    val newCount = count + list.size
+                    if (index < newCount && result.isEmpty()) newCount to k
+                    else newCount to result
+                }.second
+                if (isThumbSelected)
+                    Box(
+                        Modifier.offset(x = (-4).dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary)
+                            .size(48.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        onClick(it)
+                        Text(
+                            key,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+            },
+            settings = ScrollbarSettings.Default.copy(
+                alwaysShowScrollbar = true,
+                thumbUnselectedColor = MaterialTheme.colorScheme.surfaceVariant,
+                thumbSelectedColor = MaterialTheme.colorScheme.primary,
+                thumbThickness = 8.dp
+            ),
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                state = state,
+                contentPadding = PaddingValues(bottom = 260.dp, end = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items.forEach { (key, list) ->
+                    stickyHeader {
+                        Text(
+                            key,
+                            Modifier
+                                .background(MaterialTheme.colorScheme.surface)
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    itemsIndexed(list, { index, it -> it.id }) { index, it ->
+                        MusicCardListItem(
+                            it,
+                            modifier = Modifier.padding(horizontal = 8.dp).animateItem(),
+                            shape = expressiveRectShape(index, list.size),
+                            trailingContent = {
+                                ExpressiveIconButton(
+                                    Icons.Default.MoreVert,
+                                    widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow,
+                                    size = IconButtonDefaults.mediumIconSize,
+                                    colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                                    )
+                                ) {
+                                    onShowBottomSheet(it)
+                                }
+                            }
+                        ) {
+                            onClick(it)
+                        }
                     }
                 }
             }
