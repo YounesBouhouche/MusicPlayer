@@ -1,6 +1,6 @@
 package younesbouhouche.musicplayer.main.presentation.components
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
@@ -8,8 +8,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.font.FontWeight
@@ -80,26 +79,28 @@ fun MusicCardListItem(
     SwipeToDismissBox(
         state,
         backgroundContent = {
+            val background by animateColorAsState(
+                if (state.progress < 1f) MaterialTheme.colorScheme.error
+                else Color.Transparent
+            )
+            val tint by animateColorAsState(
+                if (state.progress < 1f) MaterialTheme.colorScheme.onError
+                else MaterialTheme.colorScheme.error
+            )
             if (onDismiss != null)
-                AnimatedVisibility(
-                    state.progress < 1f,
-                    enter = fadeIn(),
-                    exit = fadeOut()
+                Box(
+                    Modifier
+                        .clip(itemShape)
+                        .background(background)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.CenterEnd,
                 ) {
-                    Box(
-                        Modifier
-                            .clip(itemShape)
-                            .background(MaterialTheme.colorScheme.error)
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.CenterEnd,
-                    ) {
-                        Icon(
-                            Icons.Default.Delete,
-                            null,
-                            Modifier.size(24.dp).offset(x = -(24.dp)),
-                            tint = MaterialTheme.colorScheme.onError
-                        )
-                    }
+                    Icon(
+                        Icons.Default.Delete,
+                        null,
+                        Modifier.size(24.dp).offset(x = -(24.dp)),
+                        tint = tint
+                    )
                 }
         },
         onDismiss = {
