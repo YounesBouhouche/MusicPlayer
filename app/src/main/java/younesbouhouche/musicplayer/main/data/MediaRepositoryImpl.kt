@@ -127,6 +127,7 @@ class MediaRepositoryImpl(
                 }
 
                 val idColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+                val fileNameColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
                 val durationColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
                 val titleColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
                 val artistColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
@@ -146,6 +147,7 @@ class MediaRepositoryImpl(
 
                     val id = crs.getLong(idColumn)
                     val duration = crs.getLong(durationColumn)
+                    val fileName = crs.getString(fileNameColumn)
                     val title = crs.getString(titleColumn)
                     val artist = crs.getString(artistColumn)
                     val albumId = crs.getLong(albumIdColumn)
@@ -160,6 +162,7 @@ class MediaRepositoryImpl(
                     files += MusicCard.Builder()
                         .setContentUri(contentUri)
                         .setId(id)
+                        .setFileName(fileName)
                         .setTitle(title)
                         .setArtist(artist)
                         .setAlbum(album)

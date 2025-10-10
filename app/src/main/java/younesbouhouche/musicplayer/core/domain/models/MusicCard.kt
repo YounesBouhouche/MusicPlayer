@@ -27,6 +27,7 @@ data class MusicCard(
     var composer: String,
     var lyrics: String,
     var path: String,
+    var fileName: String,
     var size: Long,
     var date: Long,
     var duration: Long,
@@ -49,6 +50,7 @@ data class MusicCard(
         private var composer: String = ""
         private var lyrics: String = ""
         private var path: String = ""
+        private var fileName: String = ""
         private var size: Long = 0L
         private var date: Long = 0
         private var duration: Long = -1
@@ -79,6 +81,8 @@ data class MusicCard(
 
         fun setPath(path: String) = apply { this.path = path }
 
+        fun setFileName(fileName: String) = apply { this.fileName = fileName }
+
         fun setSize(size: Long) = apply { this.size = size }
 
         fun setDate(date: Long) = apply { this.date = date }
@@ -104,6 +108,7 @@ data class MusicCard(
                 composer,
                 lyrics,
                 path,
+                fileName,
                 size,
                 date,
                 duration,
@@ -128,6 +133,7 @@ data class MusicCard(
         if (genre != other.genre) return false
         if (composer != other.composer) return false
         if (path != other.path) return false
+        if (fileName != other.fileName) return false
         if (size != other.size) return false
         if (date != other.date) return false
         if (duration != other.duration) return false
@@ -148,6 +154,7 @@ data class MusicCard(
         result = 31 * result + genre.hashCode()
         result = 31 * result + composer.hashCode()
         result = 31 * result + path.hashCode()
+        result = 31 * result + fileName.hashCode()
         result = 31 * result + size.hashCode()
         result = 31 * result + date.hashCode()
         result = 31 * result + duration.hashCode()

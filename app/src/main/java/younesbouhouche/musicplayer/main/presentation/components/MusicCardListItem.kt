@@ -78,22 +78,23 @@ fun MusicCardListItem(
     SwipeToDismissBox(
         state,
         backgroundContent = {
-            AnimatedVisibility(state.progress > 0f) {
-                Box(
-                    Modifier
-                        .clip(itemShape)
-                        .background(MaterialTheme.colorScheme.error)
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.BottomEnd,
-                ) {
-                    Icon(
-                        Icons.Default.Delete,
-                        null,
-                        Modifier.size(40.dp).offset(x = -(40.dp)),
-                        tint = MaterialTheme.colorScheme.onError
-                    )
+            if (onDismiss != null)
+                AnimatedVisibility(state.progress > 0f) {
+                    Box(
+                        Modifier
+                            .clip(itemShape)
+                            .background(MaterialTheme.colorScheme.error)
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.CenterEnd,
+                    ) {
+                        Icon(
+                            Icons.Default.Delete,
+                            null,
+                            Modifier.size(24.dp).offset(x = -(24.dp)),
+                            tint = MaterialTheme.colorScheme.onError
+                        )
+                    }
                 }
-            }
         },
         onDismiss = {
             onDismiss?.invoke()
@@ -124,7 +125,7 @@ fun MusicCardListItem(
                         if (active) MaterialShapes.Cookie9Sided.toShape(angle.roundToInt())
                         else MaterialTheme.shapes.large,
                     background =
-                        if (active) MaterialTheme.colorScheme.onPrimaryContainer.copy(0.8f)
+                        if (active) MaterialTheme.colorScheme.onPrimaryContainer.copy(0.3f)
                         else MaterialTheme.colorScheme.surface.copy(0.8f)
                     ,
                 )

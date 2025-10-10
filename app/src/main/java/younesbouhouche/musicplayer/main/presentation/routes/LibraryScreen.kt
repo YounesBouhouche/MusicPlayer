@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -45,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
@@ -67,11 +69,12 @@ fun LibraryScreen(
     onShowBottomSheet: (MusicCard) -> Unit = {},
     onClick: (MusicCard) -> Unit = {},
 ) {
-    val favoriteFiles = files.filter { it.favorite }
+    val filesGrouped = files.groupBy(sortState.sortType.groupBy)
+    val favoriteFilesGrouped = files.filter { it.favorite }.groupBy(sortState.sortType.groupBy)
     var isFavoritesVisible by remember { mutableStateOf(true) }
     Column(
         modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Row(
             Modifier
@@ -160,7 +163,7 @@ fun LibraryScreen(
             if (it) {
                 ItemsList(
                     modifier = modifier,
-                    items = files,
+                    items = filesGrouped,
                     onShowBottomSheet = onShowBottomSheet,
                     onClick = onClick,
                     emptyIcon = Icons.Default.LibraryMusic,
@@ -169,7 +172,7 @@ fun LibraryScreen(
             } else {
                 ItemsList(
                     modifier = modifier,
-                    items = favoriteFiles,
+                    items = favoriteFilesGrouped,
                     onShowBottomSheet = onShowBottomSheet,
                     onClick = onClick,
                     emptyIcon = Icons.Default.Favorite,
@@ -194,10 +197,10 @@ fun LibraryScreen(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ItemsList(
-    modifier: Modifier = Modifier,
-    items: List<MusicCard>,
+    items: Map<String, List<MusicCard>>,
     emptyIcon: ImageVector,
     emptyText: String,
+    modifier: Modifier = Modifier,
     onShowBottomSheet: (MusicCard) -> Unit = {},
     onClick: (MusicCard) -> Unit = {},
 ) {
@@ -208,30 +211,49 @@ private fun ItemsList(
     ) {
         LazyColumn(
             modifier = modifier,
-            contentPadding = PaddingValues(12.dp, 12.dp, 12.dp, 260.dp),
+            contentPadding = PaddingValues(bottom = 260.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            itemsIndexed(items, { index, it -> it.id }) { index, it ->
-                MusicCardListItem(
-                    it,
-                    modifier = Modifier.animateItem(),
-                    shape = expressiveRectShape(index, items.size),
-                    trailingContent = {
-                        ExpressiveIconButton(
-                            Icons.Default.MoreVert,
-                            widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow,
-                            size = IconButtonDefaults.mediumIconSize,
-                            colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                            )
-                        ) {
-                            onShowBottomSheet(it)
+            items.forEach { key, list ->
+                stickyHeader {
+                    Text(
+                        key,
+                        Modifier
+                            .background(MaterialTheme.colorScheme.surface)
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                itemsIndexed(list, { index, it -> it.id }) { index, it ->
+                    MusicCardListItem(
+                        it,
+                        modifier = Modifier.padding(horizontal = 8.dp).animateItem(),
+                        shape = expressiveRectShape(index, list.size),
+                        trailingContent = {
+                            ExpressiveIconButton(
+                                Icons.Default.MoreVert,
+                                widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow,
+                                size = IconButtonDefaults.mediumIconSize,
+                                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                                )
+                            ) {
+                                onShowBottomSheet(it)
+                            }
                         }
+                    ) {
+                        onClick(it)
                     }
-                ) {
-                    onClick(it)
                 }
             }
         }
     }
 }
+
+
+
+
+
