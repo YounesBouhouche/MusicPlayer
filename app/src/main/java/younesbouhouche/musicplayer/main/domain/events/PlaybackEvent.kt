@@ -18,6 +18,7 @@ sealed interface PlaybackEvent {
     data object PauseResume : PlaybackEvent
 
     data object Stop : PlaybackEvent
+    data object ClearQueue : PlaybackEvent
 
     data object Next : PlaybackEvent
 

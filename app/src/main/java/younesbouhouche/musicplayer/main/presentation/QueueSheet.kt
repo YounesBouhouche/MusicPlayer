@@ -123,7 +123,7 @@ fun QueueSheet(
                             contentPadding = paddingValues + PaddingValues(24.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            itemsIndexed(reorderedQueue, { index, it -> it.id }) { index, item ->
+                            itemsIndexed(reorderedQueue, { _, it -> it.id }) { index, item ->
                                 ReorderableItem(
                                     modifier = Modifier.animateItem(),
                                     state = reorderState,
@@ -167,7 +167,7 @@ fun QueueSheet(
                         Icons.Default.ClearAll,
                         size = IconButtonDefaults.mediumIconSize
                     ) {
-                        onPlaybackEvent(PlaybackEvent.Stop)
+                        onPlaybackEvent(PlaybackEvent.ClearQueue)
                     }
                     ExpressiveIconButton(
                         Icons.Default.Save,

@@ -89,10 +89,7 @@ fun MusicCardListItem(
             )
             if (onDismiss != null)
                 Box(
-                    Modifier
-                        .clip(itemShape)
-                        .background(background)
-                        .fillMaxSize(),
+                    Modifier.clip(itemShape).background(background).fillMaxSize(),
                     contentAlignment = Alignment.CenterEnd,
                 ) {
                     Icon(

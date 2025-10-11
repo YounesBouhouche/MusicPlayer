@@ -1,7 +1,6 @@
 package younesbouhouche.musicplayer.core.domain.player
 
 import android.content.Context
-import android.util.Log
 import androidx.annotation.OptIn
 import androidx.glance.appwidget.updateAll
 import androidx.media3.common.MediaItem
@@ -48,7 +47,7 @@ class PlayerManager(
     /**
      * Get the singleton player instance
      */
-    fun getPlayer(): Player? = playerFactory.getPlayerOrNull()
+    fun getPlayer(): Player = playerFactory.getPlayerOrNull()
     /**
      * Initialize the player and configure it
      */
@@ -62,7 +61,6 @@ class PlayerManager(
                 object : Player.Listener {
                     override fun onPlaybackStateChanged(playbackState: Int) {
                         super.onPlaybackStateChanged(playbackState)
-                        Log.i("PlayerManager", "onPlaybackStateChanged: $playbackState")
                         stateManager.updateState {
                             it.copy(loading = playbackState == Player.STATE_BUFFERING)
                         }
@@ -177,7 +175,7 @@ class PlayerManager(
 
     // Private functions
     suspend fun startTimeUpdate() {
-        playerFactory.getPlayerOrNull()?.let { player ->
+        playerFactory.getPlayerOrNull().let { player ->
             timeTask.startRepeating(100L) {
                 stateManager.updateState {
                     it.copy(time = player.currentPosition)
@@ -191,7 +189,7 @@ class PlayerManager(
         stateManager.updateState {
             it.copy(time = time)
         }
-        playerFactory.getPlayerOrNull()?.seekTo(index, time)
+        playerFactory.getPlayerOrNull().seekTo(index, time)
     }
 
     suspend fun play(
@@ -201,7 +199,7 @@ class PlayerManager(
         autoPlay: Boolean = true,
         shuffleMode: Boolean = false
     ) {
-        playerFactory.getPlayerOrNull()?.let { player ->
+        playerFactory.getPlayerOrNull().let { player ->
             if (cardsList.isEmpty()) return
             val list = if (shuffleMode) cardsList.shuffled() else cardsList
             queueManager.setQueue(Queue(items = list.map { it.id }, index = index))
@@ -236,6 +234,6 @@ class PlayerManager(
     }
 
     fun setPlayWhenReady(playWhenReady: Boolean) {
-        playerFactory.getPlayerOrNull()?.playWhenReady = playWhenReady
+        playerFactory.getPlayerOrNull().playWhenReady = playWhenReady
     }
 }

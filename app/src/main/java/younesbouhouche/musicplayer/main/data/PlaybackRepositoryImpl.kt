@@ -20,6 +20,7 @@ import younesbouhouche.musicplayer.main.data.models.Queue
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.AddToQueue
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.Backward
+import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.ClearQueue
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.CycleRepeatMode
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.DecreaseVolume
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.Forward
@@ -44,6 +45,7 @@ import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.SetVolume
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.Stop
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.Swap
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.ToggleShuffle
+import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.domain.events.TimerType
 import younesbouhouche.musicplayer.main.domain.repo.PlaybackRepository
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
@@ -71,7 +73,6 @@ class PlaybackRepositoryImpl(
     private val _queueIndex = _queue.map { it.index }
 
     override fun initialize() {
-        Log.i("PlaybackRepo", "Init")
         CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
             mediaSessionManager.initialize(dataStore.skipSilence.first())
             if (stateManager.playerState.value.playState != PlayState.STOP)
@@ -82,8 +83,8 @@ class PlaybackRepositoryImpl(
     @OptIn(UnstableApi::class)
     override suspend fun onEvent(event: PlaybackEvent) {
         if (event == PlaybackEvent.Initialize) initialize()
-        else 
-            playerManager.getPlayer()?.let { player ->
+        else
+            playerManager.getPlayer().let { player ->
                 when(event) {
                     is Play -> {
                         if ((_queueList.first() == event.items) and (state.value.playState != PlayState.STOP)) {
@@ -100,9 +101,11 @@ class PlaybackRepositoryImpl(
                             )
                         }
                     }
+
                     is Backward -> {
                         player.seekBack()
                     }
+
                     CycleRepeatMode -> {
                         player.repeatMode = when(player.repeatMode) {
                             Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
@@ -110,56 +113,76 @@ class PlaybackRepositoryImpl(
                             else -> Player.REPEAT_MODE_OFF
                         }
                     }
+
                     DecreaseVolume -> {
                         player.decreaseDeviceVolume(0)
                     }
+
                     is Forward -> {
                         player.seekForward()
                     }
+
                     IncreaseVolume -> {
                         player.increaseDeviceVolume(0)
                     }
+
                     Next -> {
                         player.seekToNext()
                     }
+
                     Pause -> {
                         player.pause()
                     }
+
                     PauseResume -> {
                         if (player.isPlaying) player.pause()
                         else player.play()
                     }
+
                     Previous -> {
                         player.seekToPrevious()
                     }
+
                     is Remove -> {
                         player.removeMediaItem(event.index)
                         queueManager.removeAt(event.index)
+                        queueManager.updateIndex(player.currentMediaItemIndex)
+                        if (player.mediaItemCount == 0)
+                            onEvent(Stop)
                     }
+
                     ResetSpeed -> {
                         player.setPlaybackSpeed(1f)
                     }
+
                     Resume -> {
                         player.play()
                     }
+
                     is Seek -> {
                         playerManager.seek(event.index, event.time)
                     }
+
                     is SeekTime -> {
                         player.seekTo(event.time)
                     }
+
                     is SetPitch -> {
                         player.playbackParameters = player.playbackParameters.withPitch(event.pitch)
                     }
+
                     is SetPlayerVolume -> {
                         player.volume = event.volume
                     }
+
                     is SetRepeatMode -> {
                         player.repeatMode = event.repeatMode
                     }
+
                     is SetSpeed -> {
                         player.setPlaybackSpeed(event.speed)
                     }
+
                     is SetTimer -> {
                         timerTask.stop()
                         event.timer.let { timer ->
@@ -195,6 +218,7 @@ class PlaybackRepositoryImpl(
                             }
                         }
                     }
+
                     is SetVolume -> {
                         player.setDeviceVolume(
                             (event.volume * (player.deviceInfo.maxVolume - player.deviceInfo.minVolume))
@@ -202,6 +226,7 @@ class PlaybackRepositoryImpl(
                             0
                         )
                     }
+
                     Stop -> {
                         player.stop()
                         player.clearMediaItems()
@@ -211,6 +236,19 @@ class PlaybackRepositoryImpl(
                             it.copy(playState = PlayState.STOP, timer = TimerType.Disabled)
                         }
                     }
+
+                    ClearQueue -> {
+                        val index = player.currentMediaItemIndex
+                        if (index > 0)
+                            player.removeMediaItems(0, index - 1)
+                        if (index < player.mediaItemCount - 1)
+                            player.removeMediaItems(index + 1, player.mediaItemCount - 1)
+                        queueManager.updateList { items ->
+                            items.toMutableList().filterIndexed { i, _ -> i == index }
+                        }
+                        queueManager.updateIndex(player.currentMediaItemIndex)
+                    }
+
                     is Swap -> {
                         player.moveMediaItem(event.from, event.to)
                         val index = player.currentMediaItemIndex
@@ -221,6 +259,7 @@ class PlaybackRepositoryImpl(
                         }
                         queueManager.updateIndex(index)
                     }
+
                     ToggleShuffle -> {
                         player.shuffleModeEnabled = !player.shuffleModeEnabled
                     }
@@ -236,6 +275,7 @@ class PlaybackRepositoryImpl(
                         queueManager.updateIndex(player.currentMediaItemIndex)
                         player.prepare()
                     }
+
                     is PlayNext -> {
                         onEvent(AddToQueue(event.items, _queueIndex.first() + 1))
                         onEvent(Resume)
