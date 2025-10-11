@@ -72,6 +72,7 @@ import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
 import younesbouhouche.musicplayer.main.domain.models.Routes
+import younesbouhouche.musicplayer.main.presentation.components.DrawerSheetContent
 import younesbouhouche.musicplayer.main.presentation.components.MusicCardBottomSheet
 import younesbouhouche.musicplayer.main.presentation.dialogs.AddToPlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.CreatePlaylistDialog
@@ -144,70 +145,11 @@ fun AppScreen(
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
-                ModalDrawerSheet {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_launcher_foreground),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .size(64.dp)
-                        )
-                        Text(
-                            text = "Music Player",
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
-                        )
-                        Text(
-                            text = "Enjoy your music everywhere",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)
-                        )
-                        HorizontalDivider()
-                        NavigationDrawerItem(
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.Outlined.Info,
-                                    contentDescription = null
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = "About",
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                            },
-                            selected = false,
-                            onClick = {
-                                context.startActivity(Intent(context, SettingsActivity::class.java))
-                            },
-                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                        )
-                        NavigationDrawerItem(
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.Outlined.Settings,
-                                    contentDescription = null
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = "Settings",
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                            },
-                            selected = false,
-                            onClick = {
-                                context.startActivity(Intent(context, AboutActivity::class.java))
-                            },
-                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                        )
-                    }
-                }
+                DrawerSheetContent(
+                    drawerState,
+                    queue.getCurrentItem()
+                        ?.takeIf { playerState.playState != PlayState.STOP }
+                )
             }
         ) {
             Box(

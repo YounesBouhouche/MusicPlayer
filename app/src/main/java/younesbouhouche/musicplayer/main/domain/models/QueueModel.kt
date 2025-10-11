@@ -8,4 +8,6 @@ data class QueueModel(
     val id: Int = 0,
     val items: List<MusicCard> = emptyList(),
     val index: Int = -1,
-)
+) {
+    fun getCurrentItem() = items.getOrNull(index)
+}
