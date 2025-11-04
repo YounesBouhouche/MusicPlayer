@@ -40,7 +40,7 @@ fun BoxScope.NavBar(
     val bottomCorner by animateDpAsState(if (playing) 40.dp else 60.dp)
     Box(
         modifier.fillMaxWidth()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
             .navigationBarsPadding()
             .align(Alignment.BottomCenter)
     ) {
@@ -56,7 +56,7 @@ fun BoxScope.NavBar(
             shadowElevation = 8.dp
         ) {
             NavigationBar(
-                Modifier.padding(0.dp, 2.dp).fillMaxWidth(),
+                Modifier.padding(top = 4.dp, bottom = 2.dp).fillMaxWidth(),
                 containerColor = Color.Transparent,
                 windowInsets = WindowInsets()
             ) {
