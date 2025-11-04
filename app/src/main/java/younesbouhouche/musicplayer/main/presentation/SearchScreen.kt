@@ -94,7 +94,7 @@ fun SearchScreen(
     onPlay: (Int) -> Unit,
 ) {
     val context = LocalContext.current
-    val state = rememberSearchBarState()
+    val state = rememberSearchBarState(initialValue = SearchBarValue.Collapsed)
     val textFieldState = rememberTextFieldState()
     val scope = rememberCoroutineScope()
     LaunchedEffect(state.currentValue) {
@@ -389,7 +389,7 @@ inline fun <T> LazyListScope.resultHolder(
             }
         }
         itemsIndexed(
-            items.filterIndexed { index, it -> (expanded) or (index < 3) },
+            items.filterIndexed { index, _ -> (expanded) or (index < 3) },
             itemKey,
             itemContent = itemContent
         )

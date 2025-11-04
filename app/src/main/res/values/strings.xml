@@ -182,6 +182,11 @@
         <item quantity="zero">no items</item>
         <item quantity="other">$d items</item>
     </plurals>
+    <plurals name="track_s">
+        <item quantity="one">1 track</item>
+        <item quantity="zero">no tracks</item>
+        <item quantity="other">%d tracks</item>
+    </plurals>
 
     <!-- Play Icon -->
     <string name="play_icon_upper_path_data" translatable="false">
@@ -289,4 +294,6 @@
     <string name="empty_playlists_text">You don\'t have any playlists yet</string>
     <string name="welcome_text">Pick up where you left off</string>
     <string name="end">End</string>
+    <string name="speed_x">Speed: %1$sx</string>
+    <string name="reset">Reset</string>
 </resources>

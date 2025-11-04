@@ -43,10 +43,6 @@ fun CreatePlaylistDialog(
     onDismissRequest: () -> Unit,
     onConfirmRequest: () -> Unit,
 ) {
-    val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(key1 = visible) {
-        if (visible) focusRequester.requestFocus()
-    }
     Dialog(
         visible = visible,
         onDismissRequest = onDismissRequest,
@@ -57,6 +53,10 @@ fun CreatePlaylistDialog(
             onDismissRequest()
         },
     ) {
+        val focusRequester = remember { FocusRequester() }
+        LaunchedEffect(key1 = visible) {
+            if (visible) focusRequester.requestFocus()
+        }
         Column(
             Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp),

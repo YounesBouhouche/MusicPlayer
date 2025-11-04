@@ -23,7 +23,7 @@ internal fun AppTheme(
     primary: Color? = null,
     secondary: Color? = null,
     tertiary: Color? = null,
-    content: @Composable() () -> Unit,
+    content: @Composable () -> Unit,
 ) {
     val datastore = SettingsDataStore(LocalContext.current)
     val theme by datastore.theme.collectAsState(initial = Theme.SYSTEM)
@@ -60,8 +60,8 @@ internal fun AppTheme(
         secondary = colorScheme.secondary,
         tertiary = colorScheme.tertiary,
         animate = true,
-        useDarkTheme = isDark,
-        withAmoled = extraDark,
+        isDark = isDark,
+        isAmoled = extraDark,
         typography = rubikTypography(MaterialTheme.typography),
         content = content
     )
@@ -71,7 +71,7 @@ internal fun AppTheme(
 @Composable
 internal fun AppTheme(
     palette: Palette? = null,
-    content: @Composable() () -> Unit,
+    content: @Composable () -> Unit,
 ) = AppTheme(
     palette?.vibrantSwatch?.color ?: palette?.dominantSwatch?.color,
     palette?.dominantSwatch?.color,

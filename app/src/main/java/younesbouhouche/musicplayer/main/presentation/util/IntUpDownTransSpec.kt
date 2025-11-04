@@ -19,3 +19,16 @@ val intUpDownTransSpec: AnimatedContentTransitionScope<Int>.() -> ContentTransfo
             }
     )
 }
+
+
+val floatUpDownTransSpec: AnimatedContentTransitionScope<Float>.() -> ContentTransform = {
+    (
+            if (targetState > initialState) {
+                slideInVertically { height -> height } + fadeIn() togetherWith
+                        slideOutVertically { height -> -height } + fadeOut()
+            } else {
+                slideInVertically { height -> -height } + fadeIn() togetherWith
+                        slideOutVertically { height -> height } + fadeOut()
+            }
+            )
+}

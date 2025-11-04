@@ -108,7 +108,7 @@ fun PlayerScreen(
             if (progress > 0f) {
 
                 LargePlayerScreen(
-                    dragState.currentValue == ViewState.LARGE,
+//                    dragState.currentValue == ViewState.LARGE,
                     queue,
                     playerState,
                     Modifier

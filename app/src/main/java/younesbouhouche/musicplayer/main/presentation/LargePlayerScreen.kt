@@ -1,5 +1,6 @@
 package younesbouhouche.musicplayer.main.presentation
 
+import android.net.Uri
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -40,6 +41,7 @@ import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.ShuffleOn
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroupDefaults
@@ -74,10 +76,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.media3.common.Player
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.TimerType
@@ -93,7 +97,7 @@ import kotlin.math.roundToLong
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun LargePlayerScreen(
-    expanded: Boolean,
+//    expanded: Boolean,
     queue: QueueModel,
     playerState: PlayerState,
     modifier: Modifier = Modifier,
@@ -102,6 +106,7 @@ fun LargePlayerScreen(
     onPlaybackEvent: (PlaybackEvent) -> Unit
 ) {
     var queueSheetVisible by remember { mutableStateOf(false) }
+    var speedSheetVisible by remember { mutableStateOf(false) }
     var timerVisible by remember { mutableStateOf(false) }
     val currentItem = queue.items.getOrNull(queue.index)
     val pagerState = rememberPagerState {
@@ -126,7 +131,9 @@ fun LargePlayerScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(Modifier.fillMaxWidth().padding(top = 8.dp),
+        Row(Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             ExpressiveIconButton(
@@ -134,7 +141,7 @@ fun LargePlayerScreen(
                 size = IconButtonDefaults.mediumIconSize,
                 colors = IconButtonDefaults.iconButtonColors(
                     containerColor = MaterialTheme.colorScheme.surface.copy(.3f),
-                    contentColor = MaterialTheme.colorScheme.onSurface
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 modifier = Modifier.size(50.dp),
                 onClick = onCollapse
@@ -151,7 +158,7 @@ fun LargePlayerScreen(
                 size = IconButtonDefaults.mediumIconSize,
                 colors = IconButtonDefaults.iconButtonColors(
                     containerColor = MaterialTheme.colorScheme.surface.copy(.3f),
-                    contentColor = MaterialTheme.colorScheme.onSurface
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 modifier = Modifier.size(50.dp)
             ) {
@@ -160,7 +167,8 @@ fun LargePlayerScreen(
         }
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.clip(MaterialTheme.shapes.extraLarge)
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.extraLarge)
                 .weight(1f)
                 .aspectRatio(1f, true),
             contentPadding = PaddingValues(horizontal = 16.dp),
@@ -212,7 +220,9 @@ fun LargePlayerScreen(
             }
         }
         Column(
-            modifier = Modifier.fillMaxWidth().weight(1f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -254,7 +264,9 @@ fun LargePlayerScreen(
                 }
             }
             Column(
-                Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 12.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, bottom = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Slider(
@@ -320,7 +332,9 @@ fun LargePlayerScreen(
                         else  MaterialTheme.colorScheme.surface.copy(alpha = .4f)
                     ExpressiveIconButton(
                         icon,
-                        modifier = Modifier.height(100.dp).weight(weight),
+                        modifier = Modifier
+                            .height(100.dp)
+                            .weight(weight),
                         size = IconButtonDefaults.extraLargeIconSize,
                         interactionSource = interactionSource,
                         colors = IconButtonDefaults.iconButtonColors(
@@ -338,7 +352,9 @@ fun LargePlayerScreen(
             }
         }
         Surface(
-            Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
             color = MaterialTheme.colorScheme.surface.copy(.4f),
             shape = RoundedCornerShape(100),
         ) {
@@ -349,7 +365,7 @@ fun LargePlayerScreen(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                repeat(3) {
+                repeat(4) {
                     val icon = when(it) {
                         0 ->
                             if (playerState.shuffle) Icons.Default.ShuffleOn
@@ -359,12 +375,14 @@ fun LargePlayerScreen(
                             Player.REPEAT_MODE_ONE -> Icons.Default.RepeatOneOn
                             else -> Icons.Default.Repeat
                         }
-                        else -> Icons.Default.Timer
+                        2 -> Icons.Default.Timer
+                        else -> Icons.Default.Speed
                     }
                     val active = when(it) {
                         0 -> playerState.shuffle
                         1 -> playerState.repeatMode != Player.REPEAT_MODE_OFF
-                        else -> playerState.timer != TimerType.Disabled
+                        2 -> playerState.timer != TimerType.Disabled
+                        else -> playerState.speed != 1f
                     }
                     val interactionSource = remember { MutableInteractionSource() }
                     val pressed by interactionSource.collectIsPressedAsState()
@@ -373,19 +391,22 @@ fun LargePlayerScreen(
                     )
                     ToggleButton(
                         checked = active,
-                        onCheckedChange = { checked ->
+                        onCheckedChange = { _ ->
                             when(it) {
                                 0 -> onPlaybackEvent(PlaybackEvent.ToggleShuffle)
                                 1 -> onPlaybackEvent(PlaybackEvent.CycleRepeatMode)
-                                else -> {
+                                2 -> {
                                     timerVisible = true
+                                }
+                                else -> {
+                                    speedSheetVisible = true
                                 }
                             }
                         },
                         shapes =
                             if (it == 0)
                                 ButtonGroupDefaults.connectedLeadingButtonShapes()
-                            else if (it < 2)
+                            else if (it < 3)
                                 ButtonGroupDefaults.connectedMiddleButtonShapes()
                             else ButtonGroupDefaults.connectedTrailingButtonShapes(),
                         modifier = Modifier
@@ -415,6 +436,16 @@ fun LargePlayerScreen(
             onPlaybackEvent(PlaybackEvent.SetTimer(it))
         }
     )
+    SpeedSheet(
+        speedSheetVisible,
+        {
+            speedSheetVisible = false
+        },
+        playerState.speed,
+        {
+            onPlaybackEvent(PlaybackEvent.SetSpeed(it))
+        }
+    )
     AppTheme {
         QueueSheet(
             queueSheetVisible,
@@ -424,5 +455,47 @@ fun LargePlayerScreen(
             queue,
             onPlaybackEvent
         )
+    }
+}
+
+@Preview
+@Composable
+private fun LargePlayerPreview() {
+    AppTheme {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primaryContainer,
+        ) {
+            LargePlayerScreen(
+//                expanded = true,
+                queue = QueueModel(
+                    index = 0,
+                    items = List(10) {
+                        MusicCard.Builder()
+                            .setId(it.toLong())
+                            .setTitle("Song Title $it")
+                            .setArtist("Artist Name")
+                            .setAlbum("Album Name")
+                            .setDuration(240000L)
+                            .setPath("/storage/emulated/0/Music/song$it.mp3")
+                            .setCoverUri(Uri.EMPTY)
+                            .setFavorite(it % 2 == 0)
+                            .build()
+                    }
+                ),
+                playerState =
+                    PlayerState(
+                        playState = PlayState.PLAYING,
+                        time = 60000,
+                        loading = false,
+                        shuffle = true,
+                        repeatMode = Player.REPEAT_MODE_ALL,
+                        timer = TimerType.Disabled
+                    ),
+                onCollapse = {},
+                onSetFavorite = { _, _ -> },
+                onPlaybackEvent = {}
+            )
+        }
     }
 }

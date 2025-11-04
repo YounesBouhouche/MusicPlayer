@@ -83,24 +83,6 @@ class SearchVM(
                 }
             }
 
-            SearchEvent.Collapse -> {
-                _searchState.update {
-                    it.copy(expanded = false, query = "")
-                }
-            }
-
-            SearchEvent.Expand -> {
-                _searchState.update {
-                    it.copy(expanded = true)
-                }
-            }
-
-            is SearchEvent.UpdateExpanded -> {
-                _searchState.update {
-                    it.copy(expanded = event.expanded, query = "")
-                }
-            }
-
             is SearchEvent.ToggleFilter -> {
                 _searchState.update { state ->
                     state.copy(result = state.result.toggleFilter(event.filter))

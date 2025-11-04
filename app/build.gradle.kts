@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.com.google.devtools.ksp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.room)
-    id("org.jlleitschuh.gradle.ktlint") version "12.3.0"
+    id("org.jlleitschuh.gradle.ktlint") version "13.1.0"
 }
 
 android {
@@ -96,7 +96,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    //implementation(libs.material)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material3.adaptive.navigation.suite)
     implementation(libs.androidx.material3.adaptive.navigation.suite.android)
@@ -143,7 +142,7 @@ dependencies {
     implementation(libs.bundles.ktor)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.androidx.animation.graphics)
-    implementation("com.mohamedrejeb.dnd:compose-dnd:0.4.0")
+    implementation(libs.compose.dnd)
     implementation(libs.lazycolumnscrollbar)
 }
 

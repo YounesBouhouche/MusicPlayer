@@ -6,7 +6,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,22 +15,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
@@ -54,7 +43,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -93,8 +81,6 @@ import younesbouhouche.musicplayer.main.presentation.util.sendEvent
 import younesbouhouche.musicplayer.main.presentation.viewmodel.MainViewModel
 import younesbouhouche.musicplayer.main.presentation.viewmodel.SearchVM
 import younesbouhouche.musicplayer.main.util.navigateTo
-import younesbouhouche.musicplayer.settings.presentation.SettingsActivity
-import younesbouhouche.musicplayer.settings.presentation.routes.about.AboutActivity
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -174,7 +160,7 @@ fun AppScreen(
                 ) {
                     AnimatedVisibility(isParent) {
                         SearchScreen(
-                            searchState,
+                            searchState = searchState,
                             onExpandDrawer = {
                                 scope.launch {
                                     drawerState.open()

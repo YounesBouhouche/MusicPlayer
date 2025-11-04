@@ -1,11 +1,13 @@
 package younesbouhouche.musicplayer.main.presentation
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -25,13 +27,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,13 +45,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZ
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.util.ExpressiveButton
 import younesbouhouche.musicplayer.main.domain.events.TimerType
+import younesbouhouche.musicplayer.main.presentation.util.containerClip
+import younesbouhouche.musicplayer.main.presentation.util.expressiveRectShape
 import younesbouhouche.musicplayer.main.presentation.util.plus
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -73,7 +84,7 @@ fun TimerSheet(
             }
         ) {
             LazyColumn(
-                Modifier.fillMaxSize(),
+                Modifier.fillMaxWidth(),
                 contentPadding = WindowInsets.navigationBars.asPaddingValues() + PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -129,7 +140,7 @@ fun TimerSheet(
                                     selected = when (index) {
                                         0 -> TimerType.Duration(60 * 1000)
                                         1 -> TimerType.Time(0, 1)
-                                        else -> TimerType.End(2)
+                                        else -> TimerType.End(1)
                                     }
                                 },
                                 Modifier
@@ -147,6 +158,7 @@ fun TimerSheet(
                                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                                 ),
                                 interactionSource = interactionSource,
+                                enabled = selected != TimerType.Disabled,
                                 contentPadding = ButtonDefaults.contentPaddingFor(ButtonDefaults.MediumContainerHeight)
                             ) {
                                 Text(stringResource(res))
@@ -156,25 +168,91 @@ fun TimerSheet(
                 }
                 if (selected != TimerType.Disabled)
                     item {
-                        Surface(
-                            Modifier.fillMaxWidth().animateItem(),
-                            shape = MaterialTheme.shapes.extraLarge,
-                            color = MaterialTheme.colorScheme.surfaceContainerLow
+                        Column(
+                            modifier.fillMaxWidth().animateItem(),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            AnimatedContent(
-                                selected,
-                                transitionSpec = { materialSharedAxisZ(true) }
+                            Surface(
+                                Modifier.containerClip(
+                                    shape = expressiveRectShape(
+                                        0,
+                                        if (selected is TimerType.Time) 1 else 2
+                                    )
+                                )
                             ) {
-                                when(it) {
-                                    TimerType.Disabled -> Unit
-                                    is TimerType.Duration -> {
+                                AnimatedContent(
+                                    selected.javaClass,
+                                    modifier = Modifier.fillMaxWidth().padding(8.dp),
+                                    transitionSpec = { materialSharedAxisZ(true) }
+                                ) { selectedTimer ->
+                                    when(selectedTimer) {
+                                        TimerType.Duration::class.java -> {
+                                            DurationPicker(
+                                                duration = (selected as? TimerType.Duration)?.ms ?: 0L,
+                                                onDurationChange = {
+                                                    selected = TimerType.Duration(it)
+                                                },
+                                                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                                            )
+                                        }
+                                        TimerType.End::class.java -> {
+                                            EndPicker(
+                                                tracks = (selected as? TimerType.End)?.tracks ?: 1,
+                                                onTracksChange = {
+                                                    selected = TimerType.End(it)
+                                                },
+                                                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                                            )
+                                        }
+                                        TimerType.Time::class.java -> {
+                                            TimePicker(
+                                                hour = (selected as? TimerType.Time)?.hour ?: 0,
+                                                minute = (selected as? TimerType.Time)?.min ?: 0,
+                                                onTimeChange = { hour, minute ->
+                                                    selected = TimerType.Time(hour, minute)
+                                                },
+                                                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                                            )
+                                        }
+                                        else -> {
 
+                                        }
                                     }
-                                    is TimerType.End -> {
-
-                                    }
-                                    is TimerType.Time -> {
-
+                                }
+                            }
+                            AnimatedVisibility(selected !is TimerType.Time) {
+                                Surface(
+                                    Modifier.containerClip(shape = expressiveRectShape(1, 2)).fillMaxWidth(),
+                                ) {
+                                    AnimatedContent(
+                                        selected.javaClass,
+                                        transitionSpec = { materialSharedAxisZ(true) }
+                                    ) {
+                                        Text(
+                                            when(it) {
+                                                TimerType.Duration::class.java -> {
+                                                    val duration = (selected as? TimerType.Duration)?.ms ?: 0L
+                                                    pluralStringResource(
+                                                        R.plurals.minutes,
+                                                        ((duration / 1000) / 60).toInt(),
+                                                        ((duration / 1000) / 60).toInt(),
+                                                    )
+                                                }
+                                                TimerType.End::class.java -> {
+                                                    val tracks = (selected as? TimerType.End)?.tracks ?: 1
+                                                    pluralStringResource(
+                                                        R.plurals.track_s,
+                                                        tracks,
+                                                        tracks,
+                                                    )
+                                                }
+                                                else -> ""
+                                            },
+                                            color = MaterialTheme.colorScheme.primary,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier.padding(24.dp)
+                                        )
                                     }
                                 }
                             }
@@ -203,12 +281,84 @@ fun TimerSheet(
                                 Modifier.weight(weight),
                                 onClick = onClick,
                                 outlined = it == 0,
-                                interactionSource = interactionSource
+                                interactionSource = interactionSource,
                             )
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun DurationPicker(
+    duration: Long,
+    onDurationChange: (Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val max = 120 * 60 * 1000L // 2 hours
+    val min = 1 * 60 * 1000L // 1 minute
+    Slider(
+        value = if (duration < min) 0f else duration.toFloat() / max,
+        {
+            onDurationChange(
+                (it * (max - min) + min).toLong()
+            )
+        },
+        modifier = modifier.fillMaxWidth(),
+        steps = 23
+    )
+}
+
+@Composable
+fun EndPicker(
+    tracks: Int,
+    onTracksChange: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val max = 10
+    val min = 1
+    Slider(
+        value = if (tracks < min) 0f else (tracks - min) / (max - min).toFloat(),
+        {
+            onTracksChange((it * (max - min) + min).toInt())
+        },
+        modifier = modifier.fillMaxWidth(),
+        steps = 9
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimePicker(
+    hour: Int,
+    minute: Int,
+    onTimeChange: (Int, Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val state = rememberTimePickerState(hour, minute)
+    LaunchedEffect(state.hour, state.minute) {
+        onTimeChange(state.hour, state.minute)
+    }
+    TimePicker(
+        state,
+        modifier = modifier.fillMaxWidth()
+    )
+}
+
+@Preview
+@Composable
+private fun TimerSheetPreview() {
+    var timer by remember { mutableStateOf<TimerType>(TimerType.Duration(5 * 60 * 1000)) }
+    Surface(Modifier.fillMaxSize()) {
+        TimerSheet(
+            visible = true,
+            onDismissRequest = {},
+            timer = timer,
+            onSetTimer = {
+                timer = it
+            }
+        )
     }
 }

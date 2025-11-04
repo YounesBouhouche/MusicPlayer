@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -248,16 +249,16 @@ private fun AnimatedExpressiveShapes() {
         label = "float3"
     )
 
-    Box(modifier = Modifier.fillMaxSize().alpha(.2f)) {
+    Box(modifier = Modifier.blur(6.dp).fillMaxSize().alpha(.2f)) {
         // Shape 1 - Top Left
         Box(
             modifier = Modifier
                 .size(120.dp)
                 .offset(x = 30.dp, y = 40.dp + floatOffset1.dp)
                 .align(Alignment.TopStart)
-                .clip(MaterialShapes.Arrow.toShape(angle1.toInt()))
+                .rotate(angle1)
+                .clip(MaterialShapes.Arrow.toShape())
                 .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f))
-                .blur(20.dp)
         )
 
         // Shape 2 - Top Right
@@ -266,9 +267,9 @@ private fun AnimatedExpressiveShapes() {
                 .size(100.dp)
                 .offset(x = (-20).dp, y = 60.dp + floatOffset2.dp)
                 .align(Alignment.TopEnd)
-                .clip(MaterialShapes.Cookie12Sided.toShape(angle2.toInt()))
+                .rotate(angle2)
+                .clip(MaterialShapes.Cookie12Sided.toShape())
                 .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
-                .blur(15.dp)
         )
 
         // Shape 3 - Center
@@ -277,9 +278,9 @@ private fun AnimatedExpressiveShapes() {
                 .size(140.dp)
                 .offset(y = floatOffset3.dp)
                 .align(Alignment.Center)
-                .clip(MaterialShapes.Arch.toShape(angle3.toInt()))
+                .rotate(angle3)
+                .clip(MaterialShapes.Arch.toShape())
                 .background(MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.7f))
-                .blur(25.dp)
         )
 
         // Shape 4 - Bottom Left
@@ -288,9 +289,9 @@ private fun AnimatedExpressiveShapes() {
                 .size(90.dp)
                 .offset(x = 40.dp, y = (-30).dp + floatOffset1.dp)
                 .align(Alignment.BottomStart)
-                .clip(MaterialShapes.Bun.toShape(angle4.toInt()))
+                .rotate(angle4)
+                .clip(MaterialShapes.Bun.toShape())
                 .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f))
-                .blur(18.dp)
         )
 
         // Shape 5 - Bottom Right
@@ -299,9 +300,9 @@ private fun AnimatedExpressiveShapes() {
                 .size(110.dp)
                 .offset(x = (-25).dp, y = (-40).dp + floatOffset2.dp)
                 .align(Alignment.BottomEnd)
-                .clip(MaterialShapes.Gem.toShape((angle1 * 0.8f).toInt()))
+                .rotate((angle1 * 0.8f))
+                .clip(MaterialShapes.Gem.toShape())
                 .background(MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f))
-                .blur(22.dp)
         )
     }
 }
