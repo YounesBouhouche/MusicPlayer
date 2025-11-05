@@ -61,26 +61,24 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
 
         serviceScope.launch {
             withContext(Dispatchers.Main) {
-                // First initialize the player with PlayerManager
                 val player = playerManager.initialize(serviceScope)
-
-                // Create command handler with this player
                 commandHandler = CustomCommandHandler(player)
-
-
-                // Set up player listeners for notification updates
                 player.addListener(object : Player.Listener {
                     override fun onAvailableCommandsChanged(commands: Player.Commands) {
                         sessionManager.updateCustomLayout(notificationCustomCmdButtons)
                     }
                 })
-
                 sessionManager.createSession(this@MediaPlayerService, player)
-
-                // Set the notification provider
                 setMediaNotificationProvider(notificationProvider)
             }
         }
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (sessionManager.getSession() == null) {
+            notificationProvider.ensureForeground(this)
+        }
+        return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onCustomCommand(
@@ -94,7 +92,7 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        playerFactory.getPlayerOrNull()?.let { player ->
+        playerFactory.getPlayerOrNull().let { player ->
             if (!player.playWhenReady || player.mediaItemCount == 0) stopSelf()
         }
     }
@@ -103,7 +101,6 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
         session: MediaSession,
         controller: MediaSession.ControllerInfo,
     ): ConnectionResult {
-        // Create session commands for all custom buttons
         val customSessionCommands = ImmutableList.builder<SessionCommand>().apply {
             NotificationCustomCmdButton.entries.forEach { button ->
                 button.commandButton.sessionCommand?.let { cmd ->
@@ -155,24 +152,17 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
         val settable = SettableFuture.create<MediaItemsWithStartPosition>()
         serviceScope.launch {
             try {
-                // Get the saved queue
                 val queue = queueManager.getQueue().first()
                 if (queue == null || queue.items.isEmpty()) {
                     settable.set(MediaItemsWithStartPosition(emptyList(), 0, 0))
                     return@launch
                 }
-
-                // Get saved playback position and state
                 val currentIndex = queueManager.getCurrentIndex() ?: 0
                 val position = stateManager.playerState.value.time
                 val isPlaying = stateManager.playerState.value.playState == PlayState.PLAYING
-
-                // Reconstruct media items from IDs
                 val mediaItems = queue.items.mapNotNull {
                     mediaRepository.getUriById(it)?.let { uri -> MediaItem.fromUri(uri) }
                 }
-
-                // Set the resumption state
                 val resumptionPlaylist = MediaItemsWithStartPosition(
                     mediaItems,
                     currentIndex,
@@ -180,13 +170,10 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
                 )
 
                 settable.set(resumptionPlaylist)
-
-                // Restore playback state after items are set
                 withContext(Dispatchers.Main) {
                     playerManager.setPlayWhenReady(isPlaying)
                 }
             } catch (_: Exception) {
-                // Log error but still return empty state to avoid crashes
                 settable.set(MediaItemsWithStartPosition(emptyList(), 0, 0))
             }
         }

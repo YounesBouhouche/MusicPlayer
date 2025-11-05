@@ -34,6 +34,7 @@ class DialogService : MediaSessionService(), MediaSession.Callback {
 
     override fun onCreate() {
         super.onCreate()
+        customMediaNotificationProvider = CustomMediaNotificationProvider(this)
         val pendingIntent =
             PendingIntent.getActivity(
                 this,
@@ -64,8 +65,14 @@ class DialogService : MediaSessionService(), MediaSession.Callback {
                     .setCustomLayout(notificationCustomCmdButtons)
                     .build()
         }
-        customMediaNotificationProvider = CustomMediaNotificationProvider(this)
         setMediaNotificationProvider(customMediaNotificationProvider)
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (mediaSession == null) {
+            customMediaNotificationProvider.ensureForeground(this)
+        }
+        return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onCustomCommand(

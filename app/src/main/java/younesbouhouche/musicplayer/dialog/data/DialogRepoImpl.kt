@@ -52,7 +52,7 @@ class DialogRepoImpl(val context: Context): DialogRepo {
         )
         val sessionToken =
             SessionToken(context, ComponentName(context, DialogService::class.java))
-        context.startForegroundService(Intent(context, MediaSessionService::class.java))
+        context.startForegroundService(Intent(context, DialogService::class.java))
         controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
     }
     protected fun finalize() {
