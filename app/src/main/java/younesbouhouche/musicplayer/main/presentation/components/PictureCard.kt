@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kmpalette.rememberPaletteState
 import kotlinx.coroutines.launch
@@ -33,6 +36,7 @@ fun PictureCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.extraLarge,
+    contentPadding: PaddingValues = PaddingValues(16.dp),
     content: @Composable BoxScope.() -> Unit
 ) {
     val palette = rememberPaletteState()
@@ -67,11 +71,13 @@ fun PictureCard(
                                 .75f to MaterialTheme.colorScheme.primaryContainer
                             )
                         )
-                        .padding(16.dp),
+                        .padding(contentPadding),
                 ) {
                     ProvideTextStyle(
                         MaterialTheme.typography.titleMedium.copy(
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = FontWeight.Bold,
+                            fontStyle = FontStyle.Italic
                         )
                     ) {
                         content()

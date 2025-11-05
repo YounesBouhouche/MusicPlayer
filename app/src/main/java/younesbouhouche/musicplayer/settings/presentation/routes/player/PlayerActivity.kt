@@ -13,9 +13,10 @@ class PlayerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val viewModel = koinViewModel<PlayerSettingsViewModel>()
             AppTheme {
-                PlayerSettingsScreen(viewModel, onBack = { finish() })
+                PlayerSettingsScreen {
+                    finish()
+                }
             }
         }
     }

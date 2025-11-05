@@ -56,7 +56,7 @@ fun BoxScope.NavBar(
             shadowElevation = 8.dp
         ) {
             NavigationBar(
-                Modifier.padding(top = 4.dp, bottom = 2.dp).fillMaxWidth(),
+                Modifier.padding(top = 4.dp, bottom = 2.dp, start = 2.dp, end = 2.dp).fillMaxWidth(),
                 containerColor = Color.Transparent,
                 windowInsets = WindowInsets()
             ) {

@@ -37,6 +37,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -46,6 +47,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -203,10 +205,11 @@ fun <T>ListScreen(
                             Modifier.fillMaxWidth().padding(top = 24.dp),
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold,
+                            fontStyle = FontStyle.Italic,
                             textAlign = TextAlign.Center,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            fontWeight = FontWeight.Medium
                         )
                         Text(
                             subtitle,
@@ -217,7 +220,7 @@ fun <T>ListScreen(
                         )
                     }
                 }
-                itemsIndexed(items, { index, it -> it.id }, itemContent = itemContent)
+                itemsIndexed(items, { _, it -> it.id }, itemContent = itemContent)
             }
         }
         SortBottomSheet(

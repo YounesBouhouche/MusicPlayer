@@ -27,7 +27,7 @@ fun MyImage(
     modifier: Modifier = Modifier,
     iconTint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     shape: Shape = MaterialTheme.shapes.medium,
-    background: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
+    background: Color = MaterialTheme.colorScheme.surface.copy(0.5f),
     fraction: Float = .5f,
     onClick: (() -> Unit)? = null,
     onError: ((AsyncImagePainter.State.Error) -> Unit)? = null,

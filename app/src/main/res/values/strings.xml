@@ -298,4 +298,7 @@
     <string name="reset">Reset</string>
     <string name="search_no_results">No results</string>
     <string name="search_start_prompt">Type to search</string>
+    <string name="style">Style</string>
+    <string name="action_bar">Action bar</string>
+    <string name="carousel">Carousel</string>
 </resources>

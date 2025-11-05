@@ -20,6 +20,11 @@ import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -40,6 +45,14 @@ fun<T, S> GridScreen(
     key: ((T) -> Any)? = null,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
+    var colsCount by remember {
+        mutableIntStateOf(sortState.colsCount?.count ?: 2)
+    }
+    LaunchedEffect(sortState.colsCount) {
+        sortState.colsCount?.count?.takeIf { it > 1 }?.let {
+            colsCount = it
+        }
+    }
     val paddingValues = contentPadding + PaddingValues(horizontal = 8.dp)
     val sortButton = @Composable {
         Row(
@@ -70,7 +83,7 @@ fun<T, S> GridScreen(
             }
         } else {
             LazyVerticalGrid(
-                GridCells.Fixed((sortState.colsCount ?: ColsCount.Two).count),
+                GridCells.Fixed(colsCount),
                 modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),

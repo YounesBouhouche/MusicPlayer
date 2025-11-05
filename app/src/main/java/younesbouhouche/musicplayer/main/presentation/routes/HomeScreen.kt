@@ -39,9 +39,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -72,39 +75,36 @@ fun HomeScreen(
     LazyColumn(
         modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(24.dp),
-        contentPadding = PaddingValues(0.dp, 16.dp, 0.dp, 260.dp)
+        contentPadding = PaddingValues(bottom = 260.dp)
     ) {
         item {
             Box(
                 Modifier
-                    .padding(top = 32.dp, start = 16.dp, end = 16.dp)
-                    .clip(expressiveRectShape(0, 1))
                     .background(
-                        Brush.linearGradient(
+                        Brush.verticalGradient(
                             listOf(
-                                MaterialTheme.colorScheme.primary,
-                                MaterialTheme.colorScheme.tertiary
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = .5f),
+                                Color.Transparent
                             )
                         )
                     )
                     .fillMaxWidth()
-                    .padding(28.dp)
+                    .padding(vertical = 36.dp, horizontal = 28.dp)
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(28.dp)) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = stringResource(R.string.welcome_back),
-                            style = MaterialTheme.typography.displaySmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Text(
-                            text = stringResource(R.string.welcome_text),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f)
-                        )
-                    }
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = stringResource(R.string.welcome_back),
+                        style = MaterialTheme.typography.displaySmall,
+                        fontWeight = FontWeight.Bold,
+                        fontStyle = FontStyle.Italic,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+                    )
+                    Text(
+                        text = stringResource(R.string.welcome_text),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
                 }
             }
         }
@@ -145,7 +145,8 @@ fun HomeScreen(
                                     onArtistClick(artist)
                                 },
                                 Modifier.fillMaxWidth(),
-                                shape = rememberMaskShape(MaterialTheme.shapes.extraLarge)
+                                shape = rememberMaskShape(MaterialTheme.shapes.extraLarge),
+                                contentPadding = PaddingValues(24.dp)
                             ) {
                                 Column(
                                     Modifier.fillMaxSize(),
@@ -155,7 +156,7 @@ fun HomeScreen(
                                         artist.name,
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
-                                        style = MaterialTheme.typography.titleLarge
+                                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
                                     )
                                 }
                             }

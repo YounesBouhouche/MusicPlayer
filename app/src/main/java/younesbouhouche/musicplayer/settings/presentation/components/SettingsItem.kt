@@ -14,8 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
@@ -36,10 +40,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
 import younesbouhouche.musicplayer.settings.presentation.util.Checked
 import younesbouhouche.musicplayer.settings.presentation.util.SettingData
 
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SettingsItem(
     headline: String,
@@ -52,7 +58,7 @@ fun SettingsItem(
     background: Color = MaterialTheme.colorScheme.surfaceContainer,
     shape: Shape = MaterialTheme.shapes.large,
     onClick: () -> Unit = {},
-    separator: Boolean = false,
+    separator: Boolean = true,
     useCheckbox: Boolean = false,
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
@@ -93,7 +99,8 @@ fun SettingsItem(
                 )
             }
         }
-        if (separator) VerticalDivider(Modifier.fillMaxHeight(.5f))
+        if (separator and (trailingContent != null))
+            VerticalDivider(Modifier.fillMaxHeight(.5f), 2.dp)
         trailingContent?.invoke() ?: checked?.let {
             if (it.radio)
                 RadioButton(
@@ -114,6 +121,17 @@ fun SettingsItem(
                     interactionSource = interactionSource
                 )
         }
+        if ((trailingContent == null) && (checked == null)) {
+            VerticalDivider(Modifier.fillMaxHeight(.5f), 2.dp)
+            ExpressiveIconButton(
+                Icons.Default.ChevronRight,
+                size = IconButtonDefaults.smallIconSize,
+                onClick = onClick,
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                )
+            )
+        }
     }
 }
 
@@ -129,7 +147,7 @@ fun SettingsItem(
     supporting: String? = null,
     background: Color = MaterialTheme.colorScheme.surfaceContainer,
     iconTint: Color = MaterialTheme.colorScheme.onSurface,
-    iconBackground: Color = Color.Transparent,
+    iconBackground: Color? = null,
     shape: Shape = MaterialTheme.shapes.large,
     onClick: () -> Unit = {},
     large: Boolean = false,
@@ -151,17 +169,24 @@ fun SettingsItem(
     useCheckbox = useCheckbox,
     leadingContent = icon?.let {
         {
-            Box(Modifier.clip(CircleShape)
-                .background(iconBackground)
-                .size(if (large) 60.dp else 48.dp),
-                contentAlignment = Alignment.Center
-            ) {
+            val icon = @Composable {
                 Icon(
                     imageVector = it,
                     contentDescription = null,
                     tint = iconTint,
                     modifier = Modifier.size(if (large) 32.dp else 24.dp)
                 )
+            }
+            iconBackground?.let {
+                Box(Modifier.clip(CircleShape)
+                    .background(iconBackground)
+                    .size(if (large) 60.dp else 48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    icon()
+                }
+            } ?: Row(Modifier.padding(horizontal = 8.dp)) {
+                icon()
             }
         }
     },
@@ -174,7 +199,7 @@ fun SettingsItem(
     modifier: Modifier = Modifier,
     background: Color = MaterialTheme.colorScheme.surfaceContainer,
     iconTint: Color = MaterialTheme.colorScheme.onSurface,
-    iconBackground: Color = Color.Transparent,
+    iconBackground: Color? = null,
     shape: Shape = MaterialTheme.shapes.large,
     separator: Boolean = false,
 ) {

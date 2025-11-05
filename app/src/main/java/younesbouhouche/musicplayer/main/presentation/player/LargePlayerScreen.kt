@@ -1,53 +1,28 @@
 package younesbouhouche.musicplayer.main.presentation.player
 
 import android.net.Uri
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Repeat
-import androidx.compose.material.icons.filled.RepeatOn
-import androidx.compose.material.icons.filled.RepeatOneOn
-import androidx.compose.material.icons.filled.Shuffle
-import androidx.compose.material.icons.filled.ShuffleOn
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
-import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
@@ -55,30 +30,20 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleButton
-import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.lerp
 import androidx.media3.common.Player
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
@@ -86,21 +51,20 @@ import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.TimerType
 import younesbouhouche.musicplayer.main.domain.models.QueueModel
+import younesbouhouche.musicplayer.main.presentation.player.components.ActionBar
+import younesbouhouche.musicplayer.main.presentation.player.components.Carousel
+import younesbouhouche.musicplayer.main.presentation.player.sheets.QueueSheet
 import younesbouhouche.musicplayer.main.presentation.player.sheets.SpeedSheet
 import younesbouhouche.musicplayer.main.presentation.player.sheets.TimerSheet
-import younesbouhouche.musicplayer.main.presentation.components.MyImage
-import younesbouhouche.musicplayer.main.presentation.player.sheets.QueueSheet
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.util.timeString
 import younesbouhouche.musicplayer.ui.theme.AppTheme
-import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun LargePlayerScreen(
-//    expanded: Boolean,
     queue: QueueModel,
     playerState: PlayerState,
     modifier: Modifier = Modifier,
@@ -112,22 +76,8 @@ fun LargePlayerScreen(
     var speedSheetVisible by remember { mutableStateOf(false) }
     var timerVisible by remember { mutableStateOf(false) }
     val currentItem = queue.items.getOrNull(queue.index)
-    val pagerState = rememberPagerState {
-        queue.items.size
-    }
     var sliderValue by remember { mutableFloatStateOf(0f) }
     var dragging by remember { mutableStateOf(false) }
-    val pagerIsDragged by pagerState.interactionSource.collectIsDraggedAsState()
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }.collect {
-            if ((pagerState.currentPage != pagerState.settledPage) and pagerIsDragged) {
-                onPlaybackEvent(PlaybackEvent.Seek(it))
-            }
-        }
-    }
-    LaunchedEffect(queue) {
-        pagerState.animateScrollToPage(queue.index)
-    }
     Column(modifier
         .systemBarsPadding()
         .padding(24.dp, 8.dp, 24.dp, 8.dp),
@@ -168,60 +118,12 @@ fun LargePlayerScreen(
                 queueSheetVisible = true
             }
         }
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.extraLarge)
-                .weight(1f)
-                .aspectRatio(1f, true),
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            snapPosition = SnapPosition.Center,
-            key = { queue.items[it].id },
-        ) { page ->
-            val transition = rememberInfiniteTransition(label = "Playing animation")
-            val animatedScale by transition.animateFloat(
-                initialValue = 0.9f,
-                targetValue = 1f,
-                animationSpec =
-                    infiniteRepeatable(
-                        animation = tween(5000),
-                        repeatMode = RepeatMode.Reverse,
-                    ),
-                label = "Scale animation",
-            )
-            val diskScale by animateFloatAsState(
-                targetValue =
-                    if ((playerState.playState == PlayState.PLAYING) and (queue.index == page))
-                        animatedScale
-                    else 1f,
-                label = "",
-            )
-            val pageOffset =
-                (
-                        (pagerState.currentPage - page) +
-                                pagerState
-                                    .currentPageOffsetFraction
-                        ).absoluteValue
-            with(queue.items[page]) {
-                MyImage(
-                    model = coverUri,
-                    icon = Icons.Default.MusicNote,
-                    iconTint = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.7f),
-                    shape = MaterialTheme.shapes.extraLarge,
-                    background = MaterialTheme.colorScheme.surface.copy(
-                        if (pageOffset < 0.5f) 1 - pageOffset else 0.5f
-                    ),
-                    onClick = {
-
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f, true)
-                        .scale(lerp(0.8f, 1f, 1 - pageOffset))
-                        .scale(diskScale),
-                )
-            }
-        }
+        Carousel(
+            queue,
+            Modifier.weight(1f),
+            playerState.playState == PlayState.PLAYING,
+            onPlaybackEvent
+        )
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -354,80 +256,22 @@ fun LargePlayerScreen(
                 }
             }
         }
-        Surface(
-            Modifier
+        ActionBar(
+            playerState.shuffle,
+            playerState.repeatMode,
+            playerState.speed,
+            playerState.timer,
+            {
+                timerVisible = true
+            },
+            {
+                speedSheetVisible = true
+            },
+            onPlaybackEvent,
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 4.dp),
-            color = MaterialTheme.colorScheme.surface.copy(.4f),
-            shape = RoundedCornerShape(100),
-        ) {
-            FlowRow(
-                Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
-                repeat(4) {
-                    val icon = when(it) {
-                        0 ->
-                            if (playerState.shuffle) Icons.Default.ShuffleOn
-                            else Icons.Default.Shuffle
-                        1 -> when(playerState.repeatMode) {
-                            Player.REPEAT_MODE_ALL -> Icons.Default.RepeatOn
-                            Player.REPEAT_MODE_ONE -> Icons.Default.RepeatOneOn
-                            else -> Icons.Default.Repeat
-                        }
-                        2 -> Icons.Default.Timer
-                        else -> Icons.Default.Speed
-                    }
-                    val active = when(it) {
-                        0 -> playerState.shuffle
-                        1 -> playerState.repeatMode != Player.REPEAT_MODE_OFF
-                        2 -> playerState.timer != TimerType.Disabled
-                        else -> playerState.speed != 1f
-                    }
-                    val interactionSource = remember { MutableInteractionSource() }
-                    val pressed by interactionSource.collectIsPressedAsState()
-                    val weight by animateFloatAsState(
-                        if (pressed) 1.4f else 1f
-                    )
-                    ToggleButton(
-                        checked = active,
-                        onCheckedChange = { _ ->
-                            when(it) {
-                                0 -> onPlaybackEvent(PlaybackEvent.ToggleShuffle)
-                                1 -> onPlaybackEvent(PlaybackEvent.CycleRepeatMode)
-                                2 -> {
-                                    timerVisible = true
-                                }
-                                else -> {
-                                    speedSheetVisible = true
-                                }
-                            }
-                        },
-                        shapes =
-                            if (it == 0)
-                                ButtonGroupDefaults.connectedLeadingButtonShapes()
-                            else if (it < 3)
-                                ButtonGroupDefaults.connectedMiddleButtonShapes()
-                            else ButtonGroupDefaults.connectedTrailingButtonShapes(),
-                        modifier = Modifier
-                            .heightIn(ButtonDefaults.MediumContainerHeight)
-                            .semantics { role = Role.Checkbox }
-                            .weight(weight),
-                        contentPadding = ButtonDefaults
-                            .contentPaddingFor(ButtonDefaults.MediumContainerHeight),
-                        colors = ToggleButtonDefaults.toggleButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary.copy(.1f)
-                        ),
-                        interactionSource = interactionSource,
-                    ) {
-                        Icon(icon, null)
-                    }
-                }
-            }
-        }
+                .padding(bottom = 4.dp)
+        )
     }
     TimerSheet(
         timerVisible,
@@ -470,7 +314,6 @@ private fun LargePlayerPreview() {
             color = MaterialTheme.colorScheme.primaryContainer,
         ) {
             LargePlayerScreen(
-//                expanded = true,
                 queue = QueueModel(
                     index = 0,
                     items = List(10) {

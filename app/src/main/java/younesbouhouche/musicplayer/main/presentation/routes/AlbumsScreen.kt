@@ -47,7 +47,8 @@ fun AlbumsScreen(
                     it.items.size
                 ),
                 cover = it.cover,
-                icon = Icons.Default.Album
+                icon = Icons.Default.Album,
+                modifier = Modifier.animateItem()
             ) {
                 onClick(it)
             }

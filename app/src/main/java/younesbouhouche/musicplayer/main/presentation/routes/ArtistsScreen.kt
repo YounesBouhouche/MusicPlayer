@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
@@ -44,37 +45,17 @@ fun ArtistsScreen(
         },
         {
             ListItem(
-                { onClick(it) },
-                leadingContent = {
-                    MyImage(
-                        it.getPicture(),
-                        Icons.Default.Person,
-                        Modifier.size(68.dp),
-                    )
-                },
+                headline = it.name,
+                supporting = pluralStringResource(
+                    R.plurals.item_s,
+                    it.items.size,
+                    it.items.size
+                ),
+                cover = it.getPicture(),
+                icon = Icons.Default.Person,
                 modifier = Modifier.animateItem()
             ) {
-                Column(
-                    Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
-                ) {
-                    Text(
-                        it.name,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        pluralStringResource(
-                            R.plurals.item_s,
-                            it.items.size,
-                            it.items.size
-                        ),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
+                onClick(it)
             }
         },
         { artist ->

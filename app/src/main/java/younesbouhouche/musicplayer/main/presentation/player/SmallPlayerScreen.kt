@@ -52,7 +52,7 @@ fun SmallPlayerScreen(
 ) {
     val angle by rememberInfiniteTransition().animateFloat(
         initialValue = 0f,
-        targetValue = 360f,
+        targetValue = if (state == PlayState.PLAYING) 360f else 0f,
         animationSpec = infiniteRepeatable(
             animation = tween(10000, easing = { it }),
             repeatMode = RepeatMode.Restart

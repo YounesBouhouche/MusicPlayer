@@ -10,7 +10,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -53,7 +55,7 @@ fun EmptyContainer(
     ) {
         if (it) {
             Column(
-                Modifier.fillMaxSize(),
+                Modifier.fillMaxSize().padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically)
             ) {
@@ -63,7 +65,9 @@ fun EmptyContainer(
                             angle.roundToInt())
                         )
                         .background(MaterialTheme.colorScheme.surfaceContainer)
-                        .size(220.dp),
+                        .height(220.dp)
+                        .aspectRatio(1f, true)
+                        .weight(1f, false),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(

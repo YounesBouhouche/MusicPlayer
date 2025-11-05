@@ -249,7 +249,7 @@ private fun ItemsList(
                 modifier = Modifier.fillMaxSize(),
                 state = state,
                 contentPadding = PaddingValues(bottom = 260.dp, end = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 items.forEach { (key, list) ->
                     stickyHeader {
