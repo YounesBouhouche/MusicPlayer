@@ -58,7 +58,7 @@ fun EmptyContainer(
                 verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically)
             ) {
                 Box(
-                    modifier
+                    Modifier
                         .clip(MaterialShapes.Cookie12Sided.toShape(
                             angle.roundToInt())
                         )

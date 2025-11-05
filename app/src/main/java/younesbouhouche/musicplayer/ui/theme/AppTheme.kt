@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.kmpalette.color
 import com.kmpalette.palette.graphics.Palette
 import com.materialkolor.DynamicMaterialTheme
+import com.materialkolor.PaletteStyle
 import com.materialkolor.rememberDynamicColorScheme
 import younesbouhouche.musicplayer.settings.data.SettingsDataStore
 import younesbouhouche.musicplayer.settings.domain.models.ColorScheme
@@ -59,6 +60,8 @@ internal fun AppTheme(
         primary = colorScheme.primary,
         secondary = colorScheme.secondary,
         tertiary = colorScheme.tertiary,
+        error = colorScheme.error,
+        style = PaletteStyle.Expressive,
         animate = true,
         isDark = isDark,
         isAmoled = extraDark,

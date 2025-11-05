@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.main.presentation
+package younesbouhouche.musicplayer.main.presentation.player.sheets
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

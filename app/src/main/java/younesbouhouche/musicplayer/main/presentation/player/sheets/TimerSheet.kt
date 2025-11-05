@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.main.presentation
+package younesbouhouche.musicplayer.main.presentation.player.sheets
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility

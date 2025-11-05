@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.main.presentation
+package younesbouhouche.musicplayer.main.presentation.layout
 
 import android.content.Intent
 import androidx.compose.animation.AnimatedContent
@@ -64,6 +64,7 @@ import younesbouhouche.musicplayer.main.presentation.components.DrawerSheetConte
 import younesbouhouche.musicplayer.main.presentation.components.MusicCardBottomSheet
 import younesbouhouche.musicplayer.main.presentation.dialogs.AddToPlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.CreatePlaylistDialog
+import younesbouhouche.musicplayer.main.presentation.player.NavigationWithPlayer
 import younesbouhouche.musicplayer.main.presentation.routes.AlbumScreen
 import younesbouhouche.musicplayer.main.presentation.routes.AlbumsScreen
 import younesbouhouche.musicplayer.main.presentation.routes.ArtistScreen

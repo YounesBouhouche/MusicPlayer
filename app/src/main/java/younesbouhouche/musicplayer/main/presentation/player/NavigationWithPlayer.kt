@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.main.presentation
+package younesbouhouche.musicplayer.main.presentation.player
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility

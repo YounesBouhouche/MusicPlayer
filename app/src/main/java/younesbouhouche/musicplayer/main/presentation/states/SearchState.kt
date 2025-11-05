@@ -12,3 +12,9 @@ data class SearchState(
     val result: SearchResult = SearchResult(setOf(SearchFilter.FILES)),
     val expanded: Boolean = false,
 )
+
+val SearchState.isEmpty: Boolean
+    get() = result.files.takeIf { result.filters.contains(SearchFilter.FILES) }?.isEmpty() != false &&
+            result.artists.takeIf { result.filters.contains(SearchFilter.ARTISTS) }?.isEmpty() != false &&
+            result.albums.takeIf { result.filters.contains(SearchFilter.ALBUMS) }?.isEmpty() != false &&
+            result.playlists.takeIf { result.filters.contains(SearchFilter.PLAYLISTS) }?.isEmpty() != false

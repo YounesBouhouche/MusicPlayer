@@ -88,7 +88,7 @@ fun SettingsItem(
             supporting?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -128,8 +128,8 @@ fun SettingsItem(
     role: Role? = null,
     supporting: String? = null,
     background: Color = MaterialTheme.colorScheme.surfaceContainer,
-    iconTint: Color = MaterialTheme.colorScheme.onPrimary,
-    iconBackground: Color = MaterialTheme.colorScheme.primary,
+    iconTint: Color = MaterialTheme.colorScheme.onSurface,
+    iconBackground: Color = Color.Transparent,
     shape: Shape = MaterialTheme.shapes.large,
     onClick: () -> Unit = {},
     large: Boolean = false,
@@ -173,8 +173,8 @@ fun SettingsItem(
     data: SettingData,
     modifier: Modifier = Modifier,
     background: Color = MaterialTheme.colorScheme.surfaceContainer,
-    iconTint: Color = MaterialTheme.colorScheme.primary,
-    iconBackground: Color = MaterialTheme.colorScheme.onPrimary,
+    iconTint: Color = MaterialTheme.colorScheme.onSurface,
+    iconBackground: Color = Color.Transparent,
     shape: Shape = MaterialTheme.shapes.large,
     separator: Boolean = false,
 ) {

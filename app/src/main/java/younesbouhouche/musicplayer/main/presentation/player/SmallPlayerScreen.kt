@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.main.presentation
+package younesbouhouche.musicplayer.main.presentation.player
 
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable

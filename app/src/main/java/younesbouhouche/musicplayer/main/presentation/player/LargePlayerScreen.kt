@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.main.presentation
+package younesbouhouche.musicplayer.main.presentation.player
 
 import android.net.Uri
 import androidx.compose.animation.core.RepeatMode
@@ -86,7 +86,10 @@ import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.TimerType
 import younesbouhouche.musicplayer.main.domain.models.QueueModel
+import younesbouhouche.musicplayer.main.presentation.player.sheets.SpeedSheet
+import younesbouhouche.musicplayer.main.presentation.player.sheets.TimerSheet
 import younesbouhouche.musicplayer.main.presentation.components.MyImage
+import younesbouhouche.musicplayer.main.presentation.player.sheets.QueueSheet
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.util.timeString

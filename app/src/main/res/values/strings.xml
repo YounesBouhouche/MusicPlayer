@@ -296,4 +296,6 @@
     <string name="end">End</string>
     <string name="speed_x">Speed: %1$sx</string>
     <string name="reset">Reset</string>
+    <string name="search_no_results">No results</string>
+    <string name="search_start_prompt">Type to search</string>
 </resources>

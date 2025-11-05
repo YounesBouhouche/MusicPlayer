@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.main.presentation
+package younesbouhouche.musicplayer.main.presentation.player
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background

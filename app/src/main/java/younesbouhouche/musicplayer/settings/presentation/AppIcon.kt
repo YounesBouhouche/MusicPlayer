@@ -56,7 +56,7 @@ fun AppIcon(modifier: Modifier = Modifier) {
         Icon(
             ImageVector.vectorResource(R.drawable.media3_notification_small_icon),
             null,
-            Modifier.fillMaxSize(.5f),
+            Modifier.fillMaxSize(.3f),
             MaterialTheme.colorScheme.onSurface,
         )
     }
