@@ -1,9 +1,12 @@
-package younesbouhouche.musicplayer.main.presentation
+package younesbouhouche.musicplayer.main.presentation.layout
 
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,12 +23,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Album
+import androidx.compose.material.icons.filled.AllInbox
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
@@ -56,6 +62,8 @@ import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,11 +79,15 @@ import younesbouhouche.musicplayer.core.domain.models.Album
 import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.domain.models.Playlist
+import younesbouhouche.musicplayer.core.domain.models.SearchFilter
 import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
+import younesbouhouche.musicplayer.core.presentation.util.ExpressiveToggleButton
 import younesbouhouche.musicplayer.main.domain.events.SearchEvent
+import younesbouhouche.musicplayer.main.presentation.components.EmptyContainer
 import younesbouhouche.musicplayer.main.presentation.components.ListItem
 import younesbouhouche.musicplayer.main.presentation.components.MusicCardListItem
 import younesbouhouche.musicplayer.main.presentation.states.SearchState
+import younesbouhouche.musicplayer.main.presentation.states.isEmpty
 import younesbouhouche.musicplayer.main.presentation.util.plus
 import younesbouhouche.musicplayer.main.presentation.util.searchBarIconButtonColors
 import younesbouhouche.musicplayer.settings.presentation.SettingsActivity
@@ -241,121 +253,161 @@ fun SearchScreen(
             }
         }
     )
-    ExpandedFullScreenSearchBar(
-        state = state,
-        inputField = inputField,
-    ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = WindowInsets.navigationBars.asPaddingValues() +
-                    PaddingValues(bottom = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
+    if (state.currentValue == SearchBarValue.Expanded)
+        ExpandedFullScreenSearchBar(
+            state = state,
+            inputField = inputField,
         ) {
-            resultHolder(
-                label = R.string.files,
-                items = searchState.result.files,
-                leadingSpace = true,
-                expanded = searchState.filesExpanded,
-                onExpandedChange = {
-                    onAction(SearchEvent.UpdateResultExpanded(files = it))
-                },
-            ) { index, file ->
-                MusicCardListItem(
-                    file = file,
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp)
-                        .animateItem(),
-                    shape = expandableListItem(index, searchState.result.files.size),
-                    onLongClick = {
-                        onShowBottomSheet(file)
-                    }
+            Column(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                LazyRow(
+                    contentPadding = PaddingValues(12.dp, 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    onPlay(index)
-                }
-            }
-            resultHolder(
-                label = R.string.albums,
-                items = searchState.result.albums,
-                expanded = searchState.albumsExpanded,
-                onExpandedChange = {
-                    onAction(SearchEvent.UpdateResultExpanded(albums = it))
-                }
-            ) { index, album ->
-                ListItem(
-                    headline = album.name,
-                    supporting = pluralStringResource(
-                        R.plurals.item_s,
-                        album.items.size,
-                        album.items.size
-                    ),
-                    shape = expandableListItem(index, searchState.result.albums.size),
-                    background = MaterialTheme.colorScheme.surface,
-                    cover = album.cover,
-                    icon = Icons.Default.Album,
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp)
-                        .animateItem(),
-                    onClick = {
-                        onAlbumClick(album)
+                    items(SearchFilter.entries, { it.name }) {
+                        ExpressiveToggleButton(
+                            checked = searchState.result.filters.contains(it),
+                            text = {
+                                Text(stringResource(it.label))
+                            },
+                            icon = it.icon,
+                            outlined = true,
+                            size = 40.dp
+                        ) { _ ->
+                            onAction(
+                                SearchEvent.ToggleFilter(it)
+                            )
+                        }
                     }
-                )
-            }
-            resultHolder(
-                label = R.string.artists,
-                items = searchState.result.artists,
-                expanded = searchState.artistsExpanded,
-                onExpandedChange = {
-                    onAction(SearchEvent.UpdateResultExpanded(artists = it))
                 }
-            ) { index, artist ->
-                ListItem(
-                    headline = artist.name,
-                    supporting = pluralStringResource(
-                        R.plurals.item_s,
-                        artist.items.size,
-                        artist.items.size
-                    ),
-                    shape = expandableListItem(index, searchState.result.artists.size),
-                    background = MaterialTheme.colorScheme.surface,
-                    cover = artist.cover,
-                    icon = Icons.Default.Person,
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp)
-                        .animateItem(),
-                    onClick = {
-                        onArtistClick(artist)
+                EmptyContainer(
+                    searchState.query.isEmpty(),
+                    icon = Icons.Default.Search,
+                    text = stringResource(R.string.search_start_prompt),
+                    modifier = Modifier.fillMaxSize().weight(1f)
+                ) {
+                    EmptyContainer(
+                        searchState.isEmpty,
+                        icon = Icons.Default.AllInbox,
+                        text = stringResource(R.string.search_no_results)
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = WindowInsets.navigationBars.asPaddingValues() +
+                                    PaddingValues(bottom = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
+                        ) {
+                            resultHolder(
+                                label = R.string.files,
+                                items = searchState.result.files,
+                                leadingSpace = true,
+                                expanded = searchState.filesExpanded,
+                                onExpandedChange = {
+                                    onAction(SearchEvent.UpdateResultExpanded(files = it))
+                                },
+                            ) { index, file ->
+                                MusicCardListItem(
+                                    file = file,
+                                    modifier = Modifier
+                                        .padding(horizontal = 12.dp)
+                                        .animateItem(),
+                                    shape = expandableListItem(index, searchState.result.files.size),
+                                    onLongClick = {
+                                        onShowBottomSheet(file)
+                                    }
+                                ) {
+                                    onPlay(index)
+                                }
+                            }
+                            resultHolder(
+                                label = R.string.albums,
+                                items = searchState.result.albums,
+                                expanded = searchState.albumsExpanded,
+                                onExpandedChange = {
+                                    onAction(SearchEvent.UpdateResultExpanded(albums = it))
+                                }
+                            ) { index, album ->
+                                ListItem(
+                                    headline = album.name,
+                                    supporting = pluralStringResource(
+                                        R.plurals.item_s,
+                                        album.items.size,
+                                        album.items.size
+                                    ),
+                                    shape = expandableListItem(index, searchState.result.albums.size),
+                                    background = MaterialTheme.colorScheme.surface,
+                                    cover = album.cover,
+                                    icon = Icons.Default.Album,
+                                    modifier = Modifier
+                                        .padding(horizontal = 12.dp)
+                                        .animateItem(),
+                                    onClick = {
+                                        onAlbumClick(album)
+                                    }
+                                )
+                            }
+                            resultHolder(
+                                label = R.string.artists,
+                                items = searchState.result.artists,
+                                expanded = searchState.artistsExpanded,
+                                onExpandedChange = {
+                                    onAction(SearchEvent.UpdateResultExpanded(artists = it))
+                                }
+                            ) { index, artist ->
+                                ListItem(
+                                    headline = artist.name,
+                                    supporting = pluralStringResource(
+                                        R.plurals.item_s,
+                                        artist.items.size,
+                                        artist.items.size
+                                    ),
+                                    shape = expandableListItem(index, searchState.result.artists.size),
+                                    background = MaterialTheme.colorScheme.surface,
+                                    cover = artist.cover,
+                                    icon = Icons.Default.Person,
+                                    modifier = Modifier
+                                        .padding(horizontal = 12.dp)
+                                        .animateItem(),
+                                    onClick = {
+                                        onArtistClick(artist)
+                                    }
+                                )
+                            }
+                            resultHolder(
+                                label = R.string.playlists,
+                                items = searchState.result.playlists,
+                                expanded = searchState.playlistsExpanded,
+                                onExpandedChange = {
+                                    onAction(SearchEvent.UpdateResultExpanded(playlists = it))
+                                }
+                            ) { index, playlist ->
+                                ListItem(
+                                    headline = playlist.name,
+                                    supporting = pluralStringResource(
+                                        R.plurals.item_s,
+                                        playlist.items.size,
+                                        playlist.items.size
+                                    ),
+                                    shape = expandableListItem(index, searchState.result.playlists.size),
+                                    background = MaterialTheme.colorScheme.surface,
+                                    cover = playlist.image,
+                                    icon = Icons.Default.Person,
+                                    modifier = Modifier
+                                        .padding(horizontal = 12.dp)
+                                        .animateItem(),
+                                    onClick = {
+                                        onPlaylistClick(playlist)
+                                    }
+                                )
+                            }
+                        }
                     }
-                )
-            }
-            resultHolder(
-                label = R.string.playlists,
-                items = searchState.result.playlists,
-                expanded = searchState.playlistsExpanded,
-                onExpandedChange = {
-                    onAction(SearchEvent.UpdateResultExpanded(playlists = it))
                 }
-            ) { index, playlist ->
-                ListItem(
-                    headline = playlist.name,
-                    supporting = pluralStringResource(
-                        R.plurals.item_s,
-                        playlist.items.size,
-                        playlist.items.size
-                    ),
-                    shape = expandableListItem(index, searchState.result.playlists.size),
-                    background = MaterialTheme.colorScheme.surface,
-                    cover = playlist.image,
-                    icon = Icons.Default.Person,
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp)
-                        .animateItem(),
-                    onClick = {
-                        onPlaylistClick(playlist)
-                    }
-                )
             }
         }
-    }
 }
 
 
