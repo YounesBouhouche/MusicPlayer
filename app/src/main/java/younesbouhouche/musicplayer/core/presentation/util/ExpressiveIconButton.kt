@@ -1,7 +1,7 @@
 package younesbouhouche.musicplayer.core.presentation.util
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -12,9 +12,10 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import soup.compose.material.motion.animation.materialSharedAxisZ
@@ -22,7 +23,7 @@ import soup.compose.material.motion.animation.materialSharedAxisZ
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ExpressiveIconButton(
-    icon: ImageVector,
+    icon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = IconButtonDefaults.extraSmallIconSize,
     widthOption: IconButtonDefaults.IconButtonWidthOption = IconButtonDefaults.IconButtonWidthOption.Uniform,
@@ -32,7 +33,6 @@ fun ExpressiveIconButton(
         else IconButtonDefaults.iconButtonColors(),
     loading: Boolean = false,
     enabled: Boolean = true,
-    iconRotationAngle: Float = 0f,
     interactionSource: MutableInteractionSource? = null,
     onClick: () -> Unit
 ) {
@@ -60,20 +60,12 @@ fun ExpressiveIconButton(
     val content = @Composable {
         AnimatedContent(loading) { isLoading ->
             if (isLoading)
-                LoadingIndicator(Modifier.size(size))
+                LoadingIndicator(
+                    Modifier.size(size),
+                    color = colors.contentColor
+                )
             else {
-                AnimatedContent(
-                    icon,
-                    transitionSpec = {
-                        materialSharedAxisZ(true)
-                    }
-                ) {
-                    Icon(
-                        it,
-                        contentDescription = null,
-                        modifier = Modifier.size(size).rotate(iconRotationAngle),
-                    )
-                }
+                icon()
             }
         }
     }
@@ -98,3 +90,94 @@ fun ExpressiveIconButton(
             content = content,
         )
 }
+
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun ExpressiveIconButton(
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    size: Dp = IconButtonDefaults.extraSmallIconSize,
+    widthOption: IconButtonDefaults.IconButtonWidthOption = IconButtonDefaults.IconButtonWidthOption.Uniform,
+    outlined: Boolean = false,
+    colors: IconButtonColors =
+        if (outlined) IconButtonDefaults.outlinedIconButtonColors()
+        else IconButtonDefaults.iconButtonColors(),
+    loading: Boolean = false,
+    enabled: Boolean = true,
+    iconRotationAngle: Float = 0f,
+    interactionSource: MutableInteractionSource? = null,
+    onClick: () -> Unit
+) = ExpressiveIconButton(
+    icon = {
+        AnimatedContent(
+            icon,
+            transitionSpec = {
+                materialSharedAxisZ(true)
+            }
+        ) {
+            Icon(
+                it,
+                contentDescription = null,
+                modifier = Modifier.size(size).rotate(iconRotationAngle)
+            )
+        }
+    },
+    modifier = modifier,
+    size = size,
+    widthOption = widthOption,
+    outlined = outlined,
+    colors = colors,
+    loading = loading,
+    enabled = enabled,
+    interactionSource = interactionSource,
+    onClick = onClick
+)
+
+
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun ExpressiveIconButton(
+    icon: Painter,
+    modifier: Modifier = Modifier,
+    size: Dp = IconButtonDefaults.extraSmallIconSize,
+    widthOption: IconButtonDefaults.IconButtonWidthOption = IconButtonDefaults.IconButtonWidthOption.Uniform,
+    outlined: Boolean = false,
+    colors: IconButtonColors =
+        if (outlined) IconButtonDefaults.outlinedIconButtonColors()
+        else IconButtonDefaults.iconButtonColors(),
+    loading: Boolean = false,
+    enabled: Boolean = true,
+    iconRotationAngle: Float = 0f,
+    interactionSource: MutableInteractionSource? = null,
+    onClick: () -> Unit
+) = ExpressiveIconButton(
+    icon = {
+        AnimatedContent(
+            icon,
+            transitionSpec = {
+                materialSharedAxisZ(true)
+            }
+        ) {
+            Image(
+                it,
+                contentDescription = null,
+                modifier = Modifier.size(size).rotate(iconRotationAngle),
+                colorFilter = ColorFilter.tint(
+                    if (enabled) colors.contentColor
+                    else colors.disabledContentColor
+                )
+            )
+        }
+    },
+    modifier = modifier,
+    size = size,
+    widthOption = widthOption,
+    outlined = outlined,
+    colors = colors,
+    loading = loading,
+    enabled = enabled,
+    interactionSource = interactionSource,
+    onClick = onClick
+)

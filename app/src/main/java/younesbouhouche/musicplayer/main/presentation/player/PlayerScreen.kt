@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.kmpalette.rememberPaletteState
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
+import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.QueueModel
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.main.presentation.states.ViewState
@@ -44,6 +45,7 @@ fun PlayerScreen(
     state: PlayerState,
     dragState: AnchoredDraggableState<ViewState>,
     modifier: Modifier = Modifier,
+    onUiEvent: (UiEvent) -> Unit,
     onSetFavorite: (String, Boolean) -> Unit,
     onPlaybackEvent: (PlaybackEvent) -> Unit,
 ) {
@@ -120,7 +122,13 @@ fun PlayerScreen(
                         }
                     },
                     onSetFavorite,
-                    onPlaybackEvent
+                    {
+                        onUiEvent(UiEvent.ShowCreatePlaylistDialog(queue.items.map { it.path }))
+                    },
+                    {
+                        onUiEvent(UiEvent.ShowAddToPlaylistDialog(queue.items.map { it.path }))
+                    },
+                    onPlaybackEvent,
                 )
             }
         }

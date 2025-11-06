@@ -51,6 +51,7 @@ import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
+import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.domain.models.QueueModel
 import younesbouhouche.musicplayer.main.presentation.components.MusicCardListItem
 import younesbouhouche.musicplayer.main.presentation.util.expressiveRectShape
@@ -63,6 +64,8 @@ fun QueueSheet(
     onDismissRequest: () -> Unit,
     queue: QueueModel,
     onPlaybackEvent: (PlaybackEvent) -> Unit,
+    onSaveQueue: () -> Unit,
+    onAddToPlaylist: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val reorderState = rememberReorderState<MusicCard>(true)
@@ -158,7 +161,7 @@ fun QueueSheet(
                     modifier = Modifier.align(Alignment.BottomCenter).offset(y = -ScreenOffset),
                     scrollBehavior = exitAlwaysScrollBehavior,
                     floatingActionButton = {
-                        FloatingToolbarDefaults.VibrantFloatingActionButton({}) {
+                        FloatingToolbarDefaults.VibrantFloatingActionButton(onAddToPlaylist) {
                             Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null)
                         }
                     }
@@ -171,10 +174,9 @@ fun QueueSheet(
                     }
                     ExpressiveIconButton(
                         Icons.Default.Save,
-                        size = IconButtonDefaults.mediumIconSize
-                    ) {
-
-                    }
+                        size = IconButtonDefaults.mediumIconSize,
+                        onClick = onSaveQueue
+                    )
                 }
             }
         }

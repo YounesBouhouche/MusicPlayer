@@ -1,6 +1,5 @@
 package younesbouhouche.musicplayer.main.data
 
-import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -45,7 +44,6 @@ import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.SetVolume
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.Stop
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.Swap
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent.ToggleShuffle
-import younesbouhouche.musicplayer.main.domain.events.PlaylistEvent
 import younesbouhouche.musicplayer.main.domain.events.TimerType
 import younesbouhouche.musicplayer.main.domain.repo.PlaybackRepository
 import younesbouhouche.musicplayer.main.presentation.states.PlayState

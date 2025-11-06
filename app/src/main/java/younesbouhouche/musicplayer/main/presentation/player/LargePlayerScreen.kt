@@ -2,6 +2,10 @@ package younesbouhouche.musicplayer.main.presentation.player
 
 import android.net.Uri
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -17,12 +21,11 @@ import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
@@ -38,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -70,7 +74,9 @@ fun LargePlayerScreen(
     modifier: Modifier = Modifier,
     onCollapse: () -> Unit,
     onSetFavorite: (String, Boolean) -> Unit,
-    onPlaybackEvent: (PlaybackEvent) -> Unit
+    onSaveQueue: () -> Unit = {},
+    onAddToPlaylist: () -> Unit = {},
+    onPlaybackEvent: (PlaybackEvent) -> Unit,
 ) {
     var queueSheetVisible by remember { mutableStateOf(false) }
     var speedSheetVisible by remember { mutableStateOf(false) }
@@ -216,14 +222,8 @@ fun LargePlayerScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                val iconSize = IconButtonDefaults.extraLargeIconSize
                 repeat(3) {
-                    val icon = when(it) {
-                        0 -> Icons.Default.SkipPrevious
-                        1 ->
-                            if (playerState.playState == PlayState.PLAYING) Icons.Default.Pause
-                            else Icons.Default.PlayArrow
-                        else -> Icons.Default.SkipNext
-                    }
                     val interactionSource = remember { MutableInteractionSource() }
                     val pressed by interactionSource.collectIsPressedAsState()
                     val weight by animateFloatAsState(
@@ -235,12 +235,38 @@ fun LargePlayerScreen(
                     val containerColor =
                         if (it == 1) MaterialTheme.colorScheme.primary
                         else  MaterialTheme.colorScheme.surface.copy(alpha = .4f)
+                    val icon = @Composable {
+                        when(it) {
+                            0 ->
+                                Icon(
+                                    Icons.Default.SkipPrevious,
+                                    null,
+                                    Modifier.size(iconSize)
+                                )
+                            1 ->
+                                Image(
+                                    rememberAnimatedVectorPainter(
+                                        AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause_animation),
+                                        playerState.playState == PlayState.PLAYING
+                                    ),
+                                    null,
+                                    Modifier.size(iconSize),
+                                    colorFilter = ColorFilter.tint(contentColor)
+                                )
+                            else ->
+                                Icon(
+                                    Icons.Default.SkipNext,
+                                    null,
+                                    Modifier.size(iconSize)
+                                )
+                        }
+                    }
                     ExpressiveIconButton(
                         icon,
                         modifier = Modifier
                             .height(100.dp)
                             .weight(weight),
-                        size = IconButtonDefaults.extraLargeIconSize,
+                        size = iconSize,
                         interactionSource = interactionSource,
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = containerColor,
@@ -300,7 +326,9 @@ fun LargePlayerScreen(
                 queueSheetVisible = false
             },
             queue,
-            onPlaybackEvent
+            onPlaybackEvent,
+            onSaveQueue,
+            onAddToPlaylist
         )
     }
 }

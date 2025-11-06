@@ -381,6 +381,7 @@ fun AppScreen(
                     playerState,
                     mainVM::onPlayerEvent,
                     mainVM::onPlaybackEvent,
+                    mainVM::onUiEvent,
                     currentNavRoute,
                 ) {
                     navController.navigateTo(it)

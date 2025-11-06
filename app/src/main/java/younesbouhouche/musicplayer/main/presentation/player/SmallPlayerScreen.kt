@@ -7,6 +7,10 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +19,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MusicNote
@@ -30,8 +35,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
@@ -97,9 +104,16 @@ fun SmallPlayerScreen(
         }
         file?.let {
             ExpressiveIconButton(
-                when (state) {
-                    PlayState.PLAYING -> Icons.Default.Pause
-                    PlayState.PAUSED, PlayState.STOP -> Icons.Default.PlayArrow
+                {
+                    Image(
+                        rememberAnimatedVectorPainter(
+                            AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause_animation),
+                            state == PlayState.PLAYING
+                        ),
+                        null,
+                        Modifier.size(IconButtonDefaults.mediumIconSize),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primaryContainer)
+                    )
                 },
                 size = IconButtonDefaults.mediumIconSize,
                 colors = IconButtonDefaults.iconButtonColors(

@@ -97,9 +97,16 @@ class DialogRepoImpl(val context: Context): DialogRepo {
                 }
             }
         }, ContextCompat.getMainExecutor(context))
-        val cursor =
+
+        val idFromUri = try {
+            ContentUris.parseId(uri)
+        } catch (e: Exception) {
+            -1L
+        }
+
+        val cursor = if (idFromUri != -1L) {
             context.contentResolver.query(
-                uri,
+                MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL),
                 arrayOf(
                     MediaStore.Audio.Media._ID,
                     MediaStore.Audio.Media.DISPLAY_NAME,
@@ -109,18 +116,22 @@ class DialogRepoImpl(val context: Context): DialogRepo {
                     MediaStore.Audio.Media.ALBUM,
                     MediaStore.Audio.Media.ARTIST,
                 ),
-                null,
-                null,
+                "${MediaStore.Audio.Media._ID} = ?",
+                arrayOf(idFromUri.toString()),
                 null,
             )
+        } else {
+            null
+        }
+
         cursor?.use { crs ->
-            crs.moveToFirst()
-            val idColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
-            val durationColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
-            val titleColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
-            val artistColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
-            val albumIdColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
-            val albumColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+            if (crs.moveToFirst()) {
+                val idColumn = crs.getColumnIndex(MediaStore.Audio.Media._ID)
+            val durationColumn = crs.getColumnIndex(MediaStore.Audio.Media.DURATION)
+            val titleColumn = crs.getColumnIndex(MediaStore.Audio.Media.TITLE)
+            val artistColumn = crs.getColumnIndex(MediaStore.Audio.Media.ARTIST)
+            val albumIdColumn = crs.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)
+            val albumColumn = crs.getColumnIndex(MediaStore.Audio.Media.ALBUM)
             val id = crs.getLong(idColumn)
             val duration = crs.getLong(durationColumn)
             val title = crs.getString(titleColumn)
@@ -143,6 +154,7 @@ class DialogRepoImpl(val context: Context): DialogRepo {
                     .setAlbumId(albumId)
                     .setDuration(duration)
                     .build()
+            }
         }
         val cover =
             with(MediaMetadataRetriever()) {
@@ -153,7 +165,7 @@ class DialogRepoImpl(val context: Context): DialogRepo {
                     ByteArray(0)
                 }
             }
-        _card.value = _card.value?.copy(coverUri = null)
+        _card.value = _card.value?.copy(cover = cover)
     }
 
     override fun seekTo(ms: Long) {

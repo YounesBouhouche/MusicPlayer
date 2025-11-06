@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.main.domain.events.UiEvent
 import younesbouhouche.musicplayer.main.domain.models.NavRoutes
 import younesbouhouche.musicplayer.main.domain.models.QueueModel
 import younesbouhouche.musicplayer.main.domain.models.Routes
@@ -35,6 +36,7 @@ fun BoxScope.NavigationWithPlayer(
     playerState: PlayerState,
     onPlayerEvent: (PlayerEvent) -> Unit,
     onPlaybackEvent: (PlaybackEvent) -> Unit,
+    onUiEvent: (UiEvent) -> Unit,
     route: Routes?,
     navigate: (NavRoutes) -> Unit,
 ) {
@@ -91,6 +93,7 @@ fun BoxScope.NavigationWithPlayer(
             progress,
             playerState,
             state,
+            onUiEvent = onUiEvent,
             onSetFavorite = { path, favorite ->
                 onPlayerEvent(PlayerEvent.UpdateFavorite(path, favorite))
             },

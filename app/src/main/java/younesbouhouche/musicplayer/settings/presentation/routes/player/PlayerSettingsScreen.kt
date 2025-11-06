@@ -12,6 +12,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Colorize
 import androidx.compose.material.icons.filled.Lyrics
+import androidx.compose.material.icons.filled.MusicOff
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Shuffle
@@ -32,8 +34,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
 import younesbouhouche.musicplayer.main.presentation.util.plus
 import younesbouhouche.musicplayer.settings.presentation.components.SettingsItem
 import younesbouhouche.musicplayer.settings.presentation.components.SettingsList
@@ -45,136 +49,55 @@ import younesbouhouche.musicplayer.settings.presentation.util.SettingData
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerSettingsScreen(
-    viewModel: PlayerSettingsViewModel,
+    modifier: Modifier = Modifier,
     onBack: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
-    val scrollBehavior =
-        TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    val matchPictureColors by viewModel.matchPictureColors.collectAsState()
-    val showVolumeSlider by viewModel.showVolumeSlider.collectAsState()
-    val showRepeatButton by viewModel.showRepeatButton.collectAsState()
-    val showShuffleButton by viewModel.showShuffleButton.collectAsState()
-    val showSpeedButton by viewModel.showSpeedButton.collectAsState()
-    val showPitchButton by viewModel.showPitchButton.collectAsState()
-    val showTimerButton by viewModel.showTimerButton.collectAsState()
-    val showLyricsButton by viewModel.showLyricsButton.collectAsState()
     val settings = listOf(
         Category(
-            name = R.string.customize_view,
             items = listOf(
                 SettingData(
-                    headline = R.string.match_picture_colors,
-                    supporting = R.string.match_picture_colors_description,
-                    icon = Icons.Default.Colorize,
-                    checked = Checked(false, matchPictureColors) {
-                        viewModel.saveSettings(matchPictureColors = it)
-                    },
-                    large = false,
-                    separator = false,
+                    headline = R.string.style,
+                    large = true
                 ) {
-                    viewModel.saveSettings(matchPictureColors = !matchPictureColors)
-                },
-                SettingData(
-                    headline = R.string.show_volume_slider,
-                    icon = Icons.AutoMirrored.Default.VolumeUp,
-                    checked = Checked(false, showVolumeSlider) {
-                        viewModel.saveSettings(showVolumeSlider = it)
-                    },
-                    large = false,
-                    separator = false,
-                ) {
-                    viewModel.saveSettings(showVolumeSlider = !showVolumeSlider)
                 },
             ),
         ),
         Category(
-            name = R.string.controls,
             items = listOf(
                 SettingData(
-                    headline = R.string.show_repeat_button,
-                    icon = Icons.Default.Repeat,
-                    checked = Checked(false, showRepeatButton) {
-                        viewModel.saveSettings(showRepeatButton = it)
-                    },
-                    large = false,
-                    separator = false,
+                    headline = R.string.carousel,
+                    large = true
                 ) {
-                    viewModel.saveSettings(showRepeatButton = !showRepeatButton)
                 },
                 SettingData(
-                    headline = R.string.show_shuffle_button,
-                    icon = Icons.Default.Shuffle,
-                    checked = Checked(false, showShuffleButton) {
-                        viewModel.saveSettings(showShuffleButton = it)
-                    },
-                    large = false,
-                    separator = false,
+                    headline = R.string.action_bar,
+                    large = true
                 ) {
-                    viewModel.saveSettings(showShuffleButton = !showShuffleButton)
                 },
-                SettingData(
-                    headline = R.string.show_speed_button,
-                    icon = Icons.Default.Speed,
-                    checked = Checked(false, showSpeedButton) {
-                        viewModel.saveSettings(showSpeedButton = it)
-                    },
-                    large = false,
-                    separator = false,
-                ) {
-                    viewModel.saveSettings(showSpeedButton = !showSpeedButton)
-                },
-                SettingData(
-                    headline = R.string.show_pitch_button,
-                    icon = Icons.Default.RecordVoiceOver,
-                    checked = Checked(false, showPitchButton) {
-                        viewModel.saveSettings(showPitchButton = it)
-                    },
-                    large = false,
-                    separator = false,
-                ) {
-                    viewModel.saveSettings(showPitchButton = !showPitchButton)
-                },
-                SettingData(
-                    headline = R.string.show_timer_button,
-                    icon = Icons.Default.Timer,
-                    checked = Checked(false, showTimerButton) {
-                        viewModel.saveSettings(showTimerButton = it)
-                    },
-                    large = false,
-                    separator = false,
-                ) {
-                    viewModel.saveSettings(showTimerButton = !showTimerButton)
-                },
-                SettingData(
-                    headline = R.string.show_lyrics_button,
-                    icon = Icons.Default.Lyrics,
-                    checked = Checked(false, showLyricsButton) {
-                        viewModel.saveSettings(showLyricsButton = it)
-                    },
-                    large = false,
-                    separator = false,
-                ) {
-                    viewModel.saveSettings(showLyricsButton = !showLyricsButton)
-                }
             ),
-        )
+        ),
     )
+    val scrollBehavior =
+        TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     Scaffold(
-        modifier = modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
                 title = {
                     Text(
                         stringResource(id = R.string.player),
                         maxLines = 1,
-                        overflow = TextOverflow.Companion.Ellipsis,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                    }
+                    ExpressiveIconButton(
+                        icon = Icons.AutoMirrored.Filled.ArrowBack,
+                        onClick = onBack
+                    )
                 },
                 scrollBehavior = scrollBehavior,
             )
@@ -198,4 +121,12 @@ fun PlayerSettingsScreen(
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun PlayerSettingsScreenPreview() {
+    PlayerSettingsScreen(
+        onBack = {}
+    )
 }
