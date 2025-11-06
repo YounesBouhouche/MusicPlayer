@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,9 +70,9 @@ fun PlaylistScreen(
     val state = rememberLazyListState()
     val reorderState = rememberReorderState<MusicCard>(true)
     val enableReorder = sortState.ascending and (sortState.sortType == PlaylistSortType.Custom)
-//    LaunchedEffect(playlist) {
-//        reorderedPlaylist = playlist
-//    }
+    LaunchedEffect(playlist) {
+        reorderedPlaylist = playlist
+    }
     val bottomPadding by animateDpAsState(
         if (smallPlayerExpanded) 220.dp else 128.dp
     )

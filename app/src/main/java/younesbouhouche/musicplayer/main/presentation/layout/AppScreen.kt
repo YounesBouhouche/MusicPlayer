@@ -1,6 +1,7 @@
 package younesbouhouche.musicplayer.main.presentation.layout
 
 import android.content.Intent
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
@@ -333,9 +334,9 @@ fun AppScreen(
                              }
                         }
                         composable<NavRoutes.Playlist> { entry ->
-                            val id = entry.toRoute<NavRoutes.Playlist>().playlistId
-                            LaunchedEffect(id) {
-                                mainVM.getPlaylist(id)
+                            val route = entry.toRoute<NavRoutes.Playlist>()
+                            LaunchedEffect(route) {
+                                mainVM.getPlaylist(route.playlistId)
                             }
                             PlaylistScreen(
                                 playlist,
