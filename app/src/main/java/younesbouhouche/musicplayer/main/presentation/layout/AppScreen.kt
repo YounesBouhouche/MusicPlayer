@@ -311,7 +311,13 @@ fun AppScreen(
                                     bottomSheetFile = it
                                 }
                             ) { index, shuffle ->
-                                mainVM.onPlaybackEvent(PlaybackEvent.Play(artist.items, index, shuffle = shuffle))
+                                mainVM.onPlaybackEvent(
+                                    PlaybackEvent.Play(
+                                        artist.items,
+                                        index,
+                                        shuffle = shuffle
+                                    )
+                                )
                             }
                         }
                         composable<NavRoutes.Playlists> {

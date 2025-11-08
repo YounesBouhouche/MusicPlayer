@@ -15,8 +15,10 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
+import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -82,7 +84,11 @@ fun PlaylistsScreen(
                     ToggleFloatingActionButton(
                         expanded,
                         { expanded = !expanded },
-                        containerSize = ToggleFloatingActionButtonDefaults.containerSizeMedium()
+                        containerSize = ToggleFloatingActionButtonDefaults.containerSizeMedium(),
+                        containerColor = ToggleFloatingActionButtonDefaults.containerColor(
+                            MaterialTheme.colorScheme.tertiaryContainer,
+                            MaterialTheme.colorScheme.tertiary
+                        )
                     ) {
                         val imageVector by remember {
                             derivedStateOf {
@@ -94,7 +100,11 @@ fun PlaylistsScreen(
                             null,
                             Modifier.animateIcon(
                                 { checkedProgress },
-                                size = ToggleFloatingActionButtonDefaults.iconSizeMedium()
+                                size = ToggleFloatingActionButtonDefaults.iconSizeMedium(),
+                                color = ToggleFloatingActionButtonDefaults.iconColor(
+                                    MaterialTheme.colorScheme.tertiary,
+                                    MaterialTheme.colorScheme.tertiaryContainer
+                                )
                             ),
                         )
                     }
@@ -120,6 +130,7 @@ fun PlaylistsScreen(
             playlists.isEmpty(),
             Icons.AutoMirrored.Filled.PlaylistPlay,
             stringResource(R.string.empty_playlists_text),
+            modifier = Modifier.fillMaxSize()
         ) {
             GridScreen(
                 playlists,

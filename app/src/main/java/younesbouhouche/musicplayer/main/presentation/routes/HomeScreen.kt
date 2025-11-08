@@ -5,7 +5,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,17 +32,13 @@ import androidx.compose.material3.carousel.HorizontalCenteredHeroCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -55,8 +50,6 @@ import younesbouhouche.musicplayer.core.presentation.util.IconContainer
 import younesbouhouche.musicplayer.main.presentation.components.MusicCardListItem
 import younesbouhouche.musicplayer.main.presentation.components.PictureCard
 import younesbouhouche.musicplayer.main.presentation.util.expressiveRectShape
-import younesbouhouche.musicplayer.settings.data.SettingsDataStore
-import younesbouhouche.musicplayer.settings.domain.models.ColorScheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -121,7 +114,6 @@ fun HomeScreen(
                         Icons.Default.Person,
                         stringResource(R.string.top_artists),
                         stringResource(R.string.top_artists_text),
-                        colorScheme = ColorScheme.GREEN,
                     )
                     Surface(
                         Modifier
@@ -171,7 +163,6 @@ fun HomeScreen(
                 stringResource(R.string.recently_added),
                 stringResource(R.string.listen_to_your_recently_added_songs),
                 lastAdded,
-                colorScheme = ColorScheme.BLUE,
                 onPlay = onPlay,
             ) { }
         }
@@ -181,7 +172,6 @@ fun HomeScreen(
                 stringResource(R.string.favorites),
                 stringResource(R.string.favorites_subtitles),
                 favorites,
-                colorScheme = ColorScheme.RED,
                 onPlay = onPlay,
             ) { }
         }
@@ -191,7 +181,6 @@ fun HomeScreen(
                 stringResource(R.string.history),
                 stringResource(R.string.watch_your_recently_played_songs),
                 history,
-                colorScheme = ColorScheme.PURPLE,
                 onPlay = onPlay,
             ) { }
         }
@@ -206,7 +195,6 @@ private fun ListContainer(
     subtitle: String,
     items: List<MusicCard>,
     modifier: Modifier = Modifier,
-    colorScheme: ColorScheme? = null,
     onPlay: (List<MusicCard>, Int) -> Unit,
     onClick: () -> Unit,
 ) {
@@ -225,7 +213,6 @@ private fun ListContainer(
                 icon,
                 title,
                 subtitle,
-                colorScheme = colorScheme,
                 onClick = onClick
             ) {
                 IconContainer(
@@ -235,8 +222,8 @@ private fun ListContainer(
                         onPlay(items, 0)
                     },
                     shape = MaterialShapes.Cookie9Sided.toShape(),
-                    iconTint = it.onPrimaryContainer,
-                    background = it.onPrimary
+                    iconTint = MaterialTheme.colorScheme.tertiary,
+                    background = MaterialTheme.colorScheme.onTertiary
                 )
             }
             itemsSliced.forEachIndexed { index, it ->
@@ -259,21 +246,13 @@ private fun Header(
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier,
-    colorScheme: ColorScheme? = null,
     onClick: (() -> Unit)? = null,
-    trailingContent: @Composable ((androidx.compose.material3.ColorScheme) -> Unit)? = null
+    trailingContent: @Composable (() -> Unit)? = null
 ) {
-    val datastore = SettingsDataStore(LocalContext.current)
-    val isDark by datastore.isDark().collectAsState(isSystemInDarkTheme())
-    val colors = when(colorScheme) {
-        null -> MaterialTheme.colorScheme
-        else -> if(isDark) colorScheme.darkScheme else colorScheme.lightScheme
-    }
-    val contentColor = colors.onPrimary
     Row(
         modifier = modifier
             .clip(expressiveRectShape(0, 2))
-            .background(Brush.linearGradient(listOf(colors.primary, colors.tertiary)))
+            .background(MaterialTheme.colorScheme.tertiary)
             .clickable(onClick = { onClick?.invoke() }, enabled = onClick != null)
             .padding(18.dp, 24.dp)
             .fillMaxWidth(),
@@ -284,7 +263,7 @@ private fun Header(
             icon,
             null,
             Modifier.size(36.dp),
-            tint = contentColor
+            tint = MaterialTheme.colorScheme.onTertiary
         )
         Column(
             Modifier.weight(1f),
@@ -293,15 +272,15 @@ private fun Header(
             Text(
                 title,
                 style = MaterialTheme.typography.titleMedium,
-                color = contentColor,
+                color = MaterialTheme.colorScheme.onTertiary,
                 fontWeight = FontWeight.Medium
             )
             Text(
                 subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = contentColor.copy(alpha = 0.7f)
+                color = MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.7f)
             )
         }
-        trailingContent?.invoke(colors)
+        trailingContent?.invoke()
     }
 }
