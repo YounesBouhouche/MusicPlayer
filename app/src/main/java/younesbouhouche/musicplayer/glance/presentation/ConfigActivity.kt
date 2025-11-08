@@ -43,6 +43,7 @@ import androidx.glance.appwidget.updateAll
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.compose.KoinContext
+import org.koin.compose.koinInject
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.main.presentation.util.composables.SetSystemBarColors
 import younesbouhouche.musicplayer.settings.data.SettingsDataStore
@@ -66,8 +67,8 @@ class ConfigActivity : ComponentActivity() {
             return
         }
         glanceId = GlanceAppWidgetManager(this).getGlanceIdBy(appWidgetId)
-        val dataStore by inject<SettingsDataStore>()
         setContent {
+            val dataStore = koinInject<SettingsDataStore>()
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
             val opacity by dataStore.getOpacity(appWidgetId).collectAsState(1f)
             var selectedOpacity by remember { mutableFloatStateOf(1f) }
