@@ -158,7 +158,7 @@ class PlaybackRepositoryImpl(
                     }
 
                     is Seek -> {
-                        playerManager.seek(event.index, event.time)
+                        playerManager.seek(event.index, event.time, event.skipIfSameIndex)
                     }
 
                     is SeekTime -> {

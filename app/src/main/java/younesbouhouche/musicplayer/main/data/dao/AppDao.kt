@@ -97,6 +97,9 @@ interface AppDao {
     @Query("SELECT * from Queue WHERE id=0")
     fun getQueue(): Flow<Queue?>
 
+    @Query("SELECT * from Queue WHERE id=0")
+    suspend fun asyncGetQueue(): Queue?
+
     @Upsert
     suspend fun upsertQueue(queue: Queue)
 

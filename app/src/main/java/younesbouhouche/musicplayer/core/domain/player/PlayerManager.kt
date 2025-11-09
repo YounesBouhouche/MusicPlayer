@@ -172,6 +172,8 @@ class PlayerManager(
 
     val time = MutableStateFlow(0L)
     private var timeTask = Task()
+    private var lastSeekTime = 0L
+    private val seekLockDuration = 100L // milliseconds
 
     // Private functions
     suspend fun startTimeUpdate() {
@@ -184,12 +186,21 @@ class PlayerManager(
         }
     }
 
-    suspend fun seek(index: Int, time: Long) {
+    suspend fun seek(index: Int, time: Long, skipIfSameIndex: Boolean = true) {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastSeekTime < seekLockDuration) {
+            return
+        }
+        if (skipIfSameIndex and (index == playerFactory.getPlayerOrNull().currentMediaItemIndex)) {
+            return
+        }
+        lastSeekTime = currentTime
         queueManager.updateIndex(index)
         stateManager.updateState {
             it.copy(time = time)
         }
         playerFactory.getPlayerOrNull().seekTo(index, time)
+        MyAppWidget().updateAll(context)
     }
 
     suspend fun play(
