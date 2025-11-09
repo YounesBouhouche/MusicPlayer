@@ -22,13 +22,13 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.unit.ColorProvider
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.main.presentation.MainActivity
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.glance.presentation.util.IconButton
 import younesbouhouche.musicplayer.glance.presentation.util.MyImage
+import younesbouhouche.musicplayer.glance.presentation.util.RowIconButton
 import younesbouhouche.musicplayer.glance.presentation.util.WidgetText
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
+import younesbouhouche.musicplayer.main.presentation.MainActivity
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 
@@ -77,7 +77,7 @@ fun MediumWidgetContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                IconButton(
+                RowIconButton(
                     icon = R.drawable.baseline_skip_previous_24,
                     size = 60.dp,
                     containerColor = GlanceTheme.colors.tertiary,
@@ -88,7 +88,7 @@ fun MediumWidgetContent(
                     }
                 }
                 Spacer(GlanceModifier.width(12.dp))
-                IconButton(
+                RowIconButton(
                     icon =
                         if (state.playState == PlayState.PLAYING) R.drawable.pause_icon
                         else R.drawable.play_icon,
@@ -101,7 +101,7 @@ fun MediumWidgetContent(
                     }
                 }
                 Spacer(GlanceModifier.width(12.dp))
-                IconButton(
+                RowIconButton(
                     icon = R.drawable.baseline_skip_next_24,
                     size = 60.dp,
                     containerColor = GlanceTheme.colors.tertiary,

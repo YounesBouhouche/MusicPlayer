@@ -69,6 +69,7 @@ import kotlin.math.roundToLong
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun LargePlayerScreen(
+    enabled: Boolean,
     queue: QueueModel,
     playerState: PlayerState,
     modifier: Modifier = Modifier,
@@ -103,7 +104,8 @@ fun LargePlayerScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 modifier = Modifier.size(50.dp),
-                onClick = onCollapse
+                onClick = onCollapse,
+                enabled = enabled
             )
             Text(
                 stringResource(R.string.now_playing),
@@ -119,13 +121,15 @@ fun LargePlayerScreen(
                     containerColor = MaterialTheme.colorScheme.surface.copy(.3f),
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
-                modifier = Modifier.size(50.dp)
+                modifier = Modifier.size(50.dp),
+                enabled = enabled
             ) {
                 queueSheetVisible = true
             }
         }
         Carousel(
             queue,
+            enabled,
             Modifier.weight(1f),
             playerState.playState == PlayState.PLAYING,
             onPlaybackEvent
@@ -167,7 +171,8 @@ fun LargePlayerScreen(
                     colors = IconButtonDefaults.iconButtonColors(
                         containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         contentColor = MaterialTheme.colorScheme.primaryContainer
-                    )
+                    ),
+                    enabled = enabled
                 ) {
                     currentItem?.let {
                         onSetFavorite(it.path, !it.favorite)
@@ -271,7 +276,8 @@ fun LargePlayerScreen(
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = containerColor,
                             contentColor = contentColor,
-                        )
+                        ),
+                        enabled = enabled
                     ) {
                         onPlaybackEvent(when(it) {
                             0 -> PlaybackEvent.Previous
@@ -342,6 +348,7 @@ private fun LargePlayerPreview() {
             color = MaterialTheme.colorScheme.primaryContainer,
         ) {
             LargePlayerScreen(
+                enabled = true,
                 queue = QueueModel(
                     index = 0,
                     items = List(10) {

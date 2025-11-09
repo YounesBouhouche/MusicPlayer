@@ -17,6 +17,8 @@ import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
+import androidx.glance.layout.RowScope
+import androidx.glance.layout.height
 import androidx.glance.layout.size
 import androidx.glance.unit.ColorProvider
 
@@ -26,6 +28,7 @@ fun IconButton(
     icon: Int,
     size: Dp,
     modifier: GlanceModifier = GlanceModifier,
+    iconSize: Dp = size / 3,
     @SuppressLint("RestrictedApi") containerColor: ColorProvider = ColorProvider(Color.Transparent),
     contentColor: ColorProvider = GlanceTheme.colors.onSurface,
     onClick: () -> Unit
@@ -36,14 +39,35 @@ fun IconButton(
             .clickable(onClick)
             .cornerRadius(size)
             .background(containerColor)
-            .size(size),
+            .height(size),
         contentAlignment = Alignment.Center
     ) {
         Image(
             ImageProvider(Icon.createWithResource(context, icon)),
             "",
-            modifier.size(size / 2),
+            GlanceModifier.size(iconSize),
             colorFilter = ColorFilter.tint(contentColor)
         )
     }
 }
+
+
+@Composable
+fun RowScope.RowIconButton(
+    @DrawableRes
+    icon: Int,
+    size: Dp,
+    modifier: GlanceModifier = GlanceModifier,
+    iconSize: Dp = size / 3,
+    @SuppressLint("RestrictedApi") containerColor: ColorProvider = ColorProvider(Color.Transparent),
+    contentColor: ColorProvider = GlanceTheme.colors.onSurface,
+    onClick: () -> Unit
+) = IconButton(
+    icon,
+    size,
+    modifier.defaultWeight(),
+    iconSize,
+    containerColor,
+    contentColor,
+    onClick
+)

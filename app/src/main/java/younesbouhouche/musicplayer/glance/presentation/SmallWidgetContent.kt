@@ -27,6 +27,7 @@ import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.glance.presentation.util.IconButton
 import younesbouhouche.musicplayer.glance.presentation.util.MyImage
+import younesbouhouche.musicplayer.glance.presentation.util.RowIconButton
 import younesbouhouche.musicplayer.glance.presentation.util.WidgetText
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
@@ -70,7 +71,7 @@ fun SmallWidgetContent(
                 )
             }
             Spacer(GlanceModifier.width(16.dp))
-            IconButton(
+            RowIconButton(
                 icon =
                     if (state.playState == PlayState.PLAYING) R.drawable.pause_icon
                     else R.drawable.play_icon,

@@ -23,13 +23,13 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.TextAlign
 import androidx.glance.unit.ColorProvider
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.main.presentation.MainActivity
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.glance.presentation.util.IconButton
 import younesbouhouche.musicplayer.glance.presentation.util.MyImage
+import younesbouhouche.musicplayer.glance.presentation.util.RowIconButton
 import younesbouhouche.musicplayer.glance.presentation.util.WidgetText
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
+import younesbouhouche.musicplayer.main.presentation.MainActivity
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import younesbouhouche.musicplayer.main.presentation.states.PlayerState
 
@@ -45,7 +45,7 @@ fun LargeWidgetContent(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val background = GlanceTheme.colors.widgetBackground.getColor(context).copy(alpha = opacity)
+    val background = GlanceTheme.colors.background.getColor(context).copy(alpha = opacity)
     Scaffold(
         modifier.clickable(actionStartActivity<MainActivity>()),
         backgroundColor = ColorProvider(background)
@@ -79,18 +79,18 @@ fun LargeWidgetContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                IconButton(
+                RowIconButton(
                     icon = R.drawable.baseline_skip_previous_24,
                     size = 60.dp,
                     containerColor = GlanceTheme.colors.tertiary,
-                    contentColor = GlanceTheme.colors.onTertiary
+                    contentColor = GlanceTheme.colors.onTertiary,
                 ) {
                     scope.launch {
                         onEvent(PlaybackEvent.Previous)
                     }
                 }
-                Spacer(GlanceModifier.width(12.dp))
-                IconButton(
+                Spacer(GlanceModifier.width(6.dp))
+                RowIconButton(
                     icon =
                         if (state.playState == PlayState.PLAYING) R.drawable.pause_icon
                         else R.drawable.play_icon,
@@ -102,8 +102,8 @@ fun LargeWidgetContent(
                         onEvent(PlaybackEvent.PauseResume)
                     }
                 }
-                Spacer(GlanceModifier.width(12.dp))
-                IconButton(
+                Spacer(GlanceModifier.width(6.dp))
+                RowIconButton(
                     icon = R.drawable.baseline_skip_next_24,
                     size = 60.dp,
                     containerColor = GlanceTheme.colors.tertiary,

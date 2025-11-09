@@ -1,5 +1,6 @@
 package younesbouhouche.musicplayer.glance.presentation.util
 
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
 import android.net.Uri
 import androidx.compose.runtime.Composable
@@ -10,7 +11,6 @@ import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
-import androidx.glance.appwidget.ImageProvider
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
 import androidx.glance.layout.Alignment
@@ -29,24 +29,12 @@ fun MyImage(
     size: Dp = 64.dp
 ) {
     val context = LocalContext.current
-    val imageUri = model?.let {
-        when {
-            model.scheme == "file" -> {
-                try {
-//                    val file = File(model.path ?: "")
-//                    FileProvider.getUriForFile(
-//                        context,
-//                        "${context.packageName}.fileprovider",
-//                        file
-//                    )
-                    null
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    null
-                }
-            }
-
-            else -> model
+    val bitmap = model?.let {
+        try {
+            val inputStream = context.contentResolver.openInputStream(it)
+            BitmapFactory.decodeStream(inputStream)
+        } catch (_: Exception) {
+            null
         }
     }
     Box(
@@ -57,7 +45,7 @@ fun MyImage(
             ),
         contentAlignment = Alignment.Center
     ) {
-        if (imageUri == null) {
+        if (bitmap == null) {
             Image(
                 provider = ImageProvider(
                     Icon.createWithResource(
@@ -71,7 +59,7 @@ fun MyImage(
             )
         } else {
             Image(
-                provider = ImageProvider(imageUri),
+                provider = ImageProvider(bitmap),
                 contentDescription = "",
                 modifier = GlanceModifier.fillMaxSize().cornerRadius(16.dp),
                 contentScale = ContentScale.Fit,

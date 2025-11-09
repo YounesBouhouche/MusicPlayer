@@ -1,6 +1,7 @@
 package younesbouhouche.musicplayer.glance.presentation
 
 import android.content.Context
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.DpSize
@@ -33,24 +34,30 @@ class MyAppWidget : GlanceAppWidget(), KoinComponent {
     override val sizeMode = SizeMode.Responsive(setOf(SMALL, MEDIUM, LARGE))
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val playbackRepository by inject<PlaybackRepository>()
+        val mediaRepository by inject<MediaRepository>()
+        val stateManager by inject<PlayerStateManager>()
+        val queueManager by inject<QueueManager>()
+        val initial = queueManager.asyncGetQueue()?.let {
+            it.items.getOrNull(it.index)?.let { id ->
+                mediaRepository.suspendGetMediaById(id)
+            }
+        }
         provideContent {
             GlanceTheme {
                 val appWidgetId = LocalGlanceId.current.toString().filter { it.isDigit() }.toInt()
-                val playbackRepository by inject<PlaybackRepository>()
-                val mediaRepository by inject<MediaRepository>()
-                val stateManager by inject<PlayerStateManager>()
-                val queueManager by inject<QueueManager>()
                 val dataStore: SettingsDataStore by inject(SettingsDataStore::class.java)
                 val opacity by dataStore.getOpacity(appWidgetId).collectAsState(1f)
                 val state = stateManager.playerState.collectAsState(PlayerState()).value
-                val currentItem = queueManager
+                val item by queueManager
                     .getCurrentItem()
                     .map { id ->
                         id?.let {
                             mediaRepository.suspendGetMediaById(it)
                         }
                     }
-                    .collectAsState(null).value.takeIf {
+                    .collectAsState(initial)
+                val currentItem = item?.takeIf {
                     state.playState != PlayState.STOP
                 }
                 val size = LocalSize.current
