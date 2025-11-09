@@ -8,9 +8,13 @@ import younesbouhouche.musicplayer.main.data.models.Queue
 
 class QueueManager(val dao: AppDao) {
     fun getQueue() = dao.getQueue()
+    suspend fun asyncGetQueue() = dao.asyncGetQueue()
     suspend fun getCurrentIndex() = getQueue().map { it?.id }.first()
     fun getCurrentItem() = dao.getQueue().map {
         it?.items?.getOrNull(it.id)
+    }
+    suspend fun asyncGetCurrentItem() = dao.asyncGetQueue()?.let {
+        it.items.getOrNull(it.id)
     }
     suspend fun setQueue(queue: Queue) = dao.upsertQueue(queue)
     suspend fun updateList(list: List<Long>) = dao.upsertQueue(Queue(0, list))

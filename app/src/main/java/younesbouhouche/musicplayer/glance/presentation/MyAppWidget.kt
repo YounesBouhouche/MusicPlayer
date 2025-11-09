@@ -38,10 +38,8 @@ class MyAppWidget : GlanceAppWidget(), KoinComponent {
         val mediaRepository by inject<MediaRepository>()
         val stateManager by inject<PlayerStateManager>()
         val queueManager by inject<QueueManager>()
-        val initial = queueManager.asyncGetQueue()?.let {
-            it.items.getOrNull(it.index)?.let { id ->
-                mediaRepository.suspendGetMediaById(id)
-            }
+        val initial = queueManager.asyncGetCurrentItem()?.let { id ->
+            mediaRepository.suspendGetMediaById(id)
         }
         provideContent {
             GlanceTheme {
