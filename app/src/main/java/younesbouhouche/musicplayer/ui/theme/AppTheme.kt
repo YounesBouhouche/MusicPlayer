@@ -9,9 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import com.kmpalette.PaletteState
 import com.kmpalette.color
-import com.kmpalette.palette.graphics.Palette
 import com.materialkolor.DynamicMaterialTheme
 import com.materialkolor.PaletteStyle
 import com.materialkolor.rememberDynamicColorScheme
@@ -73,11 +74,15 @@ internal fun AppTheme(
 
 @Composable
 internal fun AppTheme(
-    palette: Palette? = null,
+    paletteState: PaletteState<ImageBitmap>,
     content: @Composable () -> Unit,
-) = AppTheme(
-    palette?.vibrantSwatch?.color ?: palette?.dominantSwatch?.color,
-    palette?.dominantSwatch?.color,
-    palette?.mutedSwatch?.color,
-    content
-)
+) {
+    val state = paletteState.state
+    val palette = paletteState.palette?.takeIf { state != null }
+    AppTheme(
+        palette?.vibrantSwatch?.color ?: palette?.dominantSwatch?.color,
+        palette?.dominantSwatch?.color,
+        palette?.mutedSwatch?.color,
+        content
+    )
+}

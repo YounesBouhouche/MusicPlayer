@@ -72,7 +72,7 @@ fun DrawerSheetContent(
     val paletteState = rememberPaletteState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    AppTheme(paletteState.palette) {
+    AppTheme(paletteState) {
         ModalDrawerSheet(
             state,
             windowInsets = DrawerDefaults.windowInsets.exclude(WindowInsets.systemBars)
@@ -92,6 +92,9 @@ fun DrawerSheetContent(
                                     paletteState.generate(imageBitmap)
                                 }
                             } ?: paletteState.reset()
+                        },
+                        onError = {
+                            paletteState.reset()
                         }
                     )
                     Box(Modifier

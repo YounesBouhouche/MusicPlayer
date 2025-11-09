@@ -102,7 +102,7 @@ fun <T>ListScreen(
     val scope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current
-    AppTheme(palette.palette) {
+    AppTheme(palette) {
         Scaffold(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {

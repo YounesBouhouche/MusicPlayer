@@ -17,6 +17,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import soup.compose.material.motion.animation.materialSharedAxisXIn
+import soup.compose.material.motion.animation.materialSharedAxisYIn
+import soup.compose.material.motion.animation.materialSharedAxisYOut
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.main.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.main.domain.events.UiEvent
@@ -84,7 +87,11 @@ fun BoxScope.NavigationWithPlayer(
         )
         state.snapTo(ViewState.SMALL)
     }
-    AnimatedVisibility(playerState.playState != PlayState.STOP) {
+    AnimatedVisibility(
+        playerState.playState != PlayState.STOP,
+        enter = materialSharedAxisYIn(true, 100),
+        exit = materialSharedAxisYOut(false, 100),
+    ) {
         PlayerScreen(
             queue,
             playerState,

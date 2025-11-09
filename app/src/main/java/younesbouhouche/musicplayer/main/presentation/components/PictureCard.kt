@@ -41,7 +41,7 @@ fun PictureCard(
 ) {
     val palette = rememberPaletteState()
     val scope = rememberCoroutineScope()
-    AppTheme(palette.palette) {
+    AppTheme(palette) {
         Card(
             shape = shape,
             colors = CardDefaults.cardColors(

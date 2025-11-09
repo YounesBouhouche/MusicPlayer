@@ -66,7 +66,7 @@ fun PlayerScreen(
         bottomStart = smallCorner,
         bottomEnd = smallCorner
     )
-    AppTheme(palette.palette) {
+    AppTheme(palette) {
         Box(
             modifier.fillMaxWidth()
                 .padding(16.dp * (1f - progress))
@@ -107,30 +107,27 @@ fun PlayerScreen(
                     dragState.animateTo(ViewState.LARGE)
                 }
             }
-            if (progress > 0f) {
-
-                LargePlayerScreen(
-//                    dragState.currentValue == ViewState.LARGE,
-                    queue,
-                    playerState,
-                    Modifier
-                        .alpha(progress)
-                        .requiredHeight(viewHeightDp),
-                    {
-                        scope.launch {
-                            dragState.animateTo(ViewState.SMALL)
-                        }
-                    },
-                    onSetFavorite,
-                    {
-                        onUiEvent(UiEvent.ShowCreatePlaylistDialog(queue.items.map { it.path }))
-                    },
-                    {
-                        onUiEvent(UiEvent.ShowAddToPlaylistDialog(queue.items.map { it.path }))
-                    },
-                    onPlaybackEvent,
-                )
-            }
+            LargePlayerScreen(
+                progress > 0f,
+                queue,
+                playerState,
+                Modifier
+                    .alpha(progress)
+                    .requiredHeight(viewHeightDp),
+                {
+                    scope.launch {
+                        dragState.animateTo(ViewState.SMALL)
+                    }
+                },
+                onSetFavorite,
+                {
+                    onUiEvent(UiEvent.ShowCreatePlaylistDialog(queue.items.map { it.path }))
+                },
+                {
+                    onUiEvent(UiEvent.ShowAddToPlaylistDialog(queue.items.map { it.path }))
+                },
+                onPlaybackEvent,
+            )
         }
     }
 }

@@ -81,6 +81,9 @@ fun SmallPlayerScreen(
             background = MaterialTheme.colorScheme.surface.copy(0.5f),
             onSuccess = {
                 onImageLoad((it.result.drawable as? BitmapDrawable)?.bitmap)
+            },
+            onError = {
+                onImageLoad(null)
             }
         )
         Column(Modifier.weight(1f)
