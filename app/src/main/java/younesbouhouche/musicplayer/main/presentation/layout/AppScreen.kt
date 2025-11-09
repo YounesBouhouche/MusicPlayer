@@ -1,7 +1,6 @@
 package younesbouhouche.musicplayer.main.presentation.layout
 
 import android.content.Intent
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
@@ -53,6 +52,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import kotlinx.coroutines.launch
+import soup.compose.material.motion.animation.materialSharedAxisYIn
+import soup.compose.material.motion.animation.materialSharedAxisYOut
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
@@ -249,7 +250,13 @@ fun AppScreen(
                         Modifier
                             .fillMaxSize()
                             .padding(horizontal = padding)
-                            .containerClip()
+                            .containerClip(),
+                        enterTransition = {
+                            materialSharedAxisYIn(true, 100)
+                        },
+                        exitTransition = {
+                            materialSharedAxisYOut(false, 100)
+                        }
                     ) {
                         composable<NavRoutes.Home> {
                             HomeScreen(
