@@ -130,6 +130,7 @@ fun PlaylistsScreen(
             playlists.isEmpty(),
             Icons.AutoMirrored.Filled.PlaylistPlay,
             stringResource(R.string.empty_playlists_text),
+            contentPadding = paddingValues,
             modifier = Modifier.fillMaxSize()
         ) {
             GridScreen(
