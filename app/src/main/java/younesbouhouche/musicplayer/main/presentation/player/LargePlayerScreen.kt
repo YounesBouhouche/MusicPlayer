@@ -131,7 +131,6 @@ fun LargePlayerScreen(
             queue,
             enabled,
             Modifier.weight(1f),
-            playerState.playState == PlayState.PLAYING,
             onPlaybackEvent
         )
         Column(
