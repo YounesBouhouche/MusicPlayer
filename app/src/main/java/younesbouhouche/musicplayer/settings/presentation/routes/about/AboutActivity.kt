@@ -17,8 +17,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +42,7 @@ import androidx.core.view.WindowCompat
 import org.koin.android.ext.android.get
 import org.koin.compose.KoinContext
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.core.presentation.util.ExpressiveButton
 import younesbouhouche.musicplayer.main.presentation.util.composables.SetSystemBarColors
 import younesbouhouche.musicplayer.main.presentation.util.getAppVersion
 import younesbouhouche.musicplayer.settings.presentation.AppIcon
@@ -52,7 +54,7 @@ import younesbouhouche.musicplayer.settings.presentation.util.SettingData
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 
 class AboutActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -185,15 +187,22 @@ class AboutActivity : ComponentActivity() {
                         }
                         item {
                             Text(
-                                "MusicPlayer",
+                                stringResource(R.string.app_name),
                                 Modifier.fillMaxWidth(),
                                 style = MaterialTheme.typography.headlineLarge,
                                 textAlign = TextAlign.Center,
                             )
                         }
                         item {
-                            Button(onClick = {}) {
-                                Text("v${getAppVersion()}")
+                            ExpressiveButton(
+                                "v${getAppVersion()}",
+                                ButtonDefaults.MediumContainerHeight,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.tertiary
+                                )
+                            ) {
+
                             }
                         }
                         items(categories) {
