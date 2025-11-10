@@ -29,4 +29,6 @@ enum class ColorScheme(
         fun fromString(value: String): ColorScheme =
             entries.find { it.name.equals(value, ignoreCase = true) } ?: BLUE
     }
+    fun scheme(isDark: Boolean) =
+        if (isDark) darkScheme else lightScheme
 }
