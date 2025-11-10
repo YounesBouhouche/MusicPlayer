@@ -7,6 +7,5 @@ sealed interface Event {
     data class SavePlaylist(val playlist: Playlist): Event
     data class SharePlaylist(val playlist: Playlist): Event
     data class Navigate(val route: NavRoutes): Event
-    data object ExpandPlayer: Event
     data object LaunchPlaylistDialog: Event
 }

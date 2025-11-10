@@ -48,13 +48,11 @@ import younesbouhouche.musicplayer.main.presentation.models.AlbumUi
 import younesbouhouche.musicplayer.main.presentation.models.ArtistUi
 import younesbouhouche.musicplayer.main.presentation.states.StartupEvent
 import younesbouhouche.musicplayer.main.presentation.states.UiState
-import younesbouhouche.musicplayer.main.presentation.util.Event
 import younesbouhouche.musicplayer.main.presentation.util.ListsSortType
 import younesbouhouche.musicplayer.main.presentation.util.PlaylistSortType
 import younesbouhouche.musicplayer.main.presentation.util.SortState
 import younesbouhouche.musicplayer.main.presentation.util.SortType
 import younesbouhouche.musicplayer.main.presentation.util.isPermissionGranted
-import younesbouhouche.musicplayer.main.presentation.util.sendEvent
 import younesbouhouche.musicplayer.main.util.sortBy
 
 class MainViewModel(
@@ -133,7 +131,6 @@ class MainViewModel(
 
     fun onPlaybackEvent(event: PlaybackEvent) = viewModelScope.launch {
         playbackControlUseCase(event)
-        if (event is PlaybackEvent.Play) sendEvent(Event.ExpandPlayer)
     }
 
     fun onUiEvent(event: UiEvent) = viewModelScope.launch {

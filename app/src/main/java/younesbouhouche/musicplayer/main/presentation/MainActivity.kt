@@ -106,8 +106,6 @@ class MainActivity : ComponentActivity() {
                     Event.LaunchPlaylistDialog -> {
                         importPlaylistLauncher.launch(arrayOf("audio/x-mpegurl", "audio/x-scpls", "text/plain"))
                     }
-
-                    else -> return@CollectEvents
                 }
             }
             AppTheme {
