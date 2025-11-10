@@ -2,6 +2,7 @@ package younesbouhouche.musicplayer.main.presentation.player
 
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -23,8 +24,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialShapes
@@ -38,10 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import soup.compose.material.motion.animation.materialSharedAxisX
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
+import younesbouhouche.musicplayer.main.domain.models.QueueModel
 import younesbouhouche.musicplayer.main.presentation.components.MyImage
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
 import kotlin.math.roundToInt
@@ -49,7 +49,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SmallPlayerScreen(
-    file: MusicCard?,
+    queue: QueueModel,
     state: PlayState,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -57,6 +57,7 @@ fun SmallPlayerScreen(
     onImageLoad: (Bitmap?) -> Unit = { },
     onExpand: () -> Unit = {},
 ) {
+    val file = queue.getCurrentItem()
     val angle by rememberInfiniteTransition().animateFloat(
         initialValue = 0f,
         targetValue = if (state == PlayState.PLAYING) 360f else 0f,
@@ -86,24 +87,31 @@ fun SmallPlayerScreen(
                 onImageLoad(null)
             }
         )
-        Column(Modifier.weight(1f)
-            .padding(vertical = 4.dp)
-            .fillMaxHeight(),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                file?.title ?: "No song playing",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium,
-                maxLines = 1,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-            Text(
-                file?.artist ?: "Unknown artist",
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.7f)
-            )
+        AnimatedContent(
+            queue.index,
+            Modifier.weight(1f),
+            transitionSpec = {
+                materialSharedAxisX(forward = initialState < targetState, 100)
+            },
+        ) { index ->
+            Column(
+                Modifier.padding(vertical = 4.dp).fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    queue.items.getOrNull(index)?.title ?: "No song playing",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    queue.items.getOrNull(index)?.artist ?: "Unknown artist",
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.7f)
+                )
+            }
         }
         file?.let {
             ExpressiveIconButton(

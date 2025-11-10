@@ -88,7 +88,7 @@ fun PlayerScreen(
                 .background(MaterialTheme.colorScheme.primaryContainer),
         ) {
             SmallPlayerScreen(
-                queue.items.getOrNull(queue.index),
+                queue,
                 state.playState,
                 Modifier
                     .alpha(1f - progress)
