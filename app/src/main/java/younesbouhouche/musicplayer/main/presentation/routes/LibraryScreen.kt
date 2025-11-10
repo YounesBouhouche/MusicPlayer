@@ -1,6 +1,7 @@
 package younesbouhouche.musicplayer.main.presentation.routes
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -65,6 +66,7 @@ import younesbouhouche.musicplayer.main.presentation.util.SortBottomSheet
 import younesbouhouche.musicplayer.main.presentation.util.SortState
 import younesbouhouche.musicplayer.main.presentation.util.SortType
 import younesbouhouche.musicplayer.main.presentation.util.expressiveRectShape
+import younesbouhouche.musicplayer.main.presentation.util.plus
 import kotlin.text.compareTo
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -73,6 +75,7 @@ fun LibraryScreen(
     files: List<MusicCard>,
     sortState: SortState<SortType>,
     onSortStateChange: (SortState<SortType>) -> Unit,
+    smallPlayerExpanded: Boolean,
     modifier: Modifier = Modifier,
     onShowBottomSheet: (MusicCard) -> Unit = {},
     onClick: (MusicCard) -> Unit = {},
@@ -80,6 +83,9 @@ fun LibraryScreen(
     val filesGrouped = files.groupBy(sortState.sortType.groupBy)
     val favoriteFilesGrouped = files.filter { it.favorite }.groupBy(sortState.sortType.groupBy)
     var isFavoritesVisible by remember { mutableStateOf(true) }
+    val bottomPadding by animateDpAsState(
+        if (smallPlayerExpanded) 220.dp else 128.dp
+    )
     Column(modifier.fillMaxWidth()) {
         Row(
             Modifier.padding(16.dp).fillMaxWidth(),
@@ -166,6 +172,7 @@ fun LibraryScreen(
             if (it) {
                 ItemsList(
                     modifier = modifier,
+                    contentPadding = PaddingValues(bottom = bottomPadding),
                     items = filesGrouped,
                     onShowBottomSheet = onShowBottomSheet,
                     onClick = onClick,
@@ -175,6 +182,7 @@ fun LibraryScreen(
             } else {
                 ItemsList(
                     modifier = modifier,
+                    contentPadding = PaddingValues(bottom = bottomPadding),
                     items = favoriteFilesGrouped,
                     onShowBottomSheet = onShowBottomSheet,
                     onClick = onClick,
@@ -204,6 +212,7 @@ private fun ItemsList(
     emptyIcon: ImageVector,
     emptyText: String,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     onShowBottomSheet: (MusicCard) -> Unit = {},
     onClick: (MusicCard) -> Unit = {},
 ) {
@@ -212,7 +221,8 @@ private fun ItemsList(
         items.isEmpty(),
         emptyIcon,
         emptyText,
-        modifier
+        modifier,
+        contentPadding = contentPadding
     ) {
         LazyColumnScrollbar(
             state,
@@ -248,7 +258,7 @@ private fun ItemsList(
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 state = state,
-                contentPadding = PaddingValues(bottom = 260.dp, end = 12.dp),
+                contentPadding = contentPadding + PaddingValues(end = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 items.forEach { (key, list) ->
