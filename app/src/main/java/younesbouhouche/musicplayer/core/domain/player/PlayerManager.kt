@@ -34,7 +34,6 @@ class PlayerManager(
 ) {
     private val state = stateManager.playerState
 
-    // DataStore
     private val rememberRepeat = dataStore.rememberRepeat
     private val rememberShuffle = dataStore.rememberShuffle
     private val rememberSpeed = dataStore.rememberSpeed
@@ -44,19 +43,12 @@ class PlayerManager(
     private val speed = dataStore.speed
     private val pitch = dataStore.pitch
 
-    /**
-     * Get the singleton player instance
-     */
-    fun getPlayer(): Player = playerFactory.getPlayerOrNull()
-    /**
-     * Initialize the player and configure it
-     */
+    suspend fun getPlayer(): Player = playerFactory.getPlayer()
+
     @OptIn(UnstableApi::class)
-    fun initialize(scope: CoroutineScope): Player {
-        // Get or create the singleton player from factory
-        val exoPlayer = playerFactory.getPlayerOrNull()
+    suspend fun initialize(scope: CoroutineScope): Player {
+        val exoPlayer = playerFactory.getPlayer()
         exoPlayer.apply {
-            //setSeekParameters(SeekParameters(1000L, 1000L))
             addListener(
                 object : Player.Listener {
                     override fun onPlaybackStateChanged(playbackState: Int) {
@@ -177,7 +169,7 @@ class PlayerManager(
 
     // Private functions
     suspend fun startTimeUpdate() {
-        playerFactory.getPlayerOrNull().let { player ->
+        playerFactory.getPlayer().let { player ->
             timeTask.startRepeating(100L) {
                 stateManager.updateState {
                     it.copy(time = player.currentPosition)
@@ -191,7 +183,7 @@ class PlayerManager(
         if (currentTime - lastSeekTime < seekLockDuration) {
             return
         }
-        if (skipIfSameIndex and (index == playerFactory.getPlayerOrNull().currentMediaItemIndex)) {
+        if (skipIfSameIndex and (index == playerFactory.getPlayer().currentMediaItemIndex)) {
             return
         }
         lastSeekTime = currentTime
@@ -199,7 +191,7 @@ class PlayerManager(
         stateManager.updateState {
             it.copy(time = time)
         }
-        playerFactory.getPlayerOrNull().seekTo(index, time)
+        playerFactory.getPlayer().seekTo(index, time)
         MyAppWidget().updateAll(context)
     }
 
@@ -210,7 +202,7 @@ class PlayerManager(
         autoPlay: Boolean = true,
         shuffleMode: Boolean = false
     ) {
-        playerFactory.getPlayerOrNull().let { player ->
+        playerFactory.getPlayer().let { player ->
             if (cardsList.isEmpty()) return
             val list = if (shuffleMode) cardsList.shuffled() else cardsList
             queueManager.setQueue(Queue(items = list.map { it.id }, index = index))
@@ -244,7 +236,7 @@ class PlayerManager(
         }
     }
 
-    fun setPlayWhenReady(playWhenReady: Boolean) {
-        playerFactory.getPlayerOrNull().playWhenReady = playWhenReady
+    suspend fun setPlayWhenReady(playWhenReady: Boolean) {
+        playerFactory.getPlayer().playWhenReady = playWhenReady
     }
 }

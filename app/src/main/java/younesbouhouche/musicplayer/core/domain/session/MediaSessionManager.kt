@@ -59,14 +59,14 @@ class MediaSessionManager(
         }
 
     @OptIn(UnstableApi::class)
-    fun initialize(skipSilence: Boolean) {
+    suspend fun initialize() {
         Log.i("MediaSessionManager", "Init")
         context.contentResolver.registerContentObserver(
             Settings.System.CONTENT_URI,
             true,
             observer,
         )
-        player = playerFactory.getPlayer(skipSilence)
+        player = playerFactory.getPlayer()
         val sessionToken =
             SessionToken(context, ComponentName(context, MediaPlayerService::class.java))
         context.startForegroundService(Intent(context, MediaPlayerService::class.java))

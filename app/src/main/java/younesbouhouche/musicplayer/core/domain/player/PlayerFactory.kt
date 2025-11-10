@@ -10,8 +10,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import timber.log.Timber
-import younesbouhouche.musicplayer.main.presentation.states.PlayState
+import kotlinx.coroutines.flow.first
+import younesbouhouche.musicplayer.main.data.PlayerDataStore
 
 /**
  * Factory responsible for creating and managing a single ExoPlayer instance
@@ -19,37 +19,16 @@ import younesbouhouche.musicplayer.main.presentation.states.PlayState
 class PlayerFactory(
     private val context: Context,
     private val queueManager: QueueManager,
+    dataStore: PlayerDataStore
 ) {
-    // Single ExoPlayer instance for the entire application
     private var exoPlayer: Player? = null
+    private val skipSilence = dataStore.skipSilence
 
-    /**
-     * Gets or creates a singleton ExoPlayer instance
-     */
     @OptIn(UnstableApi::class)
-    @Synchronized
-    fun getPlayer(skipSilence: Boolean): Player {
-        if (exoPlayer == null) {
-            exoPlayer = createNewPlayer(skipSilence)
-        } else {
-            // Update skip silence setting if player already exists
-            //exoPlayer?.skipSilenceEnabled = skipSilence
-        }
-        return exoPlayer!!
-    }
+    suspend fun getPlayer(): Player = exoPlayer ?: createNewPlayer().also { exoPlayer = it }
 
-    /**
-     * Gets a singleton ExoPlayer instance
-     */
     @OptIn(UnstableApi::class)
-    @Synchronized
-    fun getPlayerOrNull(): Player = exoPlayer ?: createNewPlayer(false).also { exoPlayer = it }
-
-    /**
-     * Creates a new ExoPlayer instance with proper configuration
-     */
-    @OptIn(UnstableApi::class)
-    private fun createNewPlayer(skipSilence: Boolean): ExoPlayer {
+    private suspend fun createNewPlayer(): ExoPlayer {
         val audioAttributes = AudioAttributes.Builder()
             .setUsage(C.USAGE_MEDIA)
             .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
@@ -72,7 +51,7 @@ class PlayerFactory(
             .setAudioAttributes(audioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
             .setTrackSelector(trackSelector)
-            .setSkipSilenceEnabled(skipSilence)
+            .setSkipSilenceEnabled(skipSilence.first())
             .setLoadControl(loadControl)
             .build().apply {
                 playWhenReady = false

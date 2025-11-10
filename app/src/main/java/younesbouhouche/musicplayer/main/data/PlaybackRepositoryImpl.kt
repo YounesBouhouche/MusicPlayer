@@ -72,7 +72,7 @@ class PlaybackRepositoryImpl(
 
     override fun initialize() {
         CoroutineScope(SupervisorJob() + Dispatchers.Main).launch {
-            mediaSessionManager.initialize(dataStore.skipSilence.first())
+            mediaSessionManager.initialize()
             if (stateManager.playerState.value.playState != PlayState.STOP)
                 playerManager.startTimeUpdate()
         }

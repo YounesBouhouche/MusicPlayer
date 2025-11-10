@@ -12,6 +12,7 @@ import androidx.media3.session.CommandButton
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSessionService
 import com.google.common.collect.ImmutableList
 import younesbouhouche.musicplayer.R
 
@@ -42,7 +43,7 @@ class CustomMediaNotificationProvider(context: Context) : DefaultMediaNotificati
         }
     }
 
-    fun ensureForeground(service: androidx.media3.session.MediaSessionService) {
+    fun ensureForeground(service: MediaSessionService) {
         val notification = createPlaceholderNotification(service)
         service.startForeground(NOTIFICATION_ID, notification)
     }

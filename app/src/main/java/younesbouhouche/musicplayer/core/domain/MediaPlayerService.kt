@@ -92,8 +92,10 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        playerFactory.getPlayerOrNull().let { player ->
-            if (!player.playWhenReady || player.mediaItemCount == 0) stopSelf()
+        serviceScope.launch {
+            playerFactory.getPlayer().let { player ->
+                if (!player.playWhenReady || player.mediaItemCount == 0) stopSelf()
+            }
         }
     }
 

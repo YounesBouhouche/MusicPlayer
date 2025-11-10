@@ -23,7 +23,7 @@ val utilsModule = module {
         QueueManager(get())
     }
     single<PlayerFactory> {
-        PlayerFactory(androidContext(), get())
+        PlayerFactory(androidContext(), get(), get())
     }
     single<PlayerManager> {
         PlayerManager(
