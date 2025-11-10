@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.Role
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 
@@ -39,7 +40,7 @@ fun MyImage(
         modifier = modifier
             .clip(shape)
             .background(background)
-            .clickable(onClick != null) { onClick?.invoke() },
+            .clickable(onClick != null, role = Role.Image) { onClick?.invoke() },
         contentScale = ContentScale.Crop,
         loading = {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
