@@ -380,6 +380,7 @@ fun AppScreen(
                                 files,
                                 librarySortState,
                                 mainVM::onLibrarySortChange,
+                                smallPlayerExpanded,
                                 onShowBottomSheet = {
                                     bottomSheetFile = it
                                 }
