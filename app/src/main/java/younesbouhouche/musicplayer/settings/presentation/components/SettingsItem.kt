@@ -62,76 +62,82 @@ fun SettingsItem(
     useCheckbox: Boolean = false,
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
+    bottomContent: (@Composable () -> Unit)? = null,
 ) {
     val alpha by animateFloatAsState(if (enabled) 1f else .5f)
-    Row(
+    Column(
         modifier
             .fillMaxWidth()
             .clip(shape)
             .background(background)
-            .alpha(alpha)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = LocalIndication.current,
-                role = role,
-                onClick = onClick,
-                enabled = enabled
-            )
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
     ) {
-        leadingContent?.invoke()
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(
-                text = headline,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            supporting?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+        Row(
+            Modifier.fillMaxWidth()
+                .alpha(alpha)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = LocalIndication.current,
+                    role = role,
+                    onClick = onClick,
+                    enabled = enabled
                 )
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
+        ) {
+            leadingContent?.invoke()
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = headline,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                supporting?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            if (separator and (trailingContent != null))
+                VerticalDivider(Modifier.fillMaxHeight(.5f), 2.dp)
+            trailingContent?.invoke() ?: checked?.let {
+                if (it.radio)
+                    RadioButton(
+                        it.checked,
+                        { it.onCheckedChange(null) },
+                        interactionSource = interactionSource
+                    )
+                else if (useCheckbox)
+                    Checkbox(
+                        it.checked,
+                        it.onCheckedChange,
+                        interactionSource = interactionSource
+                    )
+                else
+                    Switch(
+                        it.checked,
+                        it.onCheckedChange,
+                        interactionSource = interactionSource
+                    )
+            }
+            if ((trailingContent == null) && (checked == null)) {
+                VerticalDivider(Modifier.fillMaxHeight(.5f), 2.dp)
+    //            ExpressiveIconButton(
+    //                Icons.Default.ChevronRight,
+    //                size = IconButtonDefaults.smallIconSize,
+    //                onClick = onClick,
+    //                colors = IconButtonDefaults.iconButtonColors(
+    //                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+    //                )
+    //            )
             }
         }
-        if (separator and (trailingContent != null))
-            VerticalDivider(Modifier.fillMaxHeight(.5f), 2.dp)
-        trailingContent?.invoke() ?: checked?.let {
-            if (it.radio)
-                RadioButton(
-                    it.checked,
-                    { it.onCheckedChange(null) },
-                    interactionSource = interactionSource
-                )
-            else if (useCheckbox)
-                Checkbox(
-                    it.checked,
-                    it.onCheckedChange,
-                    interactionSource = interactionSource
-                )
-            else
-                Switch(
-                    it.checked,
-                    it.onCheckedChange,
-                    interactionSource = interactionSource
-                )
-        }
-        if ((trailingContent == null) && (checked == null)) {
-            VerticalDivider(Modifier.fillMaxHeight(.5f), 2.dp)
-            ExpressiveIconButton(
-                Icons.Default.ChevronRight,
-                size = IconButtonDefaults.smallIconSize,
-                onClick = onClick,
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-                )
-            )
-        }
+        bottomContent?.invoke()
     }
 }
 
@@ -154,6 +160,7 @@ fun SettingsItem(
     useCheckbox: Boolean = false,
     separator: Boolean = false,
     trailingContent: (@Composable () -> Unit)? = null,
+    bottomContent: (@Composable () -> Unit)? = null,
 ) = SettingsItem(
     headline,
     modifier,
@@ -191,6 +198,7 @@ fun SettingsItem(
         }
     },
     trailingContent,
+    bottomContent
 )
 
 @Composable
@@ -223,7 +231,8 @@ fun SettingsItem(
         },
         large = data.large,
         separator = separator,
-        trailingContent = data.trailingContent
+        trailingContent = data.trailingContent,
+        bottomContent = data.bottomContent,
     )
 }
 

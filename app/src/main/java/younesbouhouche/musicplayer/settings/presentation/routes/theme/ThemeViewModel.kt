@@ -14,7 +14,6 @@ import younesbouhouche.musicplayer.settings.domain.models.Theme
 
 class ThemeViewModel(val dataStore: SettingsDataStore): ViewModel() {
     private val _uiState = MutableStateFlow(UiState())
-    val uiState = _uiState.stateInVM(UiState(), viewModelScope)
 
     val theme = dataStore.theme.onEach { theme ->
         _uiState.update {

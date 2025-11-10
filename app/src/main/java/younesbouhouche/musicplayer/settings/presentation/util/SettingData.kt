@@ -13,6 +13,7 @@ data class SettingData(
     val large: Boolean = false,
     val separator: Boolean = false,
     val trailingContent: (@Composable () -> Unit)? = null,
+    val bottomContent: (@Composable () -> Unit)? = null,
     val onClick: (Context) -> Unit = {},
 )
 
