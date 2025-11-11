@@ -70,7 +70,7 @@ fun BoxScope.NavigationWithPlayer(
         }
     val offset =
         with(density) {
-            ((viewHeight - (190.dp + navBarHeight).roundToPx()) * (1f - progress)).roundToInt()
+            ((viewHeight - (174.dp + navBarHeight).roundToPx()) * (1f - progress)).roundToInt()
         }
     val navigationBarOffset = with(density) {
         (progress * (112.dp + navBarHeight).toPx()).roundToInt()
@@ -80,7 +80,7 @@ fun BoxScope.NavigationWithPlayer(
             DraggableAnchors {
                 ViewState.HIDDEN at viewHeight.toFloat()
                 ViewState.SMALL at with(density) {
-                    viewHeight - (190.dp + navBarHeight).toPx()
+                    viewHeight - (174.dp + navBarHeight).toPx()
                 }
                 ViewState.LARGE at 0f
             },
