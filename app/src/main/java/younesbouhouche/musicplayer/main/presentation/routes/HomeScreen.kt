@@ -24,13 +24,12 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialShapes
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.HorizontalCenteredHeroCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
-import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,11 +41,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.core.presentation.util.IconContainer
+import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
 import younesbouhouche.musicplayer.main.presentation.components.MusicCardListItem
 import younesbouhouche.musicplayer.main.presentation.components.PictureCard
 import younesbouhouche.musicplayer.main.presentation.util.expressiveRectShape
@@ -59,6 +59,7 @@ fun HomeScreen(
     favorites: List<MusicCard>,
     history: List<MusicCard>,
     modifier: Modifier = Modifier,
+    bottomPadding: Dp = 0.dp,
     onArtistClick: (Artist) -> Unit,
     onPlay: (List<MusicCard>, Int) -> Unit
 ) {
@@ -68,7 +69,7 @@ fun HomeScreen(
     LazyColumn(
         modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(24.dp),
-        contentPadding = PaddingValues(bottom = 260.dp)
+        contentPadding = PaddingValues(bottom = bottomPadding)
     ) {
         item {
             Box(
@@ -215,16 +216,14 @@ private fun ListContainer(
                 subtitle,
                 onClick = onClick
             ) {
-                IconContainer(
+                ExpressiveIconButton(
                     Icons.Default.PlayArrow,
-                    Modifier.size(40.dp),
-                    onClick = {
-                        onPlay(items, 0)
-                    },
-                    shape = MaterialShapes.Cookie9Sided.toShape(),
-                    iconTint = MaterialTheme.colorScheme.tertiary,
-                    background = MaterialTheme.colorScheme.onTertiary
-                )
+                    size = IconButtonDefaults.mediumIconSize,
+                    widthOption = IconButtonDefaults.IconButtonWidthOption.Wide,
+                    colors = IconButtonDefaults.filledTonalIconButtonColors()
+                ) {
+                    onPlay(items, 0)
+                }
             }
             itemsSliced.forEachIndexed { index, it ->
                 MusicCardListItem(

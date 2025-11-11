@@ -2,6 +2,7 @@ package younesbouhouche.musicplayer.core.presentation.util
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.heightIn
@@ -42,6 +43,7 @@ fun ExpressiveToggleButton(
         else
             ToggleButtonDefaults.toggleButtonColors(),
     interactionSource: MutableInteractionSource? = null,
+    contentPadding: PaddingValues = ButtonDefaults.contentPaddingFor(size),
     onCheckedChange: (Boolean) -> Unit
 ) {
     if (outlined)
@@ -49,7 +51,7 @@ fun ExpressiveToggleButton(
             checked = checked,
             onCheckedChange = onCheckedChange,
             modifier = modifier.heightIn(size),
-            contentPadding = ButtonDefaults.contentPaddingFor(size),
+            contentPadding = contentPadding,
             enabled = enabled,
             colors = colors,
             shapes = ToggleButtonDefaults.shapesFor(size),
@@ -89,7 +91,7 @@ fun ExpressiveToggleButton(
             checked = checked,
             onCheckedChange = onCheckedChange,
             modifier = modifier.heightIn(size),
-            contentPadding = ButtonDefaults.contentPaddingFor(size),
+            contentPadding = contentPadding,
             enabled = enabled,
             colors = colors,
             shapes = ToggleButtonDefaults.shapesFor(size),

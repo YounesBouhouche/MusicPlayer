@@ -7,6 +7,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.presentation.components.ListScreen
@@ -21,6 +22,7 @@ fun AlbumScreen(
     sortState: SortState<SortType>,
     onSortStateChange: (SortState<SortType>) -> Unit,
     modifier: Modifier = Modifier,
+    bottomPadding: Dp = 0.dp,
     onShowBottomSheet: (MusicCard) -> Unit = {},
     onPlay: (index: Int, shuffle: Boolean) -> Unit
 ) = ListScreen(
@@ -33,5 +35,5 @@ fun AlbumScreen(
     sortState = sortState,
     onSortStateChange = onSortStateChange,
     onShowBottomSheet = onShowBottomSheet,
-    contentPadding = PaddingValues(bottom = 260.dp)
+    contentPadding = PaddingValues(bottom = bottomPadding)
 )

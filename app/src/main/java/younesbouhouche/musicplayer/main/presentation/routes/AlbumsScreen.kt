@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Album
@@ -30,6 +31,7 @@ fun AlbumsScreen(
     sortState: SortState<ListsSortType>,
     onSortStateChange: (SortState<ListsSortType>) -> Unit,
     modifier: Modifier = Modifier,
+    bottomPadding: Dp = 0.dp,
     onClick: (Album) -> Unit
 ) {
     GridScreen(
@@ -76,7 +78,7 @@ fun AlbumsScreen(
         },
         modifier,
         { it.name },
-        contentPadding = PaddingValues(bottom = 260.dp)
+        contentPadding = PaddingValues(bottom = bottomPadding)
     )
     SortBottomSheet(
         sortState,

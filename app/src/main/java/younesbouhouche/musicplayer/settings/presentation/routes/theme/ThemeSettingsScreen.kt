@@ -16,14 +16,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
@@ -48,7 +51,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.core.presentation.util.ButtonsRow
+import younesbouhouche.musicplayer.core.presentation.util.ToggleButtonsRow
 import younesbouhouche.musicplayer.main.presentation.util.plus
+import younesbouhouche.musicplayer.settings.domain.models.Theme
 import younesbouhouche.musicplayer.settings.presentation.components.SettingsItem
 import younesbouhouche.musicplayer.settings.presentation.components.SettingsList
 import younesbouhouche.musicplayer.settings.presentation.components.listItemShape
@@ -57,7 +63,7 @@ import younesbouhouche.musicplayer.settings.presentation.util.Checked
 import younesbouhouche.musicplayer.settings.presentation.util.SettingData
 import younesbouhouche.musicplayer.settings.presentation.util.findActivity
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ThemeSettingsScreen(
     isDark: Boolean,
@@ -78,10 +84,30 @@ fun ThemeSettingsScreen(
             items =  listOf(
                 SettingData(
                     headline = R.string.app_theme,
-                    supporting = theme.label,
-                ) {
-                    viewModel.update { copy(themeDialog = true) }
-                },
+                    bottomContent = {
+                        Row(
+                            Modifier.fillMaxWidth().padding(bottom = 12.dp)
+                        ) {
+                            ToggleButtonsRow(
+                                selected = { Theme.entries[it] == theme },
+                                count = Theme.entries.size,
+                                icon = {
+                                    Theme.entries[it].icon
+                                },
+                                text = {
+                                    stringResource(Theme.entries[it].label)
+                                },
+                                outlined = { true },
+                                modifier = Modifier.padding(horizontal = 12.dp),
+                                size = ButtonDefaults.ExtraSmallContainerHeight,
+                                expandedWeight = 1.4f,
+                                buttonContentPadding = PaddingValues(vertical = 12.dp)
+                            ) {
+                                viewModel.saveSettings(theme = Theme.entries[it])
+                            }
+                        }
+                    }
+                ),
                 SettingData(
                     headline = R.string.black_theme,
                     supporting = R.string.extra_dark_description,

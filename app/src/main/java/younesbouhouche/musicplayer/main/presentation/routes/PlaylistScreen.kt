@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
@@ -55,10 +56,10 @@ import younesbouhouche.musicplayer.main.presentation.util.topAppBarIconButtonCol
 @Composable
 fun PlaylistScreen(
     playlist: UiPlaylist,
-    smallPlayerExpanded: Boolean,
     sortState: SortState<PlaylistSortType>,
     onSortStateChange: (SortState<PlaylistSortType>) -> Unit,
     modifier: Modifier = Modifier,
+    bottomPadding: Dp = 0.dp,
     onShowBottomSheet: (MusicCard) -> Unit = {},
     onRemove: (index: Int) -> Unit = {},
     onReorder: (from: Int, to: Int) -> Unit = { _, _ -> },
@@ -73,9 +74,6 @@ fun PlaylistScreen(
     LaunchedEffect(playlist) {
         reorderedPlaylist = playlist
     }
-    val bottomPadding by animateDpAsState(
-        if (smallPlayerExpanded) 220.dp else 128.dp
-    )
     Box(modifier.fillMaxSize()) {
         ReorderContainer(reorderState, enabled = enableReorder) {
             ListScreen(

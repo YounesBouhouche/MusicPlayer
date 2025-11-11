@@ -1,7 +1,6 @@
 package younesbouhouche.musicplayer.main.presentation.routes
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -54,6 +53,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import my.nanihadesuka.compose.LazyColumnScrollbar
 import my.nanihadesuka.compose.ScrollbarSettings
@@ -67,7 +67,6 @@ import younesbouhouche.musicplayer.main.presentation.util.SortState
 import younesbouhouche.musicplayer.main.presentation.util.SortType
 import younesbouhouche.musicplayer.main.presentation.util.expressiveRectShape
 import younesbouhouche.musicplayer.main.presentation.util.plus
-import kotlin.text.compareTo
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -75,17 +74,14 @@ fun LibraryScreen(
     files: List<MusicCard>,
     sortState: SortState<SortType>,
     onSortStateChange: (SortState<SortType>) -> Unit,
-    smallPlayerExpanded: Boolean,
     modifier: Modifier = Modifier,
+    bottomPadding: Dp = 0.dp,
     onShowBottomSheet: (MusicCard) -> Unit = {},
     onClick: (MusicCard) -> Unit = {},
 ) {
     val filesGrouped = files.groupBy(sortState.sortType.groupBy)
     val favoriteFilesGrouped = files.filter { it.favorite }.groupBy(sortState.sortType.groupBy)
     var isFavoritesVisible by remember { mutableStateOf(true) }
-    val bottomPadding by animateDpAsState(
-        if (smallPlayerExpanded) 220.dp else 128.dp
-    )
     Column(modifier.fillMaxWidth()) {
         Row(
             Modifier.padding(16.dp).fillMaxWidth(),
@@ -274,7 +270,7 @@ private fun ItemsList(
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    itemsIndexed(list, { index, it -> it.id }) { index, it ->
+                    itemsIndexed(list, { _, it -> it.id }) { index, it ->
                         MusicCardListItem(
                             it,
                             modifier = Modifier.padding(horizontal = 8.dp).animateItem(),

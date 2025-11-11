@@ -25,7 +25,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -47,13 +46,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.toRoute
 import kotlinx.coroutines.launch
-import soup.compose.material.motion.animation.materialSharedAxisYIn
-import soup.compose.material.motion.animation.materialSharedAxisYOut
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
@@ -67,20 +61,10 @@ import younesbouhouche.musicplayer.main.presentation.components.MusicCardBottomS
 import younesbouhouche.musicplayer.main.presentation.dialogs.AddToPlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.dialogs.CreatePlaylistDialog
 import younesbouhouche.musicplayer.main.presentation.player.NavigationWithPlayer
-import younesbouhouche.musicplayer.main.presentation.routes.AlbumScreen
-import younesbouhouche.musicplayer.main.presentation.routes.AlbumsScreen
-import younesbouhouche.musicplayer.main.presentation.routes.ArtistScreen
-import younesbouhouche.musicplayer.main.presentation.routes.ArtistsScreen
-import younesbouhouche.musicplayer.main.presentation.routes.HomeScreen
-import younesbouhouche.musicplayer.main.presentation.routes.LibraryScreen
-import younesbouhouche.musicplayer.main.presentation.routes.PlaylistScreen
-import younesbouhouche.musicplayer.main.presentation.routes.PlaylistsScreen
 import younesbouhouche.musicplayer.main.presentation.states.PlayState
-import younesbouhouche.musicplayer.main.presentation.util.Event
 import younesbouhouche.musicplayer.main.presentation.util.containerClip
 import younesbouhouche.musicplayer.main.presentation.util.intUpDownTransSpec
 import younesbouhouche.musicplayer.main.presentation.util.isRouteParent
-import younesbouhouche.musicplayer.main.presentation.util.sendEvent
 import younesbouhouche.musicplayer.main.presentation.viewmodel.MainViewModel
 import younesbouhouche.musicplayer.main.presentation.viewmodel.SearchVM
 import younesbouhouche.musicplayer.main.util.navigateTo
@@ -99,25 +83,10 @@ fun AppScreen(
     val isParent = currentRoute.isRouteParent
     var bottomSheetFile by remember { mutableStateOf<MusicCard?>(null) }
     var viewHeight by remember { mutableIntStateOf(0) }
-    val albums by mainVM.albums.collectAsState()
-    val artists by mainVM.artists.collectAsState()
     val playlists by mainVM.playlists.collectAsState()
     val queue by mainVM.queue.collectAsState()
     val playerState by mainVM.playerState.collectAsState()
-    val files by mainVM.files.collectAsState()
-    val favorites by mainVM.favorites.collectAsState()
-    val lastAdded by mainVM.lastAdded.collectAsState()
-    val mostPlayedArtists by mainVM.mostPlayedArtists.collectAsState()
-    val history by mainVM.history.collectAsState()
     val padding by animateDpAsState(if (isParent) 8.dp else 0.dp)
-    val albumsSortState by mainVM.albumsSortState.collectAsState()
-    val artistsSortState by mainVM.artistsSortState.collectAsState()
-    val playlistsSortState by mainVM.playlistsSortState.collectAsState()
-    val listScreenSortState by mainVM.listScreenSortState.collectAsState()
-    val playlistSortState by mainVM.playlistSortState.collectAsState()
-    val librarySortState by mainVM.sortState.collectAsState()
-    val playlist by mainVM.playlist.collectAsState()
-    val smallPlayerExpanded = playerState.playState != PlayState.STOP
     val uiState by mainVM.uiState.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -244,150 +213,15 @@ fun AppScreen(
                             }
                         }
                     }
-                    NavHost(
+                    NavigationHost(
                         navController,
-                        NavRoutes.Home,
+                        mainVM,
                         Modifier
                             .fillMaxSize()
                             .padding(horizontal = padding)
-                            .containerClip(),
-                        enterTransition = {
-                            materialSharedAxisYIn(true, 100)
-                        },
-                        exitTransition = {
-                            materialSharedAxisYOut(false, 100)
-                        }
+                            .containerClip()
                     ) {
-                        composable<NavRoutes.Home> {
-                            HomeScreen(
-                                mostPlayedArtists,
-                                lastAdded,
-                                favorites,
-                                history,
-                                onArtistClick = { artist ->
-                                    navController.navigateTo(NavRoutes.Artist(artist.name))
-                                }
-                            ) { list, index ->
-                                mainVM.onPlaybackEvent(PlaybackEvent.Play(list, index))
-                            }
-                        }
-                        composable<NavRoutes.Albums> {
-                            AlbumsScreen(
-                                albums,
-                                albumsSortState,
-                                mainVM::onAlbumsSortChange
-                            ) { album ->
-                                navController.navigateTo(NavRoutes.Album(album.name))
-                            }
-                        }
-                        composable<NavRoutes.Album> { entry ->
-                            val route = entry.toRoute<NavRoutes.Album>()
-                            val album by mainVM.getAlbumUi(route.title).collectAsState()
-                            AlbumScreen(
-                                album,
-                                listScreenSortState,
-                                mainVM::onListScreenSortChange,
-                                onShowBottomSheet = {
-                                    bottomSheetFile = it
-                                }
-                            ) { index, shuffle ->
-                                mainVM.onPlaybackEvent(PlaybackEvent.Play(
-                                    album.items,
-                                    index,
-                                    shuffle = shuffle
-                                ))
-                            }
-                        }
-                        composable<NavRoutes.Artists> {
-                            ArtistsScreen(
-                                artists,
-                                artistsSortState,
-                                mainVM::onArtistsSortChange
-                            ) { artist ->
-                                navController.navigateTo(NavRoutes.Artist(artist.name))
-                            }
-                        }
-                        composable<NavRoutes.Artist> { entry ->
-                            val route = entry.toRoute<NavRoutes.Artist>()
-                            val artist by mainVM.getArtistUi(route.name).collectAsState()
-                            ArtistScreen(
-                                artist,
-                                listScreenSortState,
-                                mainVM::onListScreenSortChange,
-                                onShowBottomSheet = {
-                                    bottomSheetFile = it
-                                }
-                            ) { index, shuffle ->
-                                mainVM.onPlaybackEvent(
-                                    PlaybackEvent.Play(
-                                        artist.items,
-                                        index,
-                                        shuffle = shuffle
-                                    )
-                                )
-                            }
-                        }
-                        composable<NavRoutes.Playlists> {
-                             PlaylistsScreen(
-                                 playlists,
-                                 smallPlayerExpanded,
-                                 playlistsSortState,
-                                 mainVM::onPlaylistsSortChange,
-                                 onCreatePlaylist = {
-                                     mainVM.onUiEvent(UiEvent.ShowCreatePlaylistDialog(emptyList()))
-                                 },
-                                 onImportPlaylist = {
-                                    mainVM.sendEvent(Event.LaunchPlaylistDialog)
-                                 },
-                                 onPlay = {
-                                     mainVM.onPlayerEvent(PlayerEvent.PlayPlaylist(it.id))
-                                 }
-                             ) { playlist ->
-                                 navController.navigateTo(NavRoutes.Playlist(playlist.id))
-                             }
-                        }
-                        composable<NavRoutes.Playlist> { entry ->
-                            val route = entry.toRoute<NavRoutes.Playlist>()
-                            LaunchedEffect(route) {
-                                mainVM.getPlaylist(route.playlistId)
-                            }
-                            PlaylistScreen(
-                                playlist,
-                                smallPlayerExpanded,
-                                playlistSortState,
-                                mainVM::onPlaylistSortChange,
-                                onShowBottomSheet = {
-                                    bottomSheetFile = it
-                                },
-                                onReorder = { from, to ->
-                                    mainVM.onPlaylistEvent(PlaylistEvent.Reorder(playlist, from, to))
-                                },
-                                onRemove = {
-                                    mainVM.onPlaylistEvent(PlaylistEvent.RemoveAt(playlist, it))
-                                }
-                            ) { index, shuffle ->
-                                mainVM.onPlaybackEvent(
-                                    PlaybackEvent.Play(
-                                        playlist.items,
-                                        index,
-                                        shuffle = shuffle
-                                    )
-                                )
-                            }
-                        }
-                        composable<NavRoutes.Library> {
-                            LibraryScreen(
-                                files,
-                                librarySortState,
-                                mainVM::onLibrarySortChange,
-                                smallPlayerExpanded,
-                                onShowBottomSheet = {
-                                    bottomSheetFile = it
-                                }
-                            ) { file ->
-                                mainVM.onPlaybackEvent(PlaybackEvent.Play(listOf(file)))
-                            }
-                        }
+                        bottomSheetFile = it
                     }
                 }
                 NavigationWithPlayer(

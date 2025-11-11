@@ -37,6 +37,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Playlist
@@ -55,10 +56,10 @@ import younesbouhouche.musicplayer.main.presentation.util.SortState
 @Composable
 fun PlaylistsScreen(
     playlists: List<Playlist>,
-    smallPlayerExpanded: Boolean,
     sortState: SortState<ListsSortType>,
     onSortStateChange: (SortState<ListsSortType>) -> Unit,
     modifier: Modifier = Modifier,
+    bottomPadding: Dp = 0.dp,
     onCreatePlaylist: () -> Unit = {},
     onImportPlaylist: () -> Unit = {},
     onPlay: (Playlist) -> Unit = {},
@@ -69,12 +70,9 @@ fun PlaylistsScreen(
         Triple(R.string.create_playlist, Icons.Default.Add, onCreatePlaylist),
         Triple(R.string.import_playlist, Icons.Default.FileDownload, onImportPlaylist),
     )
-    val bottomInset by animateDpAsState(
-        if (smallPlayerExpanded) 200.dp else 120.dp
-    )
     Scaffold(
         modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets(bottom = bottomInset),
+        contentWindowInsets = WindowInsets(bottom = bottomPadding),
         floatingActionButton = {
             FloatingActionButtonMenu(
                 expanded,
