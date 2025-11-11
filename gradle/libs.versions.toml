@@ -39,7 +39,7 @@ uiautomator = "2.3.0"
 benchmarkMacroJunit4 = "1.4.1"
 coilCompose = "2.7.0"
 kmpalette = "3.1.0"
-ktor = "3.3.1"
+ktor = "3.3.2"
 desugar-jdk-libs = "2.1.5"
 
 [libraries]
