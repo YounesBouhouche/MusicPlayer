@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Album
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerDefaults
 import androidx.compose.material3.DrawerState
@@ -61,7 +60,6 @@ import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.settings.presentation.SettingsActivity
-import younesbouhouche.musicplayer.settings.presentation.routes.about.AboutActivity
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 
 @Composable
@@ -148,20 +146,6 @@ fun DrawerSheetContent(
                                     Intent(
                                         context,
                                         SettingsActivity::class.java
-                                    )
-                                )
-                            },
-                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                            selected = false,
-                        )
-                        NavigationDrawerItem(
-                            icon = { Icon(Icons.Default.Info, contentDescription = null) },
-                            label = { Text(stringResource(R.string.about)) },
-                            onClick = {
-                                context.startActivity(
-                                    Intent(
-                                        context,
-                                        AboutActivity::class.java
                                     )
                                 )
                             },

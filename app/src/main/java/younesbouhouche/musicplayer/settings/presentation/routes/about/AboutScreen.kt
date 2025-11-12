@@ -129,7 +129,7 @@ fun AboutScreen(modifier: Modifier = Modifier) {
     )
     SettingsScreen(
         title = stringResource(R.string.about),
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) { paddingValues ->
         LazyColumn(
             modifier =
@@ -176,17 +176,6 @@ fun AboutScreen(modifier: Modifier = Modifier) {
                     }
                 }
             }
-        }
-    }
-}
-
-class AboutActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContent {
-
         }
     }
 }

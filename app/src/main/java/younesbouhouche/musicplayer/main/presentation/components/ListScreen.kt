@@ -86,7 +86,6 @@ import younesbouhouche.musicplayer.main.presentation.util.plus
 import younesbouhouche.musicplayer.main.presentation.util.search
 import younesbouhouche.musicplayer.main.presentation.util.topAppBarIconButtonColors
 import younesbouhouche.musicplayer.ui.theme.AppTheme
-import younesbouhouche.musicplayer.ui.theme.listScreenTitleFont
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
