@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -47,8 +48,6 @@ fun BoxScope.NavBar(
     navigate: (NavRoutes) -> Unit
 ) {
     val spacing = 16.dp
-    val topCorner by animateDpAsState(if (playing) 8.dp else 60.dp)
-    val bottomCorner = 60.dp
     val density = LocalDensity.current
     var safeRoute by remember {
         mutableStateOf(
@@ -58,9 +57,9 @@ fun BoxScope.NavBar(
     LaunchedEffect(route) {
         if (route != null) safeRoute = route
     }
-    var width by remember {
-        mutableStateOf(0.dp)
-    }
+    var width by remember { mutableStateOf(0.dp) }
+    var height by remember { mutableStateOf(100.dp) }
+    val topCorner by animateDpAsState(if (playing) 8.dp else height / 2)
     val innerWidth = width - spacing * 2
     val offset by animateDpAsState(
         with(density) {
@@ -83,16 +82,18 @@ fun BoxScope.NavBar(
                 .fillMaxWidth()
                 .onGloballyPositioned {
                     width = with(density) { it.size.width.toDp() }
+                    height = with(density) { it.size.height.toDp() }
                 }
                 .onSizeChanged {
                     width = with(density) { it.width.toDp() }
+                    height = with(density) { it.height.toDp() }
                 },
             color = MaterialTheme.colorScheme.surfaceContainer,
             shape = RoundedCornerShape(
                 topCorner,
                 topCorner,
-                bottomCorner,
-                bottomCorner
+                height / 2,
+                height / 2,
             ),
             shadowElevation = 8.dp
         ) {
