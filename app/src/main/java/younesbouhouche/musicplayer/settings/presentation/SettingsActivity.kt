@@ -4,39 +4,30 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import org.koin.android.ext.android.get
-import org.koin.compose.KoinContext
-import younesbouhouche.musicplayer.R
+import soup.compose.material.motion.animation.materialSharedAxisXIn
+import soup.compose.material.motion.animation.materialSharedAxisXOut
 import younesbouhouche.musicplayer.main.presentation.util.composables.SetSystemBarColors
-import younesbouhouche.musicplayer.main.presentation.util.plus
-import younesbouhouche.musicplayer.settings.presentation.components.SettingsItem
-import younesbouhouche.musicplayer.settings.presentation.components.SettingsList
-import younesbouhouche.musicplayer.settings.presentation.components.listItemShape
-import younesbouhouche.musicplayer.settings.presentation.util.Settings
+import younesbouhouche.musicplayer.main.presentation.util.setLanguage
+import younesbouhouche.musicplayer.settings.data.SettingsDataStore
+import younesbouhouche.musicplayer.settings.presentation.routes.SettingsPage
+import younesbouhouche.musicplayer.settings.presentation.routes.SettingsRoutes
+import younesbouhouche.musicplayer.settings.presentation.routes.about.AboutScreen
+import younesbouhouche.musicplayer.settings.presentation.routes.language.LanguageScreen
+import younesbouhouche.musicplayer.settings.presentation.routes.playback.PlaybackSettingsScreen
+import younesbouhouche.musicplayer.settings.presentation.routes.player.PlayerSettingsScreen
+import younesbouhouche.musicplayer.settings.presentation.routes.theme.ThemeSettingsScreen
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 
 
@@ -47,55 +38,62 @@ class SettingsActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
         setContent {
-            SetSystemBarColors(get())
-            val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-            val listState = rememberLazyListState()
+            val navController = rememberNavController()
+            val dataStore = get<SettingsDataStore>()
+            SetSystemBarColors(dataStore = dataStore)
+            val isDark by dataStore.isDark().collectAsState(false)
             AppTheme {
-                Scaffold(
-                    modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .nestedScroll(scrollBehavior.nestedScrollConnection),
-                    topBar = {
-                        LargeTopAppBar(
-                            title = {
-                                Text(
-                                    stringResource(id = R.string.settings),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            },
-                            navigationIcon = {
-                                IconButton(onClick = { finish() }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
-                                }
-                            },
-                            scrollBehavior = scrollBehavior,
-                        )
-                    },
-                    contentWindowInsets = WindowInsets.navigationBars,
-                ) { paddingValues ->
-                    val categories = Settings.categories
-                    LazyColumn(
-                        modifier = Modifier.fillMaxWidth(),
-                        state = listState,
-                        contentPadding = paddingValues + PaddingValues(12.dp, 24.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                Surface(
+                    Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    NavHost(
+                        navController,
+                        startDestination = SettingsRoutes.SettingsMain,
+                        enterTransition = {
+                            materialSharedAxisXIn(
+                                initialState.destination.route?.let {
+                                        SettingsRoutes.SettingsMain
+                                            .javaClass
+                                            .kotlin
+                                            .qualifiedName
+                                            ?.contains(it)
+                                        } ?: false,
+                                        200
+                            )
+                        },
+                        exitTransition = {
+                            materialSharedAxisXOut(
+                                initialState.destination.route?.let {
+                                    SettingsRoutes.SettingsMain
+                                        .javaClass
+                                        .kotlin
+                                        .qualifiedName
+                                        ?.contains(it)
+                                } ?: false,
+                                200
+                            )
+                        }
                     ) {
-                        categories.forEach { category ->
-                            item {
-                                SettingsList(
-                                    name = category.name,
-                                    itemsCount = category.items.size
-                                ) {
-                                    SettingsItem(
-                                        category.items[it],
-                                        iconTint = category.iconTint,
-                                        iconBackground = category.iconBackground,
-                                        shape = listItemShape(it, category.items.size),
-                                    )
-                                }
+                        composable<SettingsRoutes.SettingsMain> {
+                            SettingsPage(Modifier.fillMaxSize()) {
+                                navController.navigate(it)
                             }
+                        }
+                        composable<SettingsRoutes.ThemeSettings> {
+                            ThemeSettingsScreen(isDark, Modifier.fillMaxSize())
+                        }
+                        composable<SettingsRoutes.PlayerSettings> {
+                            PlayerSettingsScreen(Modifier.fillMaxSize())
+                        }
+                        composable<SettingsRoutes.PlaybackSettings> {
+                            PlaybackSettingsScreen(Modifier.fillMaxSize())
+                        }
+                        composable<SettingsRoutes.LanguageSettings> {
+                            LanguageScreen(Modifier.fillMaxSize(), ::setLanguage)
+                        }
+                        composable<SettingsRoutes.AboutSettings> {
+                            AboutScreen(Modifier.fillMaxSize())
                         }
                     }
                 }

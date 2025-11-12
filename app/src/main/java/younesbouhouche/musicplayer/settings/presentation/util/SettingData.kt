@@ -3,6 +3,7 @@ package younesbouhouche.musicplayer.settings.presentation.util
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import younesbouhouche.musicplayer.settings.presentation.routes.SettingsRoutes
 
 data class SettingData(
     val headline: Int,
@@ -14,6 +15,7 @@ data class SettingData(
     val separator: Boolean = false,
     val trailingContent: (@Composable () -> Unit)? = null,
     val bottomContent: (@Composable () -> Unit)? = null,
+    val navigateToRoute: SettingsRoutes? = null,
     val onClick: (Context) -> Unit = {},
 )
 

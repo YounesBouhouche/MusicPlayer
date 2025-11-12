@@ -1,12 +1,19 @@
 package younesbouhouche.musicplayer.main.presentation.util
 
+import android.app.Activity
+import android.app.LocaleManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.LocaleList
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.LocaleManagerCompat
+import androidx.core.os.LocaleListCompat
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.settings.domain.models.Language
 import java.time.ZonedDateTime
 
-fun (Pair<String, String>).containEachOther() = first.contains(second) or second.contains(first)
+fun (Pair<String, String>).containEachOther() = first.contains(second, true) or second.contains(first, true)
 
 fun String.removeLeadingTime(): String =
     when {
@@ -34,3 +41,24 @@ fun Context.getAppVersion(): String =
             packageManager.getPackageInfo(packageName, 0)
         }
     ).versionName ?: "Unknown"
+
+
+fun Activity.setLanguage(language: Language) {
+    runOnUiThread {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getSystemService(LocaleManager::class.java)
+                .applicationLocales =
+                LocaleList.forLanguageTags(
+                    if (language == Language.SYSTEM) {
+                        LocaleManagerCompat.getSystemLocales(this)[0]!!.language
+                    } else {
+                        language.tag
+                    },
+                )
+        } else {
+            AppCompatDelegate.setApplicationLocales(
+                LocaleListCompat.forLanguageTags(language.tag)
+            )
+        }
+    }
+}

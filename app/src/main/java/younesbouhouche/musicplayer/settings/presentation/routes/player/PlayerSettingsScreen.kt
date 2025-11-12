@@ -38,9 +38,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
+import younesbouhouche.musicplayer.core.presentation.util.TopBar
 import younesbouhouche.musicplayer.main.presentation.util.plus
 import younesbouhouche.musicplayer.settings.presentation.components.SettingsItem
 import younesbouhouche.musicplayer.settings.presentation.components.SettingsList
+import younesbouhouche.musicplayer.settings.presentation.components.SettingsScreen
 import younesbouhouche.musicplayer.settings.presentation.components.listItemShape
 import younesbouhouche.musicplayer.settings.presentation.util.Category
 import younesbouhouche.musicplayer.settings.presentation.util.Checked
@@ -48,10 +50,7 @@ import younesbouhouche.musicplayer.settings.presentation.util.SettingData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayerSettingsScreen(
-    modifier: Modifier = Modifier,
-    onBack: () -> Unit,
-) {
+fun PlayerSettingsScreen(modifier: Modifier = Modifier) {
     val settings = listOf(
         Category(
             items = listOf(
@@ -77,32 +76,9 @@ fun PlayerSettingsScreen(
             ),
         ),
     )
-    val scrollBehavior =
-        TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    Scaffold(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            LargeTopAppBar(
-                title = {
-                    Text(
-                        stringResource(id = R.string.player),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                },
-                navigationIcon = {
-                    ExpressiveIconButton(
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        onClick = onBack
-                    )
-                },
-                scrollBehavior = scrollBehavior,
-            )
-        },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    SettingsScreen(
+        title = stringResource(R.string.player),
+        modifier = modifier
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
@@ -121,12 +97,4 @@ fun PlayerSettingsScreen(
             }
         }
     }
-}
-
-@Preview
-@Composable
-private fun PlayerSettingsScreenPreview() {
-    PlayerSettingsScreen(
-        onBack = {}
-    )
 }

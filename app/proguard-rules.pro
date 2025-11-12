@@ -21,3 +21,6 @@
 #-renamesourcefileattribute SourceFile
 -keep public class younesbouhouche.musicplayer.main.domain.models.NavRoutes
 -keep public class younesbouhouche.musicplayer.main.domain.models.NavRoutes$*
+
+-keep public class younesbouhouche.musicplayer.settings.presentation.routes.SettingsRoutes
+-keep public class younesbouhouche.musicplayer.settings.presentation.routes.SettingsRoutes*

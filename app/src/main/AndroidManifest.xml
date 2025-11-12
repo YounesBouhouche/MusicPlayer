@@ -61,14 +61,6 @@
         <profileable android:shell="true" />
 
         <activity
-            android:name=".settings.presentation.routes.player.PlayerActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MusicPlayer" />
-        <activity
-            android:name=".settings.presentation.routes.playback.PlaybackActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MusicPlayer" />
-        <activity
             android:name=".main.presentation.MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:exported="true"
@@ -88,19 +80,7 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".settings.presentation.routes.about.AboutActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MusicPlayer" />
-        <activity
             android:name=".settings.presentation.SettingsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MusicPlayer" />
-        <activity
-            android:name=".settings.presentation.routes.language.LanguageActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MusicPlayer" />
-        <activity
-            android:name=".settings.presentation.routes.theme.ThemeActivity"
             android:exported="false"
             android:theme="@style/Theme.MusicPlayer" />
 
