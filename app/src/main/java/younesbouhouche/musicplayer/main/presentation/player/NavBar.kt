@@ -48,7 +48,7 @@ fun BoxScope.NavBar(
 ) {
     val spacing = 16.dp
     val topCorner by animateDpAsState(if (playing) 8.dp else 60.dp)
-    val bottomCorner by animateDpAsState(if (playing) 40.dp else 60.dp)
+    val bottomCorner = 60.dp
     val density = LocalDensity.current
     var safeRoute by remember {
         mutableStateOf(
