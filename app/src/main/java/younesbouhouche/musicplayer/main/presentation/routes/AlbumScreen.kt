@@ -24,7 +24,7 @@ fun AlbumScreen(
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
     onShowBottomSheet: (MusicCard) -> Unit = {},
-    onPlay: (index: Int, shuffle: Boolean) -> Unit
+    onPlay: (items: List<MusicCard>, index: Int, shuffle: Boolean) -> Unit
 ) = ListScreen(
     title = album.name,
     cover = album.cover,

@@ -20,7 +20,7 @@ fun ArtistScreen(
     onSortStateChange: (SortState<SortType>) -> Unit,
     modifier: Modifier = Modifier,
     onShowBottomSheet: (MusicCard) -> Unit = {},
-    onPlay: (index: Int, shuffle: Boolean) -> Unit,
+    onPlay: (items: List<MusicCard>, index: Int, shuffle: Boolean) -> Unit
 ) = ListScreen(
     title = artist.name,
     cover = artist.getPicture(),

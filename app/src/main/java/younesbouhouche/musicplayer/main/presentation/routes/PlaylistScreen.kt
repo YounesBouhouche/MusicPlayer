@@ -63,7 +63,7 @@ fun PlaylistScreen(
     onShowBottomSheet: (MusicCard) -> Unit = {},
     onRemove: (index: Int) -> Unit = {},
     onReorder: (from: Int, to: Int) -> Unit = { _, _ -> },
-    onPlay: (index: Int, shuffle: Boolean) -> Unit = { _, _ -> },
+    onPlay: (items: List<MusicCard>, index: Int, shuffle: Boolean) -> Unit = { _, _, _ -> },
 ) {
     val buttonSize = ButtonDefaults.MediumContainerHeight
     var reorderedPlaylist by remember { mutableStateOf(playlist) }
@@ -105,7 +105,7 @@ fun PlaylistScreen(
                 listState = state,
                 contentPadding = PaddingValues(bottom = bottomPadding + buttonSize + 16.dp),
                 onPlay = onPlay
-            ) { index, card ->
+            ) { items, index, card ->
                 ReorderableItem(
                     state = reorderState,
                     key = card.id,
@@ -159,7 +159,7 @@ fun PlaylistScreen(
                             }
                         },
                     ) {
-                        onPlay(index, false)
+                        onPlay(items, index, false)
                     }
                 }
             }

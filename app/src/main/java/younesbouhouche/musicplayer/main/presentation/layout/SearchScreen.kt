@@ -33,11 +33,9 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.AppBarRow
 import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -45,18 +43,12 @@ import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TooltipAnchorPosition
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberSearchBarState
-import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -186,64 +178,27 @@ fun SearchScreen(
         ),
         contentPadding = PaddingValues(8.dp, 8.dp),
         navigationIcon = {
-            AppBarRow(
-                maxItemCount = 1,
-                overflowIndicator = {
-                    TooltipBox(
-                        positionProvider =
-                            TooltipDefaults.rememberTooltipPositionProvider(
-                                TooltipAnchorPosition.Above
-                            ),
-                        tooltip = { PlainTooltip { Text(stringResource(R.string.more)) } },
-                        state = rememberTooltipState(),
-                    ) {
-                        IconButton(onClick = { it.show() }) {
-                            Icon(
-                                imageVector = Icons.Filled.MoreVert,
-                                contentDescription = "Overflow",
-                            )
-                        }
-                    }
-                },
-            ) {
-                clickableItem(
-                    onClick = onExpandDrawer,
-                    icon = {
-                        Icon(imageVector = Icons.Default.Menu, contentDescription = null)
-                    },
-                    label = "Menu",
-                )
-            }
+            ExpressiveIconButton(
+                Icons.Default.Menu,
+                size = IconButtonDefaults.mediumIconSize,
+                widthOption = IconButtonDefaults.IconButtonWidthOption.Wide,
+                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                ),
+                onClick = onExpandDrawer
+            )
         },
         actions = {
-            AppBarRow(
-                maxItemCount = 1,
-                overflowIndicator = {
-                    TooltipBox(
-                        positionProvider =
-                            TooltipDefaults.rememberTooltipPositionProvider(
-                                TooltipAnchorPosition.Above
-                            ),
-                        tooltip = { PlainTooltip { Text(stringResource(R.string.more)) } },
-                        state = rememberTooltipState(),
-                    ) {
-                        IconButton(onClick = { it.show() }) {
-                            Icon(
-                                imageVector = Icons.Filled.MoreVert,
-                                contentDescription = "Overflow",
-                            )
-                        }
-                    }
-                },
+            ExpressiveIconButton(
+                Icons.Default.Settings,
+                size = IconButtonDefaults.mediumIconSize,
+                widthOption = IconButtonDefaults.IconButtonWidthOption.Wide,
+                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                )
             ) {
-                clickableItem(
-                    onClick = {
-                        context.startActivity(Intent(context, SettingsActivity::class.java))
-                    },
-                    icon = {
-                        Icon(imageVector = Icons.Default.Settings, contentDescription = null)
-                    },
-                    label = "Settings",
+                context.startActivity(
+                    Intent(context, SettingsActivity::class.java)
                 )
             }
         }

@@ -105,9 +105,9 @@ fun NavigationHost(
                     viewModel::onListScreenSortChange,
                     onShowBottomSheet = onShowBottomSheet,
                     bottomPadding = bottomPadding
-                ) { index, shuffle ->
+                ) { items, index, shuffle ->
                     viewModel.onPlaybackEvent(PlaybackEvent.Play(
-                        album.items,
+                        items,
                         index,
                         shuffle = shuffle
                     ))
@@ -132,10 +132,10 @@ fun NavigationHost(
                     listScreenSortState,
                     viewModel::onListScreenSortChange,
                     onShowBottomSheet = onShowBottomSheet
-                ) { index, shuffle ->
+                ) { items, index, shuffle ->
                     viewModel.onPlaybackEvent(
                         PlaybackEvent.Play(
-                            artist.items,
+                            items,
                             index,
                             shuffle = shuffle
                         )
@@ -180,10 +180,10 @@ fun NavigationHost(
                     onRemove = {
                         viewModel.onPlaylistEvent(PlaylistEvent.RemoveAt(playlist, it))
                     }
-                ) { index, shuffle ->
+                ) { items, index, shuffle ->
                     viewModel.onPlaybackEvent(
                         PlaybackEvent.Play(
-                            playlist.items,
+                            items,
                             index,
                             shuffle = shuffle
                         )
