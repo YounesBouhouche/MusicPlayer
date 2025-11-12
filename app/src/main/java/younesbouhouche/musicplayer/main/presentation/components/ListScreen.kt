@@ -66,6 +66,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -313,7 +314,8 @@ fun <T>ListScreen(
                                     .fillMaxWidth()
                                     .padding(top = 24.dp),
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                style = listScreenTitleFont,
+                                style = MaterialTheme.typography.headlineLarge,
+                                fontWeight = FontWeight.Bold,
                                 fontStyle = FontStyle.Italic,
                                 textAlign = TextAlign.Center,
                                 maxLines = 1,
