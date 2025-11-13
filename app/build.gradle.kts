@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.com.google.devtools.ksp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.room)
-    id("org.jlleitschuh.gradle.ktlint") version "13.1.0"
+    alias(libs.plugins.ktlint)
 }
 
 android {
