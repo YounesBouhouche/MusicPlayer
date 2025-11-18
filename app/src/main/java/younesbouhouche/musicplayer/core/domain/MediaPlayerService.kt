@@ -32,8 +32,8 @@ import younesbouhouche.musicplayer.core.domain.player.PlayerManager
 import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
 import younesbouhouche.musicplayer.core.domain.player.QueueManager
 import younesbouhouche.musicplayer.core.domain.session.MediaSessionManager
-import younesbouhouche.musicplayer.main.domain.repo.MediaRepository
-import younesbouhouche.musicplayer.main.presentation.states.PlayState
+import younesbouhouche.musicplayer.features.main.domain.repo.MediaRepository
+import younesbouhouche.musicplayer.features.main.presentation.states.PlayState
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class MediaPlayerService : MediaSessionService(), MediaSession.Callback {

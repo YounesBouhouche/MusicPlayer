@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import younesbouhouche.musicplayer.core.domain.util.stateInVM
 import younesbouhouche.musicplayer.dialog.domain.DialogRepo
-import younesbouhouche.musicplayer.main.presentation.states.PlayerState
+import younesbouhouche.musicplayer.features.main.presentation.states.PlayerState
 
 class DialogVM (
     private val dialogRepo: DialogRepo,

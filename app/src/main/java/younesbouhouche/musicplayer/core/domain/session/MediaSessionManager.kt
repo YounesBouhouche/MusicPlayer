@@ -31,8 +31,8 @@ import younesbouhouche.musicplayer.core.domain.player.PlayerFactory
 import younesbouhouche.musicplayer.core.domain.player.PlayerManager
 import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
 import younesbouhouche.musicplayer.glance.presentation.MyAppWidget
-import younesbouhouche.musicplayer.main.data.dao.AppDao
-import younesbouhouche.musicplayer.main.presentation.states.PlayState
+import younesbouhouche.musicplayer.features.main.data.dao.AppDao
+import younesbouhouche.musicplayer.features.main.presentation.states.PlayState
 
 class MediaSessionManager(
     private val context: Context,

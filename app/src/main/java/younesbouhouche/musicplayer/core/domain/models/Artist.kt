@@ -1,7 +1,7 @@
 package younesbouhouche.musicplayer.core.domain.models
 
 import android.net.Uri
-import younesbouhouche.musicplayer.main.presentation.models.ArtistUi
+import younesbouhouche.musicplayer.features.main.presentation.models.ArtistUi
 
 data class Artist(
     val name: String = "",

@@ -11,7 +11,7 @@ import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import kotlinx.coroutines.flow.first
-import younesbouhouche.musicplayer.main.data.PlayerDataStore
+import younesbouhouche.musicplayer.features.main.data.PlayerDataStore
 
 /**
  * Factory responsible for creating and managing a single ExoPlayer instance

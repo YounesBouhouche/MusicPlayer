@@ -9,7 +9,7 @@ import coil.request.CachePolicy
 import coil.util.DebugLogger
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
-import younesbouhouche.musicplayer.main.util.AppSpecificStorageFetcher
+import younesbouhouche.musicplayer.features.main.util.AppSpecificStorageFetcher
 
 class App : Application(), ImageLoaderFactory {
     override fun onCreate() {

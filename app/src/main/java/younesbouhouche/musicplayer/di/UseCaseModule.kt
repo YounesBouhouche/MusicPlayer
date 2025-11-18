@@ -1,7 +1,7 @@
 package younesbouhouche.musicplayer.di
 
 import org.koin.dsl.module
-import younesbouhouche.musicplayer.main.domain.use_cases.*
+import younesbouhouche.musicplayer.features.main.domain.use_cases.*
 
 val useCaseModule = module {
     factory { GetAlbumsUseCase(get(), get()) }

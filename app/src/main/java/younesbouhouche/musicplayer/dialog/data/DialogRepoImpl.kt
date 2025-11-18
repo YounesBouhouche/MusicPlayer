@@ -26,9 +26,9 @@ import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.core.domain.DialogService
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.dialog.domain.DialogRepo
-import younesbouhouche.musicplayer.main.presentation.states.PlayState
-import younesbouhouche.musicplayer.main.presentation.states.PlayerState
-import younesbouhouche.musicplayer.main.presentation.viewmodel.Task
+import younesbouhouche.musicplayer.features.main.presentation.states.PlayState
+import younesbouhouche.musicplayer.features.main.presentation.states.PlayerState
+import younesbouhouche.musicplayer.features.main.presentation.viewmodel.Task
 
 class DialogRepoImpl(val context: Context): DialogRepo {
     private val _card = MutableStateFlow<MusicCard?>(null)

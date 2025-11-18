@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -37,13 +38,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.core.presentation.util.ExpressiveIconButton
-import younesbouhouche.musicplayer.main.presentation.components.MyImage
-import younesbouhouche.musicplayer.main.presentation.states.PlayState
-import younesbouhouche.musicplayer.main.presentation.states.PlayerState
-import younesbouhouche.musicplayer.main.presentation.util.timeString
+import younesbouhouche.musicplayer.features.main.presentation.components.MyImage
+import younesbouhouche.musicplayer.features.main.presentation.states.PlayState
+import younesbouhouche.musicplayer.features.main.presentation.states.PlayerState
+import younesbouhouche.musicplayer.features.main.presentation.util.timeString
 import kotlin.math.roundToLong
 
 
@@ -97,10 +98,16 @@ fun DialogContent(
             }
             Column(Modifier.fillMaxWidth()) {
                 ExpressiveIconButton(
-                    rememberAnimatedVectorPainter(
-                        AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause_animation),
-                        state.playState == PlayState.PLAYING
-                    ),
+                    {
+                        Icon(
+                            rememberAnimatedVectorPainter(
+                                AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause_animation),
+                                state.playState == PlayState.PLAYING
+                            ),
+                            null,
+                            Modifier.size(IconButtonDefaults.largeIconSize)
+                        )
+                    },
                     loading = state.loading,
                     onClick = pauseResume,
                     size = IconButtonDefaults.largeIconSize,

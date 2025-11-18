@@ -41,13 +41,11 @@ import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.updateAll
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
-import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.main.presentation.util.composables.SetSystemBarColors
-import younesbouhouche.musicplayer.settings.data.SettingsDataStore
-import younesbouhouche.musicplayer.settings.presentation.settingsLabel
+import younesbouhouche.musicplayer.features.main.presentation.util.composables.SetSystemBarColors
+import younesbouhouche.musicplayer.features.settings.data.SettingsDataStore
+import younesbouhouche.musicplayer.features.settings.presentation.settingsLabel
 import younesbouhouche.musicplayer.ui.theme.AppTheme
 import kotlin.math.roundToInt
 

@@ -33,6 +33,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MusicPlayer"
+        tools:replace="android:theme"
         tools:targetApi="tiramisu">
         <activity
             android:name=".glance.presentation.ConfigActivity"
@@ -61,7 +62,7 @@
         <profileable android:shell="true" />
 
         <activity
-            android:name=".main.presentation.MainActivity"
+            android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTop"
@@ -79,10 +80,6 @@
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
-        <activity
-            android:name=".settings.presentation.SettingsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MusicPlayer" />
 
         <service
             android:name=".core.domain.MediaPlayerService"

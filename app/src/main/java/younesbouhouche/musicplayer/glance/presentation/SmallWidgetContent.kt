@@ -22,16 +22,16 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.unit.ColorProvider
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.main.presentation.MainActivity
+import younesbouhouche.musicplayer.MainActivity
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.glance.presentation.util.IconButton
 import younesbouhouche.musicplayer.glance.presentation.util.MyImage
 import younesbouhouche.musicplayer.glance.presentation.util.RowIconButton
 import younesbouhouche.musicplayer.glance.presentation.util.WidgetText
-import younesbouhouche.musicplayer.main.domain.events.PlaybackEvent
-import younesbouhouche.musicplayer.main.presentation.states.PlayState
-import younesbouhouche.musicplayer.main.presentation.states.PlayerState
+import younesbouhouche.musicplayer.features.main.domain.events.PlaybackEvent
+import younesbouhouche.musicplayer.features.main.presentation.states.PlayState
+import younesbouhouche.musicplayer.features.main.presentation.states.PlayerState
 
 
 @SuppressLint("RestrictedApi")

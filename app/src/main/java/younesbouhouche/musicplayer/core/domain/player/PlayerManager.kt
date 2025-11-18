@@ -15,13 +15,13 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.glance.presentation.MyAppWidget
-import younesbouhouche.musicplayer.main.data.PlayerDataStore
-import younesbouhouche.musicplayer.main.data.dao.AppDao
-import younesbouhouche.musicplayer.main.data.models.Queue
-import younesbouhouche.musicplayer.main.domain.events.TimerType
-import younesbouhouche.musicplayer.main.presentation.states.PlayState
-import younesbouhouche.musicplayer.main.presentation.util.toMediaItems
-import younesbouhouche.musicplayer.main.presentation.viewmodel.Task
+import younesbouhouche.musicplayer.features.main.data.PlayerDataStore
+import younesbouhouche.musicplayer.features.main.data.dao.AppDao
+import younesbouhouche.musicplayer.features.main.data.models.Queue
+import younesbouhouche.musicplayer.features.main.domain.events.TimerType
+import younesbouhouche.musicplayer.features.main.presentation.states.PlayState
+import younesbouhouche.musicplayer.features.main.presentation.util.toMediaItems
+import younesbouhouche.musicplayer.features.main.presentation.viewmodel.Task
 
 @OptIn(UnstableApi::class)
 class PlayerManager(

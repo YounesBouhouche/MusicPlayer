@@ -12,7 +12,7 @@ import younesbouhouche.musicplayer.core.domain.player.PlayerManager
 import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
 import younesbouhouche.musicplayer.core.domain.player.QueueManager
 import younesbouhouche.musicplayer.core.domain.session.MediaSessionManager
-import younesbouhouche.musicplayer.main.data.dao.AppDao
+import younesbouhouche.musicplayer.features.main.data.dao.AppDao
 
 val utilsModule = module {
     single { MediaMetadataRetriever() }

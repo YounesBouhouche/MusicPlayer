@@ -16,9 +16,9 @@ import com.kmpalette.color
 import com.materialkolor.DynamicMaterialTheme
 import com.materialkolor.PaletteStyle
 import com.materialkolor.rememberDynamicColorScheme
-import younesbouhouche.musicplayer.settings.data.SettingsDataStore
-import younesbouhouche.musicplayer.settings.domain.models.ColorScheme
-import younesbouhouche.musicplayer.settings.domain.models.Theme
+import younesbouhouche.musicplayer.features.settings.data.SettingsDataStore
+import younesbouhouche.musicplayer.features.settings.models.ColorScheme
+import younesbouhouche.musicplayer.features.settings.models.Theme
 
 @Composable
 internal fun AppTheme(

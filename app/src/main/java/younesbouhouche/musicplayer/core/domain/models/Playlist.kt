@@ -6,7 +6,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import coil.request.ImageRequest
-import younesbouhouche.musicplayer.main.data.events.PlayerEvent
+import younesbouhouche.musicplayer.features.main.data.events.PlayerEvent
 import java.io.File
 
 @Entity

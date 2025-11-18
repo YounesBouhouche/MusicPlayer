@@ -46,6 +46,13 @@ android {
         debug {
             buildConfigField("String", "BASE_URL", "\"https://api.deezer.com/\"")
         }
+        create("staging") {
+            initWith(buildTypes.getByName("release"))
+            matchingFallbacks += listOf("debug")
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+            buildConfigField("String", "BASE_URL", "\"https://api.deezer.com/\"")
+        }
         create("benchmark") {
             initWith(buildTypes.getByName("release"))
             signingConfig = signingConfigs.getByName("debug")
@@ -54,6 +61,21 @@ android {
             proguardFiles("benchmark-rules.pro")
         }
     }
+
+//    flavorDimensions += "paidness"
+//
+//    productFlavors {
+//        create("free") {
+//            dimension = "paidness"
+//            applicationIdSuffix = ".free"
+//            versionNameSuffix = "-free"
+//        }
+//        create("paid") {
+//            dimension = "paidness"
+//            applicationIdSuffix = ".paid"
+//            versionNameSuffix = "-paid"
+//        }
+//    }
     kotlin {
         compilerOptions {
             jvmTarget = JvmTarget.fromTarget("21")
@@ -67,9 +89,6 @@ android {
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
     }
     packaging {
         resources {
@@ -144,5 +163,6 @@ dependencies {
     implementation(libs.androidx.animation.graphics)
     implementation(libs.compose.dnd)
     implementation(libs.lazycolumnscrollbar)
+    implementation(libs.composedesignsystem)
 }
 

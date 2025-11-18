@@ -1,7 +1,6 @@
 package younesbouhouche.musicplayer.glance.presentation
 
 import android.content.Context
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.DpSize
@@ -19,11 +18,11 @@ import org.koin.core.component.inject
 import org.koin.java.KoinJavaComponent.inject
 import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
 import younesbouhouche.musicplayer.core.domain.player.QueueManager
-import younesbouhouche.musicplayer.main.domain.repo.MediaRepository
-import younesbouhouche.musicplayer.main.domain.repo.PlaybackRepository
-import younesbouhouche.musicplayer.main.presentation.states.PlayState
-import younesbouhouche.musicplayer.main.presentation.states.PlayerState
-import younesbouhouche.musicplayer.settings.data.SettingsDataStore
+import younesbouhouche.musicplayer.features.main.domain.repo.MediaRepository
+import younesbouhouche.musicplayer.features.main.domain.repo.PlaybackRepository
+import younesbouhouche.musicplayer.features.main.presentation.states.PlayState
+import younesbouhouche.musicplayer.features.main.presentation.states.PlayerState
+import younesbouhouche.musicplayer.features.settings.data.SettingsDataStore
 
 class MyAppWidget : GlanceAppWidget(), KoinComponent {
     companion object {

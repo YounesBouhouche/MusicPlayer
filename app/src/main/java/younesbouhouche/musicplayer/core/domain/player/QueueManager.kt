@@ -3,8 +3,8 @@ package younesbouhouche.musicplayer.core.domain.player
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.main.data.dao.AppDao
-import younesbouhouche.musicplayer.main.data.models.Queue
+import younesbouhouche.musicplayer.features.main.data.dao.AppDao
+import younesbouhouche.musicplayer.features.main.data.models.Queue
 
 class QueueManager(val dao: AppDao) {
     fun getQueue() = dao.getQueue()

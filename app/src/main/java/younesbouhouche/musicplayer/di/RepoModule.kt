@@ -6,16 +6,16 @@ import younesbouhouche.musicplayer.core.domain.player.PlayerManager
 import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
 import younesbouhouche.musicplayer.core.domain.player.QueueManager
 import younesbouhouche.musicplayer.core.domain.session.MediaSessionManager
-import younesbouhouche.musicplayer.main.data.ArtistsRepositoryImpl
-import younesbouhouche.musicplayer.main.data.MediaRepositoryImpl
-import younesbouhouche.musicplayer.main.data.PlaybackRepositoryImpl
-import younesbouhouche.musicplayer.main.data.PlayerDataStore
-import younesbouhouche.musicplayer.main.data.PlaylistRepositoryImpl
-import younesbouhouche.musicplayer.main.data.dao.AppDao
-import younesbouhouche.musicplayer.main.domain.repo.ArtistsRepository
-import younesbouhouche.musicplayer.main.domain.repo.MediaRepository
-import younesbouhouche.musicplayer.main.domain.repo.PlaybackRepository
-import younesbouhouche.musicplayer.main.domain.repo.PlaylistRepository
+import younesbouhouche.musicplayer.features.main.data.ArtistsRepositoryImpl
+import younesbouhouche.musicplayer.features.main.data.MediaRepositoryImpl
+import younesbouhouche.musicplayer.features.main.data.PlaybackRepositoryImpl
+import younesbouhouche.musicplayer.features.main.data.PlayerDataStore
+import younesbouhouche.musicplayer.features.main.data.PlaylistRepositoryImpl
+import younesbouhouche.musicplayer.features.main.data.dao.AppDao
+import younesbouhouche.musicplayer.features.main.domain.repo.ArtistsRepository
+import younesbouhouche.musicplayer.features.main.domain.repo.MediaRepository
+import younesbouhouche.musicplayer.features.main.domain.repo.PlaybackRepository
+import younesbouhouche.musicplayer.features.main.domain.repo.PlaylistRepository
 
 
 val repoModule = module {

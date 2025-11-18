@@ -16,7 +16,7 @@ import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import timber.log.Timber
 import younesbouhouche.musicplayer.BuildConfig
-import younesbouhouche.musicplayer.main.data.networking.constructUrl
+import younesbouhouche.musicplayer.features.main.data.networking.constructUrl
 
 val appModule = module {
     single<HttpClient> {
