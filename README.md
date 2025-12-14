@@ -2,10 +2,11 @@
 
 A modern, feature-rich Android music player built with Jetpack Compose and Material Design 3 Expressive.
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.2-blue.svg)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.21-blue.svg)](https://kotlinlang.org)
 [![Android](https://img.shields.io/badge/Android-API%2030+-green.svg)](https://android.com)
-[![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-Latest-brightgreen.svg)](https://developer.android.com/jetpack/compose)
-[![Material3](https://img.shields.io/badge/Material3-Latest-orange.svg)](https://m3.material.io)
+[![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-2025.12.00-brightgreen.svg)](https://developer.android.com/jetpack/compose)
+[![Material3](https://img.shields.io/badge/Material3-1.5.0--alpha10-orange.svg)](https://m3.material.io)
+[![Navigation3](https://img.shields.io/badge/Navigation3-1.1.0--alpha01-purple.svg)](https://developer.android.com/jetpack/androidx/releases/navigation)
 
 ## ✨ Features
 
@@ -65,50 +66,94 @@ A modern, feature-rich Android music player built with Jetpack Compose and Mater
 
 ## 🏗️ Architecture
 
-This app follows clean architecture principles with MVVM pattern:
+This app follows **Clean Architecture** principles with **MVVM pattern** and **feature-based modularization**:
 
-- **Presentation Layer**: Jetpack Compose UI with ViewModels
-- **Domain Layer**: Business logic and use cases
-- **Data Layer**: Room database, DataStore preferences, and repositories
+```
+app/
+├── core/                    # Shared components
+│   ├── data/               # Core data sources and utilities
+│   ├── domain/             # Core domain models and contracts
+│   └── presentation/       # Shared UI components and theme
+├── features/               # Feature modules
+│   ├── main/              # Main app feature (library, albums, artists, playlists)
+│   │   ├── data/          # Repositories, database, and data sources
+│   │   ├── domain/        # Use cases, models, and events
+│   │   └── presentation/  # UI screens, components, and ViewModels
+│   ├── player/            # Player feature (playback control and state)
+│   │   ├── data/          # Player repository and MediaSession
+│   │   ├── domain/        # Player state, events, and use cases
+│   │   └── presentation/  # Player UI components
+│   ├── settings/          # Settings feature
+│   ├── permissions/       # Permission handling
+│   ├── dialog/            # Dialog activities
+│   └── glance/            # Widget implementation
+├── di/                    # Dependency injection modules
+└── navigation/            # App navigation with Navigation3
+```
+
+### Architectural Layers
+
+- **Presentation Layer**: Jetpack Compose UI with ViewModels, reactive state management with StateFlow
+- **Domain Layer**: Business logic, use cases, domain models, and events
+- **Data Layer**: Room database, DataStore preferences, MediaStore scanner, and repositories
 
 ### Tech Stack
 
-#### Core
-- **Kotlin 2.2**: Modern, concise programming language
-- **Jetpack Compose**: Declarative UI framework
-- **Material 3**: Latest Material Design components
-- **ExoPlayer**: Advanced media playback
-- **Coroutines & Flow**: Asynchronous programming
+#### Core Technologies
+- **Kotlin 2.2.21**: Modern, concise programming language with latest features
+- **Jetpack Compose**: Declarative UI framework with Compose BOM 2025.12.00
+- **Material Design 3**: Material 3 Expressive (1.5.0-alpha10) with adaptive components
+- **Media3 ExoPlayer**: Advanced media playback engine (1.8.0)
+- **Coroutines & Flow**: Asynchronous programming and reactive streams
+- **Navigation3**: Type-safe navigation library (1.1.0-alpha01)
 
 #### Architecture Components
-- **Room Database**: Local data persistence
-- **Navigation Compose**: Type-safe navigation
-- **ViewModel**: Lifecycle-aware state management
-- **DataStore**: Preferences storage
-- **Koin**: Dependency injection
+- **Room Database (2.8.4)**: Local data persistence with SQLite
+- **Koin (4.1.1)**: Lightweight dependency injection
+  - `koin-android`
+  - `koin-compose`
+  - `koin-compose-viewmodel`
+  - `koin-compose-viewmodel-navigation`
+- **ViewModel**: Lifecycle-aware state management with ViewModelScope
+- **DataStore (1.2.0)**: Modern preferences storage replacing SharedPreferences
+- **ProfileInstaller (1.4.1)**: Baseline profile support for startup optimization
 
 #### UI/UX Libraries
-- **Material Kolor**: Color utilities
-- **KMPalette**: Color extraction from images
-- **Coil**: Image loading
-- **Material Motion Compose**: Smooth animations
-- **Reorderable**: Drag-and-drop functionality
-- **WaveSlider**: Custom slider components
+- **Material Kolor (4.0.5)**: Dynamic color generation and manipulation
+- **KMPalette (3.1.0)**: Color extraction from images for adaptive theming
+- **Coil (2.7.0)**: Image loading and caching
+- **Material Motion Compose (1.1.3)**: Smooth Material Design transitions
+- **Calvin Reorderable (3.0.0)**: Drag-and-drop reordering for LazyColumn/LazyRow
+- **Wavy Slider (2.2.0)**: Custom animated slider components
+- **LazyColumnScrollbar (2.2.0)**: Scrollbar for lazy lists
+- **Compose DnD (0.4.0)**: Additional drag-and-drop functionality
+- **Material Icons Extended (1.7.8)**: Comprehensive icon set
+- **Material3 Adaptive Navigation Suite (1.4.0)**: Adaptive navigation patterns
 
 #### Media & Metadata
-- **JAudioTagger**: Audio metadata editing
-- **Media3 Session**: Media session management
-- **Media3 UI**: Media controls UI
+- **JAudioTagger (3.0.1)**: Audio file metadata reading and editing
+- **Media3 Session (1.8.0)**: Media session management for background playback
+- **Media3 UI (1.8.0)**: Media controls UI components
+- **Media3 ExoPlayer Dash (1.8.0)**: DASH streaming support
 
-#### Networking
-- **Ktor**: HTTP client for API calls
-- **Gson**: JSON serialization
-- **Converter Gson**: Retrofit converter
+#### Networking & Serialization
+- **Ktor (3.3.3)**: HTTP client for API calls (Deezer API integration)
+- **Kotlinx Serialization (1.9.0)**: Kotlin-first serialization
 
-#### Other
-- **Timber**: Logging
-- **DiskLruCache**: Disk caching
-- **ProfileInstaller**: Baseline profile support
+#### Widget Support
+- **Glance AppWidget (1.1.1)**: Modern widget framework
+  - `glance`
+  - `glance-appwidget`
+  - `glance-material3`
+  - `glance-material`
+
+#### Development Tools
+- **Timber (5.0.1)**: Extensible logging
+- **DiskLruCache (1.7)**: Disk-based LRU cache
+- **KSP (2.2.20-2.0.3)**: Kotlin Symbol Processing for code generation
+- **Ktlint (14.0.1)**: Kotlin linter and formatter
+- **Kotzilla (1.4.1)**: Koin configuration validation
+- **Desugar JDK Libs (2.1.5)**: Java 8+ API desugaring for older Android versions
 
 ## 📋 Requirements
 
@@ -164,34 +209,128 @@ The app requires the following permissions:
 ```
 app/
 ├── src/main/java/younesbouhouche/musicplayer/
-│   ├── core/           # Core utilities and shared components
-│   ├── di/             # Dependency injection modules
-│   ├── dialog/         # Dialog activities
-│   ├── glance/         # Widget implementation
-│   ├── main/           # Main app features
-│   │   ├── data/       # Data layer (repositories, database)
-│   │   ├── domain/     # Domain layer (models, events, use cases)
-│   │   └── presentation/ # UI layer (screens, components, viewmodels)
-│   ├── settings/       # Settings feature
-│   ├── ui/             # UI theme and styling
-│   └── welcome/        # Welcome/onboarding screens
-└── src/main/res/       # Resources (layouts, strings, drawables)
+│   ├── core/                          # Shared core components
+│   │   ├── data/                      # Core data layer
+│   │   │   ├── database/             # Room database entities and DAOs
+│   │   │   ├── ext/                  # Extension functions
+│   │   │   └── local/                # MediaStore scanner
+│   │   ├── domain/                    # Core domain layer
+│   │   │   ├── ext/                  # Domain extensions
+│   │   │   └── models/               # Shared domain models
+│   │   └── presentation/              # Shared UI components
+│   │       ├── components/           # Reusable UI components
+│   │       └── theme/                # Material Theme configuration
+│   │
+│   ├── features/                      # Feature modules
+│   │   ├── main/                     # Main app feature
+│   │   │   ├── data/                 # Data layer
+│   │   │   │   ├── db/              # Room database
+│   │   │   │   ├── mappers/         # Data mappers
+│   │   │   │   └── repository/      # Repository implementations
+│   │   │   ├── domain/               # Domain layer
+│   │   │   │   ├── events/          # Domain events (UiAction, UiEvent)
+│   │   │   │   ├── models/          # Domain models (LoadingState, etc.)
+│   │   │   │   └── usecases/        # Use cases
+│   │   │   ├── presentation/         # Presentation layer
+│   │   │   │   ├── components/      # UI components
+│   │   │   │   ├── dialogs/         # Dialog composables
+│   │   │   │   ├── navigation/      # Main navigation
+│   │   │   │   ├── player/          # Player screen UI
+│   │   │   │   ├── routes/          # Feature routes
+│   │   │   │   │   ├── album/       # Albums screen
+│   │   │   │   │   ├── artist/      # Artists screen
+│   │   │   │   │   ├── home/        # Home screen
+│   │   │   │   │   ├── library/     # Library screen
+│   │   │   │   │   └── playlist/    # Playlists screen
+│   │   │   │   ├── states/          # UI state models
+│   │   │   │   ├── util/            # Presentation utilities
+│   │   │   │   └── viewmodel/       # ViewModels
+│   │   │   └── util/                 # Feature utilities
+│   │   │
+│   │   ├── player/                   # Player feature
+│   │   │   ├── data/                 # Player data layer
+│   │   │   │   └── repository/      # Player repository
+│   │   │   ├── domain/               # Player domain layer
+│   │   │   │   ├── events/          # Player events
+│   │   │   │   ├── models/          # Player state models
+│   │   │   │   └── usecases/        # Player use cases
+│   │   │   └── presentation/         # Player UI components
+│   │   │
+│   │   ├── settings/                 # Settings feature
+│   │   │   └── presentation/        # Settings screens
+│   │   │
+│   │   ├── permissions/              # Permission handling
+│   │   │   └── presentation/        # Permission screens
+│   │   │
+│   │   ├── dialog/                   # Dialog activities
+│   │   │   └── presentation/        # Dialog implementations
+│   │   │
+│   │   └── glance/                   # Widget implementation
+│   │       └── presentation/        # Glance composables
+│   │
+│   ├── di/                           # Dependency injection
+│   │   └── modules/                 # Koin modules
+│   │
+│   ├── navigation/                   # App-level navigation
+│   │   ├── routes/                  # Navigation routes
+│   │   ├── util/                    # Navigation utilities
+│   │   ├── AppNavGraph.kt           # Main navigation graph
+│   │   ├── EventHandler.kt          # Navigation event handling
+│   │   └── MainApp.kt               # App entry point
+│   │
+│   └── MainActivity.kt               # Single activity
+│
+└── src/main/res/                     # Resources
+    ├── drawable/                     # Vector drawables
+    ├── font/                         # Custom fonts
+    ├── layout/                       # XML layouts (for widgets)
+    ├── mipmap-*/                    # App icons
+    ├── values/                      # Default resources
+    ├── values-ar/                   # Arabic translations
+    ├── values-en/                   # English translations
+    ├── values-fr/                   # French translations
+    ├── values-hi/                   # Hindi translations
+    └── xml/                         # Data extraction rules, file paths
 ```
 
 ## 🎯 Key Components
 
-### Main Screens
-- **HomeScreen**: Quick access to favorites, history, and most played
-- **LibraryScreen**: All music files in your library
-- **AlbumsScreen**: Browse music by albums
-- **ArtistsScreen**: Browse music by artists
-- **PlaylistsScreen**: Manage your playlists
-- **SearchScreen**: Search across all music content
+### Main Features
 
-### Dialogs
-- **CreatePlaylistDialog**: Create new playlists
+#### Navigation Structure
+- **AppNavGraph**: Main app navigation using Navigation3 with Material Motion animations
+  - **Permissions Graph**: Permission request handling
+  - **Main Graph**: Primary app navigation with bottom navigation
+  - **Settings Graph**: Settings and preferences
+
+#### Main Screens (Bottom Navigation)
+- **HomeScreen**: Quick access to favorites, recently added, listen history, and most played artists
+- **Library**: All songs in your library with search and filter
+- **Albums**: Browse and manage albums with grid/list views
+- **Artists**: Browse artists and their songs
+- **Playlists**: Create and manage custom playlists
+
+#### Player Feature
+- **PlayerScreen**: Full-screen player with album art, controls, and queue
+- **MiniPlayer**: Compact player bar at the bottom of the screen
+- **Queue Management**: View, reorder, and manage playback queue
+- **Playback Controls**: Play, pause, skip, shuffle, repeat modes
+- **Advanced Features**: Speed control, pitch adjustment, sleep timer, skip silence
+
+#### Dialogs & Sheets
+- **CreatePlaylistDialog**: Create new playlists with custom names
 - **AddToPlaylistDialog**: Add songs to existing playlists
-- **MusicCardBottomSheet**: Quick actions for songs
+- **PlaybackParamsSheet**: Adjust playback speed, pitch, and other parameters
+- **QueueSheet**: View and manage the current play queue
+- **SongOptionsSheet**: Quick actions for individual songs (add to playlist, edit metadata, share, etc.)
+- **MetadataEditorDialog**: Edit song information (title, artist, album, year, genre, composer)
+
+#### Settings
+- **Theme Settings**: Light/Dark/System theme, Extra Dark mode for OLED
+- **Color Settings**: Material You dynamic colors, custom color palettes
+- **Player Settings**: Customize player UI (toggle buttons, volume slider)
+- **Library Settings**: Manage library scanning and metadata
+- **About**: App information and developer details
 
 ## 🤝 Contributing
 
@@ -229,6 +368,21 @@ Mobile, Desktop & Web Developer
 - **Package Name**: `younesbouhouche.musicplayer`
 - **Version**: 1.0
 - **Version Code**: 1
+- **Min SDK**: 30 (Android 11)
+- **Target SDK**: 36 (Android 15)
+- **Compile SDK**: 36 (Android 15)
+
+## 🔄 Recent Changes
+
+### Architecture Refactoring (December 2025)
+- ✅ **Fixed Room Database**: Corrected entities and relationships for proper data persistence
+- ✅ **Cover Art Caching**: Implemented persistent cover art caching with MediaMetadataRetriever
+- ✅ **Navigation3 Migration**: Updated from Navigation2 to Navigation3 for type-safe navigation
+- ✅ **Package Reorganization**: Restructured files into appropriate feature-based packages
+- ✅ **Code Cleanup**: Removed unnecessary data classes and redundant code
+- ✅ **Loading States**: Added granular 4-step loading progress tracking for media scanning
+- ✅ **Queue Management**: Implemented reactive Flow transformations for queue handling
+- ✅ **Performance Optimization**: Parallel cover fetching with proper synchronization
 
 ---
 
