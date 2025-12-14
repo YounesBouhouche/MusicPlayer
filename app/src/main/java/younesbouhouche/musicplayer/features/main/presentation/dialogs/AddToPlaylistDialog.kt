@@ -31,12 +31,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.younesb.mydesignsystem.presentation.components.ExpressiveButton
+import com.younesb.mydesignsystem.presentation.components.Image
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.core.domain.models.getPictureRequest
 import younesbouhouche.musicplayer.features.main.presentation.components.EmptyContainer
 import younesbouhouche.musicplayer.features.main.presentation.components.ListItem
-import younesbouhouche.musicplayer.features.main.presentation.components.MyImage
 import younesbouhouche.musicplayer.features.main.presentation.util.composables.TitleText
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
 
@@ -45,8 +45,8 @@ import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRec
 fun AddToPlaylistDialog(
     visible: Boolean,
     playlists: List<Playlist>,
-    selected: Set<Int>,
-    onToggle: (Int) -> Unit,
+    selected: Set<Long>,
+    onToggle: (Long) -> Unit,
     onCreatePlaylist: () -> Unit,
     onDismissRequest: () -> Unit,
     onConfirmRequest: () -> Unit,
@@ -109,7 +109,7 @@ fun AddToPlaylistDialog(
                             ListItem(
                                 background = background,
                                 leadingContent = {
-                                    MyImage(
+                                    Image(
                                         playlist.getPictureRequest(),
                                         Icons.AutoMirrored.Filled.PlaylistPlay,
                                         Modifier.size(60.dp),

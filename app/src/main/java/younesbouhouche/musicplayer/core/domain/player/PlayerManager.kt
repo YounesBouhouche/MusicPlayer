@@ -12,42 +12,45 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.glance.presentation.MyAppWidget
-import younesbouhouche.musicplayer.features.main.data.PlayerDataStore
-import younesbouhouche.musicplayer.features.main.data.dao.AppDao
-import younesbouhouche.musicplayer.features.main.data.models.Queue
+import younesbouhouche.musicplayer.core.data.datastore.SettingsPreference
+import younesbouhouche.musicplayer.core.domain.repositories.MusicRepository
+import younesbouhouche.musicplayer.features.glance.presentation.MyAppWidget
+import younesbouhouche.musicplayer.core.domain.repositories.PreferencesRepository
+import younesbouhouche.musicplayer.core.domain.repositories.QueueRepository
 import younesbouhouche.musicplayer.features.main.domain.events.TimerType
-import younesbouhouche.musicplayer.features.main.presentation.states.PlayState
+import younesbouhouche.musicplayer.features.player.domain.models.PlayState
 import younesbouhouche.musicplayer.features.main.presentation.util.toMediaItems
 import younesbouhouche.musicplayer.features.main.presentation.viewmodel.Task
 
 @OptIn(UnstableApi::class)
 class PlayerManager(
     private val context: Context,
-    private val dao: AppDao,
-    private val dataStore: PlayerDataStore,
+    private val preferencesRepository: PreferencesRepository,
     private val stateManager: PlayerStateManager,
-    private val queueManager: QueueManager,
-    private val playerFactory: PlayerFactory
+    private val musicRepository: MusicRepository,
+    private val queueRepository: QueueRepository,
+    private val playerFactory: PlayerFactory,
+    private val scope: CoroutineScope,
 ) {
-    private val state = stateManager.playerState
+    val state = stateManager.playerState
 
-    private val rememberRepeat = dataStore.rememberRepeat
-    private val rememberShuffle = dataStore.rememberShuffle
-    private val rememberSpeed = dataStore.rememberSpeed
-    private val rememberPitch = dataStore.rememberPitch
-    private val repeatMode = dataStore.repeatMode
-    private val shuffle = dataStore.shuffle
-    private val speed = dataStore.speed
-    private val pitch = dataStore.pitch
+    private val rememberRepeat = preferencesRepository.get(SettingsPreference.RememberRepeat)
+    private val rememberShuffle = preferencesRepository.get(SettingsPreference.RememberShuffle)
+    private val rememberSpeed = preferencesRepository.get(SettingsPreference.RememberSpeed)
+    private val rememberPitch = preferencesRepository.get(SettingsPreference.RememberPitch)
+    private val repeatMode = preferencesRepository.get(SettingsPreference.RepeatMode)
+    private val shuffle = preferencesRepository.get(SettingsPreference.ShuffleMode)
+    private val speed = preferencesRepository.get(SettingsPreference.Speed)
+    private val pitch = preferencesRepository.get(SettingsPreference.Pitch)
 
-    suspend fun getPlayer(): Player = playerFactory.getPlayer()
+    private var initialized = false
 
     @OptIn(UnstableApi::class)
-    suspend fun initialize(scope: CoroutineScope): Player {
+    suspend fun initialize(): Player {
         val exoPlayer = playerFactory.getPlayer()
+        if (initialized) return exoPlayer
         exoPlayer.apply {
             addListener(
                 object : Player.Listener {
@@ -76,9 +79,7 @@ class PlayerManager(
                                     hasPrevItem = hasPreviousMediaItem(),
                                 )
                             }
-                            dataStore.override(
-                                repeatMode = mode,
-                            )
+                            preferencesRepository.set(SettingsPreference.RepeatMode, mode)
                         }
                     }
 
@@ -88,9 +89,7 @@ class PlayerManager(
                             stateManager.updateState {
                                 it.copy(shuffle = shuffleModeEnabled)
                             }
-                            dataStore.override(
-                                shuffle = shuffleModeEnabled,
-                            )
+                            preferencesRepository.set(SettingsPreference.ShuffleMode, shuffleModeEnabled)
                         }
                     }
 
@@ -100,9 +99,13 @@ class PlayerManager(
                             stateManager.updateState {
                                 it.copy(speed = playbackParameters.speed, pitch = playbackParameters.pitch)
                             }
-                            dataStore.override(
-                                speed = if (rememberSpeed.first()) playbackParameters.speed else 1f,
-                                pitch = if (rememberPitch.first()) playbackParameters.pitch else 1f
+                            preferencesRepository.set(
+                                SettingsPreference.Speed,
+                                if (rememberSpeed.first()) playbackParameters.speed else 1f
+                            )
+                            preferencesRepository.set(
+                                SettingsPreference.Pitch,
+                                if (rememberPitch.first()) playbackParameters.pitch else 1f
                             )
                         }
                     }
@@ -127,8 +130,8 @@ class PlayerManager(
                         Timber.tag("PlayerManager")
                             .d("onMediaItemTransition: ${mediaItem?.localConfiguration?.uri}")
                         scope.launch {
-                            dao.addTimestamp(mediaItem?.localConfiguration?.uri?.toString() ?: "")
-                            queueManager.updateIndex(currentMediaItemIndex)
+//                            dao.addTimestamp(mediaItem?.localConfiguration?.uri?.toString() ?: "")
+                            queueRepository.setCurrentIndex(currentMediaItemIndex)
                             MyAppWidget().updateAll(context)
                         }
                         stateManager.updateState {
@@ -149,16 +152,15 @@ class PlayerManager(
                                     val timer = (it.timer as TimerType.End)
                                     it.copy(timer = timer.copy(tracks = timer.tracks - 1))
                                 }
-                            } //else {
-                            //                            scope.launch {
-                            //                                onEvent(PlayerEvent.Stop)
-                            //                            }
-                            //                        }
+                            } else {
+                                stop()
+                            }
                         }
                     }
                 },
             )
         }
+        initialized = true
         return exoPlayer
     }
 
@@ -178,7 +180,7 @@ class PlayerManager(
         }
     }
 
-    suspend fun seek(index: Int, time: Long, skipIfSameIndex: Boolean = true) {
+    suspend fun seek(index: Int?, time: Long, skipIfSameIndex: Boolean = true) {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastSeekTime < seekLockDuration) {
             return
@@ -187,25 +189,30 @@ class PlayerManager(
             return
         }
         lastSeekTime = currentTime
-        queueManager.updateIndex(index)
+        if (index != null) {
+            queueRepository.setCurrentIndex(index)
+            playerFactory.getPlayer().seekTo(index, time)
+        } else
+            playerFactory.getPlayer().seekTo(time)
         stateManager.updateState {
             it.copy(time = time)
         }
-        playerFactory.getPlayer().seekTo(index, time)
         MyAppWidget().updateAll(context)
     }
 
     suspend fun play(
-        cardsList: List<MusicCard>,
+        tracks: List<Long>,
         index: Int = 0,
         time: Long = 0L,
         autoPlay: Boolean = true,
         shuffleMode: Boolean = false
     ) {
         playerFactory.getPlayer().let { player ->
-            if (cardsList.isEmpty()) return
-            val list = if (shuffleMode) cardsList.shuffled() else cardsList
-            queueManager.setQueue(Queue(items = list.map { it.id }, index = index))
+            if (tracks.isEmpty()) return
+            val songs = withContext(Dispatchers.IO) {
+                musicRepository.getSongs(tracks)
+            }
+            val list = if (shuffleMode) songs.shuffled() else songs
             player.setMediaItems(list.toMediaItems())
             player.seekTo(index, time)
             player.prepare()
@@ -220,19 +227,34 @@ class PlayerManager(
                     if (rememberSpeed.first()) speed.first() else 1f,
                     if (rememberPitch.first()) pitch.first() else 1f
                 )
-            list.getOrNull(index)?.let {
-                dao.addTimestamp(it.path)
-            }
-            queueManager.updateList(cardsList.map { it.id })
-            queueManager.updateIndex(index)
+//            list.getOrNull(index)?.let {
+//                dao.addTimestamp(it.path)
+//            }
+            queueRepository.createQueue(tracks)
+            queueRepository.setCurrentIndex(index)
             stateManager.suspendUpdateState {
                 it.copy(
                     time = time,
                     playState = if (autoPlay) PlayState.PLAYING else PlayState.PAUSED,
                     pitch = pitch.first(),
+                    speed = speed.first(),
                 )
             }
             startTimeUpdate()
+        }
+    }
+
+    suspend fun stop() {
+        playerFactory.getPlayer().stop()
+        timeTask.stop()
+        withContext(Dispatchers.IO) {
+            queueRepository.clearQueue()
+        }
+        stateManager.updateState {
+            it.copy(
+                playState = PlayState.STOP,
+                time = 0L,
+            )
         }
     }
 

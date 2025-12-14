@@ -26,11 +26,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.younesb.mydesignsystem.presentation.components.ImagePicker
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.features.main.presentation.components.Dialog
-import younesbouhouche.musicplayer.features.main.presentation.components.MyImagePicker
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -62,11 +62,11 @@ fun CreatePlaylistDialog(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            MyImagePicker(
+            ImagePicker(
                 image,
                 modifier = Modifier.size(200.dp),
                 shape = MaterialShapes.Cookie4Sided.toShape(),
-                onPick = onImageChange,
+                onImageChange = onImageChange,
                 fraction = .3f
             )
             OutlinedTextField(

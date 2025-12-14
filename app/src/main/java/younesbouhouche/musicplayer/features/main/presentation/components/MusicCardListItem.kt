@@ -43,13 +43,14 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import com.younesb.mydesignsystem.presentation.components.Image
+import younesbouhouche.musicplayer.core.domain.models.Song
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MusicCardListItem(
-    file: MusicCard,
+    file: Song,
     modifier: Modifier = Modifier,
     active: Boolean = false,
     dragging: Boolean = false,
@@ -118,8 +119,8 @@ fun MusicCardListItem(
                 else MaterialTheme.colorScheme.surfaceContainerLow,
             leadingContent = {
                 leadingContent?.invoke(this)
-                MyImage(
-                    model = file.coverUri,
+                Image(
+                    model = file.coverPath,
                     icon = Icons.Default.MusicNote,
                     modifier = Modifier.size(58.dp),
                     iconTint =

@@ -8,12 +8,12 @@ import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.ui.graphics.vector.ImageVector
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.Song
 import kotlin.collections.sortedBy
 import younesbouhouche.musicplayer.R
 
 
-enum class PlaylistSortType(val label: Int, val icon: ImageVector, val sort: (List<MusicCard>) -> List<MusicCard>) {
+enum class PlaylistSortType(val label: Int, val icon: ImageVector, val sort: (List<Song>) -> List<Song>) {
     Custom(
         R.string.custom,
         Icons.Default.Person,

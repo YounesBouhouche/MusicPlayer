@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
-import younesbouhouche.musicplayer.core.presentation.util.TopBar
+import younesbouhouche.musicplayer.core.presentation.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

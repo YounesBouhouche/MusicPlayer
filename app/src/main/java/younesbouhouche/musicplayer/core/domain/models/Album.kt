@@ -3,11 +3,10 @@ package younesbouhouche.musicplayer.core.domain.models
 import android.net.Uri
 
 data class Album(
-    val name: String = "",
-    val items: List<Long> = emptyList(),
-    var cover: Uri? = null,
+    val name: String,
+    val picture: String? = null,
+    val cover: Uri? = null,
+    val songs: List<Song> = emptyList()
 ) {
-    fun search(query: String): Boolean {
-        return name.contains(query, ignoreCase = true)
-    }
+    fun search(query: String) = name.lowercase().contains(query.lowercase())
 }

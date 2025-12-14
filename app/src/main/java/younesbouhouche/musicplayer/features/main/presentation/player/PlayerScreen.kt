@@ -27,17 +27,19 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.kmpalette.rememberPaletteState
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.features.main.domain.events.PlaybackEvent
-import younesbouhouche.musicplayer.features.main.domain.events.UiEvent
-import younesbouhouche.musicplayer.features.main.domain.models.QueueModel
-import younesbouhouche.musicplayer.features.main.presentation.states.PlayerState
-import younesbouhouche.musicplayer.features.main.presentation.states.ViewState
-import younesbouhouche.musicplayer.ui.theme.AppTheme
+import younesbouhouche.musicplayer.core.domain.models.Queue
+import younesbouhouche.musicplayer.core.domain.models.Song
+import younesbouhouche.musicplayer.features.main.domain.events.UiAction
+import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
+import younesbouhouche.musicplayer.features.player.domain.models.ViewState
+import younesbouhouche.musicplayer.core.presentation.theme.AppTheme
+import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 import kotlin.math.roundToInt
 
 @Composable
 fun PlayerScreen(
-    queue: QueueModel,
+    queue: Queue,
+    currentItem: Song?,
     playerState: PlayerState,
     offset: Int,
     viewHeight: Int,
@@ -45,9 +47,9 @@ fun PlayerScreen(
     state: PlayerState,
     dragState: AnchoredDraggableState<ViewState>,
     modifier: Modifier = Modifier,
-    onUiEvent: (UiEvent) -> Unit,
-    onSetFavorite: (String, Boolean) -> Unit,
-    onPlaybackEvent: (PlaybackEvent) -> Unit,
+    onAction: (UiAction) -> Unit,
+    onSetFavorite: (Long, Boolean) -> Unit,
+    onPlayerEvent: (PlayerEvent) -> Unit = {}
 ) {
     val density = LocalDensity.current
     val height = with(density) {
@@ -94,7 +96,7 @@ fun PlayerScreen(
                     .alpha(1f - progress)
                     .height(80.dp),
                 progress < 1f,
-                onPlaybackEvent,
+                onPlayerEvent,
                 {
                     it?.asImageBitmap()?.let { image ->
                         scope.launch {
@@ -119,14 +121,15 @@ fun PlayerScreen(
                         dragState.animateTo(ViewState.SMALL)
                     }
                 },
+                currentItem,
                 onSetFavorite,
                 {
-                    onUiEvent(UiEvent.ShowCreatePlaylistDialog(queue.items.map { it.path }))
+                    onAction(UiAction.ShowCreatePlaylistDialog(queue.songs.map { it.path }))
                 },
                 {
-                    onUiEvent(UiEvent.ShowAddToPlaylistDialog(queue.items.map { it.path }))
+                    onAction(UiAction.ShowAddToPlaylistDialog(queue.songs.map { it.path }))
                 },
-                onPlaybackEvent,
+                onPlayerEvent,
             )
         }
     }

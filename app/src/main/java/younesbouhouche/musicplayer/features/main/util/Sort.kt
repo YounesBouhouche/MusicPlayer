@@ -2,17 +2,17 @@ package younesbouhouche.musicplayer.features.main.util
 
 import younesbouhouche.musicplayer.core.domain.models.Album
 import younesbouhouche.musicplayer.core.domain.models.Artist
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import younesbouhouche.musicplayer.core.domain.models.Playlist
+import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.features.main.presentation.util.ListsSortType
 import younesbouhouche.musicplayer.features.main.presentation.util.PlaylistSortType
 import younesbouhouche.musicplayer.features.main.presentation.util.SortType
 
-fun List<MusicCard>.sortBy(sortType: SortType, ascending: Boolean = true) =
+fun List<Song>.sortBy(sortType: SortType, ascending: Boolean = true) =
     if (ascending) sortType.sort(this)
     else sortType.sort(this).reversed()
 
-fun List<MusicCard>.sortBy(sortType: PlaylistSortType, ascending: Boolean = true) =
+fun List<Song>.sortBy(sortType: PlaylistSortType, ascending: Boolean = true) =
     if (ascending) sortType.sort(this)
     else sortType.sort(this).reversed()
 

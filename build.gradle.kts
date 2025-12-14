@@ -7,4 +7,5 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.android.test) apply false
     alias(libs.plugins.room) apply false
+    alias(libs.plugins.kotzilla) apply false
 }

@@ -9,8 +9,8 @@ import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.LocaleManagerCompat
 import androidx.core.os.LocaleListCompat
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.features.settings.models.Language
+import younesbouhouche.musicplayer.core.domain.models.Song
+import younesbouhouche.musicplayer.core.domain.models.preferences.Language
 import java.time.ZonedDateTime
 
 fun (Pair<String, String>).containEachOther() = first.contains(second, true) or second.contains(first, true)
@@ -22,7 +22,7 @@ fun String.removeLeadingTime(): String =
         else -> this
     }.trimStart()
 
-fun MusicCard.search(query: String) =
+fun Song.search(query: String) =
     (title to query).containEachOther() or
         (path to query).containEachOther() or
         (album to query).containEachOther() or

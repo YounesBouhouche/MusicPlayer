@@ -34,8 +34,8 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
-import younesbouhouche.musicplayer.features.main.domain.events.PlaybackEvent
 import younesbouhouche.musicplayer.features.main.domain.events.TimerType
+import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -43,10 +43,11 @@ fun ActionBar(
     shuffle: Boolean,
     repeatMode: Int,
     speed: Float,
+    pitch: Float,
     timer: TimerType,
     showTimerSheet: () -> Unit,
     showSpeedSheet: () -> Unit,
-    onPlaybackEvent: (PlaybackEvent) -> Unit,
+    onPlayerEvent: (PlayerEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -78,7 +79,7 @@ fun ActionBar(
                     0 -> shuffle
                     1 -> repeatMode != Player.REPEAT_MODE_OFF
                     2 -> timer != TimerType.Disabled
-                    else -> speed != 1f
+                    else -> (speed != 1f) or (pitch != 1f)
                 }
                 val interactionSource = remember { MutableInteractionSource() }
                 val pressed by interactionSource.collectIsPressedAsState()
@@ -89,8 +90,8 @@ fun ActionBar(
                     checked = active,
                     onCheckedChange = { _ ->
                         when(it) {
-                            0 -> onPlaybackEvent(PlaybackEvent.ToggleShuffle)
-                            1 -> onPlaybackEvent(PlaybackEvent.CycleRepeatMode)
+                            0 -> onPlayerEvent(PlayerEvent.ToggleShuffle)
+                            1 -> onPlayerEvent(PlayerEvent.CycleRepeatMode)
                             2 -> showTimerSheet()
                             else -> showSpeedSheet()
                         }

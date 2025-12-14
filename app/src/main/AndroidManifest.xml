@@ -36,7 +36,7 @@
         tools:replace="android:theme"
         tools:targetApi="tiramisu">
         <activity
-            android:name=".glance.presentation.ConfigActivity"
+            android:name=".features.glance.presentation.ConfigActivity"
             android:exported="true"
             android:label="@string/title_activity_config"
             android:theme="@style/Theme.MusicPlayer" >
@@ -45,7 +45,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".dialog.presentation.DialogActivity"
+            android:name=".features.dialog.presentation.DialogActivity"
             android:excludeFromRecents="true"
             android:exported="true"
             android:label="@string/title_activity_dialog"
@@ -82,7 +82,7 @@
         </activity>
 
         <service
-            android:name=".core.domain.MediaPlayerService"
+            android:name=".features.player.presentation.service.MediaPlayerService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback"
@@ -94,7 +94,7 @@
             </intent-filter>
         </service>
         <service
-            android:name=".core.domain.DialogService"
+            android:name=".features.dialog.presentation.service.DialogService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback"
@@ -105,7 +105,7 @@
         </service>
 
         <receiver
-            android:name=".glance.presentation.MyAppWidgetReceiver"
+            android:name=".features.glance.presentation.MyAppWidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

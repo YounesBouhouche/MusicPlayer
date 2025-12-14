@@ -1,5 +1,5 @@
 package younesbouhouche.musicplayer.features.main.presentation.util
 
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.Song
 
-fun List<MusicCard>.toMediaItems() = map { it.toMediaItem() }
+fun List<Song>.toMediaItems() = map { it.toMediaItem() }

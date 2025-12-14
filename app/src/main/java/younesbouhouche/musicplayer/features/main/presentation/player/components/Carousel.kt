@@ -28,34 +28,34 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.features.main.domain.events.PlaybackEvent
-import younesbouhouche.musicplayer.features.main.domain.models.QueueModel
-import younesbouhouche.musicplayer.features.main.presentation.components.MyImage
+import com.younesb.mydesignsystem.presentation.components.Image
+import younesbouhouche.musicplayer.core.domain.models.Queue
+import younesbouhouche.musicplayer.core.domain.models.Song
+import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Carousel(
-    queue: QueueModel,
+    queue: Queue,
     enabled: Boolean,
     modifier: Modifier = Modifier,
-    onPlaybackEvent: (PlaybackEvent) -> Unit,
+    onPlayerEvent: (PlayerEvent) -> Unit,
 ) {
     val carouselState = rememberCarouselState(
-        queue.index
-            .coerceIn(0, (queue.items.size - 1).coerceAtLeast(0))
+        queue.currentIndex
+            .coerceIn(0, (queue.songs.size - 1).coerceAtLeast(0))
     ) {
-        queue.items.size
+        queue.songs.size
     }
-    LaunchedEffect(queue.index) {
-        if (carouselState.currentItem != queue.index) {
-            carouselState.animateScrollToItem(queue.index)
-            println("Scrolled to ${queue.index} from internal")
+    LaunchedEffect(queue.currentIndex) {
+        if (carouselState.currentItem != queue.currentIndex) {
+            carouselState.animateScrollToItem(queue.currentIndex)
+            println("Scrolled to ${queue.currentIndex} from internal")
         }
     }
 //    LaunchedEffect(carouselState.currentItem) {
-//        if (carouselState.currentItem != queue.index) {
-//            onPlaybackEvent(PlaybackEvent.Seek(carouselState.currentItem))
+//        if (carouselState.currentItem != queue.currentIndex) {
+//            onPlayerEvent(PlayerEvent.Seek(carouselState.currentItem))
 //            println("Scrolled to ${carouselState.currentItem} from external")
 //        }
 //    }
@@ -69,7 +69,7 @@ fun Carousel(
                     onDragEnd = {
                         println("Drag ended, current item: ${carouselState.currentItem}")
                         if (carouselState.currentItem != carouselState.currentItem)
-                            onPlaybackEvent(PlaybackEvent.Seek(carouselState.currentItem))
+                            onPlayerEvent(PlayerEvent.Seek(carouselState.currentItem))
                     }
                 ) { _, _ -> }
             },
@@ -77,15 +77,15 @@ fun Carousel(
         itemSpacing = 8.dp,
         userScrollEnabled = enabled
     ) { page ->
-        MyImage(
-            model = queue.items.getOrNull(page)?.coverUri,
+        Image(
+            model = queue.songs.getOrNull(page)?.coverPath,
             icon = Icons.Default.MusicNote,
             iconTint = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.7f),
             shape = rememberMaskShape(MaterialTheme.shapes.extraLarge),
             background = MaterialTheme.colorScheme.surfaceContainer.copy(0.5f),
             onClick = {
-                if (page != queue.index) {
-                    onPlaybackEvent(PlaybackEvent.Seek(page))
+                if (page != queue.currentIndex) {
+                    onPlayerEvent(PlayerEvent.Seek(page))
                 }
             },
             modifier = Modifier
@@ -101,14 +101,14 @@ fun Carousel(
 private fun CarouselPreview() {
     var queue by remember {
         mutableStateOf(
-            QueueModel(
-                index = 0,
-                items =
+            Queue(
+                currentIndex = 0,
+                songs =
                     List(5) {
-                        MusicCard.Builder()
-                            .setId(it.toLong())
-                            .setTitle("Title $it")
-                            .setArtist("Artist $it")
+                        Song.Builder()
+                            .id(it.toLong())
+                            .title("Title $it")
+                            .artist("Artist $it")
                             .build()
                     }
             )
@@ -125,22 +125,22 @@ private fun CarouselPreview() {
                     .fillMaxWidth()
                     .aspectRatio(1f, true),
                 enabled = true,
-                onPlaybackEvent = {
-                    if (it is PlaybackEvent.Seek) {
-                        queue = queue.copy(index = it.index)
+                onPlayerEvent = {
+                    if (it is PlayerEvent.Seek) {
+                        queue = queue.copy(currentIndex = it.index)
                         triggered++
                     }
                 },
             )
             Row {
                 Button({
-                    queue = queue.copy(index = (queue.index - 1).coerceAtLeast(0))
+                    queue = queue.copy(currentIndex = (queue.currentIndex - 1).coerceAtLeast(0))
                 }) {
                     Text("Prev")
                 }
-                Text("${queue.index}")
+                Text("${queue.currentIndex}")
                 Button({
-                    queue = queue.copy(index = (queue.index + 1).coerceAtMost(queue.items.size - 1))
+                    queue = queue.copy(currentIndex = (queue.currentIndex + 1).coerceAtMost(queue.songs.size - 1))
                 }) {
                     Text("Next")
                 }

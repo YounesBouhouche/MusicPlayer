@@ -3,20 +3,30 @@ package younesbouhouche.musicplayer.di
 import androidx.room.Room
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import younesbouhouche.musicplayer.features.main.data.PlayerDataStore
-import younesbouhouche.musicplayer.features.main.data.dao.AppDao
-import younesbouhouche.musicplayer.features.main.data.db.AppDatabase
-import younesbouhouche.musicplayer.features.settings.data.SettingsDataStore
+import younesbouhouche.musicplayer.core.data.database.dao.SongsDao
+import younesbouhouche.musicplayer.core.data.database.AppDatabase
+import younesbouhouche.musicplayer.core.data.database.dao.AlbumsDao
+import younesbouhouche.musicplayer.core.data.database.dao.ArtistsDao
+import younesbouhouche.musicplayer.core.data.database.dao.PlayHistoryDao
+import younesbouhouche.musicplayer.core.data.database.dao.PlaylistDao
+import younesbouhouche.musicplayer.core.data.database.dao.QueueDao
+import younesbouhouche.musicplayer.core.data.datastore.PreferencesDataStore
 
 val databaseModule = module {
     single<AppDatabase> {
         Room
-            .databaseBuilder(androidContext(), AppDatabase::class.java, "files.db")
+            .databaseBuilder(
+                androidContext(),
+                AppDatabase::class.java,
+                "media.db"
+            )
             .build()
     }
-    single<AppDao> {
-        get<AppDatabase>().dao
-    }
-    single { SettingsDataStore(androidContext()) }
-    single { PlayerDataStore(androidContext()) }
+    single<SongsDao> { get<AppDatabase>().songsDao }
+    single<QueueDao> { get<AppDatabase>().queueDao }
+    single<PlaylistDao> { get<AppDatabase>().playlistDao }
+    single<PlayHistoryDao> { get<AppDatabase>().playHistoryDao }
+    single<AlbumsDao> { get<AppDatabase>().albumsDao }
+    single<ArtistsDao> { get<AppDatabase>().artistsDao }
+    single { PreferencesDataStore(androidContext()) }
 }

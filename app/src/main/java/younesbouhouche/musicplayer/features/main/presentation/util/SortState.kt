@@ -1,7 +1,7 @@
 package younesbouhouche.musicplayer.features.main.presentation.util
 
 import kotlinx.serialization.Serializable
-import younesbouhouche.musicplayer.core.domain.models.ColsCount
+import younesbouhouche.musicplayer.features.main.presentation.ColsCount
 
 @Serializable
 data class SortState<T>(

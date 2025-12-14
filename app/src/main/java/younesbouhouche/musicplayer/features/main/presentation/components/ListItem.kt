@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
+import com.younesb.mydesignsystem.presentation.components.Image
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -91,7 +92,7 @@ fun ListItem(
     background = background,
     horizontalArrangement = horizontalArrangement,
     leadingContent = {
-        MyImage(
+        Image(
             cover,
             icon,
             Modifier.size(68.dp),

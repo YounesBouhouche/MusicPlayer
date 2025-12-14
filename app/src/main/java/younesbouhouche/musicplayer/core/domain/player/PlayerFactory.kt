@@ -1,7 +1,6 @@
 package younesbouhouche.musicplayer.core.domain.player
 
 import android.content.Context
-import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -11,18 +10,21 @@ import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import kotlinx.coroutines.flow.first
-import younesbouhouche.musicplayer.features.main.data.PlayerDataStore
+import timber.log.Timber
+import younesbouhouche.musicplayer.core.data.datastore.SettingsPreference
+import younesbouhouche.musicplayer.core.domain.repositories.PreferencesRepository
+import younesbouhouche.musicplayer.core.domain.repositories.QueueRepository
 
 /**
  * Factory responsible for creating and managing a single ExoPlayer instance
  */
 class PlayerFactory(
     private val context: Context,
-    private val queueManager: QueueManager,
-    dataStore: PlayerDataStore
+    private val queueRepository: QueueRepository,
+    preferencesRepository: PreferencesRepository
 ) {
     private var exoPlayer: Player? = null
-    private val skipSilence = dataStore.skipSilence
+    private val skipSilence = preferencesRepository.get(SettingsPreference.SkipSilence)
 
     @OptIn(UnstableApi::class)
     suspend fun getPlayer(): Player = exoPlayer ?: createNewPlayer().also { exoPlayer = it }
@@ -62,12 +64,12 @@ class PlayerFactory(
      * Restores player state from database
      */
     suspend fun restorePlayerState(player: Player) {
-        Log.i("PlayerFactory", "Restoring player state")
-        Log.i("PlayerFactory", "player.mediaItemCount: ${player.mediaItemCount}")
-        Log.i("PlayerFactory", "player.playing: ${player.isPlaying}")
-        Log.i("PlayerFactory", "casted: ${(player as? ExoPlayer) != null}")
+        Timber.tag("PlayerFactory").i("Restoring player state")
+        Timber.tag("PlayerFactory").i("player.mediaItemCount: ${player.mediaItemCount}")
+        Timber.tag("PlayerFactory").i("player.playing: ${player.isPlaying}")
+        Timber.tag("PlayerFactory").i("casted: ${(player as? ExoPlayer) != null}")
         this.exoPlayer = player
-        queueManager.updateIndex(player.currentMediaItemIndex)
+        queueRepository.setCurrentIndex(player.currentMediaItemIndex)
     }
 
     fun releasePlayer() {

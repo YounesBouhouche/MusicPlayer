@@ -8,7 +8,7 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.ui.graphics.vector.ImageVector
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.features.main.util.getDurationRange
 import younesbouhouche.musicplayer.features.main.util.getGroupingKey
 import younesbouhouche.musicplayer.features.main.util.getSizeRange
@@ -19,8 +19,8 @@ import younesbouhouche.musicplayer.features.main.util.toReadableDurationString
 enum class SortType(
     val label: Int,
     val icon: ImageVector,
-    val sort: (List<MusicCard>) -> List<MusicCard>,
-    val groupBy: (MusicCard) -> String,
+    val sort: (List<Song>) -> List<Song>,
+    val groupBy: (Song) -> String,
 ) {
     Title(
         R.string.title,

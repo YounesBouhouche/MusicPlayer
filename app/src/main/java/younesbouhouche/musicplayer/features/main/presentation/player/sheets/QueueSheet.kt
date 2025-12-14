@@ -47,36 +47,35 @@ import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
 import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
-import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
-import younesbouhouche.musicplayer.features.main.domain.events.PlaybackEvent
-import younesbouhouche.musicplayer.features.main.domain.events.PlaylistEvent
-import younesbouhouche.musicplayer.features.main.domain.models.QueueModel
+import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.core.domain.models.Queue
+import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.features.main.presentation.components.MusicCardListItem
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
 import younesbouhouche.musicplayer.features.main.presentation.util.plus
+import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun QueueSheet(
     visible: Boolean,
     onDismissRequest: () -> Unit,
-    queue: QueueModel,
-    onPlaybackEvent: (PlaybackEvent) -> Unit,
+    queue: Queue,
+    onPlayerEvent: (PlayerEvent) -> Unit,
     onSaveQueue: () -> Unit,
     onAddToPlaylist: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val reorderState = rememberReorderState<MusicCard>(true)
+    val reorderState = rememberReorderState<Song>(true)
     val state = rememberModalBottomSheetState(true)
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val exitAlwaysScrollBehavior =
         FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
     var expanded by rememberSaveable { mutableStateOf(true) }
-    var reorderedQueue by remember { mutableStateOf(queue.items) }
-    LaunchedEffect(queue.items) {
-        reorderedQueue = queue.items
+    var reorderedQueue by remember { mutableStateOf(queue.songs) }
+    LaunchedEffect(queue.songs) {
+        reorderedQueue = queue.songs
     }
     if (visible) {
         ModalBottomSheet(
@@ -133,23 +132,23 @@ fun QueueSheet(
                                     key = item.id,
                                     data = item,
                                     onDrop = {
-                                        val from = queue.items.indexOf(it.data)
-                                        val to = queue.items.indexOf(item)
+                                        val from = queue.songs.indexOf(it.data)
+                                        val to = queue.songs.indexOf(item)
                                         reorderedQueue = reorderedQueue.toMutableList().apply {
                                             add(to, removeAt(from))
                                         }
-                                        onPlaybackEvent(PlaybackEvent.Swap(from, to))
+                                        onPlayerEvent(PlayerEvent.Swap(from, to))
                                     }
                                 ) {
                                     MusicCardListItem(
                                         item,
-                                        active = index == queue.index,
-                                        shape = expressiveRectShape(index, queue.items.size),
+                                        active = index == queue.currentIndex,
+                                        shape = expressiveRectShape(index, queue.songs.size),
                                         onDismiss = {
-                                            onPlaybackEvent(PlaybackEvent.Remove(index))
+                                            onPlayerEvent(PlayerEvent.Remove(index))
                                         }
                                     ) {
-                                        onPlaybackEvent(PlaybackEvent.Seek(index))
+                                        onPlayerEvent(PlayerEvent.Seek(index))
                                     }
                                 }
                             }
@@ -170,7 +169,7 @@ fun QueueSheet(
                         Icons.Default.ClearAll,
                         size = IconButtonDefaults.mediumIconSize
                     ) {
-                        onPlaybackEvent(PlaybackEvent.ClearQueue)
+                        onPlayerEvent(PlayerEvent.Stop)
                     }
                     ExpressiveIconButton(
                         Icons.Default.Save,

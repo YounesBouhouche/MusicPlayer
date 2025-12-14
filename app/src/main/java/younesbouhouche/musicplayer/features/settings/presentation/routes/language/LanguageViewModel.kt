@@ -4,18 +4,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.core.domain.util.stateInVM
-import younesbouhouche.musicplayer.features.settings.data.SettingsDataStore
-import younesbouhouche.musicplayer.features.settings.models.Language
+import younesbouhouche.musicplayer.core.presentation.util.stateInVM
+import younesbouhouche.musicplayer.core.data.datastore.PreferencesDataStore
+import younesbouhouche.musicplayer.core.data.datastore.SettingsPreference
+import younesbouhouche.musicplayer.core.domain.models.preferences.Language
+import younesbouhouche.musicplayer.core.domain.repositories.PreferencesRepository
 
 class LanguageViewModel(
-    val dataStore: SettingsDataStore
+    val preferencesRepository: PreferencesRepository
 ): ViewModel() {
-    val language = dataStore.language.stateInVM(Language.SYSTEM, viewModelScope)
+    val language = preferencesRepository.get(SettingsPreference.LanguagePref)
+        .stateInVM(Language.SYSTEM, viewModelScope)
 
     fun saveLanguage(language: Language) {
         viewModelScope.launch(Dispatchers.IO) {
-            dataStore.saveSettings(language = language.toString())
+            preferencesRepository.set(SettingsPreference.LanguagePref, language)
         }
     }
 }

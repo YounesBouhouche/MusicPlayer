@@ -23,7 +23,7 @@ import younesbouhouche.musicplayer.features.settings.presentation.util.Settings
 @Composable
 fun SettingsPage(
     modifier: Modifier = Modifier,
-    navigate: (SettingsRoutes) -> Unit,
+    navigate: (SettingsGraph) -> Unit,
 ) {
     SettingsScreen(
         title = stringResource(R.string.settings),

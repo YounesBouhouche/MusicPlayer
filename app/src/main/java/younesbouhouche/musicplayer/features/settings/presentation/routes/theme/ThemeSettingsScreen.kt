@@ -5,6 +5,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,8 +41,8 @@ import com.younesb.mydesignsystem.presentation.components.ToggleButtonsRow
 import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.features.main.presentation.util.plus
-import younesbouhouche.musicplayer.features.settings.models.ColorScheme
-import younesbouhouche.musicplayer.features.settings.models.Theme
+import younesbouhouche.musicplayer.core.domain.models.preferences.ColorScheme
+import younesbouhouche.musicplayer.core.domain.models.preferences.Theme
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsItem
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsList
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsScreen
@@ -53,13 +54,14 @@ import younesbouhouche.musicplayer.features.settings.presentation.util.SettingDa
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ThemeSettingsScreen(
-    isDark: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val viewModel = koinViewModel<ThemeViewModel>()
     val isCompatible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val theme by viewModel.theme.collectAsState()
-    val colorTheme by viewModel.colorTheme.collectAsState()
+    val isDark = theme == Theme.DARK ||
+            ((theme == Theme.SYSTEM) && (isSystemInDarkTheme()))
+    val colorTheme by viewModel.colorScheme.collectAsState()
     val extraDark by viewModel.extraDark.collectAsState()
     val dynamicColors by viewModel.dynamicColors.collectAsState()
     val context = LocalContext.current

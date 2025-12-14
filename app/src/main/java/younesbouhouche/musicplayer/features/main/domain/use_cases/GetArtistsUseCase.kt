@@ -1,21 +1,10 @@
 package younesbouhouche.musicplayer.features.main.domain.use_cases
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import younesbouhouche.musicplayer.core.domain.models.Album
 import younesbouhouche.musicplayer.core.domain.models.Artist
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.features.main.data.dao.AppDao
-import younesbouhouche.musicplayer.features.main.domain.repo.MediaRepository
-import younesbouhouche.musicplayer.features.main.presentation.util.ListsSortType
-import younesbouhouche.musicplayer.features.main.presentation.util.SortState
-import younesbouhouche.musicplayer.features.main.util.sortBy
+import younesbouhouche.musicplayer.core.domain.repositories.MusicRepository
 
-class GetArtistsUseCase(val mediaRepository: MediaRepository, val dao: AppDao) {
-    operator fun invoke(sortState: Flow<SortState<ListsSortType>>): Flow<List<Artist>> {
-        val artists = mediaRepository.getArtists()
-        return combine(artists, sortState) { artists, sortState ->
-            artists.sortBy(sortState.sortType, sortState.ascending)
-        }
-    }
+class GetArtistsUseCase(val repository: MusicRepository) {
+    operator fun invoke(): Flow<List<Artist>> = repository.getArtists()
 }

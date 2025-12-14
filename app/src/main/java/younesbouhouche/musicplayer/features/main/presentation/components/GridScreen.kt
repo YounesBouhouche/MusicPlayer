@@ -29,7 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
-import younesbouhouche.musicplayer.core.domain.models.ColsCount
+import younesbouhouche.musicplayer.features.main.presentation.ColsCount
 import younesbouhouche.musicplayer.features.main.presentation.util.SortState
 import younesbouhouche.musicplayer.features.main.presentation.util.plus
 

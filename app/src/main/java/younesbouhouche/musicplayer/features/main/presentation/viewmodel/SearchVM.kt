@@ -1,6 +1,5 @@
 package younesbouhouche.musicplayer.features.main.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
@@ -9,23 +8,24 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import younesbouhouche.musicplayer.core.domain.models.SearchFilter
-import younesbouhouche.musicplayer.core.domain.util.stateInVM
-import younesbouhouche.musicplayer.features.main.domain.events.SearchEvent
-import younesbouhouche.musicplayer.features.main.domain.repo.MediaRepository
-import younesbouhouche.musicplayer.features.main.domain.repo.PlaylistRepository
+import younesbouhouche.musicplayer.core.domain.repositories.MusicRepository
+import younesbouhouche.musicplayer.core.domain.repositories.PlaylistRepository
+import younesbouhouche.musicplayer.features.main.presentation.SearchFilter
+import younesbouhouche.musicplayer.core.presentation.util.stateInVM
+import younesbouhouche.musicplayer.features.main.domain.events.SearchAction
 import younesbouhouche.musicplayer.features.main.presentation.states.SearchState
 import younesbouhouche.musicplayer.features.main.presentation.util.search
 
 class SearchVM(
-    mediaRepository: MediaRepository,
+    val mainViewModel: MainViewModel,
+    mediaRepository: MusicRepository,
     playlistRepository: PlaylistRepository
 ): ViewModel() {
     private fun <T> Flow<T>.stateInVM(initialValue: T) = stateInVM(initialValue, viewModelScope)
-    private val _files = mediaRepository.getAllMedia().stateInVM(emptyList())
+    private val _files = mediaRepository.getSongsList().stateInVM(emptyList())
     private val _artists = mediaRepository.getArtists().stateInVM(emptyList())
     private val _albums = mediaRepository.getAlbums().stateInVM(emptyList())
-    private val _playlists = playlistRepository.getAllPlaylists().stateInVM(emptyList())
+    private val _playlists = playlistRepository.getPlaylists().stateInVM(emptyList())
     private val _searchState = MutableStateFlow(SearchState())
     private val _searchQuery = _searchState.map { it.query }
     private val _searchFilters = _searchState.map { it.result.filters }
@@ -69,27 +69,36 @@ class SearchVM(
         state.copy(result = result)
     }.stateInVM(SearchState())
 
-    fun onSearchEvent(event: SearchEvent) {
+    fun play(
+        tracks: List<Long>,
+        index: Int,
+    ) = mainViewModel.play(
+        tracks = tracks,
+        index = index,
+        shuffle = false,
+    )
+
+    fun onAction(event: SearchAction) {
         when (event) {
-            SearchEvent.ClearQuery -> {
+            SearchAction.ClearQuery -> {
                 _searchState.update {
                     it.copy(query = "")
                 }
             }
 
-            is SearchEvent.UpdateQuery -> {
+            is SearchAction.UpdateQuery -> {
                 _searchState.update {
                     it.copy(query = event.query)
                 }
             }
 
-            is SearchEvent.ToggleFilter -> {
+            is SearchAction.ToggleFilter -> {
                 _searchState.update { state ->
                     state.copy(result = state.result.toggleFilter(event.filter))
                 }
             }
 
-            is SearchEvent.UpdateResultExpanded -> {
+            is SearchAction.UpdateResultExpanded -> {
                 _searchState.update { state ->
                     state.copy(
                         filesExpanded = event.files ?: state.filesExpanded,

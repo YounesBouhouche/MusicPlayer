@@ -21,13 +21,13 @@ enum class ListsSortType(
         Icons.Default.Title,
         { it.sortedBy { (name, _, _) -> name } },
         { it.sortedBy { (name, _, _, _) -> name } },
-        { it.sortedBy { (_, name, _, _, _) -> name } }
+        { it.sortedBy { (_, name, _, _) -> name } }
     ),
     Count(
         R.string.items_count,
         Icons.AutoMirrored.Default.List,
-        { it.sortedBy { (_, items, _) -> items.size } },
-        { it.sortedBy { (_, items, _, _) -> items.size } },
-        { it.sortedBy { (_, _, _, items, _) -> items.size } }
+        { it.sortedBy { (_, _, _, items) -> items.size } },
+        { it.sortedBy { (_, _, _, items) -> items.size } },
+        { it.sortedBy { (_, _, _, _, items) -> items.size } }
     ),
 }

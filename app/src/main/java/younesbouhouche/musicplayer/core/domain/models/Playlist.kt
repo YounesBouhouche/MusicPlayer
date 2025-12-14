@@ -1,27 +1,28 @@
 package younesbouhouche.musicplayer.core.domain.models
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import coil.request.ImageRequest
-import younesbouhouche.musicplayer.features.main.data.events.PlayerEvent
 import java.io.File
 
-@Entity
+
 data class Playlist(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     val name: String = "",
     val image: String? = null,
-    val items: List<String> = emptyList(),
-    val favorite: Boolean = false,
+    val createdAt: Long = System.currentTimeMillis(),
+    val songs: List<Song> = emptyList(),
 ) {
-    fun createM3UText() = "#EXTINF:$name\n#EXTM3U\n" + items.joinToString("\n")
-    fun search(query: String): Boolean {
-        return name.contains(query, ignoreCase = true)
+    fun createM3UContent(): String {
+        val builder = StringBuilder()
+        builder.append("#EXTM3U\n")
+        for (song in songs) {
+            builder.append("#EXTINF:${song.duration / 1000},${song.title}\n")
+            builder.append("${song.contentUri}\n")
+        }
+        return builder.toString()
     }
+    fun search(query: String) = name.lowercase().contains(query.lowercase())
 }
 
 @Composable

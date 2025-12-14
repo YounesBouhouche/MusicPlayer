@@ -3,7 +3,7 @@ package younesbouhouche.musicplayer.features.main.presentation.util
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.Song
 
 @JvmName("shareUris")
 fun Context.shareFiles(uris: List<Uri>) {
@@ -23,4 +23,4 @@ fun Context.shareFiles(uris: List<Uri>) {
 }
 
 @JvmName("shareMusicCards")
-fun Context.shareFiles(files: List<MusicCard>) = shareFiles(files.map { it.contentUri })
+fun Context.shareFiles(files: List<Song>) = shareFiles(files.map { it.contentUri })

@@ -1,0 +1,251 @@
+package younesbouhouche.musicplayer.features.main.presentation.player.sheets
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.exclude
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import younesbouhouche.musicplayer.R
+import com.younesb.mydesignsystem.presentation.components.ExpressiveButton
+import younesbouhouche.musicplayer.features.main.presentation.util.composables.TitleText
+import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
+import younesbouhouche.musicplayer.features.main.presentation.util.floatUpDownTransSpec
+import younesbouhouche.musicplayer.features.main.presentation.util.intUpDownTransSpec
+import younesbouhouche.musicplayer.features.main.presentation.util.plus
+import younesbouhouche.musicplayer.features.main.presentation.util.round
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun PlaybackParamsSheet(
+    visible: Boolean,
+    onDismissRequest: () -> Unit,
+    speed: Float,
+    onSetSpeed: (Float) -> Unit,
+    pitch: Float,
+    onSetPitch: (Float) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val state = rememberModalBottomSheetState(true)
+    if (visible) {
+        ModalBottomSheet(
+            onDismissRequest = onDismissRequest,
+            modifier = modifier,
+            sheetState = state,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            dragHandle = {
+                BottomSheetDefaults.DragHandle(
+                    color = MaterialTheme.colorScheme.primary
+                )
+            },
+            contentWindowInsets = {
+                BottomSheetDefaults.windowInsets.exclude(WindowInsets.navigationBars)
+            }
+        ) {
+            LazyColumn(
+                Modifier.fillMaxWidth(),
+                contentPadding = WindowInsets.navigationBars.asPaddingValues() + PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                item {
+                    TitleText(text = stringResource(R.string.playback_params))
+                }
+                item {
+                    SliderContainer(
+                        speed,
+                        onSetSpeed,
+                        {
+                            stringResource(
+                                R.string.speed_x,
+                                it
+                            )
+                        }
+                    )
+                }
+                item {
+                    SliderContainer(
+                        pitch,
+                        onSetPitch,
+                        {
+                            stringResource(
+                                R.string.pitch_x,
+                                it
+                            )
+                        },
+                        valueRange = 0.5f..2f,
+                        roundTo = 0.1f,
+                    )
+                }
+                item {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        repeat(2) {
+                            val (res, onClick) =
+                                if (it == 0) R.string.reset to {
+                                    onSetSpeed(1f)
+                                    onDismissRequest()
+                                }
+                                else R.string.ok to onDismissRequest
+                            val interactionSource = remember { MutableInteractionSource() }
+                            val pressed by interactionSource.collectIsPressedAsState()
+                            val weight by animateFloatAsState(
+                                if (pressed) 1.4f else 1f
+                            )
+                            ExpressiveButton(
+                                stringResource(res),
+                                ButtonDefaults.MediumContainerHeight,
+                                Modifier.weight(weight),
+                                onClick = onClick,
+                                outlined = it == 0,
+                                interactionSource = interactionSource,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun SliderContainer(
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    label: @Composable (String) -> String,
+    modifier: Modifier = Modifier,
+    valueRange: ClosedFloatingPointRange<Float> = .25f..3f,
+    roundTo: Float = 0.25f,
+    steps: Int = ((valueRange.endInclusive - valueRange.start) / roundTo).toInt() - 1,
+    scale: Int = 2,
+) {
+    var selectedValue by remember { mutableFloatStateOf(value) }
+    LaunchedEffect(value) {
+        selectedValue = value
+    }
+    Column(
+        modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            shape = expressiveRectShape(
+                0,
+                2,
+                MaterialTheme.shapes.small,
+                MaterialTheme.shapes.large,
+            )
+        ) {
+            Slider(
+                valueRange = valueRange,
+                value = selectedValue,
+                onValueChange = {
+                    selectedValue = (it / roundTo).toInt() * roundTo
+                },
+                onValueChangeFinished = {
+                    onValueChange(selectedValue)
+                },
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                steps = steps
+            )
+        }
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            shape = expressiveRectShape(
+                1,
+                2,
+                MaterialTheme.shapes.small,
+                MaterialTheme.shapes.large
+            )
+        ) {
+            AnimatedCounterText(
+                text = label(selectedValue.round(scale)),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(18.dp),
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+internal fun AnimatedCounterText(
+    text: String,
+    modifier: Modifier = Modifier,
+    style: TextStyle = MaterialTheme.typography.bodyMedium,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    textAlign: TextAlign = TextAlign.Start,
+) {
+    Row(
+        modifier.fillMaxWidth(),
+        horizontalArrangement = when (textAlign) {
+            TextAlign.Start -> Arrangement.Start
+            TextAlign.End -> Arrangement.End
+            TextAlign.Center -> Arrangement.Center
+            else -> Arrangement.Start
+        }
+    ) {
+        text.forEach { char ->
+            if (char.isDigit()) {
+                AnimatedContent(
+                    targetState = char.digitToInt(),
+                    transitionSpec = {
+                        intUpDownTransSpec() using SizeTransform(clip = false)
+                    },
+                ) { targetChar ->
+                    Text(
+                        targetChar.toString(),
+                        style = style,
+                        color = color,
+                    )
+                }
+            } else {
+                Text(
+                    char.toString(),
+                    style = style,
+                    color = color,
+                )
+            }
+        }
+    }
+}

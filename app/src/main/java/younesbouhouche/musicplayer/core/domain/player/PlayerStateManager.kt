@@ -3,7 +3,7 @@ package younesbouhouche.musicplayer.core.domain.player
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import younesbouhouche.musicplayer.features.main.presentation.states.PlayerState
+import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
 
 class PlayerStateManager {
     private val _playerState = MutableStateFlow(PlayerState())

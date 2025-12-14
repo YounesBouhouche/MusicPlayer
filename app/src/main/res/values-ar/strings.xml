@@ -69,7 +69,7 @@
     <string name="confirm_delete">تأكيد الحذف</string>
     <string name="pick_time">اختر وقت</string>
     <string name="invalid_value">قيمة غير صالحة</string>
-    <string name="playback_speed">سرعة التشغيل</string>
+    <string name="playback_params">سرعة التشغيل</string>
     <string name="add_playlist">إضافة قائمة التشغيل</string>
     <string name="appwidget_text">مثال</string>
     <string name="add_widget">إضافة القطعة</string>

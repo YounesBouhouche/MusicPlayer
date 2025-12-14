@@ -1,7 +1,7 @@
 package younesbouhouche.musicplayer.features.main.presentation.states
 
-import younesbouhouche.musicplayer.core.domain.models.SearchFilter
-import younesbouhouche.musicplayer.core.domain.models.SearchResult
+import younesbouhouche.musicplayer.features.main.presentation.SearchFilter
+import younesbouhouche.musicplayer.features.main.presentation.SearchResult
 
 data class SearchState(
     val query: String = "",

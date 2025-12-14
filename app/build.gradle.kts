@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.room)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.kotzilla)
 }
 
 android {
@@ -104,6 +105,7 @@ room {
 //tasks.getByPath("preBuild").dependsOn("ktlintFormat")
 
 dependencies {
+    implementation(libs.kotzilla.sdk)
     implementation(libs.material.kolor)
     implementation(libs.kmpalette.core)
     implementation(libs.androidx.core.ktx)
@@ -164,5 +166,8 @@ dependencies {
     implementation(libs.compose.dnd)
     implementation(libs.lazycolumnscrollbar)
     implementation(libs.composedesignsystem)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 }
 

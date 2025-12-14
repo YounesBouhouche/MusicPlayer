@@ -20,12 +20,12 @@ import androidx.compose.ui.graphics.Color
 import com.materialkolor.ktx.harmonize
 import org.koin.compose.koinInject
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.features.settings.data.SettingsDataStore
-import younesbouhouche.musicplayer.features.settings.presentation.routes.SettingsRoutes
-import younesbouhouche.musicplayer.ui.theme.BlueColors
-import younesbouhouche.musicplayer.ui.theme.GreenColors
-import younesbouhouche.musicplayer.ui.theme.PurpleColors
-import younesbouhouche.musicplayer.ui.theme.RedColors
+import younesbouhouche.musicplayer.core.data.datastore.PreferencesDataStore
+import younesbouhouche.musicplayer.features.settings.presentation.routes.SettingsGraph
+import younesbouhouche.musicplayer.core.presentation.theme.BlueColors
+import younesbouhouche.musicplayer.core.presentation.theme.GreenColors
+import younesbouhouche.musicplayer.core.presentation.theme.PurpleColors
+import younesbouhouche.musicplayer.core.presentation.theme.RedColors
 
 data class Category(
     val name: Int? = null,
@@ -41,7 +41,7 @@ object Settings {
             supporting = R.string.language_desc,
             icon = Icons.Default.Language,
             large = true,
-            navigateToRoute = SettingsRoutes.LanguageSettings
+            navigateToRoute = SettingsGraph.LanguageSettings
         )
     )
     val appearance = listOf(
@@ -50,14 +50,14 @@ object Settings {
             supporting = R.string.theme_desc,
             icon = Icons.Default.Palette,
             large = true,
-            navigateToRoute = SettingsRoutes.ThemeSettings
+            navigateToRoute = SettingsGraph.ThemeSettings
         ),
         SettingData(
             headline = R.string.player,
             supporting = R.string.customize_player_desc,
             icon = Icons.Default.PlayCircleFilled,
             large = true,
-            navigateToRoute = SettingsRoutes.PlayerSettings
+            navigateToRoute = SettingsGraph.PlayerSettings
         )
     )
     val playback = listOf(
@@ -66,7 +66,7 @@ object Settings {
             supporting = R.string.playback_desc,
             icon = Icons.Default.MusicNote,
             large = true,
-            navigateToRoute = SettingsRoutes.PlaybackSettings
+            navigateToRoute = SettingsGraph.PlaybackSettings
         )
     )
     val library = listOf(
@@ -89,30 +89,30 @@ object Settings {
             supporting = R.string.about_desc,
             icon = Icons.Default.Info,
             large = true,
-            navigateToRoute = SettingsRoutes.AboutSettings
+            navigateToRoute = SettingsGraph.AboutSettings
         )
     )
     private val blueColors: ColorScheme
         @Composable get() {
-            val dataStore = koinInject<SettingsDataStore>()
+            val dataStore = koinInject<PreferencesDataStore>()
             val isDark by dataStore.isDark().collectAsState(initial = false)
             return if (isDark) BlueColors.darkScheme else BlueColors.lightScheme
         }
     private val greenColors: ColorScheme
         @Composable get() {
-            val dataStore = koinInject<SettingsDataStore>()
+            val dataStore = koinInject<PreferencesDataStore>()
             val isDark by dataStore.isDark().collectAsState(initial = false)
             return if (isDark) GreenColors.darkScheme else GreenColors.lightScheme
         }
     private val redColors: ColorScheme
         @Composable get() {
-            val dataStore = koinInject<SettingsDataStore>()
+            val dataStore = koinInject<PreferencesDataStore>()
             val isDark by dataStore.isDark().collectAsState(initial = false)
             return if (isDark) RedColors.darkScheme else RedColors.lightScheme
         }
     private val purpleColors: ColorScheme
         @Composable get() {
-            val dataStore = koinInject<SettingsDataStore>()
+            val dataStore = koinInject<PreferencesDataStore>()
             val isDark by dataStore.isDark().collectAsState(initial = false)
             return if (isDark) PurpleColors.darkScheme else PurpleColors.lightScheme
         }

@@ -3,43 +3,46 @@ package younesbouhouche.musicplayer.di
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
-import android.media.MediaMetadataRetriever
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
-import younesbouhouche.musicplayer.core.domain.NotificationCustomCmdButton
+import younesbouhouche.musicplayer.features.player.presentation.service.NotificationCustomCmdButton
+import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
+import younesbouhouche.musicplayer.features.player.presentation.service.MediaSessionManager
+import younesbouhouche.musicplayer.core.data.database.dao.SongsDao
+import younesbouhouche.musicplayer.core.data.local.MediaStoreScanner
+import younesbouhouche.musicplayer.core.data.remote.ArtistsPictureFetcher
 import younesbouhouche.musicplayer.core.domain.player.PlayerFactory
 import younesbouhouche.musicplayer.core.domain.player.PlayerManager
-import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
-import younesbouhouche.musicplayer.core.domain.player.QueueManager
-import younesbouhouche.musicplayer.core.domain.session.MediaSessionManager
-import younesbouhouche.musicplayer.features.main.data.dao.AppDao
+import younesbouhouche.musicplayer.features.player.domain.controller.PlayerController
 
 val utilsModule = module {
-    single { MediaMetadataRetriever() }
-    single<PlayerStateManager> {
-        PlayerStateManager()
-    }
-    single<QueueManager> {
-        QueueManager(get())
-    }
-    single<PlayerFactory> {
-        PlayerFactory(androidContext(), get(), get())
-    }
-    single<PlayerManager> {
-        PlayerManager(
+    single {
+        MediaStoreScanner(
             androidContext(),
-            get(),
-            get(),
             get(),
             get(),
             get()
         )
     }
+    single {
+        ArtistsPictureFetcher(get())
+    }
+    single<CoroutineScope> {
+        CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    }
+    singleOf(::PlayerManager)
+    singleOf(::PlayerStateManager)
+    singleOf(::PlayerFactory)
+    singleOf(::PlayerController)
     single<MediaSessionManager> {
         val context = androidContext()
         MediaSessionManager(
             context,
-            get<AppDao>(),
+            get(),
             get<PlayerStateManager>(),
             get(),
             get(),

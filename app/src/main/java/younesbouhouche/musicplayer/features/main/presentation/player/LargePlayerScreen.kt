@@ -1,6 +1,5 @@
 package younesbouhouche.musicplayer.features.main.presentation.player
 
-import android.net.Uri
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.graphics.res.animatedVectorResource
@@ -53,38 +52,38 @@ import androidx.media3.common.Player
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
 import soup.compose.material.motion.animation.materialSharedAxisX
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.features.main.domain.events.PlaybackEvent
+import younesbouhouche.musicplayer.core.domain.models.Queue
+import younesbouhouche.musicplayer.core.domain.models.Song
+import younesbouhouche.musicplayer.core.presentation.theme.AppTheme
 import younesbouhouche.musicplayer.features.main.domain.events.TimerType
-import younesbouhouche.musicplayer.features.main.domain.models.QueueModel
 import younesbouhouche.musicplayer.features.main.presentation.player.components.ActionBar
 import younesbouhouche.musicplayer.features.main.presentation.player.components.Carousel
 import younesbouhouche.musicplayer.features.main.presentation.player.sheets.QueueSheet
-import younesbouhouche.musicplayer.features.main.presentation.player.sheets.SpeedSheet
+import younesbouhouche.musicplayer.features.main.presentation.player.sheets.PlaybackParamsSheet
 import younesbouhouche.musicplayer.features.main.presentation.player.sheets.TimerSheet
-import younesbouhouche.musicplayer.features.main.presentation.states.PlayState
-import younesbouhouche.musicplayer.features.main.presentation.states.PlayerState
 import younesbouhouche.musicplayer.features.main.presentation.util.timeString
-import younesbouhouche.musicplayer.ui.theme.AppTheme
+import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.features.player.domain.models.PlayState
+import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
 import kotlin.math.roundToLong
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun LargePlayerScreen(
     enabled: Boolean,
-    queue: QueueModel,
+    queue: Queue,
     playerState: PlayerState,
     modifier: Modifier = Modifier,
     onCollapse: () -> Unit,
-    onSetFavorite: (String, Boolean) -> Unit,
+    currentItem: Song?,
+    onSetFavorite: (Long, Boolean) -> Unit,
     onSaveQueue: () -> Unit = {},
     onAddToPlaylist: () -> Unit = {},
-    onPlaybackEvent: (PlaybackEvent) -> Unit,
+    onPlayerEvent: (PlayerEvent) -> Unit,
 ) {
     var queueSheetVisible by remember { mutableStateOf(false) }
-    var speedSheetVisible by remember { mutableStateOf(false) }
+    var playbackParamsSheetVisible by remember { mutableStateOf(false) }
     var timerVisible by remember { mutableStateOf(false) }
-    val currentItem = queue.items.getOrNull(queue.index)
     var sliderValue by remember { mutableFloatStateOf(0f) }
     var dragging by remember { mutableStateOf(false) }
     Column(modifier
@@ -133,7 +132,7 @@ fun LargePlayerScreen(
             queue,
             enabled,
             Modifier.weight(1f),
-            onPlaybackEvent
+            onPlayerEvent
         )
         Column(
             modifier = Modifier
@@ -147,17 +146,17 @@ fun LargePlayerScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 AnimatedContent(
-                    queue.index,
+                    queue.currentIndex,
                     Modifier.weight(1f),
                     transitionSpec = {
                         materialSharedAxisX(forward = initialState < targetState, 100)
                     },
-                ) { index ->
+                ) { currentIndex ->
                     Column(Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            queue.items.getOrNull(index)?.title ?: "No song playing",
+                            queue.songs.getOrNull(currentIndex)?.title ?: "No song playing",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -165,7 +164,7 @@ fun LargePlayerScreen(
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
-                            queue.items.getOrNull(index)?.artist ?: "Unknown artist",
+                            queue.songs.getOrNull(currentIndex)?.artist ?: "Unknown artist",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.7f),
                         )
@@ -173,7 +172,7 @@ fun LargePlayerScreen(
                 }
                 ExpressiveIconButton(
                     icon =
-                        if (currentItem?.favorite == true) Icons.Default.Favorite
+                        if (currentItem?.isFavorite == true) Icons.Default.Favorite
                         else Icons.Default.FavoriteBorder,
                     size = IconButtonDefaults.largeIconSize,
                     modifier = Modifier.size(72.dp),
@@ -184,7 +183,7 @@ fun LargePlayerScreen(
                     enabled = enabled
                 ) {
                     currentItem?.let {
-                        onSetFavorite(it.path, !it.favorite)
+                        onSetFavorite(it.id, !it.isFavorite)
                     }
                 }
             }
@@ -207,7 +206,7 @@ fun LargePlayerScreen(
                     },
                     onValueChangeFinished = {
                         dragging = false
-                        onPlaybackEvent(PlaybackEvent.SeekTime((sliderValue * (currentItem?.duration ?: 0)).roundToLong()))
+                        onPlayerEvent(PlayerEvent.SeekTime((sliderValue * (currentItem?.duration ?: 0)).roundToLong()))
                     },
                     colors = SliderDefaults.colors(
                         activeTrackColor = MaterialTheme.colorScheme.primary,
@@ -288,10 +287,10 @@ fun LargePlayerScreen(
                         ),
                         enabled = enabled
                     ) {
-                        onPlaybackEvent(when(it) {
-                            0 -> PlaybackEvent.Previous
-                            1 -> PlaybackEvent.PauseResume
-                            else -> PlaybackEvent.Next
+                        onPlayerEvent(when(it) {
+                            0 -> PlayerEvent.Previous
+                            1 -> PlayerEvent.PauseResume
+                            else -> PlayerEvent.Next
                         })
                     }
                 }
@@ -301,14 +300,15 @@ fun LargePlayerScreen(
             playerState.shuffle,
             playerState.repeatMode,
             playerState.speed,
+            playerState.pitch,
             playerState.timer,
             {
                 timerVisible = true
             },
             {
-                speedSheetVisible = true
+                playbackParamsSheetVisible = true
             },
-            onPlaybackEvent,
+            onPlayerEvent,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 4.dp)
@@ -321,18 +321,22 @@ fun LargePlayerScreen(
         },
         playerState.timer,
         {
-            onPlaybackEvent(PlaybackEvent.SetTimer(it))
+            onPlayerEvent(PlayerEvent.SetTimer(it))
         }
     )
-    SpeedSheet(
-        speedSheetVisible,
+    PlaybackParamsSheet(
+        playbackParamsSheetVisible,
         {
-            speedSheetVisible = false
+            playbackParamsSheetVisible = false
         },
         playerState.speed,
         {
-            onPlaybackEvent(PlaybackEvent.SetSpeed(it))
-        }
+            onPlayerEvent(PlayerEvent.SetSpeed(it))
+        },
+        playerState.pitch,
+        {
+            onPlayerEvent(PlayerEvent.SetPitch(it))
+        },
     )
     AppTheme {
         QueueSheet(
@@ -341,7 +345,7 @@ fun LargePlayerScreen(
                 queueSheetVisible = false
             },
             queue,
-            onPlaybackEvent,
+            onPlayerEvent,
             onSaveQueue,
             onAddToPlaylist
         )
@@ -358,18 +362,17 @@ private fun LargePlayerPreview() {
         ) {
             LargePlayerScreen(
                 enabled = true,
-                queue = QueueModel(
-                    index = 0,
-                    items = List(10) {
-                        MusicCard.Builder()
-                            .setId(it.toLong())
-                            .setTitle("Song Title $it")
-                            .setArtist("Artist Name")
-                            .setAlbum("Album Name")
-                            .setDuration(240000L)
-                            .setPath("/storage/emulated/0/Music/song$it.mp3")
-                            .setCoverUri(Uri.EMPTY)
-                            .setFavorite(it % 2 == 0)
+                queue = Queue(
+                    currentIndex = 0,
+                    songs = List(10) {
+                        Song.Builder()
+                            .id(it.toLong())
+                            .title("Song Title $it")
+                            .artist("Artist Name")
+                            .album("Album Name")
+                            .duration(240000L)
+                            .path("/storage/emulated/0/Music/song$it.mp3")
+                            .isFavorite(it % 2 == 0)
                             .build()
                     }
                 ),
@@ -383,8 +386,9 @@ private fun LargePlayerPreview() {
                         timer = TimerType.Disabled
                     ),
                 onCollapse = {},
+                currentItem = null,
                 onSetFavorite = { _, _ -> },
-                onPlaybackEvent = {}
+                onPlayerEvent = {}
             )
         }
     }

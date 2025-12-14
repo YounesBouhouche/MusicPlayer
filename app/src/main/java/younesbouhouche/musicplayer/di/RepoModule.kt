@@ -1,47 +1,32 @@
 package younesbouhouche.musicplayer.di
 
-import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import younesbouhouche.musicplayer.core.domain.player.PlayerManager
-import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
-import younesbouhouche.musicplayer.core.domain.player.QueueManager
-import younesbouhouche.musicplayer.core.domain.session.MediaSessionManager
-import younesbouhouche.musicplayer.features.main.data.ArtistsRepositoryImpl
-import younesbouhouche.musicplayer.features.main.data.MediaRepositoryImpl
-import younesbouhouche.musicplayer.features.main.data.PlaybackRepositoryImpl
-import younesbouhouche.musicplayer.features.main.data.PlayerDataStore
-import younesbouhouche.musicplayer.features.main.data.PlaylistRepositoryImpl
-import younesbouhouche.musicplayer.features.main.data.dao.AppDao
-import younesbouhouche.musicplayer.features.main.domain.repo.ArtistsRepository
-import younesbouhouche.musicplayer.features.main.domain.repo.MediaRepository
-import younesbouhouche.musicplayer.features.main.domain.repo.PlaybackRepository
-import younesbouhouche.musicplayer.features.main.domain.repo.PlaylistRepository
+import younesbouhouche.musicplayer.core.data.repositories.MusicRepositoryImpl
+import younesbouhouche.musicplayer.core.data.repositories.PlaylistRepositoryImpl
+import younesbouhouche.musicplayer.core.data.repositories.PreferencesRepositoryImpl
+import younesbouhouche.musicplayer.core.data.repositories.QueueRepositoryImpl
+import younesbouhouche.musicplayer.core.domain.repositories.MusicRepository
+import younesbouhouche.musicplayer.core.domain.repositories.PlaylistRepository
+import younesbouhouche.musicplayer.core.domain.repositories.PreferencesRepository
+import younesbouhouche.musicplayer.core.domain.repositories.QueueRepository
+import younesbouhouche.musicplayer.features.player.data.repository.PlayerRepositoryImpl
+import younesbouhouche.musicplayer.features.player.domain.repository.PlayerRepository
 
 
 val repoModule = module {
-    single<ArtistsRepository> {
-        ArtistsRepositoryImpl(get(), get())
-    }
-
-    single<MediaRepository> {
-        MediaRepositoryImpl(
-            androidContext(),
-            get<ArtistsRepository>(),
-            get<AppDao>()
+    single<PreferencesRepository> { PreferencesRepositoryImpl(get()) }
+    single<MusicRepository> {
+        MusicRepositoryImpl(
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
         )
     }
-
-    single<PlaybackRepository> {
-        PlaybackRepositoryImpl(
-            get<PlayerManager>(),
-            get<PlayerDataStore>(),
-            get<MediaSessionManager>(),
-            get<PlayerStateManager>(),
-            get<QueueManager>()
-        )
-    }
-
-    single<PlaylistRepository> {
-        PlaylistRepositoryImpl(androidContext(), get<AppDao>())
-    }
+    single<PlaylistRepository> { PlaylistRepositoryImpl(get()) }
+    single<QueueRepository> { QueueRepositoryImpl(get()) }
+    single<PlayerRepository> { PlayerRepositoryImpl(get()) }
 }

@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.features.main.presentation.util.plus
-import younesbouhouche.musicplayer.features.settings.models.Language
+import younesbouhouche.musicplayer.core.domain.models.preferences.Language
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsItem
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsList
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsScreen

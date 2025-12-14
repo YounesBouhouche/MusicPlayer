@@ -73,11 +73,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kmpalette.rememberPaletteState
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
+import com.younesb.mydesignsystem.presentation.components.Image
 import kotlinx.coroutines.launch
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.features.main.presentation.util.SortBottomSheet
 import younesbouhouche.musicplayer.features.main.presentation.util.SortState
 import younesbouhouche.musicplayer.features.main.presentation.util.SortType
@@ -85,13 +86,13 @@ import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRec
 import younesbouhouche.musicplayer.features.main.presentation.util.plus
 import younesbouhouche.musicplayer.features.main.presentation.util.search
 import younesbouhouche.musicplayer.features.main.presentation.util.topAppBarIconButtonColors
-import younesbouhouche.musicplayer.ui.theme.AppTheme
+import younesbouhouche.musicplayer.core.presentation.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun <T>ListScreen(
     title: String,
-    items: List<MusicCard>,
+    items: List<Song>,
     cover: Any?,
     icon: ImageVector,
     sortState: SortState<T>,
@@ -104,10 +105,10 @@ fun <T>ListScreen(
     subtitle: String = pluralStringResource(R.plurals.item_s, items.size, items.size),
     actions: @Composable RowScope.() -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(),
-    onShowBottomSheet: (MusicCard) -> Unit,
-    onPlay: (items: List<MusicCard>, index: Int, shuffle: Boolean) -> Unit,
+    onShowBottomSheet: (Song) -> Unit,
+    onPlay: (items: List<Song>, index: Int, shuffle: Boolean) -> Unit,
     listState: LazyListState = rememberLazyListState(),
-    itemContent: @Composable (LazyItemScope.(List<MusicCard>, Int, MusicCard) -> Unit) = { items, index, card ->
+    itemContent: @Composable (LazyItemScope.(List<Song>, Int, Song) -> Unit) = { items, index, card ->
         MusicCardListItem(
             card,
             shape = expressiveRectShape(index, items.size),
@@ -260,7 +261,7 @@ fun <T>ListScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
-                                MyImage(
+                                Image(
                                     cover,
                                     icon = icon,
                                     modifier = Modifier.size(160.dp),
@@ -349,7 +350,7 @@ fun <T>ListScreen(
 @Composable
 fun ListScreen(
     title: String,
-    items: List<MusicCard>,
+    items: List<Song>,
     cover: Any?,
     icon: ImageVector,
     sortState: SortState<SortType>,
@@ -359,8 +360,8 @@ fun ListScreen(
     subtitle: String = pluralStringResource(R.plurals.item_s, items.size, items.size),
     actions: @Composable RowScope.() -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(),
-    onShowBottomSheet: (MusicCard) -> Unit = {},
-    onPlay: (items: List<MusicCard>, index: Int, shuffle: Boolean) -> Unit,
+    onShowBottomSheet: (Song) -> Unit = {},
+    onPlay: (items: List<Song>, index: Int, shuffle: Boolean) -> Unit,
 ) = ListScreen(
     title,
     items,
@@ -387,7 +388,7 @@ fun ListScreen(
 @Preview
 @Composable
 private fun ListScreenPreview() {
-    val items = emptyList<MusicCard>()
+    val items = emptyList<Song>()
     ListScreen(
         title = "My Playlist",
         items = items,

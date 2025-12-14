@@ -10,39 +10,37 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
-import soup.compose.material.motion.animation.materialSharedAxisXIn
+import org.koin.compose.viewmodel.koinViewModel
 import soup.compose.material.motion.animation.materialSharedAxisYIn
 import soup.compose.material.motion.animation.materialSharedAxisYOut
-import younesbouhouche.musicplayer.features.main.domain.events.PlaybackEvent
-import younesbouhouche.musicplayer.features.main.domain.events.PlayerEvent
-import younesbouhouche.musicplayer.features.main.domain.events.UiEvent
-import younesbouhouche.musicplayer.features.main.domain.models.NavRoutes
-import younesbouhouche.musicplayer.features.main.domain.models.QueueModel
-import younesbouhouche.musicplayer.features.main.domain.models.Routes
-import younesbouhouche.musicplayer.features.main.presentation.states.PlayState
-import younesbouhouche.musicplayer.features.main.presentation.states.PlayerState
-import younesbouhouche.musicplayer.features.main.presentation.states.ViewState
+import younesbouhouche.musicplayer.core.domain.models.Queue
+import younesbouhouche.musicplayer.features.main.presentation.navigation.MainNavRoute
+import younesbouhouche.musicplayer.features.main.presentation.navigation.Routes
 import younesbouhouche.musicplayer.features.main.presentation.util.composables.navBarHeight
+import younesbouhouche.musicplayer.features.main.presentation.viewmodel.PlayerViewModel
+import younesbouhouche.musicplayer.features.player.domain.models.PlayState
+import younesbouhouche.musicplayer.features.player.domain.models.ViewState
 import kotlin.math.roundToInt
 
 @Composable
 fun BoxScope.NavigationWithPlayer(
     viewHeight: Int,
-    queue: QueueModel,
-    playerState: PlayerState,
-    onPlayerEvent: (PlayerEvent) -> Unit,
-    onPlaybackEvent: (PlaybackEvent) -> Unit,
-    onUiEvent: (UiEvent) -> Unit,
     route: Routes?,
-    navigate: (NavRoutes) -> Unit,
+    navigate: (MainNavRoute) -> Unit,
 ) {
+    val viewModel = koinViewModel<PlayerViewModel>()
+    val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+    val queue by viewModel.queue.collectAsStateWithLifecycle()
+    val currentItem by viewModel.currentItem.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val navBarHeight = navBarHeight
     val density = LocalDensity.current
@@ -93,18 +91,17 @@ fun BoxScope.NavigationWithPlayer(
         exit = materialSharedAxisYOut(false, 100),
     ) {
         PlayerScreen(
-            queue,
+            queue ?: Queue(),
+            currentItem,
             playerState,
             offset,
             viewHeight,
             progress,
             playerState,
             state,
-            onUiEvent = onUiEvent,
-            onSetFavorite = { path, favorite ->
-                onPlayerEvent(PlayerEvent.UpdateFavorite(path, favorite))
-            },
-            onPlaybackEvent = onPlaybackEvent
+            onAction = viewModel::onUiAction,
+            onSetFavorite = viewModel::setFavorite,
+            onPlayerEvent = viewModel::onPlayerEvent
         )
     }
     NavBar(

@@ -39,7 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.domain.models.ColsCount
+import younesbouhouche.musicplayer.features.main.presentation.ColsCount
 import younesbouhouche.musicplayer.features.main.presentation.util.composables.TitleText
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)

@@ -1,58 +1,61 @@
 package younesbouhouche.musicplayer.navigation
 
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import org.koin.compose.viewmodel.koinViewModel
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
 import soup.compose.material.motion.animation.materialSharedAxisXIn
 import soup.compose.material.motion.animation.materialSharedAxisXOut
-import younesbouhouche.musicplayer.features.main.presentation.layout.MainNavGraph
-import younesbouhouche.musicplayer.features.main.presentation.viewmodel.MainViewModel
-import younesbouhouche.musicplayer.features.permissions.presentation.PermissionsNavGraph
+import younesbouhouche.musicplayer.features.main.presentation.navigation.MainScreen
+import younesbouhouche.musicplayer.features.permissions.presentation.PermissionsScreen
 import younesbouhouche.musicplayer.features.settings.presentation.SettingsNavGraph
 import younesbouhouche.musicplayer.navigation.routes.Graph
-import younesbouhouche.musicplayer.navigation.util.getRoute
 
 @Composable
 fun AppNavGraph(
-    navController: NavHostController = rememberNavController(),
-    mainVM: MainViewModel = koinViewModel(),
-    modifier: Modifier = Modifier
+    backStack: NavBackStack<NavKey>,
+    modifier: Modifier = Modifier,
 ) {
     val width = LocalView.current.width
-    NavHost(
-        navController,
-        startDestination = Graph.Permissions,
-        modifier = modifier,
-        enterTransition = {
-            materialSharedAxisXIn(
-                (initialState.getRoute(Graph.graphs)?.ordinal
-                    ?: 0) < (targetState.getRoute(Graph.graphs)?.ordinal ?: 1),
-                width / 2
-            )
-        },
-        exitTransition = {
-            materialSharedAxisXOut(
-                (initialState.getRoute(Graph.graphs)?.ordinal
-                    ?: 0) < (targetState.getRoute(Graph.graphs)?.ordinal ?: 1),
-                width / 2
-            )
-        }
-    ) {
-        composable<Graph.Permissions> {
-            PermissionsNavGraph()
-        }
-        composable<Graph.Main> {
-            MainNavGraph(mainVM) {
-                navController.navigate(Graph.Settings)
+    Surface(modifier.fillMaxSize()) {
+        NavDisplay(
+            backStack = backStack,
+            modifier = modifier,
+            transitionSpec = {
+                val initialKey = initialState.key as? Graph
+                val targetKey = targetState.key as? Graph
+                val forward = (initialKey?.ordinal ?: 0) < (targetKey?.ordinal ?: 1)
+                materialSharedAxisXIn(forward, width / 2) togetherWith
+                        materialSharedAxisXOut(forward, width / 2)
+            },
+        ) { key ->
+            when(key) {
+                is Graph.Permissions -> {
+                    NavEntry(key) {
+                        PermissionsScreen()
+                    }
+                }
+                is Graph.Main -> {
+                    NavEntry(key) {
+                        MainScreen {
+                            backStack.add(Graph.Settings)
+                        }
+                    }
+                }
+                is Graph.Settings -> {
+                    NavEntry(key) {
+                        SettingsNavGraph()
+                    }
+                }
+                else -> error("Unknown NavGraph key: $key")
             }
-        }
-        composable<Graph.Settings> {
-            SettingsNavGraph()
         }
     }
 }

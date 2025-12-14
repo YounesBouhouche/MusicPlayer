@@ -66,7 +66,7 @@
     <string name="confirm_delete">Confirm delete</string>
     <string name="pick_time">Pick Time</string>
     <string name="invalid_value">Invalid value</string>
-    <string name="playback_speed">Playback Speed</string>
+    <string name="playback_params">Playback Parameters</string>
     <string name="add_playlist">Add Playlist</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
@@ -286,6 +286,7 @@
     <string name="welcome_text">Pick up where you left off</string>
     <string name="end">End</string>
     <string name="speed_x">Speed: %1$sx</string>
+    <string name="pitch_x">Pitch: %1$sx</string>
     <string name="reset">Reset</string>
     <string name="search_no_results">No results</string>
     <string name="search_start_prompt">Type to search</string>

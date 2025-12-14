@@ -4,8 +4,9 @@ import android.net.Uri
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistPlay
 import androidx.compose.ui.graphics.vector.ImageVector
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
+import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.features.main.domain.models.LoadingState
+import younesbouhouche.musicplayer.features.player.domain.models.PlaylistViewState
 
 data class UiState(
     val showAppName: Boolean = false,
@@ -15,7 +16,7 @@ data class UiState(
     val playlistId: Int = -1,
     val sheetPlaylistId: Int = -1,
     val playlistBottomSheetVisible: Boolean = false,
-    val listBottomSheetList: List<MusicCard>? = null,
+    val listBottomSheetList: List<Song>? = null,
     val listBottomSheetTitle: String = "",
     val listBottomSheetImage: Any? = null,
     val listBottomSheetIcon: ImageVector = Icons.AutoMirrored.Default.PlaylistPlay,
@@ -33,7 +34,7 @@ data class UiState(
     val metadataDialog: Boolean = false,
     val detailsDialog: Boolean = false,
     val pitchDialog: Boolean = false,
-    val detailsFile: MusicCard? = null,
+    val detailsFile: Song? = null,
     val lyricsVisible: Boolean = false,
     val syncing: Boolean = true,
     val metadata: MusicMetadata = MusicMetadata(),

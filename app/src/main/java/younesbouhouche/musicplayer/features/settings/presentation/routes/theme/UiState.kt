@@ -1,7 +1,7 @@
 package younesbouhouche.musicplayer.features.settings.presentation.routes.theme
 
-import younesbouhouche.musicplayer.features.settings.models.ColorScheme
-import younesbouhouche.musicplayer.features.settings.models.Theme
+import younesbouhouche.musicplayer.core.domain.models.preferences.ColorScheme
+import younesbouhouche.musicplayer.core.domain.models.preferences.Theme
 
 
 data class UiState(

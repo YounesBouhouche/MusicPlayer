@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,15 +36,15 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZ
-import younesbouhouche.musicplayer.features.main.domain.models.NavRoutes
-import younesbouhouche.musicplayer.features.main.domain.models.Routes
+import younesbouhouche.musicplayer.features.main.presentation.navigation.MainNavRoute
+import younesbouhouche.musicplayer.features.main.presentation.navigation.Routes
 
 @Composable
 fun BoxScope.NavBar(
     route: Routes?,
     playing: Boolean,
     modifier: Modifier = Modifier,
-    navigate: (NavRoutes) -> Unit
+    navigate: (MainNavRoute) -> Unit
 ) {
     val spacing = 16.dp
     val density = LocalDensity.current

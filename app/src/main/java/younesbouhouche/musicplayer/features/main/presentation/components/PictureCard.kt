@@ -26,8 +26,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kmpalette.rememberPaletteState
+import com.younesb.mydesignsystem.presentation.components.Image
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.ui.theme.AppTheme
+import younesbouhouche.musicplayer.core.presentation.theme.AppTheme
 
 @Composable
 fun PictureCard(
@@ -50,7 +51,7 @@ fun PictureCard(
             modifier = modifier,
         ) {
             Box(Modifier.fillMaxWidth().aspectRatio(1f)) {
-                MyImage(
+                Image(
                     picture,
                     icon,
                     Modifier.fillMaxSize(),

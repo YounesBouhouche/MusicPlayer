@@ -38,22 +38,22 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
+import com.younesb.mydesignsystem.presentation.components.Image
 import soup.compose.material.motion.animation.materialSharedAxisX
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.features.main.domain.events.PlaybackEvent
-import younesbouhouche.musicplayer.features.main.domain.models.QueueModel
-import younesbouhouche.musicplayer.features.main.presentation.components.MyImage
-import younesbouhouche.musicplayer.features.main.presentation.states.PlayState
+import younesbouhouche.musicplayer.core.domain.models.Queue
+import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
+import younesbouhouche.musicplayer.features.player.domain.models.PlayState
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SmallPlayerScreen(
-    queue: QueueModel,
+    queue: Queue,
     state: PlayState,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    onPlaybackEvent: (PlaybackEvent) -> Unit,
+    onPlayerEvent: (PlayerEvent) -> Unit,
     onImageLoad: (Bitmap?) -> Unit = { },
     onExpand: () -> Unit = {},
 ) {
@@ -73,8 +73,8 @@ fun SmallPlayerScreen(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        MyImage(
-            model = file?.coverUri,
+        Image(
+            model = file?.coverPath,
             icon = Icons.Default.MusicNote,
             iconTint = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.7f),
             modifier = Modifier.fillMaxHeight().aspectRatio(1f, true),
@@ -88,7 +88,7 @@ fun SmallPlayerScreen(
             }
         )
         AnimatedContent(
-            queue.index,
+            queue.currentIndex,
             Modifier.weight(1f),
             transitionSpec = {
                 materialSharedAxisX(forward = initialState < targetState, 100)
@@ -99,14 +99,14 @@ fun SmallPlayerScreen(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    queue.items.getOrNull(index)?.title ?: "No song playing",
+                    queue.songs.getOrNull(index)?.title ?: "No song playing",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    queue.items.getOrNull(index)?.artist ?: "Unknown artist",
+                    queue.songs.getOrNull(index)?.artist ?: "Unknown artist",
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.7f)
@@ -133,7 +133,7 @@ fun SmallPlayerScreen(
                 ),
                 enabled = enabled
             ) {
-                onPlaybackEvent(PlaybackEvent.PauseResume)
+                onPlayerEvent(PlayerEvent.PauseResume)
             }
             ExpressiveIconButton(
                 Icons.Default.Clear,
@@ -144,7 +144,7 @@ fun SmallPlayerScreen(
                 ),
                 enabled = enabled
             ) {
-                onPlaybackEvent(PlaybackEvent.Stop)
+                onPlayerEvent(PlayerEvent.Stop)
             }
         }
     }

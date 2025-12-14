@@ -1,13 +1,9 @@
 package younesbouhouche.musicplayer.features.main.domain.use_cases
 
-import younesbouhouche.musicplayer.core.domain.models.MusicCard
-import younesbouhouche.musicplayer.features.main.data.dao.AppDao
-import younesbouhouche.musicplayer.features.main.domain.repo.MediaRepository
+import younesbouhouche.musicplayer.core.domain.models.Artist
+import younesbouhouche.musicplayer.core.domain.models.Playlist
+import younesbouhouche.musicplayer.core.domain.repositories.MusicRepository
 
-class GetPlaylistUseCase(val mediaRepository: MediaRepository, val dao: AppDao) {
-    suspend operator fun invoke(id: Int): List<MusicCard>? {
-        return dao.getPlaylist(id)?.items?.mapNotNull { item ->
-            mediaRepository.suspendGetMediaByPath(item)
-        }
-    }
+class GetPlaylistUseCase(val repository: MusicRepository) {
+    suspend operator fun invoke(id: Long): Playlist = repository.getPlaylist(id)
 }
