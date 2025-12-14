@@ -159,7 +159,8 @@
     <string name="remember_pitch">Remember Pitch</string>
     <string name="unspecified">Unspecified</string>
     <string name="track_number">Track number</string>
-    <string name="skip_silence">Skip Silence</string>
+    <string name="disc_number">Disc number</string>
+    <string name="skip_silence">Skip silence</string>
     <string name="skip_silence_description">Skip silent times, applied next time you play some tracks</string>
     <string name="match_picture_colors">Match picture colors</string>
     <string name="match_picture_colors_description">Player colors follow current track thumbnail</string>
@@ -293,4 +294,7 @@
     <string name="style">Style</string>
     <string name="action_bar">Action bar</string>
     <string name="carousel">Carousel</string>
+    <string name="your_listening_history_will_appear_here">Your listening history will appear here</string>
+    <string name="explore_artists">Explore your library</string>
+    <string name="explore_library">Explore your library</string>
 </resources>

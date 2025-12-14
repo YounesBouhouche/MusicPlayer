@@ -29,12 +29,7 @@ import java.nio.file.Paths
 
 private const val TAG = "MediaStoreScanner"
 
-class MediaStoreScanner(
-    private val context: Context,
-    private val songsDao: SongsDao,
-    private val albumsDao: AlbumsDao,
-    private val artistsDao: ArtistsDao
-) {
+class MediaStoreScanner(private val context: Context) {
     data class MediaLibrary(
         val songs: List<SongEntity>,
         val albums: List<AlbumEntity>,
@@ -62,6 +57,9 @@ class MediaStoreScanner(
                     MediaStore.Audio.Media.COMPOSER,
                     MediaStore.Audio.Media.GENRE,
                     MediaStore.Audio.Media.SIZE,
+                    MediaStore.Audio.Media.YEAR,
+                    MediaStore.Audio.Media.TRACK,
+                    MediaStore.Audio.Media.CD_TRACK_NUMBER,
                 ),
                 MediaStore.Audio.Media.IS_MUSIC + "!= 0",
                 null,
@@ -81,6 +79,9 @@ class MediaStoreScanner(
                 val composerColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.COMPOSER)
                 val genreColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE)
                 val sizeColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
+                val yearColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
+                val trackColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK)
+                val discColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.CD_TRACK_NUMBER)
 
                 var processedCount = 0
                 while (crs.moveToNext()) {
@@ -95,6 +96,9 @@ class MediaStoreScanner(
                     val genre = crs.getStringOrNull(genreColumn) ?: ""
                     val date = Files.getLastModifiedTime(Paths.get(path)).toMillis()
                     val size = crs.getLongOrNull(sizeColumn) ?: 0L
+                    val year = crs.getStringOrNull(yearColumn)?.toIntOrNull()
+                    val trackNumber = crs.getStringOrNull(trackColumn)?.toIntOrNull()
+                    val discNumber = crs.getStringOrNull(discColumn)?.toIntOrNull()
                     val contentUri: Uri = ContentUris.withAppendedId(
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
                     songs += SongEntity.Builder()
@@ -110,6 +114,9 @@ class MediaStoreScanner(
                         .composer(composer)
                         .genre(genre)
                         .size(size)
+                        .year(year)
+                        .trackNumber(trackNumber)
+                        .discNumber(discNumber)
                         .build()
 
                     processedCount++

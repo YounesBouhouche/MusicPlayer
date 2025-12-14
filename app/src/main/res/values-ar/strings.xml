@@ -167,6 +167,7 @@
     <string name="show_volume_slider">إظهار منزلق التحكم بالصوت</string>
     <string name="unspecified">غير محدد</string>
     <string name="track_number">Track number</string>
+    <string name="disc_number">رقم القرص</string>
     <string name="pitch">نبرة الصوت</string>
     <string name="show_pitch_button">إظهار زر نبرة الصوت</string>
     <string name="remember_pitch">تذكر نبرة الصوت</string>

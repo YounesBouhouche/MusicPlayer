@@ -2,7 +2,11 @@ package younesbouhouche.musicplayer.features.main.presentation.util
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
+import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CalendarViewMonth
+import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Title
@@ -46,9 +50,40 @@ enum class SortType(
         { it.sortedBy { item -> item.size } },
         { it.size.getSizeRange().toReadableDurationString() },
     ),
-    Date(R.string.date_modified,
+    Date(
+        R.string.date_modified,
         Icons.Default.CalendarMonth,
         { it.sortedBy { item -> item.date } },
         { it.date.toReadableDate() },
+    ),
+    Artist(
+        R.string.artist,
+        Icons.Default.Person,
+        { it.sortedBy { item -> item.artist } },
+        { it.artist.getGroupingKey() },
+    ),
+    Album(
+        R.string.album,
+        Icons.Default.Album,
+        { it.sortedBy { item -> item.album } },
+        { it.album.getGroupingKey() },
+    ),
+    Year(
+        R.string.year,
+        Icons.Default.CalendarViewMonth,
+        { it.sortedBy { item -> item.year ?: 0 } },
+        { item -> item.year?.toString() ?: "Unknown" },
+    ),
+    TrackNumber(
+        R.string.track_number,
+        Icons.Default.Numbers,
+        { it.sortedBy { item -> item.trackNumber ?: 0 } },
+        { item -> item.trackNumber?.toString() ?: "Unknown" },
+    ),
+    DiscNumber(
+        R.string.disc_number,
+        Icons.Default.Numbers,
+        { it.sortedBy { item -> item.discNumber ?: 0 } },
+        { item -> item.discNumber?.toString() ?: "Unknown" },
     );
 }

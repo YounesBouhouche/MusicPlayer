@@ -24,7 +24,6 @@ import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.core.domain.repositories.MusicRepository
 import younesbouhouche.musicplayer.features.main.domain.models.LoadingState
-import kotlin.collections.plusAssign
 
 class MusicRepositoryImpl(
     val songsDao: SongsDao,
@@ -72,14 +71,11 @@ class MusicRepositoryImpl(
         artistsDao.clearArtists()
         artistsDao.upsertArtists(library.artists)
         _loadingState.update { state ->
-            state.copy(step = 2, progress = 0)
+            state.copy(step = 2, progress = 0, progressMax = library.artists.size)
         }
         val artistsWithPictures = artistsPictureFetcher(library.artists) { progress ->
             _loadingState.update { state ->
-                state.copy(
-                    progress = progress,
-                    progressMax = library.artists.size
-                )
+                state.copy(progress = progress)
             }
         }
         artistsDao.upsertArtists(artistsWithPictures)
@@ -119,6 +115,14 @@ class MusicRepositoryImpl(
             list
                 .sortedByDescending { it.playHistory.maxOfOrNull { entity -> entity.playedAt } }
                 .map { it.toSong() }
+        }
+    }
+
+    override fun getRecentArtists(): Flow<List<Artist>> {
+        return getRecentlyPlayedSongs().map { songs ->
+            songs.map { it.artist }.distinct().map {
+                artistsDao.getArtist(it).toArtist()
+            }.take(5)
         }
     }
 

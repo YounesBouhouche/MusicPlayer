@@ -35,6 +35,20 @@ fun AppNavGraph(
                 materialSharedAxisXIn(forward, width / 2) togetherWith
                         materialSharedAxisXOut(forward, width / 2)
             },
+            popTransitionSpec = {
+                val initialKey = initialState.key as? Graph
+                val targetKey = targetState.key as? Graph
+                val forward = (initialKey?.ordinal ?: 0) > (targetKey?.ordinal ?: 1)
+                materialSharedAxisXIn(forward, width / 2) togetherWith
+                        materialSharedAxisXOut(forward, width / 2)
+            },
+            predictivePopTransitionSpec = {
+                val initialKey = initialState.key as? Graph
+                val targetKey = targetState.key as? Graph
+                val forward = (initialKey?.ordinal ?: 0) > (targetKey?.ordinal ?: 1)
+                materialSharedAxisXIn(forward, width / 2) togetherWith
+                        materialSharedAxisXOut(forward, width / 2)
+            },
         ) { key ->
             when(key) {
                 is Graph.Permissions -> {

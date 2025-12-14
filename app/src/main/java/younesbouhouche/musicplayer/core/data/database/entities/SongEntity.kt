@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 
 @Entity
-data class SongEntity(
+data class  SongEntity(
     @PrimaryKey(autoGenerate = false)
     val id: Long,
     val contentUri: Uri,
@@ -86,5 +86,55 @@ data class SongEntity(
             coverUri = coverUri,
             coverPath = coverPath,
         )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as SongEntity
+
+        if (id != other.id) return false
+        if (duration != other.duration) return false
+        if (date != other.date) return false
+        if (size != other.size) return false
+        if (trackNumber != other.trackNumber) return false
+        if (discNumber != other.discNumber) return false
+        if (year != other.year) return false
+        if (contentUri != other.contentUri) return false
+        if (fileName != other.fileName) return false
+        if (title != other.title) return false
+        if (artist != other.artist) return false
+        if (album != other.album) return false
+        if (path != other.path) return false
+        if (composer != other.composer) return false
+        if (genre != other.genre) return false
+        if (!cover.contentEquals(other.cover)) return false
+        if (coverUri != other.coverUri) return false
+        if (coverPath != other.coverPath) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + duration.hashCode()
+        result = 31 * result + date.hashCode()
+        result = 31 * result + size.hashCode()
+        result = 31 * result + (trackNumber ?: 0)
+        result = 31 * result + (discNumber ?: 0)
+        result = 31 * result + (year ?: 0)
+        result = 31 * result + contentUri.hashCode()
+        result = 31 * result + fileName.hashCode()
+        result = 31 * result + title.hashCode()
+        result = 31 * result + artist.hashCode()
+        result = 31 * result + album.hashCode()
+        result = 31 * result + path.hashCode()
+        result = 31 * result + (composer?.hashCode() ?: 0)
+        result = 31 * result + (genre?.hashCode() ?: 0)
+        result = 31 * result + (cover?.contentHashCode() ?: 0)
+        result = 31 * result + (coverUri?.hashCode() ?: 0)
+        result = 31 * result + coverPath.hashCode()
+        return result
     }
 }

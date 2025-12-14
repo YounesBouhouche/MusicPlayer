@@ -3,16 +3,16 @@ package younesbouhouche.musicplayer.features.main.presentation.routes.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import younesbouhouche.musicplayer.core.presentation.util.stateInVM
-import younesbouhouche.musicplayer.features.main.domain.use_cases.GetArtistsUseCase
 import younesbouhouche.musicplayer.features.main.domain.use_cases.GetHistoryUseCase
+import younesbouhouche.musicplayer.features.main.domain.use_cases.GetRecentArtistsUseCase
 import younesbouhouche.musicplayer.features.main.presentation.viewmodel.MainViewModel
 
 class HomeViewModel(
     val mainViewModel: MainViewModel,
-    getArtistsUseCase: GetArtistsUseCase,
+    getRecentArtistsUseCase: GetRecentArtistsUseCase,
     getHistoryUseCase: GetHistoryUseCase
 ): ViewModel() {
-    val artists = getArtistsUseCase().stateInVM(emptyList(), viewModelScope)
+    val artists = getRecentArtistsUseCase().stateInVM(emptyList(), viewModelScope)
     val history = getHistoryUseCase().stateInVM(emptyList(), viewModelScope)
 
     fun play(

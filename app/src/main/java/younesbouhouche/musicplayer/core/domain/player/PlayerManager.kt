@@ -23,6 +23,7 @@ import younesbouhouche.musicplayer.features.main.domain.events.TimerType
 import younesbouhouche.musicplayer.features.player.domain.models.PlayState
 import younesbouhouche.musicplayer.features.main.presentation.util.toMediaItems
 import younesbouhouche.musicplayer.features.main.presentation.viewmodel.Task
+import younesbouhouche.musicplayer.features.player.presentation.service.MediaSessionManager
 
 @OptIn(UnstableApi::class)
 class PlayerManager(
@@ -59,13 +60,21 @@ class PlayerManager(
                         stateManager.updateState {
                             it.copy(loading = playbackState == Player.STATE_BUFFERING)
                         }
-                        if (playbackState == Player.STATE_READY) {
-                            stateManager.updateState {
-                                it.copy(playState = if (exoPlayer.isPlaying) PlayState.PLAYING else PlayState.PAUSED)
+                        when(playbackState) {
+                            Player.STATE_READY -> {
+                                stateManager.updateState {
+                                    it.copy(playState = if (exoPlayer.isPlaying) PlayState.PLAYING else PlayState.PAUSED)
+                                }
+                                scope.launch {
+                                    startTimeUpdate()
+                                }
                             }
-                            scope.launch {
-                                startTimeUpdate()
+                            Player.STATE_IDLE -> {
+                                stateManager.updateState {
+                                    it.copy(playState = PlayState.STOP)
+                                }
                             }
+                            else -> Unit
                         }
                     }
 
@@ -114,7 +123,11 @@ class PlayerManager(
                         super.onIsPlayingChanged(isPlaying)
                         stateManager.updateState {
                             it.copy(
-                                playState = if (isPlaying) PlayState.PLAYING else PlayState.PAUSED
+                                playState = when {
+                                    exoPlayer.playbackState == Player.STATE_IDLE -> PlayState.STOP
+                                    isPlaying -> PlayState.PLAYING
+                                    else -> PlayState.PAUSED
+                                }
                             )
                         }
                         scope.launch {
@@ -130,8 +143,10 @@ class PlayerManager(
                         Timber.tag("PlayerManager")
                             .d("onMediaItemTransition: ${mediaItem?.localConfiguration?.uri}")
                         scope.launch {
-//                            dao.addTimestamp(mediaItem?.localConfiguration?.uri?.toString() ?: "")
                             queueRepository.setCurrentIndex(currentMediaItemIndex)
+                            (mediaItem?.localConfiguration?.tag as? Long)?.let {
+                                musicRepository.addSongToPlayHistory(it)
+                            }
                             MyAppWidget().updateAll(context)
                         }
                         stateManager.updateState {
@@ -207,6 +222,7 @@ class PlayerManager(
         autoPlay: Boolean = true,
         shuffleMode: Boolean = false
     ) {
+        println("PlayerManager.play: tracks=$tracks, index=$index, time=$time, autoPlay=$autoPlay, shuffleMode=$shuffleMode")
         playerFactory.getPlayer().let { player ->
             if (tracks.isEmpty()) return
             val songs = withContext(Dispatchers.IO) {
@@ -227,9 +243,9 @@ class PlayerManager(
                     if (rememberSpeed.first()) speed.first() else 1f,
                     if (rememberPitch.first()) pitch.first() else 1f
                 )
-//            list.getOrNull(index)?.let {
-//                dao.addTimestamp(it.path)
-//            }
+            list.getOrNull(index)?.let {
+                musicRepository.addSongToPlayHistory(it.id)
+            }
             queueRepository.createQueue(tracks)
             queueRepository.setCurrentIndex(index)
             stateManager.suspendUpdateState {
@@ -245,16 +261,19 @@ class PlayerManager(
     }
 
     suspend fun stop() {
-        playerFactory.getPlayer().stop()
-        timeTask.stop()
-        withContext(Dispatchers.IO) {
-            queueRepository.clearQueue()
+        playerFactory.getPlayer().let {
+            it.stop()
+            it.clearMediaItems()
         }
+        timeTask.stop()
         stateManager.updateState {
             it.copy(
                 playState = PlayState.STOP,
                 time = 0L,
             )
+        }
+        withContext(Dispatchers.IO) {
+            queueRepository.clearQueue()
         }
     }
 

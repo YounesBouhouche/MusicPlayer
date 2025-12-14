@@ -20,14 +20,7 @@ import younesbouhouche.musicplayer.core.domain.player.PlayerManager
 import younesbouhouche.musicplayer.features.player.domain.controller.PlayerController
 
 val utilsModule = module {
-    single {
-        MediaStoreScanner(
-            androidContext(),
-            get(),
-            get(),
-            get()
-        )
-    }
+    singleOf(::MediaStoreScanner)
     single {
         ArtistsPictureFetcher(get())
     }

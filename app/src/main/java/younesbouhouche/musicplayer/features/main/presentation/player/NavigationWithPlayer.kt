@@ -44,6 +44,9 @@ fun BoxScope.NavigationWithPlayer(
     val scope = rememberCoroutineScope()
     val navBarHeight = navBarHeight
     val density = LocalDensity.current
+    LaunchedEffect(playerState) {
+        println("PlayerState changed: $playerState")
+    }
     val state = rememberSaveable(inputs = arrayOf(), saver = AnchoredDraggableState.Saver()) {
         AnchoredDraggableState(
             initialValue = ViewState.HIDDEN,
@@ -97,7 +100,6 @@ fun BoxScope.NavigationWithPlayer(
             offset,
             viewHeight,
             progress,
-            playerState,
             state,
             onAction = viewModel::onUiAction,
             onSetFavorite = viewModel::setFavorite,

@@ -11,7 +11,7 @@ import younesbouhouche.musicplayer.core.data.database.entities.SongWithState
 @Dao
 interface PlayHistoryDao {
     @Transaction
-    @Query("SELECT * FROM SongEntity")
+    @Query("SELECT * FROM SongEntity INNER JOIN PlayHistEntity ON SongEntity.id = PlayHistEntity.songId GROUP BY SongEntity.id ORDER BY PlayHistEntity.playedAt DESC")
     fun getPlayHistory(): Flow<List<SongWithState>>
 
     @Query("SELECT * FROM PlayHistEntity WHERE songId = :songId ORDER BY playedAt DESC")

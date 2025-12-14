@@ -1,6 +1,11 @@
 package younesbouhouche.musicplayer.features.main.presentation.routes.home
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
@@ -19,15 +24,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.HorizontalCenteredHeroCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,10 +48,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.younesb.mydesignsystem.presentation.components.ExpressiveButton
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
+import com.younesb.mydesignsystem.presentation.components.IconContainer
 import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Artist
@@ -52,6 +63,7 @@ import younesbouhouche.musicplayer.features.main.presentation.components.MusicCa
 import younesbouhouche.musicplayer.features.main.presentation.components.PictureCard
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
 import younesbouhouche.musicplayer.features.main.presentation.routes.home.HomeViewModel
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -59,6 +71,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
     onArtistClick: (Artist) -> Unit,
+    navigateToLibrary: () -> Unit,
 ) {
     val homeViewModel = koinViewModel<HomeViewModel>()
     val artists by homeViewModel.artists.collectAsState()
@@ -155,6 +168,40 @@ fun HomeScreen(
                             }
                         }
                     }
+                }
+            }
+        } else {
+            item {
+                Column(
+                    Modifier.padding(vertical = 60.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    val angle by rememberInfiniteTransition().animateFloat(0f, 360f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(20000, easing = { it }),
+                            repeatMode = RepeatMode.Restart
+                        )
+                    )
+                    IconContainer(
+                        Icons.Default.History,
+                        Modifier.size(160.dp),
+                        iconRatio = .4f,
+                        shape = MaterialShapes.Cookie12Sided.toShape(angle.roundToInt())
+                    )
+                    Text(
+                        stringResource(R.string.your_listening_history_will_appear_here),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    ExpressiveButton(
+                        stringResource(R.string.explore_library),
+                        ButtonDefaults.MediumContainerHeight,
+                        outlined = true,
+                        onClick = navigateToLibrary
+                    )
                 }
             }
         }

@@ -2,4 +2,5 @@
 <resources>
     <string name="unspecified">Unspecified</string>
     <string name="track_number">Track number</string>
+    <string name="disc_number">डिस्क नंबर</string>
 </resources>

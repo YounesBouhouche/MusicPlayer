@@ -69,22 +69,28 @@ class DialogRepoImpl(val context: Context): DialogRepo {
                     override fun onPlaybackStateChanged(playbackState: Int) {
                         super.onPlaybackStateChanged(playbackState)
                         _state.update {
-                            it.copy(loading = playbackState == Player.STATE_BUFFERING)
+                            it.copy(
+                                loading = playbackState == Player.STATE_BUFFERING,
+                                playState =
+                                    if (playbackState == Player.STATE_IDLE) PlayState.STOP
+                                    else it.playState
+                            )
                         }
                     }
 
                     override fun onIsPlayingChanged(isPlaying: Boolean) {
                         super.onIsPlayingChanged(isPlaying)
-                        _state.update {
-                            it.copy(
-                                playState =
-                                if (isPlaying) {
-                                    PlayState.PLAYING
-                                } else {
-                                    PlayState.PAUSED
-                                },
-                            )
-                        }
+                        if (player.playbackState != Player.STATE_IDLE)
+                            _state.update {
+                                it.copy(
+                                    playState =
+                                    if (isPlaying) {
+                                        PlayState.PLAYING
+                                    } else {
+                                        PlayState.PAUSED
+                                    },
+                                )
+                            }
                     }
                 },
             )
@@ -99,7 +105,7 @@ class DialogRepoImpl(val context: Context): DialogRepo {
 
         val idFromUri = try {
             ContentUris.parseId(uri)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             -1L
         }
 

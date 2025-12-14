@@ -11,12 +11,17 @@ import kotlinx.coroutines.flow.Flow
 import younesbouhouche.musicplayer.core.data.database.entities.QueueEntity
 import younesbouhouche.musicplayer.core.data.database.entities.QueueSongCrossRef
 import younesbouhouche.musicplayer.core.data.database.entities.QueueWithSongs
+import younesbouhouche.musicplayer.core.data.database.entities.SongEntity
 
 @Dao
 interface QueueDao {
     @Transaction
     @Query("SELECT * from QueueEntity WHERE id = 0")
-    fun observeQueue(): Flow<QueueWithSongs?>
+    fun observeQueue(): Flow<QueueEntity?>
+
+    @Transaction
+    @Query("SELECT * from queue_song_cross_ref INNER JOIN SongEntity ON queue_song_cross_ref.songId = SongEntity.id WHERE queue_song_cross_ref.queueId = 0 ORDER BY queue_song_cross_ref.position ASC")
+    fun observeQueueList(): Flow<List<SongEntity>>
 
     @Transaction
     @Query("SELECT * from QueueEntity WHERE id = 0")

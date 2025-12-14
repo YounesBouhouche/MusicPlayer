@@ -19,6 +19,10 @@ class ArtistsPictureFetcher(
         onUpdate: (Int) -> Unit = {}
     ): List<ArtistEntity> {
         return artists.mapIndexed { index, artist ->
+            if (artist.name == "<unknown>") {
+                onUpdate(index + 1)
+                return@mapIndexed artist
+            }
             (safeCall<DeezerResponse, HttpResponse>(
                 { body() },
                 { status.value }

@@ -134,11 +134,5 @@ class PlayerController(
                 }
             }
         }
-        playerStateManager.updateState {
-            it.copy(
-                playState = if (player.isPlaying) PlayState.PLAYING
-                    else PlayState.PAUSED,
-            )
-        }
     }
 }

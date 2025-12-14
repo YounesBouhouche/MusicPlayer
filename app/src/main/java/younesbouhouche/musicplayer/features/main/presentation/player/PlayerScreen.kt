@@ -44,7 +44,6 @@ fun PlayerScreen(
     offset: Int,
     viewHeight: Int,
     progress: Float,
-    state: PlayerState,
     dragState: AnchoredDraggableState<ViewState>,
     modifier: Modifier = Modifier,
     onAction: (UiAction) -> Unit,
@@ -91,7 +90,7 @@ fun PlayerScreen(
         ) {
             SmallPlayerScreen(
                 queue,
-                state.playState,
+                playerState.playState,
                 Modifier
                     .alpha(1f - progress)
                     .height(80.dp),

@@ -67,7 +67,9 @@ fun MainNavGraph(
                             backStack.add(MainNavRoute.Artist(artist.name))
                         },
                         modifier = Modifier.containerClip()
-                    )
+                    ) {
+                        backStack.add(MainNavRoute.Library)
+                    }
                 }
             }
             is MainNavRoute.Albums -> {

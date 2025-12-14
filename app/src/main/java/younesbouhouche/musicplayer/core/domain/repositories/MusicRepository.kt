@@ -26,6 +26,8 @@ interface MusicRepository {
 
     fun getRecentlyPlayedSongs(): Flow<List<Song>>
 
+    fun getRecentArtists(): Flow<List<Artist>>
+
     fun getAlbums(): Flow<List<Album>>
 
     fun getArtists(): Flow<List<Artist>>
