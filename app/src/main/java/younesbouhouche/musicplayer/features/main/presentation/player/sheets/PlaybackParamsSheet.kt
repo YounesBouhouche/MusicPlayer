@@ -63,9 +63,9 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
 import com.younesb.mydesignsystem.presentation.components.ExpressiveButton
+import younesbouhouche.musicplayer.features.main.presentation.player.components.AnimatedCounterText
 import younesbouhouche.musicplayer.features.main.presentation.util.composables.TitleText
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
-import younesbouhouche.musicplayer.features.main.presentation.util.intUpDownTransSpec
 import younesbouhouche.musicplayer.features.main.presentation.util.plus
 import younesbouhouche.musicplayer.features.main.presentation.util.round
 import kotlin.math.roundToInt
@@ -308,48 +308,6 @@ internal fun SliderContainer(
                     )
                 },
             )
-        }
-    }
-}
-
-@Composable
-internal fun AnimatedCounterText(
-    text: String,
-    modifier: Modifier = Modifier,
-    style: TextStyle = MaterialTheme.typography.bodyMedium,
-    color: Color = MaterialTheme.colorScheme.onSurface,
-    textAlign: TextAlign = TextAlign.Start,
-) {
-    Row(
-        modifier,
-        horizontalArrangement = when (textAlign) {
-            TextAlign.Start -> Arrangement.Start
-            TextAlign.End -> Arrangement.End
-            TextAlign.Center -> Arrangement.Center
-            else -> Arrangement.Start
-        }
-    ) {
-        text.forEach { char ->
-            if (char.isDigit()) {
-                AnimatedContent(
-                    targetState = char.digitToInt(),
-                    transitionSpec = {
-                        intUpDownTransSpec() using SizeTransform(clip = false)
-                    },
-                ) { targetChar ->
-                    Text(
-                        targetChar.toString(),
-                        style = style,
-                        color = color,
-                    )
-                }
-            } else {
-                Text(
-                    char.toString(),
-                    style = style,
-                    color = color,
-                )
-            }
         }
     }
 }
