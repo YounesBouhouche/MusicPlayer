@@ -2,7 +2,7 @@ package younesbouhouche.musicplayer.features.main.domain.events
 
 import android.net.Uri
 import androidx.compose.ui.graphics.vector.ImageVector
-import younesbouhouche.musicplayer.features.main.presentation.navigation.Routes
+import younesbouhouche.musicplayer.features.main.presentation.navigation.TopLevelRoutes
 import younesbouhouche.musicplayer.features.main.presentation.states.MusicMetadata
 
 sealed interface UiAction {
@@ -72,5 +72,5 @@ sealed interface UiAction {
 
     data object HidePitchDialog : UiAction
 
-    data class ShowSortSheet(val route: Routes) : UiAction
+    data class ShowSortSheet(val route: TopLevelRoutes) : UiAction
 }
