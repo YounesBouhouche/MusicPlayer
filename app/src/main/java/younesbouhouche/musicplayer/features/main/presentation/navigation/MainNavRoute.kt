@@ -4,31 +4,31 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class MainNavRoute: NavKey {
+sealed interface MainNavRoute: NavKey {
     @Serializable
-    data object Home : MainNavRoute(), NavKey
+    data object Home : MainNavRoute
 
     @Serializable
-    data object Albums : MainNavRoute(), NavKey
+    data object Albums : MainNavRoute
 
     @Serializable
-    data class Album(val name: String) : MainNavRoute(), NavKey
+    data class Album(val name: String) : MainNavRoute
 
     @Serializable
-    data object Artists : MainNavRoute(), NavKey
+    data object Artists : MainNavRoute
 
     @Serializable
-    data class Artist(val name: String) : MainNavRoute(), NavKey
+    data class Artist(val name: String) : MainNavRoute
 
     @Serializable
-    data object Playlists : MainNavRoute(), NavKey
+    data object Playlists : MainNavRoute
 
     @Serializable
-    data class Playlist(val id: Long) : MainNavRoute(), NavKey
+    data class Playlist(val id: Long) : MainNavRoute
 
     @Serializable
-    data object Library : MainNavRoute(), NavKey
+    data object Library : MainNavRoute
 
     @Serializable
-    data class SongInfo(val songId: Long) : MainNavRoute(), NavKey
+    data class SongInfo(val songId: Long) : MainNavRoute
 }

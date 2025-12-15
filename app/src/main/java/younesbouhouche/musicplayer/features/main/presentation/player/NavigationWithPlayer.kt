@@ -24,7 +24,7 @@ import soup.compose.material.motion.animation.materialSharedAxisYIn
 import soup.compose.material.motion.animation.materialSharedAxisYOut
 import younesbouhouche.musicplayer.core.domain.models.Queue
 import younesbouhouche.musicplayer.features.main.presentation.navigation.MainNavRoute
-import younesbouhouche.musicplayer.features.main.presentation.navigation.Routes
+import younesbouhouche.musicplayer.features.main.presentation.navigation.TopLevelRoutes
 import younesbouhouche.musicplayer.features.main.presentation.util.composables.navBarHeight
 import younesbouhouche.musicplayer.features.main.presentation.viewmodel.PlayerViewModel
 import younesbouhouche.musicplayer.features.player.domain.models.PlayState
@@ -34,7 +34,7 @@ import kotlin.math.roundToInt
 @Composable
 fun BoxScope.NavigationWithPlayer(
     viewHeight: Int,
-    route: Routes?,
+    route: TopLevelRoutes?,
     navigate: (MainNavRoute) -> Unit,
 ) {
     val viewModel = koinViewModel<PlayerViewModel>()

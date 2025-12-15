@@ -87,14 +87,14 @@ fun HomeScreen(
         item {
             Box(
                 Modifier
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(
-                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = .5f),
-                                Color.Transparent
-                            )
-                        )
-                    )
+//                    .background(
+//                        Brush.verticalGradient(
+//                            listOf(
+//                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = .5f),
+//                                Color.Transparent
+//                            )
+//                        )
+//                    )
                     .fillMaxWidth()
                     .padding(vertical = 36.dp, horizontal = 28.dp)
             ) {

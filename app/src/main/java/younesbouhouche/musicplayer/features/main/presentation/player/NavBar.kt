@@ -37,11 +37,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import soup.compose.material.motion.animation.materialSharedAxisZ
 import younesbouhouche.musicplayer.features.main.presentation.navigation.MainNavRoute
-import younesbouhouche.musicplayer.features.main.presentation.navigation.Routes
+import younesbouhouche.musicplayer.features.main.presentation.navigation.TopLevelRoutes
 
 @Composable
 fun BoxScope.NavBar(
-    route: Routes?,
+    route: TopLevelRoutes?,
     playing: Boolean,
     modifier: Modifier = Modifier,
     navigate: (MainNavRoute) -> Unit
@@ -50,7 +50,7 @@ fun BoxScope.NavBar(
     val density = LocalDensity.current
     var safeRoute by remember {
         mutableStateOf(
-            route ?: Routes.Home
+            route ?: TopLevelRoutes.Home
         )
     }
     LaunchedEffect(route) {
@@ -62,7 +62,7 @@ fun BoxScope.NavBar(
     val innerWidth = width - spacing * 2
     val offset by animateDpAsState(
         with(density) {
-            (safeRoute.ordinal / Routes.entries.size.toFloat() * (innerWidth).toPx()).toDp() + spacing
+            (safeRoute.ordinal / TopLevelRoutes.entries.size.toFloat() * (innerWidth).toPx()).toDp() + spacing
         }
     )
     val indicatorColor by animateColorAsState(
@@ -103,7 +103,7 @@ fun BoxScope.NavBar(
                 // Add animated indicator
                 Surface(
                     Modifier.height(40.dp)
-                        .width(innerWidth / Routes.entries.size.toFloat())
+                        .width(innerWidth / TopLevelRoutes.entries.size.toFloat())
                         .offset(offset)
                     ,
                     color = indicatorColor,
@@ -116,7 +116,7 @@ fun BoxScope.NavBar(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Routes.entries.forEach { screen ->
+                    TopLevelRoutes.entries.forEach { screen ->
                         val selected = route == screen
                         val color by animateColorAsState(
                             if (selected) MaterialTheme.colorScheme.onPrimary
@@ -158,7 +158,7 @@ fun BoxScope.NavBar(
 @Composable
 private fun NavBarPreview() {
     var route by remember {
-        mutableStateOf<Routes?>(Routes.Home)
+        mutableStateOf<TopLevelRoutes?>(TopLevelRoutes.Home)
     }
     Surface(Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize()) {
@@ -167,7 +167,7 @@ private fun NavBarPreview() {
                 playing = false,
             ) { navRoute ->
                 route =
-                    Routes.entries.first { r -> r.destination == navRoute }
+                    TopLevelRoutes.entries.first { r -> r.destination == navRoute }
                         .takeIf { it != route }
             }
         }

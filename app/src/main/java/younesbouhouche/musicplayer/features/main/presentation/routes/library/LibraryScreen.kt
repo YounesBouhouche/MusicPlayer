@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Favorite
@@ -258,7 +259,8 @@ private fun ItemsList(
             ),
         ) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.clip(expressiveRectShape(0, 2))
+                    .fillMaxSize(),
                 state = state,
                 contentPadding = contentPadding + PaddingValues(end = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -268,8 +270,9 @@ private fun ItemsList(
                         Text(
                             key,
                             Modifier
-                                .background(MaterialTheme.colorScheme.surface)
-                                .fillMaxWidth()
+                                .padding(6.dp)
+                                .clip(RoundedCornerShape(100))
+                                .background(MaterialTheme.colorScheme.surfaceContainer)
                                 .padding(16.dp),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
@@ -279,7 +282,10 @@ private fun ItemsList(
                     itemsIndexed(list, { _, it -> it.id }) { index, it ->
                         MusicCardListItem(
                             it,
-                            modifier = Modifier.padding(horizontal = 8.dp).animateItem(),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                                .animateItem(
+
+                                ),
                             shape = expressiveRectShape(index, list.size),
                             trailingContent = {
                                 ExpressiveIconButton(

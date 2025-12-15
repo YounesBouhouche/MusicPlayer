@@ -14,7 +14,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import younesbouhouche.musicplayer.R
 
-enum class Routes(
+enum class TopLevelRoutes(
     val title: Int,
     val unselectedIcon: ImageVector,
     val selectedIcon: ImageVector,

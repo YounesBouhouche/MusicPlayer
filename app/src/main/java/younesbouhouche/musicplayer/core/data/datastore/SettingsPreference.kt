@@ -37,6 +37,9 @@ sealed class SettingsPreference<T, R>(
         ColorScheme.BLUE,
         {
             ColorScheme.fromString(it)
+        },
+        {
+            it.name
         }
     )
     data object LanguagePref: SettingsPreference<String, Language>(

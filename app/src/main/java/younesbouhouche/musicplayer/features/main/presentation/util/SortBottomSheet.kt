@@ -2,7 +2,7 @@ package younesbouhouche.musicplayer.features.main.presentation.util
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -22,21 +22,15 @@ import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
-import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.features.main.presentation.ColsCount
@@ -57,7 +51,7 @@ fun <T>SortBottomSheet(
             { onSortStateChange(sortState.copy(expanded = false)) },
             modifier,
             contentWindowInsets = {
-                BottomSheetDefaults.windowInsets.add(WindowInsets(16.dp, 0.dp, 16.dp, 16.dp))
+                BottomSheetDefaults.windowInsets.add(WindowInsets(bottom = 16.dp))
             },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         ) {
@@ -66,107 +60,83 @@ fun <T>SortBottomSheet(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                TitleText(stringResource(R.string.sort_by))
-                LazyRow(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween, Alignment.CenterHorizontally)
-                ) {
-                    itemsIndexed(options) { index, option ->
-                        ToggleButton(
-                            sortState.sortType == option,
-                            {
-                                onSortStateChange(sortState.copy(sortType = option))
-                            },
-                            Modifier
-                                .weight(1f)
-                                .height(ButtonDefaults.MediumContainerHeight),
-                            shapes = when (index) {
-                                0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                options.size - 1 -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                            },
-                            contentPadding = ButtonDefaults.contentPaddingFor(ButtonDefaults.MediumContainerHeight)
-                        ) {
-                            Icon(
-                                icon(option),
-                                null,
-                                Modifier.size(ButtonDefaults.MediumIconSize)
-                            )
-                            Spacer(Modifier.width(ButtonDefaults.MediumIconSpacing))
-                            Text(stringResource(text(option)))
-                        }
+                SheetItem(
+                    stringResource(R.string.sort_by),
+                    options,
+                    sortState.sortType,
+                    { onSortStateChange(sortState.copy(sortType = it)) },
+                    icon,
+                    text
+                )
+                SheetItem(
+                    stringResource(R.string.order),
+                    listOf(0, 1),
+                    sortState.sortType,
+                    { onSortStateChange(sortState.copy(ascending = it == 0)) },
+                    {
+                        if (it == 0) Icons.Default.ArrowUpward
+                        else Icons.Default.ArrowDownward
+                    },
+                    {
+                        if (it == 0) R.string.ascending
+                        else R.string.descending
                     }
-                }
-                TitleText(stringResource(R.string.order))
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
-                ) {
-                    repeat(2) { index ->
-                        ToggleButton(
-                            if (index == 0) sortState.ascending
-                            else !sortState.ascending,
-                            {
-                                onSortStateChange(
-                                    sortState.copy(ascending = index == 0)
-                                )
-                            },
-                            Modifier
-                                .weight(1f)
-                                .height(ButtonDefaults.MediumContainerHeight),
-                            shapes =
-                                if (index == 0) ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                else ButtonGroupDefaults.connectedTrailingButtonShapes(),
-                            contentPadding = ButtonDefaults.contentPaddingFor(ButtonDefaults.MediumContainerHeight)
-                        ) {
-                            Icon(
-                                if (index == 0) Icons.Default.ArrowUpward
-                                else Icons.Default.ArrowDownward,
-                                null,
-                                Modifier.size(ButtonDefaults.MediumIconSize)
-                            )
-                            Spacer(Modifier.width(ButtonDefaults.MediumIconSpacing))
-                            Text(
-                                stringResource(
-                                    if (index == 0) R.string.ascending
-                                    else R.string.descending
-                                )
-                            )
-                        }
-                    }
-                }
+                )
                 sortState.colsCount?.let { colsCount ->
-                    TitleText(stringResource(R.string.grid))
-                    Row(Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
-                    ) {
-                        ColsCount.entries.forEachIndexed { index, item ->
-                            ToggleButton(
-                                item == colsCount,
-                                {
-                                    onSortStateChange(sortState.copy(colsCount = item))
-                                },
-                                Modifier
-                                    .weight(1f)
-                                    .height(ButtonDefaults.MediumContainerHeight),
-                                shapes = when(index) {
-                                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                    ColsCount.entries.size - 1 -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                                },
-                                contentPadding = ButtonDefaults.contentPaddingFor(ButtonDefaults.MediumContainerHeight)
-                            ) {
-                                Icon(
-                                    item.icon,
-                                    null,
-                                    Modifier.size(ButtonDefaults.MediumIconSize)
-                                )
-                                Spacer(Modifier.width(ButtonDefaults.MediumIconSpacing))
-                                Text(stringResource(item.label))
-                            }
-                        }
-                    }
+                    SheetItem(
+                        stringResource(R.string.grid),
+                        ColsCount.entries,
+                        colsCount,
+                        { onSortStateChange(sortState.copy(colsCount = it)) },
+                        { item -> item.icon },
+                        { item -> item.label }
+                    )
                 }
             }
         }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+internal fun <T> SheetItem(
+    title: String,
+    options: List<T>,
+    selectedOption: T,
+    onOptionSelect: (T) -> Unit,
+    icon: @Composable (T) -> ImageVector,
+    text: @Composable (T) -> Int,
+) {
+    TitleText(title)
+    LazyRow(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(
+            ButtonGroupDefaults.ConnectedSpaceBetween,
+            Alignment.CenterHorizontally
+        ),
+        contentPadding = PaddingValues(horizontal = 16.dp)
+    ) {
+        itemsIndexed(options) { index, option ->
+            ToggleButton(
+                selectedOption == option,
+                {
+                    onOptionSelect(option)
+                },
+                Modifier.height(ButtonDefaults.MediumContainerHeight),
+                shapes = when (index) {
+                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                    options.size - 1 -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                },
+                contentPadding = ButtonDefaults.contentPaddingFor(ButtonDefaults.MediumContainerHeight)
+            ) {
+                Icon(
+                    icon(option),
+                    null,
+                    Modifier.size(ButtonDefaults.MediumIconSize)
+                )
+                Spacer(Modifier.width(ButtonDefaults.MediumIconSpacing))
+                Text(stringResource(text(option)))
+            }
+        }
+    }
 }

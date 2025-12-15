@@ -2,15 +2,17 @@ package younesbouhouche.musicplayer.features.main.presentation.navigation
 
 import androidx.compose.animation.togetherWith
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import soup.compose.material.motion.animation.materialSharedAxisYIn
@@ -29,24 +31,18 @@ import younesbouhouche.musicplayer.features.main.presentation.util.containerClip
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavGraph(
-    backStack: NavBackStack<NavKey>,
+    navigator: Navigator,
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
 ) {
+    val navigationState = navigator.state
     val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
+    val screenModifier = Modifier.containerClip(background = Color.Transparent)
     NavDisplay(
-        backStack = backStack,
         modifier = modifier,
-        onBack = { backStack.removeAt(backStack.lastIndex) },
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator {
-                false
-            }
-        ),
         transitionSpec = {
             materialSharedAxisYIn(true, 100) togetherWith
-            materialSharedAxisYOut(false, 100)
+                    materialSharedAxisYOut(false, 100)
         },
         popTransitionSpec = {
             materialSharedAxisYIn(true, 100) togetherWith
@@ -57,100 +53,82 @@ fun MainNavGraph(
                     materialSharedAxisYOut(false, 100)
         },
         sceneStrategy = bottomSheetStrategy,
-    ) { key ->
-        when(key) {
-            is MainNavRoute.Home -> {
-                NavEntry(key) {
+        entries = navigationState.toEntries(
+            entryProvider {
+                entry<MainNavRoute.Home> {
                     HomeScreen(
                         bottomPadding = bottomPadding,
                         onArtistClick = { artist ->
-                            backStack.add(MainNavRoute.Artist(artist.name))
+                            navigator.navigate(MainNavRoute.Artist(artist.name))
                         },
-                        modifier = Modifier.containerClip()
+                        modifier = screenModifier
                     ) {
-                        backStack.add(MainNavRoute.Library)
+                        navigator.navigate(MainNavRoute.Library)
                     }
                 }
-            }
-            is MainNavRoute.Albums -> {
-                NavEntry(key) {
+                entry<MainNavRoute.Albums> {
                     AlbumsScreen(
                         bottomPadding = bottomPadding,
-                        modifier = Modifier.containerClip()
+                        modifier = screenModifier
                     ) { album ->
-                        backStack.add(MainNavRoute.Album(album.name))
+                        navigator.navigate(MainNavRoute.Album(album.name))
                     }
                 }
-            }
-            is MainNavRoute.Album -> {
-                NavEntry(key) {
+                entry<MainNavRoute.Album> {
                     AlbumScreen(
-                        key.name,
+                        it.name,
                         bottomPadding = bottomPadding
                     ) {
-                        backStack.add(MainNavRoute.SongInfo(it.id))
+                        navigator.navigate(MainNavRoute.SongInfo(it.id))
                     }
                 }
-            }
-            is MainNavRoute.Artists -> {
-                NavEntry(key) {
+                entry<MainNavRoute.Artists> {
                     ArtistsScreen(
                         bottomPadding = bottomPadding,
-                        modifier = Modifier.containerClip()
+                        modifier = screenModifier
                     ) { album ->
-                        backStack.add(MainNavRoute.Artist(album.name))
+                        navigator.navigate(MainNavRoute.Artist(album.name))
                     }
                 }
-            }
-            is MainNavRoute.Artist -> {
-                NavEntry(key) {
+                entry<MainNavRoute.Artist> {
                     ArtistScreen(
-                        key.name,
+                        it.name,
                         bottomPadding = bottomPadding
                     ) {
-                        backStack.add(MainNavRoute.SongInfo(it.id))
+                        navigator.navigate(MainNavRoute.SongInfo(it.id))
                     }
                 }
-            }
-            is MainNavRoute.Playlists -> {
-                NavEntry(key) {
+                entry<MainNavRoute.Playlists> {
                     PlaylistsScreen(
                         bottomPadding = bottomPadding,
-                        modifier = Modifier.containerClip()
+                        modifier = screenModifier
                     ) { playlist ->
-                        backStack.add(MainNavRoute.Playlist(playlist.id))
+                        navigator.navigate(MainNavRoute.Playlist(playlist.id))
                     }
                 }
-            }
-            is MainNavRoute.Playlist -> {
-                NavEntry(key) {
+                entry<MainNavRoute.Playlist> {
                     PlaylistScreen(
-                        key.id,
+                        it.id,
                         bottomPadding = bottomPadding
                     ) {
-                        backStack.add(MainNavRoute.SongInfo(it.id))
+                        navigator.navigate(MainNavRoute.SongInfo(it.id))
                     }
                 }
-            }
-            is MainNavRoute.Library -> {
-                NavEntry(key) {
+                entry<MainNavRoute.Library> {
                     LibraryScreen(
                         bottomPadding = bottomPadding,
-                        modifier = Modifier.containerClip(),
+                        modifier = screenModifier,
                     ) {
-                        backStack.add(MainNavRoute.SongInfo(it))
+                        navigator.navigate(MainNavRoute.SongInfo(it))
                     }
                 }
-            }
-            is MainNavRoute.SongInfo -> {
-                NavEntry(
-                    key = key,
+                entry<MainNavRoute.SongInfo> (
                     metadata = BottomSheetSceneStrategy.bottomSheet()
                 ) {
-                    SongInfoContent(key.songId)
+                    SongInfoContent(it.songId)
                 }
             }
-            else -> error("")
-        }
-    }
+        ),
+        onBack = navigator::goBack,
+    )
 }
