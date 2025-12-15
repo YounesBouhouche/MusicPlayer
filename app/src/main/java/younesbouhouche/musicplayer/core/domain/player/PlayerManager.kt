@@ -9,21 +9,19 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import younesbouhouche.musicplayer.core.data.datastore.SettingsPreference
 import younesbouhouche.musicplayer.core.domain.repositories.MusicRepository
-import younesbouhouche.musicplayer.features.glance.presentation.MyAppWidget
 import younesbouhouche.musicplayer.core.domain.repositories.PreferencesRepository
 import younesbouhouche.musicplayer.core.domain.repositories.QueueRepository
+import younesbouhouche.musicplayer.features.glance.presentation.MyAppWidget
 import younesbouhouche.musicplayer.features.main.domain.events.TimerType
-import younesbouhouche.musicplayer.features.player.domain.models.PlayState
 import younesbouhouche.musicplayer.features.main.presentation.util.toMediaItems
 import younesbouhouche.musicplayer.features.main.presentation.viewmodel.Task
-import younesbouhouche.musicplayer.features.player.presentation.service.MediaSessionManager
+import younesbouhouche.musicplayer.features.player.domain.models.PlayState
 
 @OptIn(UnstableApi::class)
 class PlayerManager(
@@ -179,8 +177,8 @@ class PlayerManager(
         return exoPlayer
     }
 
-    val time = MutableStateFlow(0L)
     private var timeTask = Task()
+    private var timerTask = Task()
     private var lastSeekTime = 0L
     private val seekLockDuration = 100L // milliseconds
 
@@ -190,6 +188,29 @@ class PlayerManager(
             timeTask.startRepeating(100L) {
                 stateManager.updateState {
                     it.copy(time = player.currentPosition)
+                }
+            }
+        }
+    }
+
+    suspend fun handleTimer() {
+        if (stateManager.playerState.value.timer is TimerType.Disabled) {
+            timerTask.stop()
+            return
+        }
+        timerTask.startRepeating(1000L) {
+            val timer = stateManager.playerState.value.timer
+            if (timer is TimerType.Duration) {
+                if (timer.ms <= 1000L) {
+                    stop()
+                } else {
+                    stateManager.updateState { it.copy(timer = timer.copy(ms = timer.ms - 1000L)) }
+                }
+            } else if (timer is TimerType.Time) {
+                val currentTime = System.currentTimeMillis()
+                val targetTime = timer.getTargetDateMillis()
+                if (currentTime >= targetTime) {
+                    stop()
                 }
             }
         }
@@ -266,10 +287,12 @@ class PlayerManager(
             it.clearMediaItems()
         }
         timeTask.stop()
+        timerTask.stop()
         stateManager.updateState {
             it.copy(
                 playState = PlayState.STOP,
                 time = 0L,
+                timer = TimerType.Disabled
             )
         }
         withContext(Dispatchers.IO) {

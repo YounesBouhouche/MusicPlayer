@@ -6,6 +6,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import younesbouhouche.musicplayer.core.domain.ext.setVolume
 import younesbouhouche.musicplayer.core.domain.ext.volumeDown
 import younesbouhouche.musicplayer.core.domain.ext.volumeUp
 import younesbouhouche.musicplayer.core.domain.player.PlayerManager
@@ -13,7 +14,6 @@ import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
 import younesbouhouche.musicplayer.core.domain.repositories.MusicRepository
 import younesbouhouche.musicplayer.core.domain.repositories.QueueRepository
 import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
-import younesbouhouche.musicplayer.features.player.domain.models.PlayState
 
 class PlayerController(
     val playerManager: PlayerManager,
@@ -110,12 +110,13 @@ class PlayerController(
                 player.playbackParameters = player.playbackParameters.withSpeed(event.speed)
             }
             is PlayerEvent.SetTimer -> {
-                playerStateManager.updateState {
+                playerStateManager.suspendUpdateState {
                     it.copy(timer = event.timer)
                 }
+                playerManager.handleTimer()
             }
             is PlayerEvent.SetVolume -> {
-
+                context.setVolume(event.volume)
             }
             PlayerEvent.Stop -> {
                 playerManager.stop()
