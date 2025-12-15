@@ -88,6 +88,10 @@ fun BoxScope.NavigationWithPlayer(
         )
         state.snapTo(ViewState.SMALL)
     }
+    LaunchedEffect(playerState.playState) {
+        if (playerState.playState == PlayState.STOP)
+            state.animateTo(ViewState.SMALL)
+    }
     AnimatedVisibility(
         playerState.playState != PlayState.STOP,
         enter = materialSharedAxisYIn(true, 100),
