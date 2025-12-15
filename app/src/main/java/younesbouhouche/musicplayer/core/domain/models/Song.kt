@@ -2,6 +2,7 @@ package younesbouhouche.musicplayer.core.domain.models
 
 import android.net.Uri
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import younesbouhouche.musicplayer.core.data.database.entities.PlayHistEntity
 
 data class Song(
@@ -91,10 +92,24 @@ data class Song(
     }
 
     fun toMediaItem(): MediaItem {
-        return MediaItem.Builder()
-            .setMediaId(id.toString())
-            .setUri(contentUri)
-            .setTag(this)
-            .build()
+        return MediaItem
+                .Builder()
+                .setUri(contentUri)
+                .setMediaId("$id")
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setTitle(title)
+                        .setArtist(artist)
+                        .setAlbumTitle(album)
+                        .setArtist(artist)
+                        .setGenre(genre)
+                        .setComposer(composer)
+                        .setArtworkData(
+                            MediaItem.fromUri(contentUri).mediaMetadata.artworkData,
+                            MediaMetadata.PICTURE_TYPE_MEDIA
+                        )
+                        .build()
+                )
+                .build()
     }
 }
