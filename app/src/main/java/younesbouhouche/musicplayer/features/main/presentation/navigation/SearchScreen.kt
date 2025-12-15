@@ -171,7 +171,10 @@ fun SearchScreen(
         state = state,
         inputField = inputField,
         colors = SearchBarDefaults.appBarWithSearchColors(
-            appBarContainerColor = Color.Transparent
+            appBarContainerColor = Color.Transparent,
+            searchBarColors = SearchBarDefaults.colors(
+                MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = .6f)
+            )
         ),
         contentPadding = PaddingValues(8.dp, 8.dp),
         actions = {
@@ -180,7 +183,7 @@ fun SearchScreen(
                 size = IconButtonDefaults.mediumIconSize,
                 widthOption = IconButtonDefaults.IconButtonWidthOption.Wide,
                 colors = IconButtonDefaults.filledTonalIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = .6f)
                 ),
                 onClick = navigateToSettings
             )

@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,7 +52,6 @@ import younesbouhouche.musicplayer.features.main.presentation.components.ListIte
 import younesbouhouche.musicplayer.features.main.presentation.components.PictureCard
 import younesbouhouche.musicplayer.features.main.presentation.util.ListsSortType
 import younesbouhouche.musicplayer.features.main.presentation.util.SortBottomSheet
-import younesbouhouche.musicplayer.features.main.presentation.util.SortState
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -71,6 +71,7 @@ fun PlaylistsScreen(
     Scaffold(
         modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(bottom = bottomPadding),
+        containerColor = Color.Transparent,
         floatingActionButton = {
             FloatingActionButtonMenu(
                 expanded,
@@ -103,7 +104,7 @@ fun PlaylistsScreen(
                         )
                     }
                 },
-                modifier = Modifier.offset(x = (16).dp)
+                modifier = Modifier.offset(x = 16.dp, y = 24.dp)
             ) {
                 menu.forEach { (text, icon, action) ->
                     FloatingActionButtonMenuItem(
