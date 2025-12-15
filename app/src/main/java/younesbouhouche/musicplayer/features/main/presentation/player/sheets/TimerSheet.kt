@@ -27,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -55,9 +56,14 @@ import soup.compose.material.motion.animation.materialSharedAxisZ
 import younesbouhouche.musicplayer.R
 import com.younesb.mydesignsystem.presentation.components.ExpressiveButton
 import younesbouhouche.musicplayer.features.main.domain.events.TimerType
+import younesbouhouche.musicplayer.features.main.presentation.player.components.AnimatedCounterText
 import younesbouhouche.musicplayer.features.main.presentation.util.containerClip
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
+import younesbouhouche.musicplayer.features.main.presentation.util.localTimeString
 import younesbouhouche.musicplayer.features.main.presentation.util.plus
+import younesbouhouche.musicplayer.features.main.presentation.util.timerString
+import younesbouhouche.musicplayer.features.main.presentation.util.toLocaleTimeString
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -68,13 +74,9 @@ fun TimerSheet(
     onSetTimer: (TimerType) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var selected by remember { mutableStateOf(timer) }
     val state = rememberModalBottomSheetState(true)
-    LaunchedEffect(visible) {
-        if (visible)
-            selected = timer
-    }
     if (visible) {
+        val running by remember { mutableStateOf(timer != TimerType.Disabled) }
         ModalBottomSheet(
             onDismissRequest = onDismissRequest,
             modifier = modifier,
@@ -87,209 +89,335 @@ fun TimerSheet(
                 BottomSheetDefaults.windowInsets.exclude(WindowInsets.navigationBars)
             }
         ) {
-            LazyColumn(
-                Modifier.fillMaxWidth(),
-                contentPadding = WindowInsets.navigationBars.asPaddingValues() + PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
+            if (running)
+                RunningTimerContent(timer, onDismissRequest) {
+                    onSetTimer(TimerType.Disabled)
+                }
+            else
+                SelectTimerContent(timer, onDismissRequest, onSetTimer)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+internal fun RunningTimerContent(
+    timer: TimerType,
+    onDismissRequest: () -> Unit,
+    onStopTimer: () -> Unit,
+) {
+    LazyColumn(
+        Modifier.fillMaxWidth(),
+        contentPadding = WindowInsets.navigationBars.asPaddingValues() + PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        item {
+            Column(
+                Modifier.padding(vertical = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                item {
-                    Row(Modifier
-                        .clip(RoundedCornerShape(100))
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            stringResource(R.string.sleep_timer),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(start = 4.dp)
-                        )
-                        Switch(
-                            selected != TimerType.Disabled,
-                            {
-                                selected = if (it) TimerType.Duration(60 * 1000) else TimerType.Disabled
-                            }
-                        )
-                    }
-                }
-                item {
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        repeat(3) { index ->
-                            val checked = when (index) {
-                                0 -> selected is TimerType.Duration
-                                1 -> selected is TimerType.Time
-                                else -> selected is TimerType.End
-                            }
-                            val res = when (index) {
-                                0 -> R.string.duration
-                                1 -> R.string.time
-                                else -> R.string.end
-                            }
-                            val interactionSource = remember { MutableInteractionSource() }
-                            val pressed by interactionSource.collectIsPressedAsState()
-                            val weight by animateFloatAsState(
-                                if (pressed) 1.4f else 1f
+                Text(
+                    text = when(timer) {
+                        TimerType.Disabled -> ""
+                        is TimerType.Duration -> "Player will stop after"
+                        is TimerType.End -> "Tracks to play before stopping:"
+                        is TimerType.Time -> "Player will stop at"
+                    },
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                ProvideTextStyle(
+                    MaterialTheme.typography.displayLarge.copy(
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center
+                    )
+                ) {
+                    when(timer) {
+                        TimerType.Disabled -> {
+
+                        }
+                        is TimerType.Duration -> {
+                            AnimatedCounterText(
+                                text = timer.ms.timerString,
                             )
-                            ToggleButton(
-                                checked,
-                                {
-                                    selected = when (index) {
-                                        0 -> TimerType.Duration(60 * 1000)
-                                        1 -> TimerType.Time(0, 1)
-                                        else -> TimerType.End(1)
-                                    }
-                                },
-                                Modifier
-                                    .weight(weight)
-                                    .height(ButtonDefaults.MediumContainerHeight),
-                                shapes = when(index) {
-                                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                    1 -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                                    else -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                },
-                                colors = ToggleButtonDefaults.toggleButtonColors(
-                                    checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                ),
-                                interactionSource = interactionSource,
-                                enabled = selected != TimerType.Disabled,
-                                contentPadding = ButtonDefaults.contentPaddingFor(ButtonDefaults.MediumContainerHeight)
+                        }
+                        is TimerType.End -> {
+                            AnimatedCounterText(
+                                text = "${timer.tracks}",
+                            )
+                        }
+                        is TimerType.Time -> {
+                            Column(
+                                Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Text(stringResource(res))
+                                Text(text = timer.getTargetDate().toLocaleTimeString())
+                                if (timer.tomorrow)
+                                    Text(text = "(tomorrow)", style = MaterialTheme.typography.bodyMedium)
                             }
                         }
                     }
                 }
-                item {
-                    AnimatedVisibility(selected != TimerType.Disabled) {
-                        Column(
-                            modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Surface(
-                                Modifier.containerClip(
-                                    shape = expressiveRectShape(
-                                        0,
-                                        if (selected is TimerType.Time) 1 else 2
+            }
+        }
+        item {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                repeat(2) {
+                    val (res, onClick) =
+                        if (it == 0) R.string.cancel to onDismissRequest
+                        else R.string.stop to {
+                            onStopTimer()
+                            onDismissRequest()
+                        }
+                    val interactionSource = remember { MutableInteractionSource() }
+                    val pressed by interactionSource.collectIsPressedAsState()
+                    val weight by animateFloatAsState(
+                        if (pressed) 1.4f else 1f
+                    )
+                    ExpressiveButton(
+                        stringResource(res),
+                        ButtonDefaults.MediumContainerHeight,
+                        Modifier.weight(weight),
+                        onClick = onClick,
+                        outlined = it == 0,
+                        interactionSource = interactionSource,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+internal fun SelectTimerContent(
+    timer: TimerType,
+    onDismissRequest: () -> Unit,
+    onSetTimer: (TimerType) -> Unit
+) {
+    var selected by remember { mutableStateOf(timer) }
+    LazyColumn(
+        Modifier.fillMaxWidth(),
+        contentPadding = WindowInsets.navigationBars.asPaddingValues() + PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        item {
+            Row(Modifier
+                .clip(RoundedCornerShape(100))
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(16.dp)
+                .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    stringResource(R.string.sleep_timer),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+                Switch(
+                    selected != TimerType.Disabled,
+                    {
+                        selected = if (it) TimerType.Duration(60 * 1000) else TimerType.Disabled
+                    }
+                )
+            }
+        }
+        item {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                repeat(3) { index ->
+                    val checked = when (index) {
+                        0 -> selected is TimerType.Duration
+                        1 -> selected is TimerType.Time
+                        else -> selected is TimerType.End
+                    }
+                    val res = when (index) {
+                        0 -> R.string.duration
+                        1 -> R.string.time
+                        else -> R.string.end
+                    }
+                    val interactionSource = remember { MutableInteractionSource() }
+                    val pressed by interactionSource.collectIsPressedAsState()
+                    val weight by animateFloatAsState(
+                        if (pressed) 1.4f else 1f
+                    )
+                    ToggleButton(
+                        checked,
+                        {
+                            selected = when (index) {
+                                0 -> TimerType.Duration(60 * 1000)
+                                1 ->
+                                    TimerType.Time(
+                                        LocalDateTime.now().hour,
+                                        LocalDateTime.now().minute + 1,
+                                        false
                                     )
-                                )
+                                else -> TimerType.End(1)
+                            }
+                        },
+                        Modifier
+                            .weight(weight)
+                            .height(ButtonDefaults.MediumContainerHeight),
+                        shapes = when(index) {
+                            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                            1 -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                            else -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                        },
+                        colors = ToggleButtonDefaults.toggleButtonColors(
+                            checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        interactionSource = interactionSource,
+                        enabled = selected != TimerType.Disabled,
+                        contentPadding = ButtonDefaults.contentPaddingFor(ButtonDefaults.MediumContainerHeight)
+                    ) {
+                        Text(stringResource(res))
+                    }
+                }
+            }
+        }
+        item {
+            AnimatedVisibility(selected != TimerType.Disabled) {
+                Column(
+                    Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Surface(
+                        Modifier.containerClip(
+                            shape = expressiveRectShape(
+                                0,
+                                if (selected is TimerType.Time) 1 else 2
+                            )
+                        )
+                    ) {
+                        AnimatedContent(
+                            selected.javaClass,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            transitionSpec = { materialSharedAxisZ(true) }
+                        ) { selectedTimer ->
+                            when(selectedTimer) {
+                                TimerType.Duration::class.java -> {
+                                    DurationPicker(
+                                        duration = (selected as? TimerType.Duration)?.ms ?: 0L,
+                                        onDurationChange = {
+                                            selected = TimerType.Duration(it)
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp)
+                                    )
+                                }
+                                TimerType.End::class.java -> {
+                                    EndPicker(
+                                        tracks = (selected as? TimerType.End)?.tracks ?: 1,
+                                        onTracksChange = {
+                                            selected = TimerType.End(it)
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp)
+                                    )
+                                }
+                                TimerType.Time::class.java -> {
+                                    TimePicker(
+                                        hour = (selected as? TimerType.Time)?.hour ?: 0,
+                                        minute = (selected as? TimerType.Time)?.min ?: 0,
+                                        onTimeChange = { hour, minute ->
+                                            selected = TimerType.Time(hour, minute)
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp)
+                                    )
+                                }
+                                else -> {
+
+                                }
+                            }
+                        }
+                    }
+                    AnimatedVisibility(selected !is TimerType.Time) {
+                        Surface(
+                            Modifier
+                                .containerClip(shape = expressiveRectShape(1, 2))
+                                .fillMaxWidth(),
+                        ) {
+                            AnimatedContent(
+                                selected.javaClass,
+                                transitionSpec = { materialSharedAxisZ(true) }
                             ) {
-                                AnimatedContent(
-                                    selected.javaClass,
-                                    modifier = Modifier.fillMaxWidth().padding(8.dp),
-                                    transitionSpec = { materialSharedAxisZ(true) }
-                                ) { selectedTimer ->
-                                    when(selectedTimer) {
+                                Text(
+                                    when(it) {
                                         TimerType.Duration::class.java -> {
-                                            DurationPicker(
-                                                duration = (selected as? TimerType.Duration)?.ms ?: 0L,
-                                                onDurationChange = {
-                                                    selected = TimerType.Duration(it)
-                                                },
-                                                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                                            val duration = (selected as? TimerType.Duration)?.ms ?: 0L
+                                            pluralStringResource(
+                                                R.plurals.minutes,
+                                                ((duration / 1000) / 60).toInt(),
+                                                ((duration / 1000) / 60).toInt(),
                                             )
                                         }
                                         TimerType.End::class.java -> {
-                                            EndPicker(
-                                                tracks = (selected as? TimerType.End)?.tracks ?: 1,
-                                                onTracksChange = {
-                                                    selected = TimerType.End(it)
-                                                },
-                                                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                                            val tracks = (selected as? TimerType.End)?.tracks ?: 1
+                                            pluralStringResource(
+                                                R.plurals.track_s,
+                                                tracks,
+                                                tracks,
                                             )
                                         }
-                                        TimerType.Time::class.java -> {
-                                            TimePicker(
-                                                hour = (selected as? TimerType.Time)?.hour ?: 0,
-                                                minute = (selected as? TimerType.Time)?.min ?: 0,
-                                                onTimeChange = { hour, minute ->
-                                                    selected = TimerType.Time(hour, minute)
-                                                },
-                                                modifier = Modifier.fillMaxWidth().padding(16.dp)
-                                            )
-                                        }
-                                        else -> {
-
-                                        }
-                                    }
-                                }
-                            }
-                            AnimatedVisibility(selected !is TimerType.Time) {
-                                Surface(
-                                    Modifier.containerClip(shape = expressiveRectShape(1, 2)).fillMaxWidth(),
-                                ) {
-                                    AnimatedContent(
-                                        selected.javaClass,
-                                        transitionSpec = { materialSharedAxisZ(true) }
-                                    ) {
-                                        Text(
-                                            when(it) {
-                                                TimerType.Duration::class.java -> {
-                                                    val duration = (selected as? TimerType.Duration)?.ms ?: 0L
-                                                    pluralStringResource(
-                                                        R.plurals.minutes,
-                                                        ((duration / 1000) / 60).toInt(),
-                                                        ((duration / 1000) / 60).toInt(),
-                                                    )
-                                                }
-                                                TimerType.End::class.java -> {
-                                                    val tracks = (selected as? TimerType.End)?.tracks ?: 1
-                                                    pluralStringResource(
-                                                        R.plurals.track_s,
-                                                        tracks,
-                                                        tracks,
-                                                    )
-                                                }
-                                                else -> ""
-                                            },
-                                            color = MaterialTheme.colorScheme.primary,
-                                            style = MaterialTheme.typography.titleMedium,
-                                            textAlign = TextAlign.Center,
-                                            modifier = Modifier.padding(24.dp)
-                                        )
-                                    }
-                                }
+                                        else -> ""
+                                    },
+                                    color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(24.dp)
+                                )
                             }
                         }
                     }
                 }
-                item {
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        repeat(2) {
-                            val (res, onClick) =
-                                if (it == 0) R.string.cancel to onDismissRequest
-                                else R.string.ok to {
-                                    onSetTimer(selected)
-                                    onDismissRequest()
-                                }
-                            val interactionSource = remember { MutableInteractionSource() }
-                            val pressed by interactionSource.collectIsPressedAsState()
-                            val weight by animateFloatAsState(
-                                if (pressed) 1.4f else 1f
-                            )
-                            ExpressiveButton(
-                                stringResource(res),
-                                ButtonDefaults.MediumContainerHeight,
-                                Modifier.weight(weight),
-                                onClick = onClick,
-                                outlined = it == 0,
-                                interactionSource = interactionSource,
-                            )
+            }
+        }
+        item {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                repeat(2) {
+                    val (res, onClick) =
+                        if (it == 0) R.string.cancel to onDismissRequest
+                        else R.string.ok to {
+                            onSetTimer(selected)
+                            onDismissRequest()
                         }
-                    }
+                    val interactionSource = remember { MutableInteractionSource() }
+                    val pressed by interactionSource.collectIsPressedAsState()
+                    val weight by animateFloatAsState(
+                        if (pressed) 1.4f else 1f
+                    )
+                    ExpressiveButton(
+                        stringResource(res),
+                        ButtonDefaults.MediumContainerHeight,
+                        Modifier.weight(weight),
+                        onClick = onClick,
+                        outlined = it == 0,
+                        interactionSource = interactionSource,
+                    )
                 }
             }
         }
