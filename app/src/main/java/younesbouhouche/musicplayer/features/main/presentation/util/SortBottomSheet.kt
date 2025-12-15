@@ -3,7 +3,6 @@ package younesbouhouche.musicplayer.features.main.presentation.util
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.add
@@ -71,7 +70,7 @@ fun <T>SortBottomSheet(
                 SheetItem(
                     stringResource(R.string.order),
                     listOf(0, 1),
-                    sortState.sortType,
+                    if (sortState.ascending) 0 else 1,
                     { onSortStateChange(sortState.copy(ascending = it == 0)) },
                     {
                         if (it == 0) Icons.Default.ArrowUpward
