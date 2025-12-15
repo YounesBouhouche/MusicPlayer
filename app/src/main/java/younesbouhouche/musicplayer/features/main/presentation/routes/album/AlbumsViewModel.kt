@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import younesbouhouche.musicplayer.core.presentation.util.stateInVM
 import younesbouhouche.musicplayer.features.main.domain.use_cases.GetAlbumsUseCase
+import younesbouhouche.musicplayer.features.main.presentation.ColsCount
 import younesbouhouche.musicplayer.features.main.presentation.util.ListsSortType
 import younesbouhouche.musicplayer.features.main.presentation.util.SortState
 import younesbouhouche.musicplayer.features.main.presentation.viewmodel.MainViewModel
@@ -16,7 +17,9 @@ class AlbumsViewModel(
     val mainViewModel: MainViewModel,
     getAlbumsUseCase: GetAlbumsUseCase,
 ): ViewModel() {
-    private val _sortState = MutableStateFlow(SortState(ListsSortType.Name))
+    private val _sortState = MutableStateFlow(
+        SortState(ListsSortType.Name, ColsCount.Two)
+    )
     val sortState = _sortState.asStateFlow()
     val albums = combine(getAlbumsUseCase(), _sortState) { albums, sortState ->
         albums.sortBy(sortState.sortType, sortState.ascending)
