@@ -70,6 +70,10 @@ fun TimerSheet(
 ) {
     var selected by remember { mutableStateOf(timer) }
     val state = rememberModalBottomSheetState(true)
+    LaunchedEffect(visible) {
+        if (visible)
+            selected = timer
+    }
     if (visible) {
         ModalBottomSheet(
             onDismissRequest = onDismissRequest,
@@ -166,10 +170,10 @@ fun TimerSheet(
                         }
                     }
                 }
-                if (selected != TimerType.Disabled)
-                    item {
+                item {
+                    AnimatedVisibility(selected != TimerType.Disabled) {
                         Column(
-                            modifier.fillMaxWidth().animateItem(),
+                            modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             Surface(
@@ -258,6 +262,7 @@ fun TimerSheet(
                             }
                         }
                     }
+                }
                 item {
                     Row(
                         Modifier.fillMaxWidth(),
