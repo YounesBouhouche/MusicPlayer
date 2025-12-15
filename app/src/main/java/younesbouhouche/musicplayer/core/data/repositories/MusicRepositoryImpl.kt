@@ -67,7 +67,7 @@ class MusicRepositoryImpl(
         }
         songsDao.upsertSongs(songsWithCovers)
         albumsDao.clearAlbums()
-        albumsDao.upsertAlbums(library.albums)
+        albumsDao.upsertAlbums(mediaStoreScanner.fetchAlbums(songsWithCovers))
         artistsDao.clearArtists()
         artistsDao.upsertArtists(library.artists)
         _loadingState.update { state ->

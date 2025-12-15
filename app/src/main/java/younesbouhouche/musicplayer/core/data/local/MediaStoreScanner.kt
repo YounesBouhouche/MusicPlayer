@@ -22,10 +22,12 @@ import younesbouhouche.musicplayer.core.data.database.entities.AlbumEntity
 import younesbouhouche.musicplayer.core.data.database.entities.ArtistEntity
 import younesbouhouche.musicplayer.core.data.database.entities.SongEntity
 import younesbouhouche.musicplayer.core.data.ext.getCoverUri
+import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.features.main.domain.models.LoadingState
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
+import kotlin.collections.plusAssign
 
 private const val TAG = "MediaStoreScanner"
 
@@ -124,17 +126,6 @@ class MediaStoreScanner(private val context: Context) {
                 }
             }
             cursor?.close()
-        }
-        albums += songs.groupBy {
-            it.album
-        }.map { (albumName, songsInAlbum) ->
-            val firstSongWithCover = songsInAlbum.firstOrNull {
-                it.coverUri != null
-            }
-            AlbumEntity(
-                name = albumName,
-                cover = firstSongWithCover?.coverUri
-            )
         }
         artists += songs.groupBy {
             it.artist
@@ -246,5 +237,17 @@ class MediaStoreScanner(private val context: Context) {
                 songs
             }
         }
+    }
+
+    fun fetchAlbums(songs: List<SongEntity>) = songs.groupBy {
+        it.album
+    }.map { (albumName, songsInAlbum) ->
+        val firstSongWithCover = songsInAlbum.firstOrNull {
+            it.coverUri != null
+        }
+        AlbumEntity(
+            name = albumName,
+            cover = firstSongWithCover?.coverUri
+        )
     }
 }
