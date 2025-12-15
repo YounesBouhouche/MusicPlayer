@@ -20,15 +20,12 @@ import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
 
 class MainViewModel(
     val scanLibraryUseCase: ScanLibraryUseCase,
-    getQueueUseCase: GetQueueUseCase,
     getPlayerStateUseCase: GetPlayerStateUseCase,
     val handlePlayerEventUseCase: HandlePlayerEventUseCase,
     getLoadingStateUseCase: GetLoadingStateUseCase
 ): ViewModel() {
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
-
-    val queue = getQueueUseCase().stateInVM(null, viewModelScope)
 
     val playerState = getPlayerStateUseCase().stateInVM(PlayerState(), viewModelScope)
 
