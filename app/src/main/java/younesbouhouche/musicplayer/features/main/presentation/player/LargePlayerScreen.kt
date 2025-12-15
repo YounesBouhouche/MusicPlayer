@@ -1,6 +1,7 @@
 package younesbouhouche.musicplayer.features.main.presentation.player
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
@@ -50,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
+import ir.mahozad.multiplatform.wavyslider.material3.WavySlider
 import soup.compose.material.motion.animation.materialSharedAxisX
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Queue
@@ -193,7 +195,7 @@ fun LargePlayerScreen(
                     .padding(top = 8.dp, bottom = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Slider(
+                WavySlider(
                     value =
                         if ((dragging) or (playerState.loading)) {
                             sliderValue
@@ -220,13 +222,21 @@ fun LargePlayerScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                    ProvideTextStyle(
-                        MaterialTheme.typography.labelMedium.copy(
+                    ProvideTextStyle(MaterialTheme.typography.labelMedium) {
+                        val color by animateColorAsState(
+                            if (dragging) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            if (dragging)
+                                (sliderValue * (currentItem?.duration ?: 0L)).roundToLong().timeString
+                            else playerState.time.timeString,
+                            color = color
+                        )
+                        Text(
+                            (currentItem?.duration ?: 0).timeString,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                    ) {
-                        Text(playerState.time.timeString)
-                        Text((currentItem?.duration ?: 0).timeString)
                     }
                 }
             }
