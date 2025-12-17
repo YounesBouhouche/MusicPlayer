@@ -33,7 +33,7 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AppBarWithSearch
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -72,7 +72,7 @@ import younesbouhouche.musicplayer.features.main.domain.events.SearchAction
 import younesbouhouche.musicplayer.features.main.presentation.SearchFilter
 import younesbouhouche.musicplayer.features.main.presentation.components.EmptyContainer
 import younesbouhouche.musicplayer.features.main.presentation.components.ListItem
-import younesbouhouche.musicplayer.features.main.presentation.components.MusicCardListItem
+import younesbouhouche.musicplayer.features.main.presentation.components.SongListItem
 import younesbouhouche.musicplayer.features.main.presentation.states.isEmpty
 import younesbouhouche.musicplayer.features.main.presentation.util.plus
 import younesbouhouche.musicplayer.features.main.presentation.util.searchBarIconButtonColors
@@ -103,11 +103,20 @@ fun SearchScreen(
         if (textFieldState.text.isEmpty())
             viewModel.onAction(SearchAction.ClearQuery)
     }
-    val inputField =
+    val inputField: @Composable (Boolean) -> Unit =
         @Composable {
+            val color =
+                if (it)
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                else
+                    MaterialTheme.colorScheme.tertiary
             SearchBarDefaults.InputField(
                 searchBarState = state,
                 textFieldState = textFieldState,
+                colors = SearchBarDefaults.inputFieldColors(
+                    unfocusedPlaceholderColor = color,
+                    focusedPlaceholderColor = color,
+                ),
                 leadingIcon = if (state.currentValue == SearchBarValue.Expanded) {
                     {
                         Row(
@@ -169,21 +178,22 @@ fun SearchScreen(
         }
     AppBarWithSearch(
         state = state,
-        inputField = inputField,
+        inputField = {
+            inputField(false)
+        },
         colors = SearchBarDefaults.appBarWithSearchColors(
             appBarContainerColor = Color.Transparent,
             searchBarColors = SearchBarDefaults.colors(
-                MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = .6f)
+                MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = .6f)
             )
         ),
         contentPadding = PaddingValues(8.dp, 8.dp),
         actions = {
             ExpressiveIconButton(
-                Icons.Default.Settings,
+                Icons.Outlined.Settings,
                 size = IconButtonDefaults.mediumIconSize,
-                widthOption = IconButtonDefaults.IconButtonWidthOption.Wide,
                 colors = IconButtonDefaults.filledTonalIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = .6f)
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
                 ),
                 onClick = navigateToSettings
             )
@@ -192,7 +202,9 @@ fun SearchScreen(
     if (state.currentValue == SearchBarValue.Expanded)
         ExpandedFullScreenSearchBar(
             state = state,
-            inputField = inputField,
+            inputField = {
+                inputField(true)
+            },
         ) {
             Column(
                 Modifier.fillMaxSize(),
@@ -245,8 +257,8 @@ fun SearchScreen(
                                     viewModel.onAction(SearchAction.UpdateResultExpanded(files = it))
                                 },
                             ) { index, file ->
-                                MusicCardListItem(
-                                    file = file,
+                                SongListItem(
+                                    song = file,
                                     modifier = Modifier
                                         .padding(horizontal = 12.dp)
                                         .animateItem(),

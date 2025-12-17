@@ -59,7 +59,6 @@ import younesbouhouche.musicplayer.features.main.domain.events.TimerType
 import younesbouhouche.musicplayer.features.main.presentation.player.components.AnimatedCounterText
 import younesbouhouche.musicplayer.features.main.presentation.util.containerClip
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
-import younesbouhouche.musicplayer.features.main.presentation.util.localTimeString
 import younesbouhouche.musicplayer.features.main.presentation.util.plus
 import younesbouhouche.musicplayer.features.main.presentation.util.timerString
 import younesbouhouche.musicplayer.features.main.presentation.util.toLocaleTimeString

@@ -71,7 +71,7 @@ fun BoxScope.NavigationWithPlayer(
         }
     val offset =
         with(density) {
-            ((viewHeight - (174.dp + navBarHeight).roundToPx()) * (1f - progress)).roundToInt()
+            ((viewHeight - (156.dp + navBarHeight).roundToPx()) * (1f - progress)).roundToInt()
         }
     val navigationBarOffset = with(density) {
         (progress * (112.dp + navBarHeight).toPx()).roundToInt()

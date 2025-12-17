@@ -109,7 +109,7 @@ fun <T>ListScreen(
     onPlay: (items: List<Song>, index: Int, shuffle: Boolean) -> Unit,
     listState: LazyListState = rememberLazyListState(),
     itemContent: @Composable (LazyItemScope.(List<Song>, Int, Song) -> Unit) = { items, index, card ->
-        MusicCardListItem(
+        SongListItem(
             card,
             shape = expressiveRectShape(index, items.size),
             modifier = Modifier.animateItem(),

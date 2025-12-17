@@ -2,6 +2,7 @@ package younesbouhouche.musicplayer.features.main.presentation.player
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
@@ -51,6 +52,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
+import ir.mahozad.multiplatform.wavyslider.material3.WaveHeight
 import ir.mahozad.multiplatform.wavyslider.material3.WavySlider
 import soup.compose.material.motion.animation.materialSharedAxisX
 import younesbouhouche.musicplayer.R
@@ -88,6 +90,10 @@ fun LargePlayerScreen(
     var timerVisible by remember { mutableStateOf(false) }
     var sliderValue by remember { mutableFloatStateOf(0f) }
     var dragging by remember { mutableStateOf(false) }
+    val waveHeight by animateDpAsState(
+        if (playerState.playState == PlayState.PLAYING) SliderDefaults.WaveHeight
+        else 0.dp
+    )
     Column(modifier
         .systemBarsPadding()
         .padding(24.dp, 8.dp, 24.dp, 8.dp),
@@ -210,6 +216,7 @@ fun LargePlayerScreen(
                         dragging = false
                         onPlayerEvent(PlayerEvent.SeekTime((sliderValue * (currentItem?.duration ?: 0)).roundToLong()))
                     },
+                    waveHeight = waveHeight,
                     colors = SliderDefaults.colors(
                         activeTrackColor = MaterialTheme.colorScheme.primary,
                         inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(.3f),

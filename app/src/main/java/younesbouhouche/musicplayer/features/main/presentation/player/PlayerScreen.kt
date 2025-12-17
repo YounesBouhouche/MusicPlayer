@@ -70,7 +70,7 @@ fun PlayerScreen(
     AppTheme(palette) {
         Box(
             modifier.fillMaxWidth()
-                .padding(16.dp * (1f - progress))
+                .padding(8.dp * (1f - progress))
                 .height(height)
                 .offset {
                     IntOffset(0, offset)

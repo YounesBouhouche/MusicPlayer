@@ -53,7 +53,6 @@ fun<T, S> GridScreen(
             colsCount = it
         }
     }
-    val paddingValues = contentPadding + PaddingValues(horizontal = 8.dp)
     val sortButton = @Composable {
         Row(
             Modifier.padding(vertical = 16.dp, horizontal = 8.dp).fillMaxWidth(),
@@ -70,9 +69,9 @@ fun<T, S> GridScreen(
     AnimatedContent(sortState.colsCount == ColsCount.One, Modifier.fillMaxSize()) {
         if (it) {
             LazyColumn(
-                modifier.fillMaxSize(),
+                Modifier.fillMaxSize().padding(horizontal = 8.dp).then(modifier),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = paddingValues
+                contentPadding = contentPadding
             ) {
                 item {
                     sortButton()
@@ -84,10 +83,10 @@ fun<T, S> GridScreen(
         } else {
             LazyVerticalGrid(
                 GridCells.Fixed(colsCount),
-                modifier.fillMaxSize(),
+                Modifier.fillMaxSize().padding(horizontal = 8.dp).then(modifier),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = paddingValues
+                contentPadding = contentPadding
             ) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     sortButton()

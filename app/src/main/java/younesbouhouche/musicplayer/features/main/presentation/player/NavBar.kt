@@ -1,25 +1,34 @@
 package younesbouhouche.musicplayer.features.main.presentation.player
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,12 +42,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import soup.compose.material.motion.animation.materialSharedAxisZ
 import younesbouhouche.musicplayer.features.main.presentation.navigation.MainNavRoute
 import younesbouhouche.musicplayer.features.main.presentation.navigation.TopLevelRoutes
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun BoxScope.NavBar(
     route: TopLevelRoutes?,
@@ -46,8 +60,9 @@ fun BoxScope.NavBar(
     modifier: Modifier = Modifier,
     navigate: (MainNavRoute) -> Unit
 ) {
-    val spacing = 16.dp
+    val spacing = 8.dp
     val density = LocalDensity.current
+    val buttonHeight = 48.dp
     var safeRoute by remember {
         mutableStateOf(
             route ?: TopLevelRoutes.Home
@@ -63,16 +78,18 @@ fun BoxScope.NavBar(
     val offset by animateDpAsState(
         with(density) {
             (safeRoute.ordinal / TopLevelRoutes.entries.size.toFloat() * (innerWidth).toPx()).toDp() + spacing
-        }
+        },
+        animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec()
     )
     val indicatorColor by animateColorAsState(
         if (route == null) Color.Transparent
-        else MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = .5f),
+        animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec()
     )
     Box(
         modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 8.dp)
             .navigationBarsPadding()
             .align(Alignment.BottomCenter)
     ) {
@@ -87,7 +104,7 @@ fun BoxScope.NavBar(
                     width = with(density) { it.width.toDp() }
                     height = with(density) { it.height.toDp() }
                 },
-            color = MaterialTheme.colorScheme.surfaceContainer,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
             shape = RoundedCornerShape(
                 topCorner,
                 topCorner,
@@ -102,7 +119,7 @@ fun BoxScope.NavBar(
             ) {
                 // Add animated indicator
                 Surface(
-                    Modifier.height(40.dp)
+                    Modifier.height(buttonHeight)
                         .width(innerWidth / TopLevelRoutes.entries.size.toFloat())
                         .offset(offset)
                     ,
@@ -119,32 +136,57 @@ fun BoxScope.NavBar(
                     TopLevelRoutes.entries.forEach { screen ->
                         val selected = route == screen
                         val color by animateColorAsState(
-                            if (selected) MaterialTheme.colorScheme.onPrimary
-                            else MaterialTheme.colorScheme.onSurfaceVariant
+                            if (selected) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
+                            animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec()
+                        )
+                        val offset by animateDpAsState(
+                            if (selected) 5.dp else 0.dp,
+                            animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec()
                         )
                         Column(
                             Modifier
                                 .clip(RoundedCornerShape(100))
-                                .height(40.dp)
+                                .height(buttonHeight)
                                 .weight(1f)
                                 .clickable {
                                     navigate(screen.destination)
                                 },
-                            horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             AnimatedContent(
                                 selected,
                                 transitionSpec = {
                                     materialSharedAxisZ(targetState)
-                                }
+                                },
+                                modifier = Modifier.weight(1f, false),
+                                contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     if (it) screen.selectedIcon
                                     else screen.unselectedIcon,
                                     null,
+                                    Modifier.size(24.dp).offset(y = offset),
                                     tint = color
                                 )
+                            }
+                            AnimatedVisibility(
+                                selected,
+                                enter = expandVertically(expandFrom = Alignment.Top),
+                                exit = shrinkVertically(shrinkTowards = Alignment.Top),
+                                modifier = Modifier.weight(1f, false)
+                            ) {
+                                Column {
+                                    Text(
+                                        stringResource(screen.title),
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 8.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                }
                             }
                         }
                     }

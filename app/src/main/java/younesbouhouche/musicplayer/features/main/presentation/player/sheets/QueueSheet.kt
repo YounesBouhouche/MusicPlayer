@@ -51,7 +51,7 @@ import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Queue
 import younesbouhouche.musicplayer.core.domain.models.Song
-import younesbouhouche.musicplayer.features.main.presentation.components.MusicCardListItem
+import younesbouhouche.musicplayer.features.main.presentation.components.SongListItem
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
 import younesbouhouche.musicplayer.features.main.presentation.util.plus
 import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
@@ -140,7 +140,7 @@ fun QueueSheet(
                                         onPlayerEvent(PlayerEvent.Swap(from, to))
                                     }
                                 ) {
-                                    MusicCardListItem(
+                                    SongListItem(
                                         item,
                                         active = index == queue.currentIndex,
                                         shape = expressiveRectShape(index, queue.songs.size),

@@ -2,18 +2,15 @@ package younesbouhouche.musicplayer.features.main.presentation.navigation
 
 import androidx.compose.animation.togetherWith
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import soup.compose.material.motion.animation.materialSharedAxisYIn
 import soup.compose.material.motion.animation.materialSharedAxisYOut
@@ -24,6 +21,8 @@ import younesbouhouche.musicplayer.features.main.presentation.routes.artist.Arti
 import younesbouhouche.musicplayer.features.main.presentation.routes.artist.ArtistsScreen
 import younesbouhouche.musicplayer.features.main.presentation.routes.home.HomeScreen
 import younesbouhouche.musicplayer.features.main.presentation.routes.library.LibraryScreen
+import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.AddToPlaylistContent
+import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.CreatePlaylistContent
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.PlaylistScreen
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.PlaylistsScreen
 import younesbouhouche.musicplayer.features.main.presentation.util.containerClip
@@ -36,7 +35,7 @@ fun MainNavGraph(
     bottomPadding: Dp = 0.dp,
 ) {
     val navigationState = navigator.state
-    val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
+    val sceneStrategy = remember { SceneStrategy<NavKey>() }
     val screenModifier = Modifier.containerClip(background = Color.Transparent)
     NavDisplay(
         modifier = modifier,
@@ -52,7 +51,7 @@ fun MainNavGraph(
             materialSharedAxisYIn(true, 100) togetherWith
                     materialSharedAxisYOut(false, 100)
         },
-        sceneStrategy = bottomSheetStrategy,
+        sceneStrategy = sceneStrategy,
         entries = navigationState.toEntries(
             entryProvider {
                 entry<MainNavRoute.Home> {
@@ -101,7 +100,10 @@ fun MainNavGraph(
                 entry<MainNavRoute.Playlists> {
                     PlaylistsScreen(
                         bottomPadding = bottomPadding,
-                        modifier = screenModifier
+                        modifier = screenModifier,
+                        onCreatePlaylist = {
+                            navigator.navigate(MainNavRoute.CreatePlaylist)
+                        }
                     ) { playlist ->
                         navigator.navigate(MainNavRoute.Playlist(playlist.id))
                     }
@@ -114,6 +116,23 @@ fun MainNavGraph(
                         navigator.navigate(MainNavRoute.SongInfo(it.id))
                     }
                 }
+                entry<MainNavRoute.CreatePlaylist> (
+                    metadata = SceneStrategy.dialog()
+                ) {
+                    CreatePlaylistContent {
+                        navigator.goBack()
+                    }
+                }
+                entry<MainNavRoute.AddToPlaylist> (
+                    metadata = SceneStrategy.bottomSheet()
+                ) {
+                    AddToPlaylistContent(
+                        it.ids,
+                        { navigator.navigate(MainNavRoute.CreatePlaylist) }
+                    ) {
+                        navigator.goBack()
+                    }
+                }
                 entry<MainNavRoute.Library> {
                     LibraryScreen(
                         bottomPadding = bottomPadding,
@@ -123,9 +142,11 @@ fun MainNavGraph(
                     }
                 }
                 entry<MainNavRoute.SongInfo> (
-                    metadata = BottomSheetSceneStrategy.bottomSheet()
+                    metadata = SceneStrategy.bottomSheet()
                 ) {
-                    SongInfoContent(it.songId)
+                    SongInfoContent(it.songId) {
+                        navigator.navigate(MainNavRoute.AddToPlaylist(listOf(it.songId)))
+                    }
                 }
             }
         ),
