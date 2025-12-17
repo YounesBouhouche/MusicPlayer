@@ -59,6 +59,8 @@ fun MainScreen(
                     subclass(MainNavRoute.Artist::class, MainNavRoute.Artist.serializer())
                     subclass(MainNavRoute.Playlists::class, MainNavRoute.Playlists.serializer())
                     subclass(MainNavRoute.Playlist::class, MainNavRoute.Playlist.serializer())
+                    subclass(MainNavRoute.CreatePlaylist::class, MainNavRoute.CreatePlaylist.serializer())
+                    subclass(MainNavRoute.AddToPlaylist::class, MainNavRoute.AddToPlaylist.serializer())
                     subclass(MainNavRoute.Library::class, MainNavRoute.Library.serializer())
                     subclass(MainNavRoute.SongInfo::class, MainNavRoute.SongInfo.serializer())
                 }
@@ -70,7 +72,12 @@ fun MainScreen(
     }
     val loadingState by mainVM.loadingState.collectAsStateWithLifecycle()
     val playerState by mainVM.playerState.collectAsStateWithLifecycle()
-    val currentRoute = navigationState.backStacks[navigationState.topLevelRoute]?.last()
+    val currentRoute = navigationState.backStacks[navigationState.topLevelRoute]?.let {
+        if ((it.lastOrNull() as? MainNavRoute)?.isDialog == true)
+            it.elementAtOrNull(it.lastIndex - 1)
+        else
+            it.lastOrNull()
+    }
     val currentNavRoute = TopLevelRoutes.entries.firstOrNull { routes ->
         routes.destination == navigationState.topLevelRoute
     }
@@ -78,8 +85,8 @@ fun MainScreen(
     var viewHeight by remember { mutableIntStateOf(0) }
     val bottomPadding =
         WindowInsets.navigationBars.add(
-            WindowInsets(bottom = 100.dp +
-                (if (playerState.playState != PlayState.STOP) 100.dp else 0.dp)
+            WindowInsets(bottom = 80.dp +
+                (if (playerState.playState != PlayState.STOP) 80.dp else 0.dp)
             )
         ).asPaddingValues().calculateBottomPadding()
     Surface(modifier.fillMaxSize()) {
@@ -98,7 +105,8 @@ fun MainScreen(
                     .fillMaxSize()
                     .background(
                         Brush.verticalGradient(
-                            0.0f to MaterialTheme.colorScheme.tertiaryContainer,
+                            0.0f to MaterialTheme.colorScheme.tertiaryContainer
+                                .copy(alpha = 0.5f),
                             .4f to MaterialTheme.colorScheme.surface,
                         )
                     )
@@ -115,8 +123,8 @@ fun MainScreen(
                                         slideOutVertically { height -> height } + fadeOut()
                             }
                         }
-                    ) {
-                        if (it)
+                    ) { isLoading ->
+                        if (isLoading)
                             LoadingBar(loadingState)
                         else
                             SearchScreen(
@@ -149,50 +157,5 @@ fun MainScreen(
                 navigator.navigate(it)
             }
         }
-//        CreatePlaylistDialog(
-//            visible = uiState.newPlaylistDialog,
-//            playlistName = uiState.newPlaylistName,
-//            onNameChange = {
-//                mainVM.onUiEvent(UiEvent.UpdateNewPlaylistName(it))
-//                           },
-//            image = uiState.newPlaylistImage,
-//            onImageChange = {
-//                mainVM.onUiEvent(UiEvent.UpdateNewPlaylistImage(it))
-//            },
-//            onDismissRequest = {
-//                mainVM.onUiEvent(UiEvent.HideNewPlaylistDialog)
-//            },
-//        ) {
-//            mainVM.onPlaylistEvent(
-//                PlaylistEvent.CreateNew(
-//                    uiState.newPlaylistName,
-//                    emptyList(),
-//                    uiState.newPlaylistImage
-//                )
-//            )
-//            mainVM.onUiEvent(UiEvent.HideNewPlaylistDialog)
-//        }
-//        AddToPlaylistDialog(
-//            uiState.addToPlaylistDialog,
-//            playlists,
-//            uiState.addToPlaylistSelected,
-//            {
-//                mainVM.onUiEvent(UiEvent.UpdateSelectedPlaylist(it))
-//            },
-//            {
-//                mainVM.onUiEvent(UiEvent.ShowCreatePlaylistDialog(emptyList()))
-//            },
-//            {
-//                mainVM.onUiEvent(UiEvent.HideAddToPlaylistDialog)
-//            }
-//        ) {
-//            mainVM.onPlaylistEvent(
-//                PlaylistEvent.AddToPlaylist(
-//                    uiState.addToPlaylistSelected,
-//                    uiState.addToPlaylistItems
-//                )
-//            )
-//            mainVM.onUiEvent(UiEvent.HideAddToPlaylistDialog)
-//        }
     }
 }
