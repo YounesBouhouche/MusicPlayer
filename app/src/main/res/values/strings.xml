@@ -20,7 +20,7 @@
     <string name="extra_dark_colors">Extra Dark Colors</string>
     <string name="extra_dark_description">Perfect for OLED screens</string>
     <string name="dynamic_colors">Dynamic colors (Android 12+)</string>
-    <string name="follow_system_dynamic_colors">Follow system dynamic colors (available on android 12 and above)</string>
+    <string name="follow_system_dynamic_colors">Follow system dynamic colors (available on Android 12 and above)</string>
     <string name="color_palette">Color Palette</string>
     <string name="choose_colors_scheme">Choose colors scheme</string>
     <string name="younes_bouhouche">Younes Bouhouche</string>
@@ -109,7 +109,7 @@
     <string name="about_description">App info, contact developer</string>
     <string name="customize_player">Customize player</string>
     <string name="play_next">Play next</string>
-    <string name="add_to_playing_queue">Add to playing queue</string>
+    <string name="add_to_queue">Add to queue</string>
     <string name="developer">Developer</string>
     <string name="project">Project</string>
     <string name="source_code">Source Code</string>
@@ -299,4 +299,6 @@
     <string name="explore_library">Explore your library</string>
     <string name="speed">Speed</string>
     <string name="stop">Stop</string>
+    <string name="create">Create</string>
+    <string name="list_options">List options</string>
 </resources>
