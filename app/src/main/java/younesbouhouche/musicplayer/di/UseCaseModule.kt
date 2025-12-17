@@ -22,4 +22,7 @@ val useCaseModule = module {
     factoryOf(::GetLoadingStateUseCase)
     factoryOf(::SetFavoriteUseCase)
     factoryOf(::HandlePlayerEventUseCase)
+    factoryOf(::CreatePlaylistUseCase)
+    factoryOf(::AddToPlaylistsUseCase)
+    factoryOf(::SetPlaylistSongsUseCase)
 }

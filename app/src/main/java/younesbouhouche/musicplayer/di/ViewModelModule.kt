@@ -10,6 +10,8 @@ import younesbouhouche.musicplayer.features.main.presentation.routes.artist.Arti
 import younesbouhouche.musicplayer.features.main.presentation.routes.artist.ArtistsViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.home.HomeViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.library.LibraryViewModel
+import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.AddToPlaylistViewModel
+import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.CreatePlaylistViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.PlaylistViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.PlaylistsViewModel
 import younesbouhouche.musicplayer.features.main.presentation.viewmodel.MainViewModel
@@ -42,11 +44,23 @@ val viewModelModule = module {
     }
     viewModelOf(::PlaylistsViewModel)
     viewModel { (playlistId: Long) ->
-        PlaylistViewModel(get(), get(), playlistId)
+        PlaylistViewModel(
+            get(),
+            get(),
+            get(),
+            playlistId
+        )
     }
+    viewModelOf(::CreatePlaylistViewModel)
+    viewModelOf(::AddToPlaylistViewModel)
     viewModelOf(::LibraryViewModel)
     viewModel { (songId: Long) ->
-        SongInfoViewModel(get(), get(), songId)
+        SongInfoViewModel(
+            get(),
+            get(),
+            get(),
+            songId
+        )
     }
     viewModelOf(::PlayerViewModel)
 }
