@@ -14,9 +14,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -37,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.font.FontWeight
@@ -49,8 +49,8 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun MusicCardListItem(
-    file: Song,
+fun SongListItem(
+    song: Song,
     modifier: Modifier = Modifier,
     active: Boolean = false,
     dragging: Boolean = false,
@@ -80,26 +80,33 @@ fun MusicCardListItem(
     SwipeToDismissBox(
         state,
         backgroundContent = {
-            val background by animateColorAsState(
-                if (state.progress < 1f) MaterialTheme.colorScheme.error
-                else Color.Transparent
-            )
-            val tint by animateColorAsState(
-                if (state.progress < 1f) MaterialTheme.colorScheme.onError
-                else MaterialTheme.colorScheme.error
-            )
-            if (onDismiss != null)
-                Box(
-                    Modifier.clip(itemShape).background(background).fillMaxSize(),
-                    contentAlignment = Alignment.CenterEnd,
-                ) {
-                    Icon(
-                        Icons.Default.Delete,
-                        null,
-                        Modifier.size(24.dp).offset(x = -(24.dp)),
-                        tint = tint
-                    )
+            if (onDismiss != null) {
+                val background by animateColorAsState(
+                    if (state.progress < 1f) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.surfaceVariant
+                )
+                val tint by animateColorAsState(
+                    if (state.progress < 1f) MaterialTheme.colorScheme.onError
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
+                    Box(
+                        Modifier.clip(itemShape).background(background)
+                            .fillMaxWidth(1f) //state.progress
+                            .fillMaxHeight()
+                            .padding(start = 8.dp)
+                        ,
+                        contentAlignment = Alignment.CenterEnd,
+                    ) {
+                        Icon(
+                            Icons.Default.Delete,
+                            null,
+                            Modifier.size(24.dp).offset(x = -(24.dp)),
+                            tint = tint
+                        )
+                    }
                 }
+            }
         },
         onDismiss = {
             onDismiss?.invoke()
@@ -115,12 +122,13 @@ fun MusicCardListItem(
             onLongClick,
             shape = itemShape,
             background =
-                if (active) MaterialTheme.colorScheme.primaryContainer.copy(.4f).compositeOver(MaterialTheme.colorScheme.surfaceContainerLow)
+                if (active) MaterialTheme.colorScheme.primaryContainer.copy(.4f)
+                    .compositeOver(MaterialTheme.colorScheme.surfaceContainerLow)
                 else MaterialTheme.colorScheme.surfaceContainerLow,
             leadingContent = {
                 leadingContent?.invoke(this)
                 Image(
-                    model = file.coverPath,
+                    model = song.coverPath,
                     icon = Icons.Default.MusicNote,
                     modifier = Modifier.size(58.dp),
                     iconTint =
@@ -130,7 +138,7 @@ fun MusicCardListItem(
                         if (active) MaterialShapes.Cookie9Sided.toShape(angle.roundToInt())
                         else MaterialTheme.shapes.large,
                     background =
-                        if (active) MaterialTheme.colorScheme.onPrimaryContainer.copy(0.3f)
+                        if (active) MaterialTheme.colorScheme.onPrimaryContainer.copy(0.1f)
                         else MaterialTheme.colorScheme.surface.copy(0.5f)
                     ,
                 )
@@ -149,7 +157,7 @@ fun MusicCardListItem(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    file.title,
+                    song.title,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
@@ -158,7 +166,7 @@ fun MusicCardListItem(
                 )
                 Row(Modifier.fillMaxWidth()) {
                     Text(
-                        file.artist,
+                        song.artist,
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 1,
                         overflow = TextOverflow.MiddleEllipsis,
