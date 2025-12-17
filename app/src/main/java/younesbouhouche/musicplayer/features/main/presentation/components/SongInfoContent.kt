@@ -7,13 +7,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
@@ -43,8 +41,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -53,34 +53,42 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.younesb.mydesignsystem.presentation.components.ExpressiveButton
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
 import com.younesb.mydesignsystem.presentation.components.Image
-import io.ktor.http.parametersOf
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.core.domain.models.Song
-import younesbouhouche.musicplayer.features.main.presentation.routes.artist.ArtistViewModel
 import younesbouhouche.musicplayer.features.main.presentation.util.containerClip
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
+import younesbouhouche.musicplayer.features.main.presentation.util.shareFile
 import younesbouhouche.musicplayer.features.main.presentation.util.timeString
 import younesbouhouche.musicplayer.features.main.presentation.viewmodel.SongInfoViewModel
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun SongInfoContent(trackId: Long) {
+fun SongInfoContent(
+    trackId: Long,
+    onAddToPlaylist: () -> Unit = {},
+) {
     val viewModel: SongInfoViewModel = koinViewModel(
         parameters = { parametersOf(trackId) }
     )
+    val context = LocalContext.current
     val song by viewModel.song.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val clipboard = LocalClipboard.current
     song?.let { song ->
         val data = listOf(
-            (R.string.artist to Icons.Default.Person) to song.artist,
-            (R.string.album to Icons.Default.Album) to song.album,
-            (R.string.duration to Icons.Default.Timer) to song.duration.timeString,
-            (R.string.genre to Icons.Default.Category) to (song.genre),
-            (R.string.file_path to Icons.AutoMirrored.Filled.InsertDriveFile) to song.path,
+            listOf(
+                Triple(R.string.artist, Icons.Default.Person, song.artist),
+                Triple(R.string.album, Icons.Default.Album, song.album),
+            ),
+            listOf(Triple(R.string.duration, Icons.Default.Timer, song.duration.timeString)),
+            listOf(
+                Triple(R.string.genre, Icons.Default.Category, song.genre),
+                Triple(R.string.composer, Icons.Default.Person, song.composer),
+            ),
+            listOf(Triple(R.string.file_path, Icons.AutoMirrored.Filled.InsertDriveFile, song.path)),
         )
         Column(
             Modifier.fillMaxWidth().padding(16.dp),
@@ -111,7 +119,7 @@ fun SongInfoContent(trackId: Long) {
                 repeat(2) { index ->
                     val (res, icon) =
                         if (index == 0) R.string.play to Icons.Default.PlayArrow
-                        else R.string.add_to_playlist to Icons.Default.AddToQueue
+                        else R.string.add_to_queue to Icons.Default.AddToQueue
                     val containerColor =
                         if (index == 0) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.tertiary
@@ -158,8 +166,11 @@ fun SongInfoContent(trackId: Long) {
                         onClick = {
                             when(index) {
                                 0 -> viewModel.toggleFavorite()
-                                1 -> viewModel.addToPlaylist()
-//                                    2 -> viewModel.share()
+                                1 -> onAddToPlaylist()
+                                2 -> context.shareFile(
+                                    File(song.path),
+                                    "audio/*"
+                                )
                             }
                         },
                         icon = icon,
@@ -173,48 +184,60 @@ fun SongInfoContent(trackId: Long) {
                     )
                 }
             }
-            Column(Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                data.forEachIndexed { index, (iconPair, value) ->
-                    val (res, icon) = iconPair
-                    val text = stringResource(res)
+            Column(
+                Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                data.forEachIndexed { index, line ->
                     Row(
-                        Modifier
-                            .containerClip(
-                                MaterialTheme.colorScheme.surfaceContainerLowest,
-                                expressiveRectShape(index, data.size)
-                            )
-                            .clickable {
-                                scope.launch {
-                                    clipboard.setClipEntry(
-                                        ClipEntry(
-                                            ClipData.newPlainText(text, value)
-                                        )
+                        Modifier.fillMaxWidth().clip(
+                            expressiveRectShape(index,data.size)
+                        ),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        line.forEachIndexed { index, (res, icon, value) ->
+                            val text = stringResource(res)
+                            Row(
+                                Modifier
+                                    .weight(1f)
+                                    .containerClip(
+                                        MaterialTheme.colorScheme.surfaceContainerLowest,
+                                        MaterialTheme.shapes.medium,
+                                    )
+                                    .clickable {
+                                        scope.launch {
+                                            clipboard.setClipEntry(
+                                                ClipEntry(
+                                                    ClipData.newPlainText(text, value)
+                                                )
+                                            )
+                                        }
+                                    }
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Icon(icon, null, Modifier.size(30.dp))
+                                Column(
+                                    Modifier.fillMaxWidth(),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Text(
+                                        text,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        value?.takeIf { it.isNotBlank() }
+                                            ?: stringResource(R.string.unknown),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        style = MaterialTheme.typography.bodyLarge
                                     )
                                 }
                             }
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Icon(icon, null, Modifier.size(30.dp))
-                        Column(
-                            Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Text(
-                                text,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                value?.takeIf { it.isNotBlank() }
-                                    ?: stringResource(R.string.unknown),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
                         }
                     }
                 }
