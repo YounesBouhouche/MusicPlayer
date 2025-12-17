@@ -146,7 +146,7 @@ class MusicRepositoryImpl(
         return artistsDao.getArtist(name).toArtist()
     }
 
-    override suspend fun getPlaylist(id: Long): Playlist {
-        return playlistDao.getPlaylist(id).toPlaylist()
+    override fun getPlaylist(id: Long): Flow<Playlist> {
+        return playlistDao.observePlaylist(id).map { it.toPlaylist() }
     }
 }

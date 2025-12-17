@@ -17,7 +17,6 @@ import com.materialkolor.DynamicMaterialTheme
 import com.materialkolor.PaletteStyle
 import com.materialkolor.rememberDynamicColorScheme
 import org.koin.compose.koinInject
-import younesbouhouche.musicplayer.core.data.datastore.PreferencesDataStore
 import younesbouhouche.musicplayer.core.data.datastore.SettingsPreference
 import younesbouhouche.musicplayer.core.domain.models.preferences.ColorScheme
 import younesbouhouche.musicplayer.core.domain.models.preferences.Theme

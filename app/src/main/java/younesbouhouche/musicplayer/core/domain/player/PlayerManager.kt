@@ -104,7 +104,10 @@ class PlayerManager(
                         super.onPlaybackParametersChanged(playbackParameters)
                         scope.launch(Dispatchers.IO) {
                             stateManager.updateState {
-                                it.copy(speed = playbackParameters.speed, pitch = playbackParameters.pitch)
+                                it.copy(
+                                    speed = playbackParameters.speed,
+                                    pitch = playbackParameters.pitch
+                                )
                             }
                             preferencesRepository.set(
                                 SettingsPreference.Speed,

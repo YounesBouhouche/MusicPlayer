@@ -38,5 +38,5 @@ interface MusicRepository {
 
     suspend fun getArtist(name: String): Artist
 
-    suspend fun getPlaylist(id: Long): Playlist
+    fun getPlaylist(id: Long): Flow<Playlist>
 }
