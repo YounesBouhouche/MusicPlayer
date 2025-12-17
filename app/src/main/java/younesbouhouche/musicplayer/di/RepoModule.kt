@@ -1,5 +1,6 @@
 package younesbouhouche.musicplayer.di
 
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import younesbouhouche.musicplayer.core.data.repositories.MusicRepositoryImpl
 import younesbouhouche.musicplayer.core.data.repositories.PlaylistRepositoryImpl
@@ -26,7 +27,7 @@ val repoModule = module {
             get(),
         )
     }
-    single<PlaylistRepository> { PlaylistRepositoryImpl(get()) }
+    single<PlaylistRepository> { PlaylistRepositoryImpl(get(), androidContext()) }
     single<QueueRepository> { QueueRepositoryImpl(get()) }
     single<PlayerRepository> { PlayerRepositoryImpl(get()) }
 }

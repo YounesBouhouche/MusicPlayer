@@ -41,14 +41,13 @@ import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
 import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
 import com.younesb.mydesignsystem.presentation.components.ExpressiveButton
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
-import io.ktor.http.parametersOf
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.core.domain.models.getPictureRequest
 import younesbouhouche.musicplayer.features.main.presentation.components.ListScreen
-import younesbouhouche.musicplayer.features.main.presentation.components.MusicCardListItem
+import younesbouhouche.musicplayer.features.main.presentation.components.SongListItem
 import younesbouhouche.musicplayer.features.main.presentation.util.PlaylistSortType
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
 import younesbouhouche.musicplayer.features.main.presentation.util.topAppBarIconButtonColors
@@ -67,20 +66,25 @@ fun PlaylistScreen(
     val playlist by viewModel.playlist.collectAsStateWithLifecycle()
     val sortState by viewModel.sortState.collectAsStateWithLifecycle()
     val buttonSize = ButtonDefaults.MediumContainerHeight
-    var reorderedPlaylist by remember { mutableStateOf(playlist) }
+    var tempPlaylist by remember { mutableStateOf(playlist) }
     val hapticFeedback = LocalHapticFeedback.current
     val state = rememberLazyListState()
     val reorderState = rememberReorderState<Song>(true)
     val enableReorder = sortState.ascending and (sortState.sortType == PlaylistSortType.Custom)
+    val updatePlaylist: ((MutableList<Song>) -> List<Song>) -> Unit = { callback ->
+        val newList = callback(tempPlaylist.songs.toMutableList())
+        tempPlaylist = tempPlaylist.copy(songs = newList)
+        viewModel.update(newList.map { it.id })
+    }
     LaunchedEffect(playlist) {
-        reorderedPlaylist = playlist
+        tempPlaylist = playlist
     }
     Box(modifier.fillMaxSize()) {
         ReorderContainer(reorderState, enabled = enableReorder) {
             ListScreen(
                 playlist.name,
-                reorderedPlaylist.songs,
-                reorderedPlaylist.getPictureRequest(),
+                tempPlaylist.songs,
+                tempPlaylist.getPictureRequest(),
                 Icons.AutoMirrored.Filled.PlaylistPlay,
                 sortState,
                 viewModel::setSortState,
@@ -118,23 +122,26 @@ fun PlaylistScreen(
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
                     },
                     onDrop = { state ->
-                        val from = reorderedPlaylist.songs.indexOf(state.data)
-                        val to = reorderedPlaylist.songs.indexOf(card)
-                        reorderedPlaylist = reorderedPlaylist.copy(
-                            songs = reorderedPlaylist.songs.toMutableList().apply {
+                        val from = tempPlaylist.songs.indexOf(state.data)
+                        val to = tempPlaylist.songs.indexOf(card)
+                        updatePlaylist {
+                            it.apply {
                                 add(to, removeAt(from))
                             }
-                        )
-                        viewModel.reorder(from, to)
+                        }
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
-                    }
+                    },
+                    modifier = Modifier.animateItem(),
                 ) {
-                    MusicCardListItem(
+                    SongListItem(
                         card,
                         shape = expressiveRectShape(index, playlist.songs.size),
-                        modifier = Modifier.animateItem(),
                         onDismiss = {
-                            viewModel.remove(index)
+                            updatePlaylist {
+                                it.apply {
+                                    removeAt(index)
+                                }
+                            }
                         },
                         leadingContent = {
                             AnimatedVisibility(

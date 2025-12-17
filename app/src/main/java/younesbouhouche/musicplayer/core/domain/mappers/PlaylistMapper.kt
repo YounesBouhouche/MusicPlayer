@@ -9,5 +9,6 @@ fun PlaylistWithSongs.toPlaylist() = Playlist(
     id = playlist.id,
     name = playlist.name,
     createdAt = playlist.createdAt,
-    songs = songs.map { it.toSong() }
+    songs = songs.map { it.toSong() },
+    image = playlist.image
 )

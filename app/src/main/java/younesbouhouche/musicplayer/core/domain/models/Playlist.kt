@@ -27,7 +27,9 @@ data class Playlist(
 
 @Composable
 fun Playlist.getPictureRequest() = with(LocalContext.current) {
-    ImageRequest.Builder(this)
-        .data(image?.let { File(filesDir, it) })
-        .build()
+    image?.let { File(filesDir, it) }?.let {
+        ImageRequest.Builder(this)
+            .data(it)
+            .build()
+    }
 }

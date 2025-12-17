@@ -38,10 +38,6 @@ class PlaylistsViewModel(
     fun setSortState(state: SortState<ListsSortType>) {
         _sortState.value = state
     }
-
-    fun createPlaylist() {
-    }
-
     fun importPlaylist() {
     }
 }

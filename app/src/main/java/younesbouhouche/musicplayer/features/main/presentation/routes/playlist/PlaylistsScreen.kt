@@ -25,6 +25,7 @@ import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +59,7 @@ import younesbouhouche.musicplayer.features.main.presentation.util.SortBottomShe
 fun PlaylistsScreen(
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
+    onCreatePlaylist: () -> Unit = {},
     onClick: (Playlist) -> Unit
 ) {
     val viewModel = koinViewModel<PlaylistsViewModel>()
@@ -65,7 +67,7 @@ fun PlaylistsScreen(
     val sortState by viewModel.sortState.collectAsStateWithLifecycle()
     var expanded by remember { mutableStateOf(false) }
     val menu = listOf(
-        Triple(R.string.create_playlist, Icons.Default.Add, viewModel::createPlaylist),
+        Triple(R.string.create_playlist, Icons.Default.Add, onCreatePlaylist),
         Triple(R.string.import_playlist, Icons.Default.FileDownload, viewModel::importPlaylist),
     )
     Scaffold(
@@ -187,7 +189,8 @@ fun PlaylistsScreen(
                         {
                             onClick(playlist)
                         },
-                        Modifier.animateItem()
+                        Modifier.animateItem(),
+                        alternatives = playlist.songs.map { it.coverUri }
                     ) {
                         Column(
                             Modifier.fillMaxSize(),
