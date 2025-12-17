@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Text
@@ -53,7 +54,7 @@ fun AlbumsScreen(
                     it.songs.size
                 ),
                 cover = it.cover,
-                icon = Icons.Default.Person,
+                icon = Icons.Default.Album,
                 modifier = Modifier.animateItem()
             ) {
                 onClick(it)
@@ -62,11 +63,12 @@ fun AlbumsScreen(
         { albums ->
             PictureCard(
                 albums.cover,
-                Icons.Default.Person,
+                Icons.Default.Album,
                 {
                     onClick(albums)
                 },
-                Modifier.animateItem()
+                Modifier.animateItem(),
+                alternatives = albums.songs.map { it.coverUri }
             ) {
                 Column(
                     Modifier.fillMaxSize(),

@@ -64,7 +64,7 @@ import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
 import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.features.main.presentation.components.EmptyContainer
-import younesbouhouche.musicplayer.features.main.presentation.components.MusicCardListItem
+import younesbouhouche.musicplayer.features.main.presentation.components.SongListItem
 import younesbouhouche.musicplayer.features.main.presentation.util.SortBottomSheet
 import younesbouhouche.musicplayer.features.main.presentation.util.SortType
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
@@ -280,7 +280,7 @@ private fun ItemsList(
                         )
                     }
                     itemsIndexed(list, { _, it -> it.id }) { index, it ->
-                        MusicCardListItem(
+                        SongListItem(
                             it,
                             modifier = Modifier.padding(horizontal = 8.dp)
                                 .animateItem(

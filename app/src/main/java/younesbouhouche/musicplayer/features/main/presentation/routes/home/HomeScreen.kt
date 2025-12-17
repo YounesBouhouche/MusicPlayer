@@ -42,8 +42,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -59,10 +57,9 @@ import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.core.domain.models.Song
-import younesbouhouche.musicplayer.features.main.presentation.components.MusicCardListItem
+import younesbouhouche.musicplayer.features.main.presentation.components.SongListItem
 import younesbouhouche.musicplayer.features.main.presentation.components.PictureCard
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
-import younesbouhouche.musicplayer.features.main.presentation.routes.home.HomeViewModel
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -80,23 +77,15 @@ fun HomeScreen(
         artists.size
     }
     LazyColumn(
-        modifier.fillMaxSize(),
+        Modifier.fillMaxSize().padding(16.dp).then(modifier),
         verticalArrangement = Arrangement.spacedBy(24.dp),
         contentPadding = PaddingValues(bottom = bottomPadding)
     ) {
         item {
             Box(
                 Modifier
-//                    .background(
-//                        Brush.verticalGradient(
-//                            listOf(
-//                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = .5f),
-//                                Color.Transparent
-//                            )
-//                        )
-//                    )
                     .fillMaxWidth()
-                    .padding(vertical = 36.dp, horizontal = 28.dp)
+                    .padding(vertical = 36.dp, horizontal = 12.dp)
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
@@ -120,8 +109,7 @@ fun HomeScreen(
                 Column(
                     Modifier
                         .fillMaxWidth()
-                        .animateItem()
-                        .padding(horizontal = 16.dp),
+                        .animateItem(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Header(
@@ -275,7 +263,7 @@ private fun ListContainer(
                 }
             }
             itemsSliced.forEachIndexed { index, it ->
-                MusicCardListItem(
+                SongListItem(
                     it,
                     modifier = Modifier.fillMaxWidth(),
                     shape = expressiveRectShape(index + 1, itemsSliced.size + 1),
