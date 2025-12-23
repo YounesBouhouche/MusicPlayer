@@ -2,10 +2,12 @@ package younesbouhouche.musicplayer.core.data.database.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 
 @Entity(
     tableName = "queue_song_cross_ref",
     primaryKeys = ["queueId", "songId"],
+    indices = [Index(value = ["songId"]), Index(value = ["queueId"])],
     foreignKeys = [
         ForeignKey(
             entity = QueueEntity::class,

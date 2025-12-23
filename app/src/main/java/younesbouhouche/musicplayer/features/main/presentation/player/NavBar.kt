@@ -104,7 +104,7 @@ fun BoxScope.NavBar(
                     width = with(density) { it.width.toDp() }
                     height = with(density) { it.height.toDp() }
                 },
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            color = MaterialTheme.colorScheme.surfaceContainer,
             shape = RoundedCornerShape(
                 topCorner,
                 topCorner,

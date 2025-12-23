@@ -34,7 +34,7 @@ interface SongsDao {
 
     @Transaction
     @Query("SELECT * from SongEntity WHERE id=:id")
-    fun getSongById(id: Long): SongWithState
+    fun getSongById(id: Long): SongWithState?
 
     @Upsert
     suspend fun upsertSongStatus(songStateEntity: SongStateEntity)

@@ -12,7 +12,6 @@ import org.koin.dsl.module
 import younesbouhouche.musicplayer.features.player.presentation.service.NotificationCustomCmdButton
 import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
 import younesbouhouche.musicplayer.features.player.presentation.service.MediaSessionManager
-import younesbouhouche.musicplayer.core.data.database.dao.SongsDao
 import younesbouhouche.musicplayer.core.data.local.MediaStoreScanner
 import younesbouhouche.musicplayer.core.data.remote.ArtistsPictureFetcher
 import younesbouhouche.musicplayer.core.domain.player.PlayerFactory
@@ -35,9 +34,6 @@ val utilsModule = module {
         val context = androidContext()
         MediaSessionManager(
             context,
-            get(),
-            get<PlayerStateManager>(),
-            get(),
             get(),
             PendingIntent.getActivity(
                 context,

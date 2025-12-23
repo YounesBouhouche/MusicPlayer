@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.younesb.mydesignsystem.presentation.components.ToggleButtonsRow
 import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.features.main.presentation.util.plus
+import com.younesb.mydesignsystem.presentation.util.plus
 import younesbouhouche.musicplayer.core.domain.models.preferences.ColorScheme
 import younesbouhouche.musicplayer.core.domain.models.preferences.Theme
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsItem
@@ -88,7 +88,7 @@ fun ThemeSettingsScreen(
                                 modifier = Modifier.padding(horizontal = 12.dp),
                                 size = ButtonDefaults.ExtraSmallContainerHeight,
                                 expandedWeight = 1.4f,
-//                                buttonContentPadding = PaddingValues(vertical = 12.dp)
+                                buttonContentPadding = PaddingValues(vertical = 12.dp)
                             ) { it, _ ->
                                 viewModel.saveSettings(theme = Theme.entries[it])
                             }
@@ -124,7 +124,6 @@ fun ThemeSettingsScreen(
                                         if (isDark) dynamicDarkColorScheme(context)
                                         else dynamicLightColorScheme(context),
                                         selected = dynamicColors,
-                                        size = 80.dp
                                     ) {
                                         viewModel.saveSettings(dynamic = true, color = null)
                                     }
@@ -133,7 +132,6 @@ fun ThemeSettingsScreen(
                                 ColorPreview(
                                     it.scheme(isDark),
                                     selected = !dynamicColors and (colorTheme == it),
-                                    size = 80.dp
                                 ) {
                                     viewModel.saveSettings(
                                         color = it, dynamic = false.takeIf { isCompatible }
@@ -202,7 +200,7 @@ internal fun ColorPreview(
         ) {
             Box(
                 modifier = Modifier
-                    .size(60.dp)
+                    .size(size / 1.5f)
                     .border(3.dp, color, CircleShape)
                     .padding(6.dp),
                 contentAlignment = Alignment.Center

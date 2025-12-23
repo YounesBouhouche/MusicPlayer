@@ -14,6 +14,7 @@ data class  SongEntity(
     val title: String,
     val artist: String,
     val album: String,
+    val albumArtist: String,
     val duration: Long,
     val path: String,
     val date: Long = System.currentTimeMillis(),
@@ -23,6 +24,7 @@ data class  SongEntity(
     val year: Int? = null,
     val composer: String?,
     val genre: String?,
+    val lyrics: String?,
     var cover: ByteArray?,
     var coverUri: Uri?,
     var coverPath: String
@@ -34,6 +36,7 @@ data class  SongEntity(
         private var title: String = ""
         private var artist: String = ""
         private var album: String = ""
+        private var albumArtist: String = ""
         private var duration: Long = 0
         private var path: String = ""
         private var date: Long = System.currentTimeMillis()
@@ -43,6 +46,7 @@ data class  SongEntity(
         private var year: Int? = null
         private var composer: String? = null
         private var genre: String? = null
+        private var lyrics: String? = null
         private var cover: ByteArray? = null
         private var coverUri: Uri? = null
         private var coverPath: String = ""
@@ -53,6 +57,7 @@ data class  SongEntity(
         fun title(title: String) = apply { this.title = title }
         fun artist(artist: String) = apply { this.artist = artist }
         fun album(album: String) = apply { this.album = album }
+        fun albumArtist(albumArtist: String) = apply { this.albumArtist = albumArtist }
         fun duration(duration: Long) = apply { this.duration = duration }
         fun path(path: String) = apply { this.path = path }
         fun date(date: Long) = apply { this.date = date }
@@ -62,6 +67,7 @@ data class  SongEntity(
         fun year(year: Int?) = apply { this.year = year }
         fun composer(composer: String?) = apply { this.composer = composer }
         fun genre(genre: String?) = apply { this.genre = genre }
+        fun lyrics(lyrics: String?) = apply { this.lyrics = lyrics }
         fun cover(cover: ByteArray?) { this.cover = cover }
         fun coverUri(coverUri: Uri?) { this.coverUri = coverUri }
         fun coverPath(coverPath: String) { this.coverPath = coverPath }
@@ -73,6 +79,7 @@ data class  SongEntity(
             title = title,
             artist = artist,
             album = album,
+            albumArtist = albumArtist,
             duration = duration,
             path = path,
             date = date,
@@ -82,6 +89,7 @@ data class  SongEntity(
             year = year,
             composer = composer,
             genre = genre,
+            lyrics = lyrics,
             cover = cover,
             coverUri = coverUri,
             coverPath = coverPath,
@@ -106,9 +114,11 @@ data class  SongEntity(
         if (title != other.title) return false
         if (artist != other.artist) return false
         if (album != other.album) return false
+        if (albumArtist != other.albumArtist) return false
         if (path != other.path) return false
         if (composer != other.composer) return false
         if (genre != other.genre) return false
+        if (lyrics != other.lyrics) return false
         if (!cover.contentEquals(other.cover)) return false
         if (coverUri != other.coverUri) return false
         if (coverPath != other.coverPath) return false
@@ -129,9 +139,11 @@ data class  SongEntity(
         result = 31 * result + title.hashCode()
         result = 31 * result + artist.hashCode()
         result = 31 * result + album.hashCode()
+        result = 31 * result + albumArtist.hashCode()
         result = 31 * result + path.hashCode()
         result = 31 * result + (composer?.hashCode() ?: 0)
         result = 31 * result + (genre?.hashCode() ?: 0)
+        result = 31 * result + (lyrics?.hashCode() ?: 0)
         result = 31 * result + (cover?.contentHashCode() ?: 0)
         result = 31 * result + (coverUri?.hashCode() ?: 0)
         result = 31 * result + coverPath.hashCode()

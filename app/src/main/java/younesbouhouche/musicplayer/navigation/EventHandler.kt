@@ -1,8 +1,14 @@
 package younesbouhouche.musicplayer.navigation
 
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.features.main.presentation.util.Event
@@ -15,10 +21,26 @@ import younesbouhouche.musicplayer.features.permissions.presentation.Permissions
 @Composable
 fun EventHandler(
     onCreatePlaylist: (String, List<String>) -> Unit,
+    onShowSnackBar: (String) -> Unit,
     launchMainScreen: () -> Unit,
 ) {
     var savePlaylist: Playlist? = null
+    var pendingWriteAction by remember { mutableStateOf<(() -> Unit)?>(null) }
     val context = LocalContext.current
+
+    val writePermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartIntentSenderForResult(),
+        ) { result ->
+            if (result.resultCode == android.app.Activity.RESULT_OK) {
+                pendingWriteAction?.invoke()
+                pendingWriteAction = null
+            } else {
+                onShowSnackBar("Permission denied")
+                pendingWriteAction = null
+            }
+        }
+
     val permissionLauncher =
         rememberLauncherForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions(),
@@ -68,9 +90,6 @@ fun EventHandler(
                     )
                 }
             }
-            is Event.RequestPermissions -> {
-                permissionLauncher.launch(event.permissions.toTypedArray())
-            }
             is Event.SavePlaylist -> {
                 savePlaylist = event.playlist
                 savePlaylistDialog.launch("${event.playlist.name}.m3u")
@@ -92,6 +111,27 @@ fun EventHandler(
                         "text/plain"
                     )
                 )
+            }
+
+            is Event.ShowSnackBar -> {
+                onShowSnackBar(event.message)
+            }
+
+            is Event.RequestWritePermission -> {
+                try {
+                    val uris = listOf(event.uri)
+                    val intentSender = MediaStore.createWriteRequest(
+                        context.contentResolver,
+                        uris
+                    ).intentSender
+                    pendingWriteAction = event.onGranted
+                    writePermissionLauncher.launch(
+                        IntentSenderRequest.Builder(intentSender).build()
+                    )
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    onShowSnackBar("Failed to request permission")
+                }
             }
         }
     }

@@ -1,8 +1,12 @@
 package younesbouhouche.musicplayer.navigation
 
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
@@ -20,13 +24,20 @@ import younesbouhouche.musicplayer.navigation.routes.Graph
 @Composable
 fun AppNavGraph(
     backStack: NavBackStack<NavKey>,
+    snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     val width = LocalView.current.width
-    Surface(modifier.fillMaxSize()) {
+    Scaffold(
+        modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(),
+        snackbarHost = {
+            SnackbarHost(snackBarHostState)
+        }
+    ) { paddingValues ->
         NavDisplay(
             backStack = backStack,
-            modifier = modifier,
+            modifier = modifier.padding(paddingValues),
             transitionSpec = {
                 val initialKey = initialState.key as? Graph
                 val targetKey = targetState.key as? Graph

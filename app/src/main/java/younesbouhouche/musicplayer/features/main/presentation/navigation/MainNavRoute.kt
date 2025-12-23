@@ -38,6 +38,9 @@ sealed class MainNavRoute(val isDialog: Boolean = false): NavKey {
     @Serializable
     data class SongInfo(val songId: Long) : MainNavRoute(true)
 
+    @Serializable
+    data class MetadataEditor(val songId: Long) : MainNavRoute(true)
+
     companion object {
         val routes = listOf(
             Home,

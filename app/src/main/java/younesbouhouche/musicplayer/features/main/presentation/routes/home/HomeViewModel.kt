@@ -4,16 +4,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import younesbouhouche.musicplayer.core.presentation.util.stateInVM
 import younesbouhouche.musicplayer.features.main.domain.use_cases.GetHistoryUseCase
+import younesbouhouche.musicplayer.features.main.domain.use_cases.GetLastAddedUseCase
 import younesbouhouche.musicplayer.features.main.domain.use_cases.GetRecentArtistsUseCase
 import younesbouhouche.musicplayer.features.main.presentation.viewmodel.MainViewModel
 
 class HomeViewModel(
     val mainViewModel: MainViewModel,
     getRecentArtistsUseCase: GetRecentArtistsUseCase,
-    getHistoryUseCase: GetHistoryUseCase
+    getHistoryUseCase: GetHistoryUseCase,
+    getLastAddedUseCase: GetLastAddedUseCase
 ): ViewModel() {
     val artists = getRecentArtistsUseCase().stateInVM(emptyList(), viewModelScope)
     val history = getHistoryUseCase().stateInVM(emptyList(), viewModelScope)
+    val lastAdded = getLastAddedUseCase().stateInVM(emptyList(), viewModelScope)
 
     fun play(
         tracks: List<Long>,

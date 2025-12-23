@@ -20,7 +20,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
@@ -34,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.HorizontalCenteredHeroCarousel
+import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
@@ -57,6 +62,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.core.domain.models.Song
+import younesbouhouche.musicplayer.core.presentation.theme.topAppBarTitleFont
 import younesbouhouche.musicplayer.features.main.presentation.components.SongListItem
 import younesbouhouche.musicplayer.features.main.presentation.components.PictureCard
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
@@ -72,12 +78,13 @@ fun HomeScreen(
 ) {
     val homeViewModel = koinViewModel<HomeViewModel>()
     val artists by homeViewModel.artists.collectAsState()
+    val lastAdded by homeViewModel.lastAdded.collectAsState()
     val history by homeViewModel.history.collectAsState()
     val state = rememberCarouselState {
         artists.size
     }
     LazyColumn(
-        Modifier.fillMaxSize().padding(16.dp).then(modifier),
+        Modifier.fillMaxSize().padding(8.dp, 16.dp).then(modifier),
         verticalArrangement = Arrangement.spacedBy(24.dp),
         contentPadding = PaddingValues(bottom = bottomPadding)
     ) {
@@ -112,23 +119,19 @@ fun HomeScreen(
                         .animateItem(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Header(
-                        Icons.Default.Person,
-                        stringResource(R.string.top_artists),
-                        stringResource(R.string.top_artists_text),
-                    )
+                    Header(stringResource(R.string.top_artists))
                     Surface(
                         Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 16.dp),
+                            .padding(vertical = 16.dp),
                         color = MaterialTheme.colorScheme.surfaceContainerLow,
-                        shape = expressiveRectShape(1, 2)
+                        shape = MaterialTheme.shapes.extraExtraLarge
                     ) {
-                        HorizontalCenteredHeroCarousel(
+                        HorizontalUncontainedCarousel(
                             state = state,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
+                            itemWidth = 200.dp,
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(16.dp),
                             itemSpacing = 16.dp,
                         ) {
                             val artist = artists[it]
@@ -193,15 +196,15 @@ fun HomeScreen(
                 }
             }
         }
-//        item {
-//            ListContainer(
-//                Icons.Default.Timer,
-//                stringResource(R.string.recently_added),
-//                stringResource(R.string.listen_to_your_recently_added_songs),
-//                lastAdded,
-//                onPlay = onPlay,
-//            ) { }
-//        }
+        item {
+            ListContainer(
+                stringResource(R.string.recently_added),
+                lastAdded,
+                onPlay = { list, index ->
+                    homeViewModel.play(list.map { it.id }, index)
+                }
+            ) { }
+        }
 //        item {
 //            ListContainer(
 //                Icons.Default.Favorite,
@@ -213,9 +216,7 @@ fun HomeScreen(
 //        }
         item {
             ListContainer(
-                Icons.Default.History,
                 stringResource(R.string.history),
-                stringResource(R.string.watch_your_recently_played_songs),
                 history,
                 onPlay = { songs, index ->
                     homeViewModel.play(songs.map { it.id }, index)
@@ -228,9 +229,7 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ListContainer(
-    icon: ImageVector,
     title: String,
-    subtitle: String,
     items: List<Song>,
     modifier: Modifier = Modifier,
     onPlay: (List<Song>, Int) -> Unit,
@@ -241,16 +240,14 @@ private fun ListContainer(
         items.isNotEmpty(),
         enter = expandVertically(expandFrom = Alignment.Top),
         exit = shrinkVertically(shrinkTowards = Alignment.Top),
-        modifier = modifier.padding(horizontal = 16.dp)
+        modifier = modifier
     ) {
         Column(
             modifier = modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Header(
-                icon,
                 title,
-                subtitle,
                 onClick = onClick
             ) {
                 ExpressiveIconButton(
@@ -266,7 +263,7 @@ private fun ListContainer(
                 SongListItem(
                     it,
                     modifier = Modifier.fillMaxWidth(),
-                    shape = expressiveRectShape(index + 1, itemsSliced.size + 1),
+                    shape = expressiveRectShape(index, itemsSliced.size),
                     onClick = {
                         onPlay(items, index)
                     }
@@ -276,47 +273,38 @@ private fun ListContainer(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun Header(
-    icon: ImageVector,
     title: String,
-    subtitle: String,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    trailingContent: @Composable (() -> Unit)? = null
+    trailingContent: @Composable (() -> Unit)? = onClick?.let {
+        {
+            ExpressiveIconButton(
+                Icons.AutoMirrored.Filled.ArrowForward,
+                size = IconButtonDefaults.mediumIconSize,
+                colors = IconButtonDefaults.filledTonalIconButtonColors()
+            ) {
+                onClick()
+            }
+        }
+    }
 ) {
     Row(
         modifier = modifier
-            .clip(expressiveRectShape(0, 2))
-            .background(MaterialTheme.colorScheme.tertiary)
+            .clip(RoundedCornerShape(100))
             .clickable(onClick = { onClick?.invoke() }, enabled = onClick != null)
-            .padding(18.dp, 24.dp)
+            .padding(16.dp)
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            icon,
-            null,
-            Modifier.size(36.dp),
-            tint = MaterialTheme.colorScheme.onTertiary
+        Text(
+            title,
+            style = topAppBarTitleFont,
+            modifier = Modifier.weight(1f)
         )
-        Column(
-            Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(
-                title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onTertiary,
-                fontWeight = FontWeight.Medium
-            )
-            Text(
-                subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onTertiary.copy(alpha = 0.7f)
-            )
-        }
         trailingContent?.invoke()
     }
 }

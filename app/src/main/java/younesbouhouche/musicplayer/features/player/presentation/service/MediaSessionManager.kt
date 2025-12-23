@@ -10,7 +10,6 @@ import android.os.Looper
 import android.provider.Settings
 import androidx.annotation.OptIn
 import androidx.core.content.ContextCompat
-import androidx.glance.appwidget.updateAll
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
@@ -22,22 +21,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
-import younesbouhouche.musicplayer.core.domain.player.PlayerFactory
 import younesbouhouche.musicplayer.core.domain.player.PlayerManager
-import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
-import younesbouhouche.musicplayer.core.domain.repositories.QueueRepository
-import younesbouhouche.musicplayer.features.glance.presentation.MyAppWidget
-import younesbouhouche.musicplayer.features.player.domain.models.PlayState
-import younesbouhouche.musicplayer.features.player.domain.repository.PlayerRepository
 
 class MediaSessionManager(
     private val context: Context,
-    private val queueRepository: QueueRepository,
-    private val stateManager: PlayerStateManager,
     private val playerManager: PlayerManager,
-    private val playerFactory: PlayerFactory,
     private val pendingIntent: PendingIntent,
     private val customCommands: List<CommandButton>
 ) {
@@ -49,9 +38,7 @@ class MediaSessionManager(
             override fun onChange(selfChange: Boolean) {
                 super.onChange(selfChange)
                 if (::player.isInitialized) {
-                    stateManager.updateState {
-                        it.copy(volume = player.deviceVolume.toFloat())
-                    }
+                    playerManager.updateVolume(player.deviceVolume.toFloat())
                 }
             }
         }
@@ -64,39 +51,15 @@ class MediaSessionManager(
             true,
             observer,
         )
-        player = playerFactory.getPlayer()
+        player = playerManager.getPlayer()
         val sessionToken =
             SessionToken(context, ComponentName(context, MediaPlayerService::class.java))
         context.startForegroundService(Intent(context, MediaPlayerService::class.java))
         controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
         controllerFuture.addListener({
             val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-            Timber.tag("MediaSessionManager")
-                .i("Restoring, ${controllerFuture.get().mediaItemCount}")
-            // Restore player state
-            scope.launch {
-                playerFactory.restorePlayerState(controllerFuture.get())
-                if (player.playWhenReady) {
-                    stateManager.updateState {
-                        it.copy(
-                            time = player.currentPosition,
-                            playState =
-                                if (player.isPlaying) PlayState.PLAYING else PlayState.PAUSED,
-                            repeatMode = player.repeatMode,
-                            shuffle = player.shuffleModeEnabled,
-                            speed = player.playbackParameters.speed,
-                            pitch = player.playbackParameters.pitch,
-                            volume = player.deviceVolume.toFloat(),
-                            hasNextItem = player.hasNextMediaItem(),
-                            hasPrevItem = player.hasPreviousMediaItem(),
-                        )
-                    }
-                    queueRepository.setCurrentIndex(player.currentMediaItemIndex)
-                    withContext(Dispatchers.Main) {
-                        MyAppWidget().updateAll(context)
-                    }
-                }
-                playerManager.initialize()
+            scope.launch(Dispatchers.Main) {
+                playerManager.restoreSessionState(controllerFuture.get())
             }
         }, ContextCompat.getMainExecutor(context))
     }

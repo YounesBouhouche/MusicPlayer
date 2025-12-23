@@ -74,7 +74,7 @@ import younesbouhouche.musicplayer.features.main.presentation.components.EmptyCo
 import younesbouhouche.musicplayer.features.main.presentation.components.ListItem
 import younesbouhouche.musicplayer.features.main.presentation.components.SongListItem
 import younesbouhouche.musicplayer.features.main.presentation.states.isEmpty
-import younesbouhouche.musicplayer.features.main.presentation.util.plus
+import com.younesb.mydesignsystem.presentation.util.plus
 import younesbouhouche.musicplayer.features.main.presentation.util.searchBarIconButtonColors
 import younesbouhouche.musicplayer.features.main.presentation.viewmodel.SearchVM
 import younesbouhouche.musicplayer.features.settings.presentation.components.listItemShape

@@ -13,8 +13,4 @@ sealed class Graph(val ordinal: Int): NavKey {
 
     @Serializable
     data object Settings : NavKey, Graph(2)
-
-    companion object {
-        val graphs = listOf(Permissions, Main, Settings)
-    }
 }

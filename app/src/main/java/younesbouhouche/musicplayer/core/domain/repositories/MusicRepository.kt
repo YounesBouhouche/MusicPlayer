@@ -21,10 +21,15 @@ interface MusicRepository {
 
     fun getSongsList(): Flow<List<Song>>
 
-    fun getSong(id: Long): Flow<Song?>
+    fun observeSong(id: Long): Flow<Song?>
+
+    suspend fun getSong(id: Long): Song?
+
     suspend fun getSongs(ids: List<Long>): List<Song>
 
     fun getRecentlyPlayedSongs(): Flow<List<Song>>
+
+    fun getLastAddedSongs(): Flow<List<Song>>
 
     fun getRecentArtists(): Flow<List<Artist>>
 

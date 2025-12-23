@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import timber.log.Timber
+import younesbouhouche.musicplayer.features.main.util.toFileUri
 import java.io.File
 
 
@@ -27,5 +28,5 @@ fun Context.getCoverContentUri(coverPath: String): Uri? {
 fun Context.getCoverUri(coverPath: String): Uri? {
     if (coverPath.isEmpty()) return null
     val file = File(coverPath)
-    return if (file.exists()) { "file://${file.absolutePath}".toUri() } else null
+    return if (file.exists()) { file.absolutePath.toFileUri().toUri() } else null
 }

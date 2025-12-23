@@ -15,8 +15,10 @@ class MainActivity : ComponentActivity() {
     val sessionManager by inject<MediaSessionManager>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycleScope.launch {
-            sessionManager.initialize()
+        window.decorView.post {
+            lifecycleScope.launch {
+                sessionManager.initialize()
+            }
         }
         setContent {
             AppTheme {

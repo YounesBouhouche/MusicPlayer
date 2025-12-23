@@ -102,19 +102,29 @@ class MusicRepositoryImpl(
         return songsDao.getSongs().map { flow -> flow.map { it.toSong() } }
     }
 
-    override fun getSong(id: Long): Flow<Song?> {
+    override fun observeSong(id: Long): Flow<Song?> {
         return songsDao.observeSongById(id).map { it?.toSong() }
     }
 
+    override suspend fun getSong(id: Long): Song? {
+        return songsDao.getSongById(id)?.toSong()
+    }
+
     override suspend fun getSongs(ids: List<Long>): List<Song> {
-        return ids.map { id -> songsDao.getSongById(id).toSong() }
+        return ids.mapNotNull { id -> songsDao.getSongById(id)?.toSong() }
     }
 
     override fun getRecentlyPlayedSongs(): Flow<List<Song>> {
         return playHistoryDao.getPlayHistory().map { list ->
             list
-                .sortedByDescending { it.playHistory.maxOfOrNull { entity -> entity.playedAt } }
+                .sortedByDescending { it.playHistory.size }
                 .map { it.toSong() }
+        }
+    }
+
+    override fun getLastAddedSongs(): Flow<List<Song>> {
+        return songsDao.getSongs().map { flow ->
+            flow.sortedByDescending { it.song.date }.map { it.toSong() }
         }
     }
 

@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import soup.compose.material.motion.animation.materialSharedAxisYIn
 import soup.compose.material.motion.animation.materialSharedAxisYOut
@@ -21,6 +20,7 @@ import younesbouhouche.musicplayer.features.main.presentation.routes.artist.Arti
 import younesbouhouche.musicplayer.features.main.presentation.routes.artist.ArtistsScreen
 import younesbouhouche.musicplayer.features.main.presentation.routes.home.HomeScreen
 import younesbouhouche.musicplayer.features.main.presentation.routes.library.LibraryScreen
+import younesbouhouche.musicplayer.features.main.presentation.routes.metadata_editor.MetadataEditorScreen
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.AddToPlaylistContent
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.CreatePlaylistContent
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.PlaylistScreen
@@ -73,9 +73,9 @@ fun MainNavGraph(
                         navigator.navigate(MainNavRoute.Album(album.name))
                     }
                 }
-                entry<MainNavRoute.Album> {
+                entry<MainNavRoute.Album> { album ->
                     AlbumScreen(
-                        it.name,
+                        album.name,
                         bottomPadding = bottomPadding
                     ) {
                         navigator.navigate(MainNavRoute.SongInfo(it.id))
@@ -89,9 +89,9 @@ fun MainNavGraph(
                         navigator.navigate(MainNavRoute.Artist(album.name))
                     }
                 }
-                entry<MainNavRoute.Artist> {
+                entry<MainNavRoute.Artist> { artist ->
                     ArtistScreen(
-                        it.name,
+                        artist.name,
                         bottomPadding = bottomPadding
                     ) {
                         navigator.navigate(MainNavRoute.SongInfo(it.id))
@@ -108,9 +108,9 @@ fun MainNavGraph(
                         navigator.navigate(MainNavRoute.Playlist(playlist.id))
                     }
                 }
-                entry<MainNavRoute.Playlist> {
+                entry<MainNavRoute.Playlist> { playlist ->
                     PlaylistScreen(
-                        it.id,
+                        playlist.id,
                         bottomPadding = bottomPadding
                     ) {
                         navigator.navigate(MainNavRoute.SongInfo(it.id))
@@ -144,9 +144,20 @@ fun MainNavGraph(
                 entry<MainNavRoute.SongInfo> (
                     metadata = SceneStrategy.bottomSheet()
                 ) {
-                    SongInfoContent(it.songId) {
-                        navigator.navigate(MainNavRoute.AddToPlaylist(listOf(it.songId)))
+                    SongInfoContent(
+                        it.songId,
+                        onAddToPlaylist = {
+                            navigator.navigate(MainNavRoute.AddToPlaylist(listOf(it.songId)))
+                        }
+                    ) {
+                        navigator.goBack()
+                        navigator.navigate(MainNavRoute.MetadataEditor(it.songId))
                     }
+                }
+                entry<MainNavRoute.MetadataEditor>(
+                    metadata = SceneStrategy.fullScreenDialog()
+                ) {
+                    MetadataEditorScreen(it.songId, onBack = navigator::goBack)
                 }
             }
         ),

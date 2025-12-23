@@ -17,3 +17,11 @@ fun String.getGroupingKey(): String {
         else -> "*"
     }
 }
+
+fun String.toFileUri(): String {
+    return if (this.startsWith("file://")) {
+        this
+    } else {
+        "file://$this"
+    }
+}

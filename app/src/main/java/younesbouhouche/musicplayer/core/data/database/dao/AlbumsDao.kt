@@ -6,7 +6,6 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
-import retrofit2.http.GET
 import younesbouhouche.musicplayer.core.data.database.entities.AlbumEntity
 import younesbouhouche.musicplayer.core.data.database.entities.AlbumWithSongs
 

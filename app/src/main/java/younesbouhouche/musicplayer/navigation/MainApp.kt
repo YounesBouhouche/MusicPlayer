@@ -1,16 +1,18 @@
 package younesbouhouche.musicplayer.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.savedstate.serialization.SavedStateConfiguration
+import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
-import org.koin.compose.viewmodel.koinViewModel
-import younesbouhouche.musicplayer.features.main.presentation.viewmodel.MainViewModel
 import younesbouhouche.musicplayer.features.permissions.presentation.Permissions
 import younesbouhouche.musicplayer.navigation.routes.Graph
 
@@ -32,9 +34,18 @@ fun MainApp(modifier: Modifier = Modifier) {
         },
         initialRoute
     )
+    val scope = rememberCoroutineScope()
+    val snackBarHostState = remember {
+        SnackbarHostState()
+    }
     EventHandler(
-        { name, items ->
+        onCreatePlaylist = { name, items ->
 //            mainVM.onPlaylistEvent(PlaylistEvent.CreateNew(name, items, null))
+        },
+        onShowSnackBar = {
+            scope.launch {
+                snackBarHostState.showSnackbar(it)
+            }
         }
     ) {
         backStack.clear()
@@ -42,6 +53,7 @@ fun MainApp(modifier: Modifier = Modifier) {
     }
     AppNavGraph(
         backStack,
+        snackBarHostState,
         modifier.fillMaxSize(),
     )
 }

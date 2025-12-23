@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.AddToQueue
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MusicNote
@@ -69,6 +70,7 @@ import java.io.File
 fun SongInfoContent(
     trackId: Long,
     onAddToPlaylist: () -> Unit = {},
+    onEditMetadata: () -> Unit = {},
 ) {
     val viewModel: SongInfoViewModel = koinViewModel(
         parameters = { parametersOf(trackId) }
@@ -91,12 +93,13 @@ fun SongInfoContent(
             listOf(Triple(R.string.file_path, Icons.AutoMirrored.Filled.InsertDriveFile, song.path)),
         )
         Column(
-            Modifier.fillMaxWidth().padding(16.dp),
+            Modifier.fillMaxWidth().padding(vertical = 16.dp, horizontal = 8.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Row(Modifier.fillMaxWidth(),
+            Row(
+                Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Image(
                     song.coverUri,
@@ -106,10 +109,18 @@ fun SongInfoContent(
                 )
                 Text(
                     song.title,
+                    modifier = Modifier.weight(1f),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Medium
+                )
+                ExpressiveIconButton(
+                    Icons.Default.Edit,
+                    colors = IconButtonDefaults.filledTonalIconButtonColors(),
+                    onClick = onEditMetadata,
+                    size = IconButtonDefaults.largeIconSize,
+                    widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow
                 )
             }
             Row(Modifier.fillMaxWidth(),
@@ -196,7 +207,7 @@ fun SongInfoContent(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        line.forEachIndexed { index, (res, icon, value) ->
+                        line.forEach { (res, icon, value) ->
                             val text = stringResource(res)
                             Row(
                                 Modifier

@@ -13,7 +13,9 @@ plugins {
 
 android {
     namespace = "younesbouhouche.musicplayer"
-    compileSdk = 36
+    compileSdk {
+        version = release(36)
+    }
     android.buildFeatures.buildConfig = true
 
     defaultConfig {
@@ -53,13 +55,6 @@ android {
             applicationIdSuffix = ".staging"
             versionNameSuffix = "-staging"
             buildConfigField("String", "BASE_URL", "\"https://api.deezer.com/\"")
-        }
-        create("benchmark") {
-            initWith(buildTypes.getByName("release"))
-            signingConfig = signingConfigs.getByName("debug")
-            matchingFallbacks += listOf("release")
-            isDebuggable = false
-            proguardFiles("benchmark-rules.pro")
         }
     }
 
@@ -113,7 +108,6 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
-    implementation(libs.sh.reorderable)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
@@ -133,7 +127,6 @@ dependencies {
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
     implementation(libs.androidx.glance.material)
-    implementation(libs.converter.gson)
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.datastore.preferences)
@@ -151,7 +144,6 @@ dependencies {
     ksp(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
     implementation(libs.gson)
-    implementation(libs.androidx.profileinstaller)
     implementation(libs.coil.compose)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)

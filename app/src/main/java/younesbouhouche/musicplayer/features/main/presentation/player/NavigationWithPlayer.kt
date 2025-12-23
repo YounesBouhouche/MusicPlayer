@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -44,9 +46,6 @@ fun BoxScope.NavigationWithPlayer(
     val scope = rememberCoroutineScope()
     val navBarHeight = navBarHeight
     val density = LocalDensity.current
-    LaunchedEffect(playerState) {
-        println("PlayerState changed: $playerState")
-    }
     val state = rememberSaveable(inputs = arrayOf(), saver = AnchoredDraggableState.Saver()) {
         AnchoredDraggableState(
             initialValue = ViewState.HIDDEN,
@@ -60,15 +59,18 @@ fun BoxScope.NavigationWithPlayer(
                 }
         )
     }
-    val progress =
-        when (state.settledValue) {
+    val progress by remember {
+        derivedStateOf {
+            when (state.settledValue) {
 //                        playerState.playState == PlayState.STOP -> 0f
 //                        state.settledValue == ViewState.HIDDEN -> 0f
 //                        state.offset == 0f -> 1f
-            ViewState.SMALL -> state.progress(ViewState.SMALL, ViewState.LARGE)
-            ViewState.LARGE -> 1f - state.progress(ViewState.LARGE, ViewState.SMALL)
-            else -> 0f
+                ViewState.SMALL -> state.progress(ViewState.SMALL, ViewState.LARGE)
+                ViewState.LARGE -> 1f - state.progress(ViewState.LARGE, ViewState.SMALL)
+                else -> 0f
+            }
         }
+    }
     val offset =
         with(density) {
             ((viewHeight - (156.dp + navBarHeight).roundToPx()) * (1f - progress)).roundToInt()

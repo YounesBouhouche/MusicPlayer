@@ -10,6 +10,7 @@ import younesbouhouche.musicplayer.features.main.presentation.routes.artist.Arti
 import younesbouhouche.musicplayer.features.main.presentation.routes.artist.ArtistsViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.home.HomeViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.library.LibraryViewModel
+import younesbouhouche.musicplayer.features.main.presentation.routes.metadata_editor.MetadataEditorViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.AddToPlaylistViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.CreatePlaylistViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.PlaylistViewModel
@@ -62,5 +63,11 @@ val viewModelModule = module {
             songId
         )
     }
-    viewModelOf(::PlayerViewModel)
+    viewModel { (songId: Long) ->
+        MetadataEditorViewModel(
+            songId,
+            get()
+        )
+    }
+    singleOf(::PlayerViewModel)
 }

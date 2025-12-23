@@ -53,7 +53,7 @@ import younesbouhouche.musicplayer.core.domain.models.Queue
 import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.features.main.presentation.components.SongListItem
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
-import younesbouhouche.musicplayer.features.main.presentation.util.plus
+import com.younesb.mydesignsystem.presentation.util.plus
 import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)

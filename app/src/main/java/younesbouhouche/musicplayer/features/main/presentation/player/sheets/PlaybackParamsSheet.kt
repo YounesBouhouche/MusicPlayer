@@ -66,7 +66,7 @@ import com.younesb.mydesignsystem.presentation.components.ExpressiveButton
 import younesbouhouche.musicplayer.features.main.presentation.player.components.AnimatedCounterText
 import younesbouhouche.musicplayer.features.main.presentation.util.composables.TitleText
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
-import younesbouhouche.musicplayer.features.main.presentation.util.plus
+import com.younesb.mydesignsystem.presentation.util.plus
 import younesbouhouche.musicplayer.features.main.presentation.util.round
 import kotlin.math.roundToInt
 

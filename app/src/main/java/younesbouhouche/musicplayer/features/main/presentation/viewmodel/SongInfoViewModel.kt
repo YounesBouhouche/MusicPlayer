@@ -5,13 +5,13 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.core.presentation.util.stateInVM
-import younesbouhouche.musicplayer.features.main.domain.use_cases.GetSongUseCase
+import younesbouhouche.musicplayer.features.main.domain.use_cases.ObserveSongUseCase
 import younesbouhouche.musicplayer.features.main.domain.use_cases.SetFavoriteUseCase
 
 class SongInfoViewModel(
     val mainViewModel: MainViewModel,
     val setFavoriteUseCase: SetFavoriteUseCase,
-    getSongUseCase: GetSongUseCase,
+    getSongUseCase: ObserveSongUseCase,
     songId: Long
 ): ViewModel() {
     val song = getSongUseCase(songId).stateInVM(null, viewModelScope)

@@ -29,10 +29,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kmpalette.rememberPaletteState
 import com.younesb.mydesignsystem.presentation.components.Image
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.core.presentation.theme.AppTheme
+import younesbouhouche.musicplayer.core.presentation.theme.topAppBarTitleFont
 
 @Composable
 fun PictureCard(
@@ -102,10 +104,11 @@ fun PictureCard(
                         .padding(contentPadding),
                 ) {
                     ProvideTextStyle(
-                        MaterialTheme.typography.titleMedium.copy(
+                        topAppBarTitleFont.copy(
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
                             fontWeight = FontWeight.Bold,
-                            fontStyle = FontStyle.Italic
+                            fontStyle = FontStyle.Italic,
+                            fontSize = 16.sp
                         )
                     ) {
                         content()

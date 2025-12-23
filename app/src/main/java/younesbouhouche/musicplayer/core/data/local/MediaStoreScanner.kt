@@ -8,12 +8,17 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.database.getLongOrNull
 import androidx.core.database.getStringOrNull
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
+import org.jaudiotagger.audio.AudioFile
+import org.jaudiotagger.audio.AudioFileIO
+import org.jaudiotagger.tag.FieldKey
 import timber.log.Timber
 import younesbouhouche.musicplayer.core.data.database.dao.AlbumsDao
 import younesbouhouche.musicplayer.core.data.database.dao.ArtistsDao
@@ -24,6 +29,7 @@ import younesbouhouche.musicplayer.core.data.database.entities.SongEntity
 import younesbouhouche.musicplayer.core.data.ext.getCoverUri
 import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.features.main.domain.models.LoadingState
+import younesbouhouche.musicplayer.features.main.util.toFileUri
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -55,6 +61,7 @@ class MediaStoreScanner(private val context: Context) {
                     MediaStore.Audio.Media.ALBUM_ID,
                     MediaStore.Audio.Media.ALBUM,
                     MediaStore.Audio.Media.ARTIST,
+                    MediaStore.Audio.Media.ALBUM_ARTIST,
                     MediaStore.Audio.Media.DATA,
                     MediaStore.Audio.Media.COMPOSER,
                     MediaStore.Audio.Media.GENRE,
@@ -77,6 +84,7 @@ class MediaStoreScanner(private val context: Context) {
                 val titleColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
                 val artistColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
                 val albumColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+                val albumArtistColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ARTIST)
                 val pathColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
                 val composerColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.COMPOSER)
                 val genreColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE)
@@ -93,6 +101,7 @@ class MediaStoreScanner(private val context: Context) {
                     val title = crs.getString(titleColumn)
                     val artist = crs.getString(artistColumn)
                     val album = crs.getString(albumColumn)
+                    val albumArtist = crs.getStringOrNull(albumArtistColumn) ?: artist
                     val path = crs.getString(pathColumn)
                     val composer = crs.getStringOrNull(composerColumn) ?: ""
                     val genre = crs.getStringOrNull(genreColumn) ?: ""
@@ -103,6 +112,14 @@ class MediaStoreScanner(private val context: Context) {
                     val discNumber = crs.getStringOrNull(discColumn)?.toIntOrNull()
                     val contentUri: Uri = ContentUris.withAppendedId(
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+                    val lyrics = try {
+                        AudioFileIO.read(path.toFileUri().toUri().toFile())
+                            .tag
+                            .getFirst(FieldKey.LYRICS)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        null
+                    }
                     songs += SongEntity.Builder()
                         .contentUri(contentUri)
                         .id(id)
@@ -110,11 +127,13 @@ class MediaStoreScanner(private val context: Context) {
                         .title(title)
                         .artist(artist)
                         .album(album)
+                        .albumArtist(albumArtist)
                         .path(path)
                         .date(date)
                         .duration(duration)
                         .composer(composer)
                         .genre(genre)
+                        .lyrics(lyrics)
                         .size(size)
                         .year(year)
                         .trackNumber(trackNumber)

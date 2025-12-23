@@ -6,13 +6,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.core.presentation.util.stateInVM
 import younesbouhouche.musicplayer.features.main.domain.events.UiAction
 import younesbouhouche.musicplayer.features.main.domain.use_cases.GetPlayerStateUseCase
 import younesbouhouche.musicplayer.features.main.domain.use_cases.GetQueueUseCase
-import younesbouhouche.musicplayer.features.main.domain.use_cases.GetSongUseCase
+import younesbouhouche.musicplayer.features.main.domain.use_cases.ObserveSongUseCase
 import younesbouhouche.musicplayer.features.main.domain.use_cases.HandlePlayerEventUseCase
 import younesbouhouche.musicplayer.features.main.domain.use_cases.SetFavoriteUseCase
 import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
@@ -23,7 +22,7 @@ class PlayerViewModel(
     private val handlePlayerEventUseCase: HandlePlayerEventUseCase,
     getPlayerStateUseCase: GetPlayerStateUseCase,
     getQueueUseCase: GetQueueUseCase,
-    observeSongUseCase: GetSongUseCase,
+    observeSongUseCase: ObserveSongUseCase,
     val setFavoriteUseCase: SetFavoriteUseCase
 ): ViewModel() {
     val playerState = getPlayerStateUseCase().stateInVM(PlayerState(), viewModelScope)

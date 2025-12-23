@@ -63,6 +63,7 @@ fun MainScreen(
                     subclass(MainNavRoute.AddToPlaylist::class, MainNavRoute.AddToPlaylist.serializer())
                     subclass(MainNavRoute.Library::class, MainNavRoute.Library.serializer())
                     subclass(MainNavRoute.SongInfo::class, MainNavRoute.SongInfo.serializer())
+                    subclass(MainNavRoute.MetadataEditor::class, MainNavRoute.MetadataEditor.serializer())
                 }
             }
         }
@@ -73,15 +74,13 @@ fun MainScreen(
     val loadingState by mainVM.loadingState.collectAsStateWithLifecycle()
     val playerState by mainVM.playerState.collectAsStateWithLifecycle()
     val currentRoute = navigationState.backStacks[navigationState.topLevelRoute]?.let {
-        if ((it.lastOrNull() as? MainNavRoute)?.isDialog == true)
-            it.elementAtOrNull(it.lastIndex - 1)
-        else
-            it.lastOrNull()
+        it.lastOrNull { navKey -> (navKey as? MainNavRoute)?.isDialog == false }
+            ?: it.lastOrNull()
     }
     val currentNavRoute = TopLevelRoutes.entries.firstOrNull { routes ->
         routes.destination == navigationState.topLevelRoute
     }
-    val isParent = (currentRoute in TopLevelRoutes.entries.map { it.destination }) or (currentRoute is MainNavRoute.SongInfo)
+    val isParent = (currentRoute in TopLevelRoutes.entries.map { it.destination })
     var viewHeight by remember { mutableIntStateOf(0) }
     val bottomPadding =
         WindowInsets.navigationBars.add(

@@ -46,6 +46,39 @@ class PlayerManager(
 
     private var initialized = false
 
+    suspend fun getPlayer(): Player = playerFactory.getPlayer()
+
+    fun updateVolume(volume: Float) {
+        stateManager.updateState {
+            it.copy(volume = volume)
+        }
+    }
+
+    suspend fun restoreSessionState(controller: Player) {
+        playerFactory.restorePlayerState(controller)
+        if (controller.playWhenReady) {
+            stateManager.updateState {
+                it.copy(
+                    time = controller.currentPosition,
+                    playState =
+                    if (controller.isPlaying) PlayState.PLAYING else PlayState.PAUSED,
+                    repeatMode = controller.repeatMode,
+                    shuffle = controller.shuffleModeEnabled,
+                    speed = controller.playbackParameters.speed,
+                    pitch = controller.playbackParameters.pitch,
+                    volume = controller.deviceVolume.toFloat(),
+                    hasNextItem = controller.hasNextMediaItem(),
+                    hasPrevItem = controller.hasPreviousMediaItem(),
+                )
+            }
+            queueRepository.setCurrentIndex(controller.currentMediaItemIndex)
+            withContext(Dispatchers.Main) {
+                MyAppWidget().updateAll(context)
+            }
+        }
+        initialize()
+    }
+
     @OptIn(UnstableApi::class)
     suspend fun initialize(): Player {
         val exoPlayer = playerFactory.getPlayer()

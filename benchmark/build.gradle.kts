@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "younesbouhouche.musicplayer.benchmark"
-    compileSdk = 34
+    compileSdk = 36
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -48,8 +48,6 @@ android {
 dependencies {
     implementation(libs.androidx.junit)
     implementation(libs.androidx.espresso.core)
-    implementation(libs.androidx.uiautomator)
-    implementation(libs.androidx.benchmark.macro.junit4)
     implementation(libs.androidx.core.ktx)
 }
 

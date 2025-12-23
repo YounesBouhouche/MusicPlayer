@@ -68,7 +68,7 @@ import younesbouhouche.musicplayer.features.main.presentation.components.SongLis
 import younesbouhouche.musicplayer.features.main.presentation.util.SortBottomSheet
 import younesbouhouche.musicplayer.features.main.presentation.util.SortType
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
-import younesbouhouche.musicplayer.features.main.presentation.util.plus
+import com.younesb.mydesignsystem.presentation.util.plus
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

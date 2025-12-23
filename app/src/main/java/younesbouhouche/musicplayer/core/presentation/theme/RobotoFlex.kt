@@ -26,22 +26,3 @@ val topAppBarTitleFont = TextStyle(
     fontWeight = FontWeight.Bold,
     fontSize = 22.sp,
 )
-
-
-@OptIn(ExperimentalTextApi::class)
-val listScreenTitleFont = TextStyle(
-    fontFamily = FontFamily(
-        Font(
-            R.font.robotoflex,
-            FontWeight.Bold,
-            variationSettings =
-                FontVariation.Settings(
-                    FontVariation.weight(FontWeight.Bold.weight),
-                    FontVariation.width(150f),
-                ),
-        ),
-    ),
-    fontWeight = FontWeight.Bold,
-    fontSize = 28.sp,
-    letterSpacing = 2.sp
-)
