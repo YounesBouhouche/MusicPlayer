@@ -19,6 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-dontwarn java.awt.image.BufferedImage
+-dontwarn javax.imageio.ImageIO
+-dontwarn javax.imageio.stream.ImageInputStream
+
 -keep public class younesbouhouche.musicplayer.features.main.presentation.navigation.NavRoutes
 -keep public class younesbouhouche.musicplayer.features.main.presentation.navigation.NavRoutes$*
 
