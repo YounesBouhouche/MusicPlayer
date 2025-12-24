@@ -149,10 +149,11 @@ class DialogService : MediaSessionService(), MediaSession.Callback {
     override fun onPlaybackResumption(
         mediaSession: MediaSession,
         controller: MediaSession.ControllerInfo,
+        isForPlayback: Boolean
     ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
         this.controller = controller
         this.mediaSession = mediaSession
-        return super.onPlaybackResumption(mediaSession, controller)
+        return super.onPlaybackResumption(mediaSession, controller, isForPlayback)
     }
 
     override fun onAddMediaItems(
