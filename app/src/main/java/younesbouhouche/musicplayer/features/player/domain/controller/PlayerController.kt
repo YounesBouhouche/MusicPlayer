@@ -122,10 +122,13 @@ class PlayerController(
                 playerManager.stop()
             }
             is PlayerEvent.Swap -> {
+                player.moveMediaItem(event.from, event.to)
                 withContext(Dispatchers.IO) {
                     queueRepository.swapPositions(event.from, event.to)
+                    queueRepository.setCurrentIndex(withContext(Dispatchers.Main) {
+                        player.currentMediaItemIndex
+                    })
                 }
-                player.moveMediaItem(event.from, event.to)
             }
             PlayerEvent.ToggleShuffle -> {
                 val shuffleMode = !player.shuffleModeEnabled
