@@ -69,5 +69,5 @@ val viewModelModule = module {
             get()
         )
     }
-    singleOf(::PlayerViewModel)
+    viewModelOf(::PlayerViewModel)
 }
