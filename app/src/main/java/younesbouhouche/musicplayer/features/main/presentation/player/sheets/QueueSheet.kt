@@ -27,6 +27,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -40,7 +41,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -74,6 +77,7 @@ fun QueueSheet(
         FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
     var expanded by rememberSaveable { mutableStateOf(true) }
     var reorderedQueue by remember { mutableStateOf(queue.songs) }
+    val hapticFeedback = LocalHapticFeedback.current
     LaunchedEffect(queue.songs) {
         reorderedQueue = queue.songs
     }
@@ -99,7 +103,6 @@ fun QueueSheet(
                             onExpand = { expanded = true },
                             onCollapse = { expanded = false },
                         ),
-                    contentWindowInsets = WindowInsets(),
                     topBar = {
                         TopAppBar(
                             title = {
@@ -117,6 +120,7 @@ fun QueueSheet(
                             scrollBehavior = scrollBehavior
                         )
                     },
+                    contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 ) { paddingValues ->
                     ReorderContainer(reorderState) {
@@ -131,6 +135,9 @@ fun QueueSheet(
                                     state = reorderState,
                                     key = item.id,
                                     data = item,
+                                    onDragEnter = {
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                                    },
                                     onDrop = {
                                         val from = queue.songs.indexOf(it.data)
                                         val to = queue.songs.indexOf(item)
@@ -138,6 +145,7 @@ fun QueueSheet(
                                             add(to, removeAt(from))
                                         }
                                         onPlayerEvent(PlayerEvent.Swap(from, to))
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
                                     }
                                 ) {
                                     SongListItem(

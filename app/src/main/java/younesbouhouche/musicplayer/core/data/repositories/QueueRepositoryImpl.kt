@@ -2,6 +2,7 @@ package younesbouhouche.musicplayer.core.data.repositories
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import younesbouhouche.musicplayer.core.data.database.dao.QueueDao
 import younesbouhouche.musicplayer.core.data.database.entities.QueueSongCrossRef
@@ -22,7 +23,9 @@ class QueueRepositoryImpl(
     }
 
     override suspend fun getQueue(): Queue? {
-        return dao.getQueue()?.toQueue()
+        return dao.getQueue()?.copy(
+            songs = dao.observeQueueList().first()
+        )?.toQueue()
     }
 
     override suspend fun createQueue(queue: List<Long>) {

@@ -20,7 +20,11 @@ interface QueueDao {
     fun observeQueue(): Flow<QueueEntity?>
 
     @Transaction
-    @Query("SELECT * from queue_song_cross_ref INNER JOIN SongEntity ON queue_song_cross_ref.songId = SongEntity.id WHERE queue_song_cross_ref.queueId = 0 ORDER BY queue_song_cross_ref.position ASC")
+    @Query("""
+        SELECT SongEntity.* from queue_song_cross_ref
+        INNER JOIN SongEntity ON queue_song_cross_ref.songId = SongEntity.id
+        WHERE queue_song_cross_ref.queueId = 0 ORDER BY queue_song_cross_ref.position ASC
+        """)
     fun observeQueueList(): Flow<List<SongEntity>>
 
     @Transaction
