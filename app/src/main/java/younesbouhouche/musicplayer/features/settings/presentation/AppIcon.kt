@@ -36,7 +36,7 @@ fun AppIcon(modifier: Modifier = Modifier) {
     Surface(
         modifier.size(200.dp),
         color = MaterialTheme.colorScheme.surfaceContainer,
-        shape = MaterialShapes.Cookie9Sided.toShape(animatedAngle)
+        shape = MaterialShapes.Cookie12Sided.toShape(animatedAngle)
     ) {
         Box(
             modifier.fillMaxSize().clickable {
@@ -46,7 +46,7 @@ fun AppIcon(modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                ImageVector.vectorResource(R.drawable.media3_notification_small_icon),
+                ImageVector.vectorResource(R.drawable.foreground),
                 null,
                 Modifier.fillMaxSize(.4f),
                 MaterialTheme.colorScheme.onSurface,

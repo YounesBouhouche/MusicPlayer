@@ -54,7 +54,7 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
         super.onCreate()
 
         notificationProvider = CustomMediaNotificationProvider(this)
-        notificationProvider.setSmallIcon(R.drawable.media3_notification_small_icon)
+        notificationProvider.setSmallIcon(R.drawable.foreground)
 
         serviceScope.launch {
             withContext(Dispatchers.Main) {
@@ -147,11 +147,14 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
     override fun onPlaybackResumption(
         mediaSession: MediaSession,
         controller: MediaSession.ControllerInfo,
+        isForPlayback: Boolean
     ): ListenableFuture<MediaItemsWithStartPosition> {
         val settable = SettableFuture.create<MediaItemsWithStartPosition>()
         serviceScope.launch {
             try {
-                val queue = queueRepository.getQueue()
+                val queue = withContext(Dispatchers.IO) {
+                    queueRepository.getQueue()
+                }
                 if (queue?.songs?.isEmpty() != false) {
                     settable.set(MediaItemsWithStartPosition(emptyList(), 0, 0))
                     return@launch
