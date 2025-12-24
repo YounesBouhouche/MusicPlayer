@@ -143,7 +143,6 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     ksp(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
-    implementation(libs.gson)
     implementation(libs.coil.compose)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
