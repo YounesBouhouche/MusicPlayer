@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 
 @Entity
-data class  SongEntity(
+data class SongEntity(
     @PrimaryKey(autoGenerate = false)
     val id: Long,
     val contentUri: Uri,
