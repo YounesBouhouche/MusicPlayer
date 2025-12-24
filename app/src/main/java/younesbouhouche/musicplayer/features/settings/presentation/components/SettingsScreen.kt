@@ -40,7 +40,6 @@ fun SettingsScreen(
                 scrollBehavior = scrollBehavior,
             )
         },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         content = content,
     )
 }

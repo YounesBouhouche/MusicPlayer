@@ -29,7 +29,7 @@ import younesbouhouche.musicplayer.core.presentation.theme.topAppBarTitleFont
 @Composable
 fun TopBar(
     title: @Composable () -> Unit,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {
         val backDispatcher = LocalOnBackPressedDispatcherOwner.current
         ExpressiveIconButton(
