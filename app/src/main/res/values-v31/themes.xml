@@ -2,6 +2,6 @@
 <resources>
 
     <style name="Theme.MusicPlayer" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <item name="android:windowSplashScreenBackground">#f0fbff</item>
+        <item name="android:windowSplashScreenBackground">#fff</item>
     </style>
 </resources>
