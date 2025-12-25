@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialShapes
@@ -136,7 +137,7 @@ fun SmallPlayerScreen(
                 onPlayerEvent(PlayerEvent.PauseResume)
             }
             ExpressiveIconButton(
-                Icons.Default.Clear,
+                Icons.Default.SkipNext,
                 size = IconButtonDefaults.mediumIconSize,
                 colors = IconButtonDefaults.iconButtonColors(
                     containerColor = MaterialTheme.colorScheme.surface.copy(.3f),
@@ -144,7 +145,7 @@ fun SmallPlayerScreen(
                 ),
                 enabled = enabled
             ) {
-                onPlayerEvent(PlayerEvent.Stop)
+                onPlayerEvent(PlayerEvent.Next)
             }
         }
     }

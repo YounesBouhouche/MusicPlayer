@@ -8,6 +8,8 @@ import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.offset
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -48,10 +50,9 @@ fun BoxScope.NavigationWithPlayer(
     val density = LocalDensity.current
     val state = rememberSaveable(inputs = arrayOf(), saver = AnchoredDraggableState.Saver()) {
         AnchoredDraggableState(
-            initialValue = ViewState.HIDDEN,
+            initialValue = ViewState.SMALL,
             anchors =
                 DraggableAnchors {
-                    ViewState.HIDDEN at viewHeight.toFloat()
                     ViewState.SMALL at with(density) {
                         viewHeight - (202.dp + navBarHeight).toPx()
                     }
@@ -62,12 +63,8 @@ fun BoxScope.NavigationWithPlayer(
     val progress by remember {
         derivedStateOf {
             when (state.settledValue) {
-//                        playerState.playState == PlayState.STOP -> 0f
-//                        state.settledValue == ViewState.HIDDEN -> 0f
-//                        state.offset == 0f -> 1f
                 ViewState.SMALL -> state.progress(ViewState.SMALL, ViewState.LARGE)
                 ViewState.LARGE -> 1f - state.progress(ViewState.LARGE, ViewState.SMALL)
-                else -> 0f
             }
         }
     }
@@ -78,10 +75,10 @@ fun BoxScope.NavigationWithPlayer(
     val navigationBarOffset = with(density) {
         (progress * (112.dp + navBarHeight).toPx()).roundToInt()
     }
+    val swipeState = rememberSwipeToDismissBoxState()
     LaunchedEffect(key1 = viewHeight) {
         state.updateAnchors(
             DraggableAnchors {
-                ViewState.HIDDEN at viewHeight.toFloat()
                 ViewState.SMALL at with(density) {
                     viewHeight - (174.dp + navBarHeight).toPx()
                 }
@@ -93,6 +90,8 @@ fun BoxScope.NavigationWithPlayer(
     LaunchedEffect(playerState.playState) {
         if (playerState.playState == PlayState.STOP)
             state.animateTo(ViewState.SMALL)
+        else
+            swipeState.snapTo(SwipeToDismissBoxValue.Settled)
     }
     AnimatedVisibility(
         playerState.playState != PlayState.STOP,
@@ -100,6 +99,7 @@ fun BoxScope.NavigationWithPlayer(
         exit = materialSharedAxisYOut(false, 100),
     ) {
         PlayerScreen(
+            swipeState,
             queue ?: Queue(),
             currentItem,
             playerState,

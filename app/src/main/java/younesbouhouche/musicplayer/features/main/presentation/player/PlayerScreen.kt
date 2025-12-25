@@ -1,5 +1,6 @@
 package younesbouhouche.musicplayer.features.main.presentation.player
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
@@ -8,14 +9,21 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -36,8 +44,10 @@ import younesbouhouche.musicplayer.core.presentation.theme.AppTheme
 import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PlayerScreen(
+    swipeState: SwipeToDismissBoxState,
     queue: Queue,
     currentItem: Song?,
     playerState: PlayerState,
@@ -58,7 +68,11 @@ fun PlayerScreen(
         viewHeight.toDp()
     }
     val largeCorner = 32.dp * (1f - progress)
-    val smallCorner = 8.dp * (1f - progress)
+    val smallCorner by animateDpAsState(
+        if (swipeState.currentValue != SwipeToDismissBoxValue.Settled) 32.dp
+        else 8.dp * (1f - progress),
+        animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec()
+    )
     val palette = rememberPaletteState {  }
     val scope = rememberCoroutineScope()
     val shape = RoundedCornerShape(
@@ -68,8 +82,14 @@ fun PlayerScreen(
         bottomEnd = smallCorner
     )
     AppTheme(palette) {
-        Box(
-            modifier.fillMaxWidth()
+        SwipeToDismissBox(
+            state = swipeState,
+            backgroundContent = {},
+            onDismiss = {
+                if (it != SwipeToDismissBoxValue.Settled)
+                    onPlayerEvent(PlayerEvent.Stop)
+            },
+            modifier = modifier.fillMaxWidth()
                 .padding(8.dp * (1f - progress))
                 .height(height)
                 .offset {
@@ -83,53 +103,57 @@ fun PlayerScreen(
                         animationSpec = tween(),
                         positionalThreshold = { it * .5f }
                     ),
-                )
-                .shadow(8.dp, shape)
-                .clip(shape)
-                .background(MaterialTheme.colorScheme.primaryContainer),
+                ),
         ) {
-            SmallPlayerScreen(
-                queue,
-                playerState.playState,
-                Modifier
-                    .alpha(1f - progress)
-                    .height(80.dp),
-                progress < 1f,
-                onPlayerEvent,
-                {
-                    it?.asImageBitmap()?.let { image ->
-                        scope.launch {
-                            palette.generate(image)
-                        }
-                    } ?: palette.reset()
-                }
+            Box(
+                Modifier.shadow(8.dp, shape)
+                    .clip(shape)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .fillMaxSize()
             ) {
-                scope.launch {
-                    dragState.animateTo(ViewState.LARGE)
-                }
-            }
-            LargePlayerScreen(
-                progress > 0f,
-                queue,
-                playerState,
-                Modifier
-                    .alpha(progress)
-                    .requiredHeight(viewHeightDp),
-                {
-                    scope.launch {
-                        dragState.animateTo(ViewState.SMALL)
+                SmallPlayerScreen(
+                    queue,
+                    playerState.playState,
+                    Modifier
+                        .alpha(1f - progress)
+                        .height(80.dp),
+                    progress < 1f,
+                    onPlayerEvent,
+                    {
+                        it?.asImageBitmap()?.let { image ->
+                            scope.launch {
+                                palette.generate(image)
+                            }
+                        } ?: palette.reset()
                     }
-                },
-                currentItem,
-                onSetFavorite,
-                {
-                    onAction(UiAction.ShowCreatePlaylistDialog(queue.songs.map { it.path }))
-                },
-                {
-                    onAction(UiAction.ShowAddToPlaylistDialog(queue.songs.map { it.path }))
-                },
-                onPlayerEvent,
-            )
+                ) {
+                    scope.launch {
+                        dragState.animateTo(ViewState.LARGE)
+                    }
+                }
+                LargePlayerScreen(
+                    progress > 0f,
+                    queue,
+                    playerState,
+                    Modifier
+                        .alpha(progress)
+                        .requiredHeight(viewHeightDp),
+                    {
+                        scope.launch {
+                            dragState.animateTo(ViewState.SMALL)
+                        }
+                    },
+                    currentItem,
+                    onSetFavorite,
+                    {
+                        onAction(UiAction.ShowCreatePlaylistDialog(queue.songs.map { it.path }))
+                    },
+                    {
+                        onAction(UiAction.ShowAddToPlaylistDialog(queue.songs.map { it.path }))
+                    },
+                    onPlayerEvent,
+                )
+            }
         }
     }
 }

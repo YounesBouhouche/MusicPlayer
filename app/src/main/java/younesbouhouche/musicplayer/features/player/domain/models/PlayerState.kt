@@ -18,7 +18,6 @@ data class PlayerState(
 )
 
 enum class ViewState {
-    HIDDEN,
     SMALL,
     LARGE,
 }

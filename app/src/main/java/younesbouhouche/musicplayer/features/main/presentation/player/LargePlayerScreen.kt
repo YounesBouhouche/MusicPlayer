@@ -166,7 +166,6 @@ fun LargePlayerScreen(
                         Text(
                             queue.songs.getOrNull(currentIndex)?.title ?: "No song playing",
                             style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
