@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "abe34f3ab311f278e29e554ded925235",
+    "identityHash": "4b9f1b867e60b97e514cd24c2ca08b67",
     "entities": [
       {
         "tableName": "AlbumEntity",
@@ -81,7 +81,7 @@
       },
       {
         "tableName": "SongEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `contentUri` TEXT NOT NULL, `fileName` TEXT NOT NULL, `title` TEXT NOT NULL, `artist` TEXT NOT NULL, `album` TEXT NOT NULL, `duration` INTEGER NOT NULL, `path` TEXT NOT NULL, `date` INTEGER NOT NULL, `size` INTEGER NOT NULL, `trackNumber` INTEGER, `discNumber` INTEGER, `year` INTEGER, `composer` TEXT, `genre` TEXT, `cover` BLOB, `coverUri` TEXT, `coverPath` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `contentUri` TEXT NOT NULL, `fileName` TEXT NOT NULL, `title` TEXT NOT NULL, `artist` TEXT NOT NULL, `album` TEXT NOT NULL, `albumArtist` TEXT NOT NULL, `duration` INTEGER NOT NULL, `path` TEXT NOT NULL, `date` INTEGER NOT NULL, `size` INTEGER NOT NULL, `trackNumber` INTEGER, `discNumber` INTEGER, `year` INTEGER, `composer` TEXT, `genre` TEXT, `lyrics` TEXT, `cover` BLOB, `coverUri` TEXT, `coverPath` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -116,6 +116,12 @@
           {
             "fieldPath": "album",
             "columnName": "album",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "albumArtist",
+            "columnName": "albumArtist",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -166,6 +172,11 @@
           {
             "fieldPath": "genre",
             "columnName": "genre",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lyrics",
+            "columnName": "lyrics",
             "affinity": "TEXT"
           },
           {
@@ -310,7 +321,18 @@
             "playlistId",
             "songId"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_playlist_song_cross_ref_songId",
+            "unique": false,
+            "columnNames": [
+              "songId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_playlist_song_cross_ref_songId` ON `${TABLE_NAME}` (`songId`)"
+          }
+        ]
       },
       {
         "tableName": "play_hist_song_cross_ref",
@@ -367,6 +389,26 @@
             "songId"
           ]
         },
+        "indices": [
+          {
+            "name": "index_queue_song_cross_ref_songId",
+            "unique": false,
+            "columnNames": [
+              "songId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_queue_song_cross_ref_songId` ON `${TABLE_NAME}` (`songId`)"
+          },
+          {
+            "name": "index_queue_song_cross_ref_queueId",
+            "unique": false,
+            "columnNames": [
+              "queueId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_queue_song_cross_ref_queueId` ON `${TABLE_NAME}` (`queueId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "QueueEntity",
@@ -395,7 +437,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'abe34f3ab311f278e29e554ded925235')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4b9f1b867e60b97e514cd24c2ca08b67')"
     ]
   }
 }

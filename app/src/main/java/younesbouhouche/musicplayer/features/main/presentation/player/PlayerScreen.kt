@@ -21,7 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,11 +36,11 @@ import com.kmpalette.rememberPaletteState
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.core.domain.models.Queue
 import younesbouhouche.musicplayer.core.domain.models.Song
+import younesbouhouche.musicplayer.core.presentation.theme.AppTheme
 import younesbouhouche.musicplayer.features.main.domain.events.UiAction
+import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
 import younesbouhouche.musicplayer.features.player.domain.models.ViewState
-import younesbouhouche.musicplayer.core.presentation.theme.AppTheme
-import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

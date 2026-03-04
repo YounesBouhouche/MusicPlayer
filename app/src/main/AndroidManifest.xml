@@ -33,7 +33,7 @@
         android:localeConfig="@xml/locales_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MusicPlayer"
+        android:theme="@style/Theme.App.Splash"
         tools:replace="android:theme"
         tools:targetApi="tiramisu">
         <activity
@@ -67,7 +67,7 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.MusicPlayer">
+            android:theme="@style/Theme.App.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

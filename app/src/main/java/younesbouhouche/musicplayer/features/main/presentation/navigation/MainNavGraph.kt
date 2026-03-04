@@ -35,7 +35,7 @@ fun MainNavGraph(
     bottomPadding: Dp = 0.dp,
 ) {
     val navigationState = navigator.state
-    val sceneStrategy = remember { SceneStrategy<NavKey>() }
+    val sceneStrategy = remember { listOf(SceneStrategy<NavKey>()) }
     val screenModifier = Modifier.containerClip(background = Color.Transparent)
     NavDisplay(
         modifier = modifier,
@@ -51,7 +51,7 @@ fun MainNavGraph(
             materialSharedAxisYIn(true, 100) togetherWith
                     materialSharedAxisYOut(false, 100)
         },
-        sceneStrategy = sceneStrategy,
+        sceneStrategies = sceneStrategy,
         entries = navigationState.toEntries(
             entryProvider {
                 entry<MainNavRoute.Home> {

@@ -7,7 +7,6 @@ import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import coil.util.DebugLogger
-import io.kotzilla.sdk.analytics.koin.analytics
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import younesbouhouche.musicplayer.features.main.util.AppSpecificStorageFetcher
@@ -17,7 +16,6 @@ class App : Application(), ImageLoaderFactory {
         super.onCreate()
         startKoin {
             androidContext(this@App)
-            analytics()
             modules(appModule, dialogModule)
         }
     }

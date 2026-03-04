@@ -68,14 +68,14 @@ fun Carousel(
                 detectHorizontalDragGestures(
                     onDragEnd = {
                         println("Drag ended, current item: ${carouselState.currentItem}")
-                        if (carouselState.currentItem != carouselState.currentItem)
+                        if (carouselState.currentItem != queue.currentIndex)
                             onPlayerEvent(PlayerEvent.Seek(carouselState.currentItem))
                     }
                 ) { _, _ -> }
             },
         contentPadding = PaddingValues(horizontal = 16.dp),
         itemSpacing = 8.dp,
-        userScrollEnabled = enabled
+        userScrollEnabled = enabled,
     ) { page ->
         Image(
             model = queue.songs.getOrNull(page)?.coverPath,
