@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="sequentially">
+
+    <!-- Squish in -->
+    <set android:ordering="together">
+        <objectAnimator
+            android:propertyName="scaleX"
+            android:valueFrom="1"
+            android:valueTo="0.84"
+            android:duration="100"
+            android:startOffset="1000"
+            android:interpolator="@android:interpolator/decelerate_quad" />
+        <objectAnimator
+            android:propertyName="scaleY"
+            android:valueFrom="1"
+            android:valueTo="1.08"
+            android:duration="100"
+            android:startOffset="1000"
+            android:interpolator="@android:interpolator/decelerate_quad" />
+    </set>
+
+    <!-- Stretch out -->
+    <set android:ordering="together">
+        <objectAnimator
+            android:propertyName="scaleX"
+            android:valueFrom="0.84"
+            android:valueTo="1.06"
+            android:duration="150"
+            android:interpolator="@android:interpolator/decelerate_quad" />
+        <objectAnimator
+            android:propertyName="scaleY"
+            android:valueFrom="1.08"
+            android:valueTo="0.96"
+            android:duration="150"
+            android:interpolator="@android:interpolator/decelerate_quad" />
+    </set>
+
+    <!-- Settle -->
+    <set android:ordering="together">
+        <objectAnimator
+            android:propertyName="scaleX"
+            android:valueFrom="1.06"
+            android:valueTo="1"
+            android:duration="250"
+            android:interpolator="@android:interpolator/overshoot" />
+        <objectAnimator
+            android:propertyName="scaleY"
+            android:valueFrom="0.96"
+            android:valueTo="1"
+            android:duration="250"
+            android:interpolator="@android:interpolator/overshoot" />
+    </set>
+
+</set>

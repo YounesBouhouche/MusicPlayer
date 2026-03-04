@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="together">
+
+    <!-- ScaleX: 1.35 -> 0.88 at collision (65%) -> 1.08 -> 1 -->
+    <objectAnimator
+        android:propertyName="scaleX"
+        android:duration="750"
+        android:startOffset="550"
+        android:interpolator="@android:interpolator/linear"
+        android:valueType="floatType">
+        <android:keyframe android:fraction="0"    android:value="1.35" />
+        <android:keyframe android:fraction="0.65" android:value="0.88"
+            android:interpolator="@android:interpolator/decelerate_cubic" />
+        <android:keyframe android:fraction="0.82" android:value="1.08"
+            android:interpolator="@android:interpolator/decelerate_quad" />
+        <android:keyframe android:fraction="1"    android:value="1.0"
+            android:interpolator="@android:interpolator/decelerate_quad" />
+    </objectAnimator>
+
+    <!-- ScaleY mirrors ScaleX -->
+    <objectAnimator
+        android:propertyName="scaleY"
+        android:duration="750"
+        android:startOffset="550"
+        android:interpolator="@android:interpolator/linear"
+        android:valueType="floatType">
+        <android:keyframe android:fraction="0"    android:value="1.35" />
+        <android:keyframe android:fraction="0.65" android:value="0.88"
+            android:interpolator="@android:interpolator/decelerate_cubic" />
+        <android:keyframe android:fraction="0.82" android:value="1.08"
+            android:interpolator="@android:interpolator/decelerate_quad" />
+        <android:keyframe android:fraction="1"    android:value="1.0"
+            android:interpolator="@android:interpolator/decelerate_quad" />
+    </objectAnimator>
+
+</set>

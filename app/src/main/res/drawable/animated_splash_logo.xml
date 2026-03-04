@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_splash_logo">
+
+    <!-- Music note: fade + scale appear -->
+    <target
+        android:name="note_group"
+        android:animation="@anim/anim_note_appear" />
+
+    <!-- Music note: collision squish reaction -->
+    <target
+        android:name="note_group"
+        android:animation="@anim/anim_note_react" />
+
+    <!-- Bar 1 slide (outer group) -->
+    <target
+        android:name="bar1_slide_group"
+        android:animation="@anim/anim_bar1_slide" />
+
+    <!-- Bar 1 scale (inner group) -->
+    <target
+        android:name="bar1_scale_group"
+        android:animation="@anim/anim_bar1_scale" />
+
+    <!-- Bar 2 slide -->
+    <target
+        android:name="bar2_slide_group"
+        android:animation="@anim/anim_bar2_slide" />
+
+    <!-- Bar 2 scale -->
+    <target
+        android:name="bar2_scale_group"
+        android:animation="@anim/anim_bar2_scale" />
+
+    <!-- Dot slide -->
+    <target
+        android:name="dot_slide_group"
+        android:animation="@anim/anim_dot_slide" />
+
+    <!-- Dot scale -->
+    <target
+        android:name="dot_scale_group"
+        android:animation="@anim/anim_dot_scale" />
+
+</animated-vector>

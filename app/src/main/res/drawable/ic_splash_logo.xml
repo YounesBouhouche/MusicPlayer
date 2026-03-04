@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Vector drawable: 512x512 viewBox
+  Elements:
+    - note_group    : the music note path
+    - bar1_slide_group / bar1_scale_group / bar1
+    - bar2_slide_group / bar2_scale_group / bar2
+    - dot_slide_group  / dot_scale_group  / dot
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="512dp"
+    android:height="512dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+
+    <!-- Background -->
+    <path
+        android:fillColor="#f0fbf6"
+        android:pathData="M0,0 H512 V512 H0 Z" />
+
+    <!-- Music Note -->
+    <group
+        android:name="note_group"
+        android:pivotX="178"
+        android:pivotY="240">
+        <path
+            android:name="note_path"
+            android:fillColor="#006b4f"
+            android:pathData="M254.04,140.94v175.43c0,41.8-33.44,76.44-75.24,76.74-42.12,0.3-76.35-33.75-76.35-75.8s33.93-75.79,75.8-75.79c7.55,0,14.84,1.1,21.72,3.15,7.89,2.35,15.79-3.7,15.79-11.93v-92.3c0-5.29,2.14-10.07,5.61-13.53,3.52-3.53,8.42-5.68,13.81-5.61,10.54,0.15,18.86,9.09,18.86,19.63Z" />
+    </group>
+
+    <!-- Bar 1: outer group translates, inner group scales -->
+    <group android:name="bar1_slide_group">
+        <group
+            android:name="bar1_scale_group"
+            android:pivotX="291.5"
+            android:pivotY="218.68">
+            <path
+                android:name="bar1"
+                android:fillColor="#00a374"
+                android:pathData="M291.51,150.25 a19.14,19.14 0 0 1 19.14,19.14 v98.59 a19.14,19.14 0 0 1 -38.29,0 v-98.59 a19.14,19.14 0 0 1 19.14,-19.14 Z" />
+        </group>
+    </group>
+
+    <!-- Bar 2: outer group translates, inner group scales -->
+    <group android:name="bar2_slide_group">
+        <group
+            android:name="bar2_scale_group"
+            android:pivotX="345.8"
+            android:pivotY="218.68">
+            <path
+                android:name="bar2"
+                android:fillColor="#5ce0ac"
+                android:pathData="M345.79,180.16 a19.14,19.14 0 0 1 19.14,19.14 v38.76 a19.14,19.14 0 0 1 -38.29,0 v-38.76 a19.14,19.14 0 0 1 19.14,-19.14 Z" />
+        </group>
+    </group>
+
+    <!-- Dot: outer group translates, inner group scales -->
+    <group android:name="dot_slide_group">
+        <group
+            android:name="dot_scale_group"
+            android:pivotX="395.41"
+            android:pivotY="218.68">
+            <path
+                android:name="dot"
+                android:fillColor="#b2f0d8"
+                android:pathData="M395.41,199.54 a19.14,19.14 0 1 1 0,38.28 a19.14,19.14 0 0 1 0,-38.28 Z" />
+        </group>
+    </group>
+
+</vector>
