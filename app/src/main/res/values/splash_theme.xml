@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash screen theme using SplashScreen API (Android 12+) -->
+    <style name="Theme.App.Splash" parent="Theme.SplashScreen">
+        <!-- Icon background color -->
+        <item name="windowSplashScreenBackground">#f0fbf6</item>
+        <!-- Animated icon (requires API 31+) -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/animated_splash_logo</item>
+        <!-- How long to show the splash icon (this is the icon fade-in duration) -->
+        <item name="windowSplashScreenAnimationDuration">300</item>
+        <!-- Theme to transition into after splash -->
+        <item name="postSplashScreenTheme">@style/Theme.MusicPlayer</item>
+    </style>
+</resources>
