@@ -1,22 +1,22 @@
+import com.android.build.api.dsl.ApplicationExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.com.google.devtools.ksp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.room)
     alias(libs.plugins.ktlint)
-    alias(libs.plugins.kotzilla)
 }
 
-android {
+configure<ApplicationExtension> {
     namespace = "younesbouhouche.musicplayer"
     compileSdk {
         version = release(36)
     }
-    android.buildFeatures.buildConfig = true
+    buildFeatures.buildConfig = true
 
     defaultConfig {
         applicationId = "younesbouhouche.musicplayer"
@@ -72,13 +72,6 @@ android {
 //            versionNameSuffix = "-paid"
 //        }
 //    }
-    kotlin {
-        compilerOptions {
-            jvmTarget = JvmTarget.fromTarget("21")
-            languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.fromVersion("2.2")
-            apiVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.fromVersion("2.2")
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -93,6 +86,15 @@ android {
     }
 }
 
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+        languageVersion.set(KotlinVersion.KOTLIN_2_2)
+        apiVersion.set(KotlinVersion.KOTLIN_2_2)
+    }
+}
+
 room {
     schemaDirectory("$projectDir/schemas")
 }
@@ -100,7 +102,6 @@ room {
 //tasks.getByPath("preBuild").dependsOn("ktlintFormat")
 
 dependencies {
-    implementation(libs.kotzilla.sdk)
     implementation(libs.material.kolor)
     implementation(libs.kmpalette.core)
     implementation(libs.androidx.core.ktx)
@@ -160,5 +161,6 @@ dependencies {
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.androidx.core.splashscreen)
 }
 
