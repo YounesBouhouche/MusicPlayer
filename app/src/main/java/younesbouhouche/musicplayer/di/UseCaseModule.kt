@@ -15,7 +15,6 @@ val useCaseModule = module {
     factoryOf(::GetPlaylistsUseCase)
     factoryOf(::GetPlaylistUseCase)
     factoryOf(::GetQueueUseCase)
-    factoryOf(::ScanLibraryUseCase)
     factoryOf(::GetPlayerStateUseCase)
     factoryOf(::GetSongsUseCase)
     factoryOf(::ObserveSongUseCase)
