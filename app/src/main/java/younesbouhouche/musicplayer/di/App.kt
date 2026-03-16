@@ -8,6 +8,7 @@ import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import coil.util.DebugLogger
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.startKoin
 import younesbouhouche.musicplayer.features.main.util.AppSpecificStorageFetcher
 
@@ -16,6 +17,7 @@ class App : Application(), ImageLoaderFactory {
         super.onCreate()
         startKoin {
             androidContext(this@App)
+            workManagerFactory()
             modules(appModule, dialogModule)
         }
     }

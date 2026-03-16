@@ -13,9 +13,11 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.koin.androidx.workmanager.dsl.workerOf
 import org.koin.dsl.module
 import timber.log.Timber
 import younesbouhouche.musicplayer.BuildConfig
+import younesbouhouche.musicplayer.MusicLibraryWorker
 import younesbouhouche.musicplayer.core.data.util.constructUrl
 
 val appModule = module {
@@ -46,4 +48,5 @@ val appModule = module {
         }
     }
     includes(databaseModule, repoModule, viewModelModule, utilsModule, useCaseModule)
+    workerOf(::MusicLibraryWorker)
 }
