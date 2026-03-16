@@ -89,7 +89,7 @@ fun PlayerScreen(
                     onPlayerEvent(PlayerEvent.Stop)
             },
             modifier = modifier.fillMaxWidth()
-                .padding(8.dp * (1f - progress))
+                .padding(12.dp * (1f - progress))
                 .height(height)
                 .offset {
                     IntOffset(0, offset)
