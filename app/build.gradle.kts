@@ -149,6 +149,7 @@ dependencies {
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
     implementation(libs.koin.compose.viewmodel.navigation)
+    implementation(libs.koin.androidx.workmanager)
     implementation(libs.androidx.collection)
     implementation(libs.androidx.collection.ktx)
     implementation(libs.disk.lru.cache)
@@ -162,5 +163,6 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.work.runtime.ktx)
 }
 

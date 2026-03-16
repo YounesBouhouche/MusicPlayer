@@ -1,7 +1,7 @@
 [versions]
-agp = "9.0.1"
-animationGraphics = "1.10.4"
-collectionKtx = "1.5.0"
+agp = "9.1.0"
+animationGraphics = "1.10.5"
+collectionKtx = "1.6.0"
 composedesignsystem = "v0.3.2-hotfix"
 composeDnd = "0.4.0"
 coreSplashscreen = "1.2.0"
@@ -9,14 +9,14 @@ diskLruCache = "1.7"
 glanceAppwidget = "1.1.1"
 koinAndroid = "4.1.1"
 kotlin = "2.3.10"
-coreKtx = "1.17.0"
+coreKtx = "1.18.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 lazycolumnscrollbar = "2.2.0"
 lifecycleRuntimeKtx = "2.10.0"
-activityCompose = "1.12.4"
-composeBom = "2026.02.01"
+activityCompose = "1.13.0"
+composeBom = "2026.03.00"
 material-icons-extended = "1.7.8"
 material3 = "1.5.0-alpha15"
 jaudiotagger = "3.0.1"
@@ -24,7 +24,7 @@ ksp = "2.3.2"
 material3AdaptiveNavigationSuite = "1.4.0"
 materialKolor = "4.1.1"
 media3Exoplayer = "1.9.2"
-navigation3 = "1.1.0-alpha05"
+navigation3 = "1.1.0-beta01"
 navigation-compose = "2.9.7"
 serialization = "1.10.0"
 media3Session = "1.9.2"
@@ -33,12 +33,13 @@ waveslider = "2.2.0"
 material-motion-compose-navigation = "1.1.3"
 roomRuntime = "2.8.4"
 appcompat = "1.7.1"
-datastore-preferences = "1.2.0"
+datastore-preferences = "1.2.1"
 coilCompose = "2.7.0"
 kmpalette = "3.1.0"
 ktor = "3.4.1"
 desugar-jdk-libs = "2.1.5"
-ktlint = "14.0.1"
+ktlint = "14.1.0"
+workRuntimeKtx = "2.11.1"
 
 [libraries]
 androidx-animation-graphics = { module = "androidx.compose.animation:animation-graphics", version.ref = "animationGraphics" }
@@ -48,6 +49,7 @@ androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", versi
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleRuntimeKtx" }
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 compose-dnd = { module = "com.mohamedrejeb.dnd:compose-dnd", version.ref = "composeDnd" }
 composedesignsystem = { module = "com.github.YounesBouhouche:ComposeDesignSystem", version.ref = "composedesignsystem" }
 disk-lru-cache = { module = "com.github.solkin:disk-lru-cache", version.ref = "diskLruCache" }
@@ -60,6 +62,7 @@ androidx-material3-adaptive-navigation-suite = { module = "androidx.compose.mate
 androidx-material3-adaptive-navigation-suite-android = { module = "androidx.compose.material3:material3-adaptive-navigation-suite-android", version.ref = "material3AdaptiveNavigationSuite" }
 androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3Exoplayer" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinAndroid" }
+koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager", version.ref = "koinAndroid" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koinAndroid" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinAndroid" }
 koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation", version.ref = "koinAndroid" }
