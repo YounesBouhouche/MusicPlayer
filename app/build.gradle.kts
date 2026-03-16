@@ -22,8 +22,8 @@ configure<ApplicationExtension> {
         applicationId = "younesbouhouche.musicplayer"
         minSdk = 30
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 1_2
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
