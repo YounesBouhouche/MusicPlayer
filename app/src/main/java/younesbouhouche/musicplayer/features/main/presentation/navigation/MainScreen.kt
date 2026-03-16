@@ -1,12 +1,6 @@
 package younesbouhouche.musicplayer.features.main.presentation.navigation
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,9 +8,12 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -71,7 +68,7 @@ fun MainScreen(
     val navigator = remember {
         Navigator(navigationState)
     }
-    val loadingState by mainVM.loadingState.collectAsStateWithLifecycle()
+    val isLoading by mainVM.isLoading.collectAsStateWithLifecycle()
     val playerState by mainVM.playerState.collectAsStateWithLifecycle()
     val currentRoute = navigationState.backStacks[navigationState.topLevelRoute]?.let {
         it.lastOrNull { navKey -> (navKey as? MainNavRoute)?.isDialog == false }
@@ -84,7 +81,7 @@ fun MainScreen(
     var viewHeight by remember { mutableIntStateOf(0) }
     val bottomPadding =
         WindowInsets.navigationBars.add(
-            WindowInsets(bottom = 80.dp +
+            WindowInsets(bottom = 100.dp +
                 (if (playerState.playState != PlayState.STOP) 80.dp else 0.dp)
             )
         ).asPaddingValues().calculateBottomPadding()
@@ -111,36 +108,31 @@ fun MainScreen(
                     )
             ) {
                 AnimatedVisibility(isParent) {
-                    AnimatedContent(
-                        targetState = loadingState.isLoading(),
-                        transitionSpec = {
-                            if (initialState) {
-                                slideInVertically { height -> height } + fadeIn() togetherWith
-                                        slideOutVertically { height -> -height } + fadeOut()
-                            } else {
-                                slideInVertically { height -> -height } + fadeIn() togetherWith
-                                        slideOutVertically { height -> height } + fadeOut()
-                            }
-                        }
-                    ) { isLoading ->
-                        if (isLoading)
-                            LoadingBar(loadingState)
-                        else
-                            SearchScreen(
-                                onShowBottomSheet = {
-                                    navigator.navigate(MainNavRoute.SongInfo(it.id))
-                                },
-                                onAlbumClick = {
-                                    navigator.navigate(MainNavRoute.Album(it.name))
-                                },
-                                onArtistClick = {
-                                    navigator.navigate(MainNavRoute.Artist(it.name))
-                                },
-                                onPlaylistClick = {
-                                    navigator.navigate(MainNavRoute.Playlist(it.id))
-                                },
-                                navigateToSettings = navigateToSettings
+                    Column(Modifier.fillMaxWidth()) {
+                        SearchScreen(
+                            onShowBottomSheet = {
+                                navigator.navigate(MainNavRoute.SongInfo(it.id))
+                            },
+                            onAlbumClick = {
+                                navigator.navigate(MainNavRoute.Album(it.name))
+                            },
+                            onArtistClick = {
+                                navigator.navigate(MainNavRoute.Artist(it.name))
+                            },
+                            onPlaylistClick = {
+                                navigator.navigate(MainNavRoute.Playlist(it.id))
+                            },
+                            navigateToSettings = navigateToSettings
+                        )
+                        AnimatedVisibility(visible = isLoading) {
+                            LinearWavyProgressIndicator(
+                                modifier = Modifier.fillMaxWidth().height(12.dp),
+                                color = MaterialTheme.colorScheme.primary,
+                                trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                                waveSpeed = (-40).dp,
+                                wavelength = 60.dp,
                             )
+                        }
                     }
                 }
                 MainNavGraph(

@@ -44,9 +44,7 @@ class MediaStoreScanner(private val context: Context) {
         val artists: List<ArtistEntity>
     )
 
-    suspend fun scanMediaLibrary(
-        onUpdate: (progress: Int, max: Int) -> Unit
-    ): MediaLibrary {
+    suspend fun scanMediaLibrary(): MediaLibrary {
         val songs = mutableListOf<SongEntity>()
         val albums = mutableListOf<AlbumEntity>()
         val artists = mutableListOf<ArtistEntity>()
@@ -75,9 +73,6 @@ class MediaStoreScanner(private val context: Context) {
                 MediaStore.Audio.Media.IS_MUSIC + "!= 0",
             )
             cursor?.use { crs ->
-                val totalSongs = crs.count
-                onUpdate(0, totalSongs)
-
                 val idColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
                 val fileNameColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
                 val durationColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
@@ -141,21 +136,22 @@ class MediaStoreScanner(private val context: Context) {
                         .build()
 
                     processedCount++
-                    onUpdate(processedCount, totalSongs)
                 }
             }
             cursor?.close()
         }
-        artists += songs.groupBy {
-            it.artist
-        }.map { (artistName, songsInArtist) ->
-            val firstSongWithCover = songsInArtist.firstOrNull {
-                it.coverUri != null
+        withContext(Dispatchers.Default) {
+            artists += songs.groupBy {
+                it.artist
+            }.map { (artistName, songsInArtist) ->
+                val firstSongWithCover = songsInArtist.firstOrNull {
+                    it.coverUri != null
+                }
+                ArtistEntity(
+                    name = artistName,
+                    coverUri = firstSongWithCover?.coverUri
+                )
             }
-            ArtistEntity(
-                name = artistName,
-                coverUri = firstSongWithCover?.coverUri
-            )
         }
 
         return MediaLibrary(
@@ -167,7 +163,6 @@ class MediaStoreScanner(private val context: Context) {
 
     suspend fun fetchSongsCover(
         songs: List<SongEntity>,
-        onUpdate: (progress: Int) -> Unit
     ): List<SongEntity> {
         return withContext(Dispatchers.IO) {
             try {
@@ -178,9 +173,6 @@ class MediaStoreScanner(private val context: Context) {
                 if (!coversDir.exists()) {
                     coversDir.mkdirs()
                 }
-
-                var processedCount = 0
-
                 val results = songs.map { song ->
                     async {
                         try {
@@ -232,19 +224,9 @@ class MediaStoreScanner(private val context: Context) {
                                     song
                                 }
                             }
-
-                            synchronized(this@MediaStoreScanner) {
-                                processedCount++
-                                onUpdate(processedCount)
-                            }
-
                             result
                         } catch (e: Exception) {
                             Timber.tag(TAG).e("Error fetching cover for song ${song.id}: ${e.message}")
-                            synchronized(this@MediaStoreScanner) {
-                                processedCount++
-                                onUpdate(processedCount)
-                            }
                             song
                         }
                     }

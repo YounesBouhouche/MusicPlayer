@@ -16,12 +16,10 @@ class ArtistsPictureFetcher(
 ) {
     suspend operator fun invoke(
         artists: List<ArtistEntity>,
-        onUpdate: (Int) -> Unit = {}
     ): List<ArtistEntity> {
-        return artists.mapIndexed { index, artist ->
+        return artists.map { artist ->
             if (artist.name == "<unknown>") {
-                onUpdate(index + 1)
-                return@mapIndexed artist
+                return@map artist
             }
             (safeCall<DeezerResponse, HttpResponse>(
                 { body() },
@@ -34,7 +32,6 @@ class ArtistsPictureFetcher(
                     }
                 }
             }.map {
-                onUpdate(index + 1)
                 artist.copy(
                     picture = it.data.firstOrNull()?.pictureXl
                 )
