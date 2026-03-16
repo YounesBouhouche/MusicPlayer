@@ -66,6 +66,7 @@ internal fun AppTheme(
         error = colorScheme.error,
         style = PaletteStyle.Expressive,
         animate = true,
+        animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec(),
         isDark = isDark,
         isAmoled = extraDark,
         typography = rubikTypography(MaterialTheme.typography),
