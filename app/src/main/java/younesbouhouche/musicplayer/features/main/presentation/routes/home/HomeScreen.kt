@@ -84,33 +84,10 @@ fun HomeScreen(
         artists.size
     }
     LazyColumn(
-        Modifier.fillMaxSize().padding(8.dp, 16.dp).then(modifier),
+        Modifier.fillMaxSize().then(modifier),
         verticalArrangement = Arrangement.spacedBy(24.dp),
         contentPadding = PaddingValues(bottom = bottomPadding)
     ) {
-        item {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 36.dp, horizontal = 12.dp)
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        text = stringResource(R.string.welcome_back),
-                        style = MaterialTheme.typography.displaySmall,
-                        fontWeight = FontWeight.Bold,
-                        fontStyle = FontStyle.Italic,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
-                    )
-                    Text(
-                        text = stringResource(R.string.welcome_text),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                }
-            }
-        }
         if (artists.isNotEmpty()) {
             item {
                 Column(
@@ -120,42 +97,34 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Header(stringResource(R.string.top_artists))
-                    Surface(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp),
-                        color = MaterialTheme.colorScheme.surfaceContainerLow,
-                        shape = MaterialTheme.shapes.extraExtraLarge
+                    HorizontalUncontainedCarousel(
+                        state = state,
+                        itemWidth = 200.dp,
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(16.dp),
+                        itemSpacing = 16.dp,
                     ) {
-                        HorizontalUncontainedCarousel(
-                            state = state,
-                            itemWidth = 200.dp,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentPadding = PaddingValues(16.dp),
-                            itemSpacing = 16.dp,
+                        val artist = artists[it]
+                        PictureCard(
+                            artist.getPicture(),
+                            Icons.Default.Person,
+                            {
+                                onArtistClick(artist)
+                            },
+                            Modifier.fillMaxWidth(),
+                            shape = rememberMaskShape(MaterialTheme.shapes.extraLarge),
+                            contentPadding = PaddingValues(24.dp)
                         ) {
-                            val artist = artists[it]
-                            PictureCard(
-                                artist.getPicture(),
-                                Icons.Default.Person,
-                                {
-                                    onArtistClick(artist)
-                                },
-                                Modifier.fillMaxWidth(),
-                                shape = rememberMaskShape(MaterialTheme.shapes.extraLarge),
-                                contentPadding = PaddingValues(24.dp)
+                            Column(
+                                Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
                             ) {
-                                Column(
-                                    Modifier.fillMaxSize(),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
-                                ) {
-                                    Text(
-                                        artist.name,
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis,
-                                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                                    )
-                                }
+                                Text(
+                                    artist.name,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                                )
                             }
                         }
                     }
