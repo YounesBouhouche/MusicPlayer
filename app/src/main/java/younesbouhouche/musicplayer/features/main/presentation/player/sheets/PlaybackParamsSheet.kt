@@ -94,7 +94,7 @@ fun PlaybackParamsSheet(
                 )
             },
             contentWindowInsets = {
-                BottomSheetDefaults.windowInsets.exclude(WindowInsets.navigationBars)
+                BottomSheetDefaults.modalWindowInsets.exclude(WindowInsets.navigationBars)
             }
         ) {
             LazyColumn(

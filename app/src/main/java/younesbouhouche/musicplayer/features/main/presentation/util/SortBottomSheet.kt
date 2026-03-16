@@ -56,7 +56,7 @@ fun <T>SortBottomSheet(
             { onSortStateChange(sortState.copy(expanded = false)) },
             modifier,
             contentWindowInsets = {
-                BottomSheetDefaults.windowInsets.add(WindowInsets(bottom = 16.dp))
+                BottomSheetDefaults.modalWindowInsets.add(WindowInsets(bottom = 16.dp))
             },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         ) {

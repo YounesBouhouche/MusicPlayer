@@ -85,7 +85,7 @@ fun TimerSheet(
                 color = MaterialTheme.colorScheme.primary
             ) },
             contentWindowInsets = {
-                BottomSheetDefaults.windowInsets.exclude(WindowInsets.navigationBars)
+                BottomSheetDefaults.modalWindowInsets.exclude(WindowInsets.navigationBars)
             }
         ) {
             if (running)
