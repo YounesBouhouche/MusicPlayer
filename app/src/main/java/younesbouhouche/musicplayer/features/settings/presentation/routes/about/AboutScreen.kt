@@ -2,11 +2,8 @@ package younesbouhouche.musicplayer.features.settings.presentation.routes.about
 
 import android.content.Intent
 import android.os.Build
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mail
@@ -16,19 +13,17 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import younesbouhouche.musicplayer.R
+import androidx.glance.appwidget.lazy.items
 import com.younesb.mydesignsystem.presentation.components.ExpressiveButton
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.features.main.presentation.util.getAppVersion
-import younesbouhouche.musicplayer.features.settings.presentation.AppIcon
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsItem
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsList
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsScreen
@@ -124,51 +119,36 @@ fun AboutScreen(modifier: Modifier = Modifier) {
     )
     SettingsScreen(
         title = stringResource(R.string.about),
-        modifier = modifier.fillMaxSize()
-    ) { paddingValues ->
-        LazyColumn(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-            contentPadding = paddingValues,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(
-                16.dp,
-                Alignment.CenterVertically
-            ),
-        ) {
-            item {
-                AppIcon()
-            }
-            item {
-                Text(
-                    stringResource(R.string.app_name),
-                    Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.headlineLarge,
-                    textAlign = TextAlign.Center,
+        modifier = modifier.fillMaxSize(),
+        icon = ImageVector.vectorResource(R.drawable.monochrome)
+    ) {
+        item {
+            Text(
+                stringResource(R.string.app_name),
+                Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
+            )
+        }
+        item {
+            ExpressiveButton(
+                "v${context.getAppVersion()}",
+                ButtonDefaults.MediumContainerHeight,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.tertiary
                 )
-            }
-            item {
-                ExpressiveButton(
-                    "v${context.getAppVersion()}",
-                    ButtonDefaults.MediumContainerHeight,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        contentColor = MaterialTheme.colorScheme.tertiary
-                    )
-                ) {
+            ) {
 
-                }
             }
-            items(categories) {
-                SettingsList(it.name) {
-                    it.items.forEachIndexed { index, setting ->
-                        SettingsItem(
-                            setting,
-                            shape = listItemShape(index , it.items.size),
-                        )
-                    }
+        }
+        items(categories) {
+            SettingsList(it.name) {
+                it.items.forEachIndexed { index, setting ->
+                    SettingsItem(
+                        setting,
+                        shape = listItemShape(index , it.items.size),
+                    )
                 }
             }
         }

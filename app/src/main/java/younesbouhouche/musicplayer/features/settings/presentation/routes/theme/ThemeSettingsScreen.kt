@@ -19,6 +19,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -37,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.glance.appwidget.lazy.items
 import com.younesb.mydesignsystem.presentation.components.ToggleButtonsRow
 import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.R
@@ -146,21 +149,16 @@ fun ThemeSettingsScreen(
     )
     SettingsScreen(
         title = stringResource(R.string.theme_settings),
+        icon = Icons.Default.Palette,
         modifier = modifier
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = paddingValues + PaddingValues(12.dp, 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(settings) {
-                SettingsList(it.name) {
-                    it.items.forEachIndexed { index, item ->
-                        SettingsItem(
-                            data = item,
-                            shape = listItemShape(index, it.items.size),
-                        )
-                    }
+    ) {
+        items(settings) {
+            SettingsList(it.name) {
+                it.items.forEachIndexed { index, item ->
+                    SettingsItem(
+                        data = item,
+                        shape = listItemShape(index, it.items.size),
+                    )
                 }
             }
         }

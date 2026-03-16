@@ -1,9 +1,5 @@
 package younesbouhouche.musicplayer.features.settings.presentation.routes.playback
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MusicOff
@@ -15,10 +11,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.glance.appwidget.lazy.items
 import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.R
-import com.younesb.mydesignsystem.presentation.util.plus
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsItem
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsList
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsScreen
@@ -78,24 +73,18 @@ fun PlaybackSettingsScreen(modifier: Modifier = Modifier) {
     )
     SettingsScreen(
         title = stringResource(R.string.playback),
+        icon = Icons.Default.Speed,
         modifier = modifier
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = paddingValues + PaddingValues(12.dp, 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(settings) {
-                SettingsList(it.name) {
-                    it.items.forEachIndexed { index, item ->
-                        SettingsItem(
-                            data = item,
-                            shape = listItemShape(index, it.items.size),
-                        )
-                    }
+    ) {
+        items(settings) {
+            SettingsList(it.name) {
+                it.items.forEachIndexed { index, item ->
+                    SettingsItem(
+                        data = item,
+                        shape = listItemShape(index, it.items.size),
+                    )
                 }
             }
         }
     }
-
 }

@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -25,40 +28,33 @@ fun SettingsPage(
     modifier: Modifier = Modifier,
     navigate: (SettingsGraph) -> Unit,
 ) {
+    val categories = Settings.categories
     SettingsScreen(
         title = stringResource(R.string.settings),
+        icon = Icons.Default.Settings,
         modifier = modifier.fillMaxSize()
-    ) { paddingValues ->
-        val categories = Settings.categories
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = paddingValues + PaddingValues(12.dp, 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            categories.forEach { category ->
-                item {
-                    SettingsList(
-                        name = category.name,
-                        itemsCount = category.items.size
-                    ) {
-                        SettingsItem(
-                            headline = stringResource(category.items[it].headline),
-                            supporting = category.items[it].supporting?.let { resId ->
-                                stringResource(resId)
-                            },
-                            icon = category.items[it].icon,
-                            iconTint = category.iconTint,
-                            iconBackground = category.iconBackground,
-                            background = MaterialTheme.colorScheme.surfaceContainerHigh,
-                            shape = listItemShape(it, category.items.size),
-                            onClick = {
-                                category.items[it].navigateToRoute?.let { route ->
-                                    navigate(route)
-                                }
-                            }
-                        )
+    ) {
+        items(categories) { category ->
+            SettingsList(
+                name = category.name,
+                itemsCount = category.items.size
+            ) {
+                SettingsItem(
+                    headline = stringResource(category.items[it].headline),
+                    supporting = category.items[it].supporting?.let { resId ->
+                        stringResource(resId)
+                    },
+                    icon = category.items[it].icon,
+                    iconTint = category.iconTint,
+                    iconBackground = category.iconBackground,
+                    background = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    shape = listItemShape(it, category.items.size),
+                    onClick = {
+                        category.items[it].navigateToRoute?.let { route ->
+                            navigate(route)
+                        }
                     }
-                }
+                )
             }
         }
     }

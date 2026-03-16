@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -49,21 +51,16 @@ fun PlayerSettingsScreen(modifier: Modifier = Modifier) {
     )
     SettingsScreen(
         title = stringResource(R.string.player),
+        icon = Icons.Default.PlayArrow,
         modifier = modifier
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = paddingValues + PaddingValues(12.dp, 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(settings) {
-                SettingsList(it.name) {
-                    it.items.forEachIndexed { index, item ->
-                        SettingsItem(
-                            data = item,
-                            shape = listItemShape(index, it.items.size),
-                        )
-                    }
+    ) {
+        items(settings) {
+            SettingsList(it.name) {
+                it.items.forEachIndexed { index, item ->
+                    SettingsItem(
+                        data = item,
+                        shape = listItemShape(index, it.items.size),
+                    )
                 }
             }
         }

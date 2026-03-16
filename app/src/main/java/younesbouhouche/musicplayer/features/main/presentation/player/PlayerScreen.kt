@@ -1,6 +1,10 @@
 package younesbouhouche.musicplayer.features.main.presentation.player
 
+import androidx.activity.compose.PredictiveBackHandler
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
@@ -22,6 +26,7 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -29,7 +34,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.kmpalette.rememberPaletteState
@@ -72,7 +79,7 @@ fun PlayerScreen(
         else 8.dp * (1f - progress),
         animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec()
     )
-    val palette = rememberPaletteState {  }
+    val palette = rememberPaletteState()
     val scope = rememberCoroutineScope()
     val shape = RoundedCornerShape(
         topStart = largeCorner,
@@ -80,6 +87,11 @@ fun PlayerScreen(
         bottomStart = smallCorner,
         bottomEnd = smallCorner
     )
+    val hapticFeedback = LocalHapticFeedback.current
+    LaunchedEffect(swipeState.currentValue) {
+        if (swipeState.currentValue != SwipeToDismissBoxValue.Settled)
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+    }
     AppTheme(palette) {
         SwipeToDismissBox(
             state = swipeState,
@@ -99,7 +111,7 @@ fun PlayerScreen(
                     Orientation.Vertical,
                     flingBehavior = AnchoredDraggableDefaults.flingBehavior(
                         state = dragState,
-                        animationSpec = tween(),
+                        animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec(),
                         positionalThreshold = { it * .5f }
                     ),
                 ),
