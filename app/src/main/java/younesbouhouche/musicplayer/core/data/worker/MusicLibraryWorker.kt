@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer
+package younesbouhouche.musicplayer.core.data.worker
 
 import android.content.Context
 import androidx.work.BackoffPolicy
@@ -23,14 +23,15 @@ class MusicLibraryWorker(
             Result.failure()
         }
     }
-}
-
-fun launchWorkRequest(context: Context) {
-    val worker = OneTimeWorkRequestBuilder<MusicLibraryWorker>()
-        .setBackoffCriteria(
-            backoffPolicy = BackoffPolicy.EXPONENTIAL,
-            duration = Duration.ofSeconds(10),
-        )
-        .build()
-    WorkManager.getInstance(context).enqueue(worker)
+    companion object {
+        fun launchWorkRequest(context: Context) {
+            val worker = OneTimeWorkRequestBuilder<MusicLibraryWorker>()
+                .setBackoffCriteria(
+                    backoffPolicy = BackoffPolicy.EXPONENTIAL,
+                    duration = Duration.ofSeconds(10),
+                )
+                .build()
+            WorkManager.Companion.getInstance(context).enqueue(worker)
+        }
+    }
 }

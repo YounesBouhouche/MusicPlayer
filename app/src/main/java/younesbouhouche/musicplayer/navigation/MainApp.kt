@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import younesbouhouche.musicplayer.features.permissions.presentation.Permissions
-import younesbouhouche.musicplayer.launchWorkRequest
+import younesbouhouche.musicplayer.core.data.worker.MusicLibraryWorker
 import younesbouhouche.musicplayer.navigation.routes.Graph
 
 @Composable
@@ -23,7 +23,7 @@ fun MainApp(modifier: Modifier = Modifier) {
 
     val initialRoute = remember {
         if (Permissions.AUDIO.isGranted(context)) {
-            launchWorkRequest(context)
+            MusicLibraryWorker.launchWorkRequest(context)
             Graph.Main
         }
         else Graph.Permissions

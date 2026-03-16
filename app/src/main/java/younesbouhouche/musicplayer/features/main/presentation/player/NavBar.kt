@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,17 +52,21 @@ fun NavBar(
     val topRadius by animateDpAsState(
         if (playing) 8.dp else 40.dp
     )
+    val shape = remember(topRadius) {
+        RoundedCornerShape(
+            topStart = topRadius,
+            topEnd = topRadius,
+            bottomEnd = 40.dp,
+            bottomStart = 40.dp
+        )
+    }
     Box(
         modifier = modifier
             .padding(12.dp)
             .fillMaxWidth()
             .height(80.dp)
-            .clip(RoundedCornerShape(
-                topStart = topRadius,
-                topEnd = topRadius,
-                bottomEnd = 40.dp,
-                bottomStart = 40.dp
-            ))
+            .shadow(8.dp, shape)
+            .clip(shape)
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
         Row(

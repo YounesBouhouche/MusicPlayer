@@ -17,7 +17,7 @@ import org.koin.androidx.workmanager.dsl.workerOf
 import org.koin.dsl.module
 import timber.log.Timber
 import younesbouhouche.musicplayer.BuildConfig
-import younesbouhouche.musicplayer.MusicLibraryWorker
+import younesbouhouche.musicplayer.core.data.worker.MusicLibraryWorker
 import younesbouhouche.musicplayer.core.data.util.constructUrl
 
 val appModule = module {
