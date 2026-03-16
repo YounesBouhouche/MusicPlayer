@@ -221,7 +221,7 @@ private fun ListContainer(
             itemsSliced.forEachIndexed { index, it ->
                 SongListItem(
                     it,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     shape = expressiveRectShape(index, itemsSliced.size),
                     onClick = {
                         onPlay(items, index)
