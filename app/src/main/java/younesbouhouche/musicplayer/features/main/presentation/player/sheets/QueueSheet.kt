@@ -91,7 +91,7 @@ fun QueueSheet(
                 color = MaterialTheme.colorScheme.primary
             ) },
             contentWindowInsets = {
-                BottomSheetDefaults.windowInsets.exclude(WindowInsets.navigationBars)
+                BottomSheetDefaults.modalWindowInsets.exclude(WindowInsets.navigationBars)
             }
         ) {
             Box(Modifier.fillMaxSize()) {
