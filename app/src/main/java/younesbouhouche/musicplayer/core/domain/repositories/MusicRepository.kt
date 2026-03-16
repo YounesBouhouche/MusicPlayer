@@ -11,7 +11,7 @@ import younesbouhouche.musicplayer.features.main.domain.models.LoadingState
 interface MusicRepository {
     suspend fun refreshMusicLibrary(force: Boolean = false)
 
-    fun getLoadingState(): StateFlow<LoadingState>
+    fun getLoadingState(): StateFlow<Boolean>
 
     suspend fun setFavoriteSong(songId: Long, isFavorite: Boolean)
 
