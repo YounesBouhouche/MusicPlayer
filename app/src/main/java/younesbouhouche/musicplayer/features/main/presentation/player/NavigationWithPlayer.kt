@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -54,7 +55,7 @@ fun BoxScope.NavigationWithPlayer(
             anchors =
                 DraggableAnchors {
                     ViewState.SMALL at with(density) {
-                        viewHeight - (202.dp + navBarHeight).toPx()
+                        viewHeight - (174.dp + navBarHeight).toPx()
                     }
                     ViewState.LARGE at 0f
                 }
@@ -68,10 +69,9 @@ fun BoxScope.NavigationWithPlayer(
             }
         }
     }
-    val offset =
-        with(density) {
-            ((viewHeight - (156.dp + navBarHeight).roundToPx()) * (1f - progress)).roundToInt()
-        }
+    val offset = with(density) {
+        ((viewHeight - (176.dp + navBarHeight).roundToPx()) * (1f - progress)).roundToInt()
+    }
     val navigationBarOffset = with(density) {
         (progress * (112.dp + navBarHeight).toPx()).roundToInt()
     }
@@ -80,7 +80,7 @@ fun BoxScope.NavigationWithPlayer(
         state.updateAnchors(
             DraggableAnchors {
                 ViewState.SMALL at with(density) {
-                    viewHeight - (174.dp + navBarHeight).toPx()
+                    viewHeight - (192.dp + navBarHeight).toPx()
                 }
                 ViewState.LARGE at 0f
             },
@@ -115,7 +115,7 @@ fun BoxScope.NavigationWithPlayer(
     NavBar(
         route,
         playerState.playState != PlayState.STOP,
-        Modifier.offset { IntOffset(0, navigationBarOffset) },
+        Modifier.align(Alignment.BottomCenter).offset { IntOffset(0, navigationBarOffset) },
         navigate = navigate
     )
     BackHandler(state.currentValue == ViewState.LARGE) {
