@@ -49,7 +49,7 @@ class CustomMediaNotificationProvider(context: Context) : DefaultMediaNotificati
         return NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle("Music Player")
             .setContentText("Loading...")
-            .setSmallIcon(R.drawable.foreground)
+            .setSmallIcon(R.drawable.monochrome)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
             .build()

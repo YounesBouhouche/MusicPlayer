@@ -54,7 +54,7 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
         super.onCreate()
 
         notificationProvider = CustomMediaNotificationProvider(this)
-        notificationProvider.setSmallIcon(R.drawable.foreground)
+        notificationProvider.setSmallIcon(R.drawable.monochrome)
 
         serviceScope.launch {
             withContext(Dispatchers.Main) {

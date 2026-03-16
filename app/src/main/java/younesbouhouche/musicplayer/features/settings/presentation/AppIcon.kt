@@ -46,7 +46,7 @@ fun AppIcon(modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                ImageVector.vectorResource(R.drawable.foreground),
+                ImageVector.vectorResource(R.drawable.monochrome),
                 null,
                 Modifier.fillMaxSize(.4f),
                 MaterialTheme.colorScheme.onSurface,
