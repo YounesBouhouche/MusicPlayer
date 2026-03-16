@@ -17,6 +17,7 @@ import younesbouhouche.musicplayer.features.main.presentation.util.createTempFil
 import younesbouhouche.musicplayer.features.main.presentation.util.parsePlaylistFile
 import younesbouhouche.musicplayer.features.main.presentation.util.shareFile
 import younesbouhouche.musicplayer.features.permissions.presentation.Permissions
+import younesbouhouche.musicplayer.launchWorkRequest
 
 @Composable
 fun EventHandler(
@@ -46,6 +47,7 @@ fun EventHandler(
             ActivityResultContracts.RequestMultiplePermissions(),
         ) { permissions ->
             if (permissions[Permissions.AUDIO.permission] == true) {
+                launchWorkRequest(context)
                 launchMainScreen()
             }
         }
@@ -80,6 +82,7 @@ fun EventHandler(
         when (event) {
             Event.Initiate -> {
                 if (Permissions.AUDIO.isGranted(context)) {
+                    launchWorkRequest(context)
                     launchMainScreen()
                 } else {
                     permissionLauncher.launch(

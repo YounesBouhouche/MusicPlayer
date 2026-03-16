@@ -14,13 +14,20 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import younesbouhouche.musicplayer.features.permissions.presentation.Permissions
+import younesbouhouche.musicplayer.launchWorkRequest
 import younesbouhouche.musicplayer.navigation.routes.Graph
 
 @Composable
 fun MainApp(modifier: Modifier = Modifier) {
-    val initialRoute =
-        if (Permissions.AUDIO.isGranted(LocalContext.current)) Graph.Main
+    val context = LocalContext.current
+
+    val initialRoute = remember {
+        if (Permissions.AUDIO.isGranted(context)) {
+            launchWorkRequest(context)
+            Graph.Main
+        }
         else Graph.Permissions
+    }
 
     val backStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
