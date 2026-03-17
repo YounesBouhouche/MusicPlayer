@@ -48,6 +48,8 @@ configure<ApplicationExtension> {
         }
         debug {
             buildConfigField("String", "BASE_URL", "\"https://api.deezer.com/\"")
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
         create("staging") {
             initWith(buildTypes.getByName("release"))
