@@ -2,15 +2,18 @@ package younesbouhouche.musicplayer.features.main.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.core.presentation.util.stateInVM
 import younesbouhouche.musicplayer.features.main.domain.use_cases.GetLoadingStateUseCase
 import younesbouhouche.musicplayer.features.main.domain.use_cases.GetPlayerStateUseCase
 import younesbouhouche.musicplayer.features.main.domain.use_cases.HandlePlayerEventUseCase
+import younesbouhouche.musicplayer.features.main.domain.use_cases.ScanMediaUseCase
 import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
 
 class MainViewModel(
+    val scanMediaUseCase: ScanMediaUseCase,
     getPlayerStateUseCase: GetPlayerStateUseCase,
     val handlePlayerEventUseCase: HandlePlayerEventUseCase,
     getLoadingStateUseCase: GetLoadingStateUseCase
@@ -29,6 +32,12 @@ class MainViewModel(
                 index = index,
                 shuffle = shuffle
             ))
+        }
+    }
+
+    fun refreshLibrary() {
+        viewModelScope.launch(Dispatchers.Default) {
+            scanMediaUseCase()
         }
     }
 }

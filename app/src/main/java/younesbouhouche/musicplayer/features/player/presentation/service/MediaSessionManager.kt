@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import younesbouhouche.musicplayer.core.domain.player.PlayerManager
 
@@ -59,7 +60,9 @@ class MediaSessionManager(
         controllerFuture.addListener({
             val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
             scope.launch(Dispatchers.Main) {
-                playerManager.restoreSessionState(controllerFuture.get())
+                playerManager.restoreSessionState(withContext(Dispatchers.IO) {
+                    controllerFuture.get()
+                })
             }
         }, ContextCompat.getMainExecutor(context))
     }
@@ -89,7 +92,7 @@ class MediaSessionManager(
 
     fun release() {
         // Just release the media session but not the player
-        // The player will be released by the PlayerFactory
+        //  will be released by the PlayerFactory
         mediaSession?.release()
         mediaSession = null
     }

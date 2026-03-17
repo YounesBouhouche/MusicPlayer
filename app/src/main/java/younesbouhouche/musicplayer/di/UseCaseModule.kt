@@ -2,6 +2,7 @@ package younesbouhouche.musicplayer.di
 
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
+import younesbouhouche.musicplayer.features.main.domain.use_cases.ScanMediaUseCase
 import younesbouhouche.musicplayer.features.main.domain.use_cases.*
 
 val useCaseModule = module {
@@ -26,4 +27,5 @@ val useCaseModule = module {
     factoryOf(::CreatePlaylistUseCase)
     factoryOf(::AddToPlaylistsUseCase)
     factoryOf(::SetPlaylistSongsUseCase)
+    factoryOf(::ScanMediaUseCase)
 }

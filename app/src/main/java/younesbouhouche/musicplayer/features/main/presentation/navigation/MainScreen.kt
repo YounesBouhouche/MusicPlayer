@@ -16,11 +16,15 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -86,8 +90,12 @@ fun MainScreen(
             )
         ).asPaddingValues().calculateBottomPadding()
     Surface(modifier.fillMaxSize()) {
-        Box(
-            Modifier
+        PullToRefreshBox(
+            isRefreshing = false,
+            onRefresh = {
+                mainVM.refreshLibrary()
+            },
+            modifier = Modifier
                 .fillMaxSize()
                 .onGloballyPositioned {
                     viewHeight = it.size.height
@@ -108,38 +116,41 @@ fun MainScreen(
                     )
             ) {
                 AnimatedVisibility(isParent) {
-                    Column(Modifier.fillMaxWidth()) {
-                        SearchScreen(
-                            onShowBottomSheet = {
-                                navigator.navigate(MainNavRoute.SongInfo(it.id))
-                            },
-                            onAlbumClick = {
-                                navigator.navigate(MainNavRoute.Album(it.name))
-                            },
-                            onArtistClick = {
-                                navigator.navigate(MainNavRoute.Artist(it.name))
-                            },
-                            onPlaylistClick = {
-                                navigator.navigate(MainNavRoute.Playlist(it.id))
-                            },
-                            navigateToSettings = navigateToSettings
+                    SearchScreen(
+                        onShowBottomSheet = {
+                            navigator.navigate(MainNavRoute.SongInfo(it.id))
+                        },
+                        onAlbumClick = {
+                            navigator.navigate(MainNavRoute.Album(it.name))
+                        },
+                        onArtistClick = {
+                            navigator.navigate(MainNavRoute.Artist(it.name))
+                        },
+                        onPlaylistClick = {
+                            navigator.navigate(MainNavRoute.Playlist(it.id))
+                        },
+                        navigateToSettings = navigateToSettings
+                    )
+                }
+                Box(Modifier.fillMaxWidth()) {
+                    MainNavGraph(
+                        navigator,
+                        Modifier.fillMaxSize(),
+                        bottomPadding
+                    )
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = isLoading,
+                        modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter)
+                    ) {
+                        LinearWavyProgressIndicator(
+                            modifier = Modifier.fillMaxWidth().height(12.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                            waveSpeed = (-40).dp,
+                            wavelength = 60.dp,
                         )
-                        AnimatedVisibility(visible = isLoading) {
-                            LinearWavyProgressIndicator(
-                                modifier = Modifier.fillMaxWidth().height(12.dp),
-                                color = MaterialTheme.colorScheme.primary,
-                                trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                                waveSpeed = (-40).dp,
-                                wavelength = 60.dp,
-                            )
-                        }
                     }
                 }
-                MainNavGraph(
-                    navigator,
-                    Modifier.fillMaxSize(),
-                    bottomPadding
-                )
             }
             NavigationWithPlayer(
                 viewHeight,
