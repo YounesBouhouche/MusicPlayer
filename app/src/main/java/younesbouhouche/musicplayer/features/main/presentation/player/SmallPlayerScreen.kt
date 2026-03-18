@@ -5,6 +5,7 @@ import android.graphics.drawable.BitmapDrawable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -22,19 +23,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -45,13 +49,14 @@ import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Queue
 import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.features.player.domain.models.PlayState
+import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SmallPlayerScreen(
     queue: Queue,
-    state: PlayState,
+    state: PlayerState,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onPlayerEvent: (PlayerEvent) -> Unit,
@@ -61,13 +66,34 @@ fun SmallPlayerScreen(
     val file = queue.getCurrentItem()
     val angle by rememberInfiniteTransition().animateFloat(
         initialValue = 0f,
-        targetValue = if (state == PlayState.PLAYING) 360f else 0f,
+        targetValue = if (state.playState == PlayState.PLAYING) 360f else 0f,
         animationSpec = infiniteRepeatable(
             animation = tween(10000, easing = { it }),
             repeatMode = RepeatMode.Restart
         ),
     )
+    val songProgress by remember(queue.currentIndex, state.time) {
+        derivedStateOf {
+            file?.duration?.let { duration ->
+                if (duration > 0) {
+                    state.time.toFloat() / duration
+                } else 0f
+            } ?: 0f
+        }
+    }
+    val animatedProgress by animateFloatAsState(
+        songProgress,
+        ProgressIndicatorDefaults.ProgressAnimationSpec
+    )
+    val progressIndicatorColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.3f)
     Row(modifier
+        .drawBehind {
+            drawRect(
+                color = progressIndicatorColor.copy(alpha = 0.4f),
+                size = this.size.copy(width = size.width * animatedProgress),
+                alpha = 0.5f
+            )
+        }
         .clickable(onClick = onExpand, enabled = enabled)
         .fillMaxWidth()
         .padding(12.dp),
@@ -120,7 +146,7 @@ fun SmallPlayerScreen(
                     Image(
                         rememberAnimatedVectorPainter(
                             AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause_animation),
-                            state == PlayState.PLAYING
+                            state.playState == PlayState.PLAYING
                         ),
                         null,
                         Modifier.size(IconButtonDefaults.mediumIconSize),

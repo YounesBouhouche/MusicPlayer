@@ -124,7 +124,7 @@ fun PlayerScreen(
             ) {
                 SmallPlayerScreen(
                     queue,
-                    playerState.playState,
+                    playerState,
                     Modifier
                         .alpha(1f - progress)
                         .height(80.dp),
