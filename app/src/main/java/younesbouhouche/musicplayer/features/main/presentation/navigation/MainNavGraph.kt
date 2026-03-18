@@ -18,7 +18,7 @@ import younesbouhouche.musicplayer.features.main.presentation.routes.album.Album
 import younesbouhouche.musicplayer.features.main.presentation.routes.album.AlbumsScreen
 import younesbouhouche.musicplayer.features.main.presentation.routes.artist.ArtistScreen
 import younesbouhouche.musicplayer.features.main.presentation.routes.artist.ArtistsScreen
-import younesbouhouche.musicplayer.features.main.presentation.routes.home.HomeScreen
+import younesbouhouche.musicplayer.features.main.presentation.routes.home.HomeRoute
 import younesbouhouche.musicplayer.features.main.presentation.routes.library.LibraryScreen
 import younesbouhouche.musicplayer.features.main.presentation.routes.metadata_editor.MetadataEditorScreen
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.AddToPlaylistContent
@@ -55,15 +55,14 @@ fun MainNavGraph(
         entries = navigationState.toEntries(
             entryProvider {
                 entry<MainNavRoute.Home> {
-                    HomeScreen(
+                    HomeRoute(
                         bottomPadding = bottomPadding,
                         onArtistClick = { artist ->
                             navigator.navigate(MainNavRoute.Artist(artist.name))
                         },
-                        modifier = screenModifier
-                    ) {
-                        navigator.navigate(MainNavRoute.Library)
-                    }
+                        modifier = screenModifier,
+                        navigateTo = navigator::navigate
+                    )
                 }
                 entry<MainNavRoute.Albums> {
                     AlbumsScreen(

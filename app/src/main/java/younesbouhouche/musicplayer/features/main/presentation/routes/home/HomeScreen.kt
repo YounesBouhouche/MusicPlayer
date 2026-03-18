@@ -1,269 +1,186 @@
 package younesbouhouche.musicplayer.features.main.presentation.routes.home
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.clickable
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialShapes
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
+import androidx.compose.material3.carousel.HorizontalCenteredHeroCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
-import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.younesb.mydesignsystem.presentation.components.ExpressiveButton
-import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
-import com.younesb.mydesignsystem.presentation.components.IconContainer
-import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.core.domain.models.Album
 import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.core.domain.models.Song
-import younesbouhouche.musicplayer.core.presentation.theme.topAppBarTitleFont
-import younesbouhouche.musicplayer.features.main.presentation.components.PictureCard
-import younesbouhouche.musicplayer.features.main.presentation.components.SongListItem
-import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
-import kotlin.math.roundToInt
+import younesbouhouche.musicplayer.features.main.presentation.components.ScreenHeader
+import younesbouhouche.musicplayer.features.main.presentation.navigation.MainNavRoute
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    albums: List<Album>,
+    artists: List<Artist>,
+    lastAdded: List<Song>,
+    history: List<Song>,
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
     onArtistClick: (Artist) -> Unit,
-    navigateToLibrary: () -> Unit,
+    navigateTo: (MainNavRoute) -> Unit,
+    play: (List<Long>, Int, Boolean) -> Unit
 ) {
-    val homeViewModel = koinViewModel<HomeViewModel>()
-    val artists by homeViewModel.artists.collectAsState()
-    val lastAdded by homeViewModel.lastAdded.collectAsState()
-    val history by homeViewModel.history.collectAsState()
-    val state = rememberCarouselState {
-        artists.size
-    }
     LazyColumn(
-        Modifier.fillMaxSize().then(modifier),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-        contentPadding = PaddingValues(bottom = bottomPadding)
+        Modifier
+            .fillMaxSize()
+            .then(modifier),
+        verticalArrangement = Arrangement.spacedBy(32.dp),
+        contentPadding = PaddingValues(bottom = bottomPadding, top = 30.dp)
     ) {
-        if (artists.isNotEmpty()) {
-            item {
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .animateItem(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Header(stringResource(R.string.top_artists))
-                    HorizontalUncontainedCarousel(
-                        state = state,
-                        itemWidth = 200.dp,
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(16.dp),
-                        itemSpacing = 16.dp,
+        item {
+            ListContainer(
+                title = "Discover Albums",
+                subtitle = "Based on your listening history",
+                actions = {
+                    OutlinedButton(
+                        onClick = {},
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                        contentPadding = PaddingValues(16.dp, 10.dp)
                     ) {
-                        val artist = artists[it]
-                        PictureCard(
-                            artist.getPicture(),
-                            Icons.Default.Person,
-                            {
-                                onArtistClick(artist)
-                            },
-                            Modifier.fillMaxWidth(),
-                            shape = rememberMaskShape(MaterialTheme.shapes.extraLarge),
-                            contentPadding = PaddingValues(24.dp)
-                        ) {
-                            Column(
-                                Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
-                            ) {
-                                Text(
-                                    artist.name,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                                )
+                        Text("View All")
+                        Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+                        Icon(Icons.AutoMirrored.Default.ArrowForward, null)
+                    }
+                }
+            ) {
+                Column(
+                    Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    val state = rememberCarouselState {
+                        albums.size
+                    }
+                    HorizontalCenteredHeroCarousel(
+                        state = state,
+                        itemSpacing = 8.dp,
+                        modifier = Modifier.padding(horizontal = 20.dp),
+                    ) { index ->
+                        val album = albums[index]
+                        val opacity by remember(state) {
+                            derivedStateOf {
+                                carouselItemDrawInfo.size / carouselItemDrawInfo.maxSize
                             }
+                        }
+                        AlbumCard(
+                            album,
+                            rememberMaskShape(MaterialTheme.shapes.extraLarge),
+                            opacity = opacity
+                        ) {
+                            navigateTo(MainNavRoute.Album(album.name))
+                        }
+                    }
+                    // TODO: Add pagination indicators
+                }
+            }
+        }
+        item {
+            SongsListContainer(
+                title = "Recently Added",
+                subtitle = "Your most recent additions to the library",
+                list = lastAdded,
+                onPlay = play,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        item {
+            ListContainer(
+                title = "Top Artists",
+                subtitle = "Based on your listening history",
+                actions = {
+                    OutlinedButton(
+                        onClick = {},
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                        contentPadding = PaddingValues(16.dp, 10.dp)
+                    ) {
+                        Text("View All")
+                        Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+                        Icon(Icons.AutoMirrored.Default.ArrowForward, null)
+                    }
+                }
+            ) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 20.dp),
+                ) {
+                    items(artists, { it.name }) { artist ->
+                        ArtistCard(artist, Modifier.animateItem()) {
+                            onArtistClick(artist)
                         }
                     }
                 }
             }
-        } else {
-            item {
-                Column(
-                    Modifier.padding(vertical = 60.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    val angle by rememberInfiniteTransition().animateFloat(0f, 360f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(20000, easing = { it }),
-                            repeatMode = RepeatMode.Restart
-                        )
-                    )
-                    IconContainer(
-                        Icons.Default.History,
-                        Modifier.size(160.dp),
-                        iconRatio = .4f,
-                        shape = MaterialShapes.Cookie12Sided.toShape(angle.roundToInt())
-                    )
-                    Text(
-                        stringResource(R.string.your_listening_history_will_appear_here),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    ExpressiveButton(
-                        stringResource(R.string.explore_library),
-                        ButtonDefaults.MediumContainerHeight,
-                        outlined = true,
-                        onClick = navigateToLibrary
-                    )
-                }
-            }
         }
         item {
-            ListContainer(
-                stringResource(R.string.recently_added),
-                lastAdded,
-                onPlay = { list, index ->
-                    homeViewModel.play(list.map { it.id }, index)
-                }
-            ) { }
-        }
-//        item {
-//            ListContainer(
-//                Icons.Default.Favorite,
-//                stringResource(R.string.favorites),
-//                stringResource(R.string.favorites_subtitles),
-//                favorites,
-//                onPlay = onPlay,
-//            ) { }
-//        }
-        item {
-            ListContainer(
-                stringResource(R.string.history),
-                history,
-                onPlay = { songs, index ->
-                    homeViewModel.play(songs.map { it.id }, index)
-                }
-            ) { }
+            SongsListContainer(
+                title = "Recently Played",
+                subtitle = "Your listening history",
+                list = history,
+                onPlay = play,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Preview
 @Composable
-private fun ListContainer(
-    title: String,
-    items: List<Song>,
-    modifier: Modifier = Modifier,
-    onPlay: (List<Song>, Int) -> Unit,
-    onClick: () -> Unit,
-) {
-    val itemsSliced = items.take(2)
-    AnimatedVisibility(
-        items.isNotEmpty(),
-        enter = expandVertically(expandFrom = Alignment.Top),
-        exit = shrinkVertically(shrinkTowards = Alignment.Top),
-        modifier = modifier
-    ) {
-        Column(
-            modifier = modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Header(
-                title,
-                onClick = onClick
-            ) {
-                ExpressiveIconButton(
-                    Icons.Default.PlayArrow,
-                    size = IconButtonDefaults.mediumIconSize,
-                    widthOption = IconButtonDefaults.IconButtonWidthOption.Wide,
-                    colors = IconButtonDefaults.filledTonalIconButtonColors()
-                ) {
-                    onPlay(items, 0)
-                }
-            }
-            itemsSliced.forEachIndexed { index, it ->
-                SongListItem(
-                    it,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    shape = expressiveRectShape(index, itemsSliced.size),
-                    onClick = {
-                        onPlay(items, index)
-                    }
-                )
-            }
-        }
-    }
-}
+private fun HomeScreenPreview() {
+    val artists = List(10) { Artist("Artist $it") }
+    val albums = List(10) { Album("Album $it") }
+    val songs = List(5) { Song(
+        it.toLong(),
+        Uri.EMPTY,
+        "Song $it",
+        "Song $it",
+        "Artist $it",
+        "Album $it",
+    ) }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun Header(
-    title: String,
-    modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
-    trailingContent: @Composable (() -> Unit)? = onClick?.let {
-        {
-            ExpressiveIconButton(
-                Icons.AutoMirrored.Filled.ArrowForward,
-                size = IconButtonDefaults.mediumIconSize,
-                colors = IconButtonDefaults.filledTonalIconButtonColors()
-            ) {
-                onClick()
-            }
-        }
-    }
-) {
-    Row(
-        modifier = modifier
-            .clip(RoundedCornerShape(100))
-            .clickable(onClick = { onClick?.invoke() }, enabled = onClick != null)
-            .padding(16.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(18.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            title,
-            style = topAppBarTitleFont,
-            modifier = Modifier.weight(1f)
+    Surface(Modifier.fillMaxSize()) {
+        HomeScreen(
+            albums = albums,
+            artists = artists,
+            lastAdded = songs,
+            history = songs,
+            onArtistClick = {},
+            navigateTo = {},
+            play = { _, _, _ -> },
+            bottomPadding = 40.dp
         )
-        trailingContent?.invoke()
     }
 }

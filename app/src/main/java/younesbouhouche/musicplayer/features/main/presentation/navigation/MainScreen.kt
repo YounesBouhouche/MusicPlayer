@@ -104,17 +104,7 @@ fun MainScreen(
                     viewHeight = it.height
                 }
         ) {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            0.0f to MaterialTheme.colorScheme.tertiaryContainer
-                                .copy(alpha = 0.5f),
-                            .4f to MaterialTheme.colorScheme.surface,
-                        )
-                    )
-            ) {
+            Column(Modifier.fillMaxSize()) {
                 AnimatedVisibility(isParent) {
                     SearchScreen(
                         onShowBottomSheet = {
