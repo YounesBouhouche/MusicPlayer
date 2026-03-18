@@ -11,6 +11,7 @@ val useCaseModule = module {
     factoryOf(::GetAlbumUseCase)
     factoryOf(::GetArtistUseCase)
     factoryOf(::GetRecentArtistsUseCase)
+    factoryOf(::GetRecentAlbumsUseCase)
     factoryOf(::GetHistoryUseCase)
     factoryOf(::GetLastAddedUseCase)
     factoryOf(::GetPlaylistsUseCase)

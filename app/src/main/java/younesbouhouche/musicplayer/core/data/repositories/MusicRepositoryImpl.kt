@@ -168,6 +168,16 @@ class MusicRepositoryImpl(
         }
     }
 
+    override fun getRecentAlbums(): Flow<List<Album>> {
+        return getRecentlyPlayedSongs().map { songs ->
+            val albumsByName = _albumsState.value.associateBy { it.name }
+            val albumPlayCounts = songs.groupingBy { it.album }.eachCount()
+            albumPlayCounts.entries.sortedByDescending { it.value }.mapNotNull { entry ->
+                albumsByName[entry.key]
+            }.take(5)
+        }
+    }
+
     override fun getRecentArtists(): Flow<List<Artist>> {
         return getRecentlyPlayedSongs().map { songs ->
             val artistsByName = _artistsState.value.associateBy { it.name }
