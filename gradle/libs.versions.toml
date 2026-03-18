@@ -6,6 +6,7 @@ composedesignsystem = "v0.3.2-hotfix"
 composeDnd = "0.4.0"
 coreSplashscreen = "1.2.0"
 diskLruCache = "1.7"
+dotsindicator = "5.1.0"
 glanceAppwidget = "1.1.1"
 koinAndroid = "4.1.1"
 kotlin = "2.3.20"
@@ -53,6 +54,7 @@ androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version
 compose-dnd = { module = "com.mohamedrejeb.dnd:compose-dnd", version.ref = "composeDnd" }
 composedesignsystem = { module = "com.github.YounesBouhouche:ComposeDesignSystem", version.ref = "composedesignsystem" }
 disk-lru-cache = { module = "com.github.solkin:disk-lru-cache", version.ref = "diskLruCache" }
+dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
 kmpalette-core = { module = "com.kmpalette:kmpalette-core", version.ref = "kmpalette" }
 androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glanceAppwidget" }
 androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glanceAppwidget" }
