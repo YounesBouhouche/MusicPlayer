@@ -22,5 +22,4 @@ local.properties
 app/kotzilla.json
 
 # Sensitive files
-app/kotzilla.json
 app/src/main/assets/kotzilla.key
