@@ -3,6 +3,7 @@ package younesbouhouche.musicplayer.core.data.datastore
 import android.content.Context
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -18,11 +19,13 @@ class PreferencesDataStore(
     @Composable
     fun isDark(): Flow<Boolean> {
         val systemInDarkTheme = isSystemInDarkTheme()
-        return get(SettingsPreference.ThemeMode).map { theme ->
-            when (theme) {
-                Theme.LIGHT -> false
-                Theme.DARK -> true
-                Theme.SYSTEM -> systemInDarkTheme
+        return remember {
+            get(SettingsPreference.ThemeMode).map { theme ->
+                when (theme) {
+                    Theme.LIGHT -> false
+                    Theme.DARK -> true
+                    Theme.SYSTEM -> systemInDarkTheme
+                }
             }
         }
     }
