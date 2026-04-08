@@ -24,7 +24,7 @@ data class Song(
     var coverPath: String? = null,
     var coverUri: Uri? = null,
     val isFavorite: Boolean = false,
-    val playHistory: List<PlayHistEntity> = emptyList()
+    val playHistory: List<PlayHistEntity> = emptyList(),
 ) {
     class Builder {
         private var id: Long = 0
@@ -48,68 +48,84 @@ data class Song(
         private var playHistory: List<PlayHistEntity> = emptyList()
 
         fun id(id: Long) = apply { this.id = id }
+
         fun contentUri(contentUri: Uri) = apply { this.contentUri = contentUri }
+
         fun fileName(fileName: String) = apply { this.fileName = fileName }
+
         fun title(title: String) = apply { this.title = title }
+
         fun artist(artist: String) = apply { this.artist = artist }
+
         fun album(album: String) = apply { this.album = album }
+
         fun duration(duration: Long) = apply { this.duration = duration }
+
         fun path(path: String) = apply { this.path = path }
+
         fun date(date: Long) = apply { this.date = date }
+
         fun size(size: Long) = apply { this.size = size }
+
         fun trackNumber(trackNumber: Int?) = apply { this.trackNumber = trackNumber }
+
         fun discNumber(discNumber: Int?) = apply { this.discNumber = discNumber }
+
         fun year(year: Int?) = apply { this.year = year }
+
         fun composer(composer: String?) = apply { this.composer = composer }
+
         fun genre(genre: String?) = apply { this.genre = genre }
+
         fun coverPath(coverPath: String?) = apply { this.coverPath = coverPath }
+
         fun coverUri(coverUri: Uri?) = apply { this.coverUri = coverUri }
+
         fun isFavorite(isFavorite: Boolean) = apply { this.isFavorite = isFavorite }
-        fun playHistory(playHistory: List<PlayHistEntity>) =
-            apply { this.playHistory = playHistory }
 
-        fun build() = Song(
-            id,
-            contentUri,
-            fileName,
-            title,
-            artist,
-            album,
-            duration,
-            path,
-            date,
-            size,
-            trackNumber,
-            discNumber,
-            year,
-            composer,
-            genre,
-            coverPath,
-            coverUri,
-            isFavorite,
-            playHistory
-        )
+        fun playHistory(playHistory: List<PlayHistEntity>) = apply { this.playHistory = playHistory }
+
+        fun build() =
+            Song(
+                id,
+                contentUri,
+                fileName,
+                title,
+                artist,
+                album,
+                duration,
+                path,
+                date,
+                size,
+                trackNumber,
+                discNumber,
+                year,
+                composer,
+                genre,
+                coverPath,
+                coverUri,
+                isFavorite,
+                playHistory,
+            )
     }
 
-    fun toMediaItem(): MediaItem {
-        return MediaItem
-                .Builder()
-                .setUri(contentUri)
-                .setMediaId("$id")
-                .setMediaMetadata(
-                    MediaMetadata.Builder()
-                        .setTitle(title)
-                        .setArtist(artist)
-                        .setAlbumTitle(album)
-                        .setArtist(artist)
-                        .setGenre(genre)
-                        .setComposer(composer)
-                        .setArtworkData(
-                            MediaItem.fromUri(contentUri).mediaMetadata.artworkData,
-                            MediaMetadata.PICTURE_TYPE_MEDIA
-                        )
-                        .build()
-                )
-                .build()
-    }
+    fun toMediaItem(): MediaItem =
+        MediaItem
+            .Builder()
+            .setUri(contentUri)
+            .setMediaId("$id")
+            .setMediaMetadata(
+                MediaMetadata
+                    .Builder()
+                    .setTitle(title)
+                    .setArtist(artist)
+                    .setAlbumTitle(album)
+                    .setArtist(artist)
+                    .setGenre(genre)
+                    .setComposer(composer)
+                    .setArtworkData(
+                        MediaItem.fromUri(contentUri).mediaMetadata.artworkData,
+                        MediaMetadata.PICTURE_TYPE_MEDIA,
+                    ).build(),
+            ).build()
 }

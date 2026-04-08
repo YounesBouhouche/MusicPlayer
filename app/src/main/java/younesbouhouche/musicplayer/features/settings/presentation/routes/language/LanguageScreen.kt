@@ -30,7 +30,7 @@ fun LanguageScreen(
     SettingsScreen(
         title = stringResource(R.string.language),
         icon = Icons.Default.Translate,
-        modifier = modifier
+        modifier = modifier,
     ) {
         item {
             SettingsList(null) {
@@ -38,10 +38,11 @@ fun LanguageScreen(
                     SettingsItem(
                         headline = stringResource(lang.label),
                         supporting = lang.getLocalizedName(context),
-                        checked = Checked(true, language == lang) {
-                            viewModel.saveLanguage(lang)
-                            onLanguageSelected(lang)
-                        },
+                        checked =
+                            Checked(true, language == lang) {
+                                viewModel.saveLanguage(lang)
+                                onLanguageSelected(lang)
+                            },
                         onClick = { onLanguageSelected(lang) },
                         shape = listItemShape(index, Language.entries.size),
                     )

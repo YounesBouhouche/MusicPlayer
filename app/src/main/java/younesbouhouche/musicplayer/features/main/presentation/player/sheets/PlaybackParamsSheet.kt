@@ -1,7 +1,5 @@
 package younesbouhouche.musicplayer.features.main.presentation.player.sheets
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -55,18 +53,17 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.R
 import com.younesb.mydesignsystem.presentation.components.ExpressiveButton
+import com.younesb.mydesignsystem.presentation.util.plus
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.features.main.presentation.player.components.AnimatedCounterText
 import younesbouhouche.musicplayer.features.main.presentation.util.composables.TitleText
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
-import com.younesb.mydesignsystem.presentation.util.plus
 import younesbouhouche.musicplayer.features.main.presentation.util.round
 import kotlin.math.roundToInt
 
@@ -79,7 +76,7 @@ fun PlaybackParamsSheet(
     onSetSpeed: (Float) -> Unit,
     pitch: Float,
     onSetPitch: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val state = rememberModalBottomSheetState(true)
     if (visible) {
@@ -90,50 +87,56 @@ fun PlaybackParamsSheet(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             dragHandle = {
                 BottomSheetDefaults.DragHandle(
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
             },
             contentWindowInsets = {
                 BottomSheetDefaults.modalWindowInsets.exclude(WindowInsets.navigationBars)
-            }
+            },
         ) {
             LazyColumn(
                 Modifier.fillMaxWidth(),
                 contentPadding = WindowInsets.navigationBars.asPaddingValues() + PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 item {
                     TitleText(
                         text = stringResource(R.string.playback_params),
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 16.dp),
                     )
                 }
                 repeat(2) {
-                    val value = when(it) {
-                        0 -> speed
-                        else -> pitch
-                    }
-                    val valueRange = when(it) {
-                        0 -> 0.25f..3f
-                        else -> 0.5f..2f
-                    }
-                    val roundTo = when(it) {
-                        0 -> 0.25f
-                        else -> 0.1f
-                    }
-                    val onValueChange = when(it) {
-                        0 -> onSetSpeed
-                        else -> onSetPitch
-                    }
-                    val label = when(it) {
-                        0 -> R.string.speed
-                        else -> R.string.pitch
-                    }
-                    val icon = when(it) {
-                        0 -> Icons.Default.Speed
-                        else -> Icons.Default.GraphicEq
-                    }
+                    val value =
+                        when (it) {
+                            0 -> speed
+                            else -> pitch
+                        }
+                    val valueRange =
+                        when (it) {
+                            0 -> 0.25f..3f
+                            else -> 0.5f..2f
+                        }
+                    val roundTo =
+                        when (it) {
+                            0 -> 0.25f
+                            else -> 0.1f
+                        }
+                    val onValueChange =
+                        when (it) {
+                            0 -> onSetSpeed
+                            else -> onSetPitch
+                        }
+                    val label =
+                        when (it) {
+                            0 -> R.string.speed
+                            else -> R.string.pitch
+                        }
+                    val icon =
+                        when (it) {
+                            0 -> Icons.Default.Speed
+                            else -> Icons.Default.GraphicEq
+                        }
                     item {
                         SliderContainer(
                             value,
@@ -142,31 +145,35 @@ fun PlaybackParamsSheet(
                             icon,
                             valueRange = valueRange,
                             roundTo = roundTo,
-                            shape = expressiveRectShape(
-                                it,
-                                2,
-                                MaterialTheme.shapes.extraSmall,
-                                MaterialTheme.shapes.large,
-                            )
+                            shape =
+                                expressiveRectShape(
+                                    it,
+                                    2,
+                                    MaterialTheme.shapes.extraSmall,
+                                    MaterialTheme.shapes.large,
+                                ),
                         )
                     }
                 }
                 item {
                     Row(
                         Modifier.fillMaxWidth().padding(top = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
                         repeat(2) {
                             val (res, onClick) =
-                                if (it == 0) R.string.reset to {
-                                    onSetSpeed(1f)
-                                    onSetPitch(1f)
+                                if (it == 0) {
+                                    R.string.reset to {
+                                        onSetSpeed(1f)
+                                        onSetPitch(1f)
+                                    }
+                                } else {
+                                    R.string.ok to onDismissRequest
                                 }
-                                else R.string.ok to onDismissRequest
                             val interactionSource = remember { MutableInteractionSource() }
                             val pressed by interactionSource.collectIsPressedAsState()
                             val weight by animateFloatAsState(
-                                if (pressed) 1.4f else 1f
+                                if (pressed) 1.4f else 1f,
                             )
                             ExpressiveButton(
                                 stringResource(res),
@@ -222,34 +229,35 @@ internal fun SliderContainer(
     }
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shape = shape
+        shape = shape,
     ) {
         Column(
             modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Row(
                 Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     label,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
                 Box(
                     Modifier
                         .clip(RoundedCornerShape(100))
-                        .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                        .background(MaterialTheme.colorScheme.surfaceContainerLow),
                 ) {
                     AnimatedCounterText(
                         text = valueFormat(selectedValue.round(scale)),
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = modifier
-                            .padding(12.dp, 4.dp),
+                        modifier =
+                            modifier
+                                .padding(12.dp, 4.dp),
                         color = MaterialTheme.colorScheme.primary,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 }
             }
@@ -280,7 +288,7 @@ internal fun SliderContainer(
                                 val activeTrackStart = 0f
                                 val activeTrackEnd =
                                     size.width * sliderState.coercedValueAsFraction -
-                                            thumbTrackGapSize.toPx()
+                                        thumbTrackGapSize.toPx()
                                 val inactiveTrackStart = activeTrackEnd + thumbTrackGapSize.toPx() * 2
                                 val inactiveTrackEnd = size.width
 
@@ -304,7 +312,7 @@ internal fun SliderContainer(
                         trackCornerSize = 12.dp,
                         drawStopIndicator = null,
                         thumbTrackGapSize = thumbTrackGapSize,
-                        drawTick = { _, _ -> }
+                        drawTick = { _, _ -> },
                     )
                 },
             )
@@ -320,6 +328,6 @@ private fun SliderContainerPreview() {
         onValueChange = {},
         valueFormat = { it },
         icon = Icons.Default.MusicNote,
-        label = "Sound"
+        label = "Sound",
     )
 }

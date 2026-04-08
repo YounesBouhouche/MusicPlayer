@@ -3,8 +3,8 @@ package younesbouhouche.musicplayer.features.main.util
 import java.util.Locale
 import kotlin.math.roundToInt
 
-fun Long.getDurationRange(): Pair<Long, Long> {
-    return when (this) {
+fun Long.getDurationRange(): Pair<Long, Long> =
+    when (this) {
         in 0L..60_000L -> Pair(0L, 60_000L) // 0s - 1min
         in 60_001L..300_000L -> Pair(60_001L, 300_000L) // 1min - 5min
         in 300_001L..600_000L -> Pair(300_001L, 600_000L) // 5min - 10min
@@ -12,7 +12,6 @@ fun Long.getDurationRange(): Pair<Long, Long> {
         in 1_800_001L..3_600_000L -> Pair(1_800_001L, 3_600_000L) // 30min - 1h
         else -> Pair(3_600_001L, Long.MAX_VALUE) // > 1h
     }
-}
 
 fun Long.toReadableDurationString(): String {
     if (this < 0) return "0s"

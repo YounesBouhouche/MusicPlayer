@@ -10,9 +10,11 @@ import coil.util.DebugLogger
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.startKoin
-import younesbouhouche.musicplayer.features.main.util.AppSpecificStorageFetcher
+import younesbouhouche.musicplayer.features.main.util.StorageFetcher
 
-class App : Application(), ImageLoaderFactory {
+class App :
+    Application(),
+    ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
         startKoin {
@@ -22,27 +24,26 @@ class App : Application(), ImageLoaderFactory {
         }
     }
 
-    override fun newImageLoader(): ImageLoader {
-        return ImageLoader.Builder(this)
+    override fun newImageLoader(): ImageLoader =
+        ImageLoader
+            .Builder(this)
             .memoryCachePolicy(CachePolicy.ENABLED)
             .memoryCache {
-                MemoryCache.Builder(this)
+                MemoryCache
+                    .Builder(this)
                     .maxSizePercent(0.25)
                     .strongReferencesEnabled(true)
                     .build()
-            }
-            .diskCachePolicy(CachePolicy.ENABLED)
+            }.diskCachePolicy(CachePolicy.ENABLED)
             .diskCache {
-                DiskCache.Builder()
+                DiskCache
+                    .Builder()
                     .maxSizePercent(.03)
                     .directory(cacheDir)
                     .build()
-            }
-            .components {
-                add(AppSpecificStorageFetcher.Factory())
-            }
-            .logger(DebugLogger())
+            }.components {
+                add(StorageFetcher.Factory())
+            }.logger(DebugLogger())
             .crossfade(true)
             .build()
-    }
 }

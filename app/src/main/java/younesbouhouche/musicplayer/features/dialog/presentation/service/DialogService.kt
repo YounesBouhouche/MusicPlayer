@@ -21,7 +21,9 @@ import younesbouhouche.musicplayer.features.player.presentation.service.CustomMe
 import younesbouhouche.musicplayer.features.player.presentation.service.NotificationCustomCmdButton
 
 @OptIn(UnstableApi::class)
-class DialogService : MediaSessionService(), MediaSession.Callback {
+class DialogService :
+    MediaSessionService(),
+    MediaSession.Callback {
     private var player: ExoPlayer? = null
     private var mediaSession: MediaSession? = null
     private var controller: MediaSession.ControllerInfo? = null
@@ -49,8 +51,7 @@ class DialogService : MediaSessionService(), MediaSession.Callback {
                 .setAudioAttributes(
                     AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).build(),
                     true,
-                )
-                .build(),
+                ).build(),
         ) {
             setSeekParameters(SeekParameters(1000L, 1000L))
             player = this
@@ -59,8 +60,7 @@ class DialogService : MediaSessionService(), MediaSession.Callback {
                     .Builder(
                         this@DialogService,
                         this,
-                    )
-                    .setId("MusicPlayerDialogService")
+                    ).setId("MusicPlayerDialogService")
                     .setSessionActivity(pendingIntent)
                     .setCustomLayout(notificationCustomCmdButtons)
                     .build()
@@ -68,7 +68,11 @@ class DialogService : MediaSessionService(), MediaSession.Callback {
         setMediaNotificationProvider(customMediaNotificationProvider)
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         if (mediaSession == null) {
             customMediaNotificationProvider.ensureForeground(this)
         }
@@ -149,7 +153,7 @@ class DialogService : MediaSessionService(), MediaSession.Callback {
     override fun onPlaybackResumption(
         mediaSession: MediaSession,
         controller: MediaSession.ControllerInfo,
-        isForPlayback: Boolean
+        isForPlayback: Boolean,
     ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
         this.controller = controller
         this.mediaSession = mediaSession

@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import younesbouhouche.musicplayer.core.presentation.util.stateInVM
-import younesbouhouche.musicplayer.features.main.domain.use_cases.GetAlbumsUseCase
+import younesbouhouche.musicplayer.features.main.domain.usecases.GetAlbumsUseCase
 import younesbouhouche.musicplayer.features.main.presentation.ColsCount
 import younesbouhouche.musicplayer.features.main.presentation.util.ListsSortType
 import younesbouhouche.musicplayer.features.main.presentation.util.SortState
@@ -16,23 +16,25 @@ import younesbouhouche.musicplayer.features.main.util.sortBy
 class AlbumsViewModel(
     val mainViewModel: MainViewModel,
     getAlbumsUseCase: GetAlbumsUseCase,
-): ViewModel() {
-    private val _sortState = MutableStateFlow(
-        SortState(ListsSortType.Name, ColsCount.Two)
-    )
+) : ViewModel() {
+    private val _sortState =
+        MutableStateFlow(
+            SortState(ListsSortType.Name, ColsCount.Two),
+        )
     val sortState = _sortState.asStateFlow()
-    val albums = combine(getAlbumsUseCase(), _sortState) { albums, sortState ->
-        albums.sortBy(sortState.sortType, sortState.ascending)
-    }.stateInVM(emptyList(), viewModelScope)
+    val albums =
+        combine(getAlbumsUseCase(), _sortState) { albums, sortState ->
+            albums.sortBy(sortState.sortType, sortState.ascending)
+        }.stateInVM(emptyList(), viewModelScope)
 
     fun play(
         tracks: List<Long>,
         index: Int = 0,
-        shuffle: Boolean = false
+        shuffle: Boolean = false,
     ) = mainViewModel.play(
         tracks = tracks,
         index = index,
-        shuffle = shuffle
+        shuffle = shuffle,
     )
 
     fun setSortState(state: SortState<ListsSortType>) {

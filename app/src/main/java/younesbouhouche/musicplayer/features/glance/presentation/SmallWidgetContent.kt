@@ -32,7 +32,6 @@ import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.features.player.domain.models.PlayState
 import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
 
-
 @SuppressLint("RestrictedApi")
 @Composable
 fun SmallWidgetContent(
@@ -40,43 +39,49 @@ fun SmallWidgetContent(
     state: PlayerState,
     onEvent: suspend (PlayerEvent) -> Unit,
     opacity: Float,
-    modifier: GlanceModifier = GlanceModifier
+    modifier: GlanceModifier = GlanceModifier,
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val background = GlanceTheme.colors.widgetBackground.getColor(context).copy(alpha = opacity)
+    val background =
+        GlanceTheme.colors.widgetBackground
+            .getColor(context)
+            .copy(alpha = opacity)
     Scaffold(
         modifier.clickable(actionStartActivity<MainActivity>()),
-        backgroundColor = ColorProvider(background)
+        backgroundColor = ColorProvider(background),
     ) {
         Row(
             GlanceModifier.padding(8.dp).fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            MyImage(/*card?.coverUri*/null, opacity = opacity)
+            MyImage(null, opacity = opacity)
             Spacer(GlanceModifier.width(16.dp))
             Column(GlanceModifier.fillMaxWidth().defaultWeight()) {
                 WidgetText(
                     card?.title ?: "No track",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 20f
+                    fontSize = 20f,
                 )
                 Spacer(GlanceModifier.height(6.dp))
                 WidgetText(
                     card?.artist ?: "Click to open the app",
                     fontWeight = FontWeight.Medium,
                     color = GlanceTheme.colors.onSurfaceVariant,
-                    fontSize = 16f
+                    fontSize = 16f,
                 )
             }
             Spacer(GlanceModifier.width(16.dp))
             RowIconButton(
                 icon =
-                    if (state.playState == PlayState.PLAYING) R.drawable.pause_icon
-                    else R.drawable.play_icon,
+                    if (state.playState == PlayState.PLAYING) {
+                        R.drawable.pause_icon
+                    } else {
+                        R.drawable.play_icon
+                    },
                 size = 60.dp,
                 containerColor = GlanceTheme.colors.primary,
-                contentColor = GlanceTheme.colors.onPrimary
+                contentColor = GlanceTheme.colors.onPrimary,
             ) {
                 scope.launch {
                     onEvent(PlayerEvent.PauseResume)

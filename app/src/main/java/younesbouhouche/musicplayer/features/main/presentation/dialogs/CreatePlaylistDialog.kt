@@ -67,7 +67,7 @@ fun CreatePlaylistDialog(
                 modifier = Modifier.size(200.dp),
                 shape = MaterialShapes.Cookie4Sided.toShape(),
                 onImageChange = onImageChange,
-                fraction = .3f
+                fraction = .3f,
             )
             OutlinedTextField(
                 value = playlistName,

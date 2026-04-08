@@ -8,12 +8,12 @@ data class SongWithState(
     val song: SongEntity,
     @Relation(
         parentColumn = "id",
-        entityColumn = "songId"
+        entityColumn = "songId",
     )
     val state: SongStateEntity?,
     @Relation(
         parentColumn = "id",
-        entityColumn = "songId"
+        entityColumn = "songId",
     )
     val playHistory: List<PlayHistEntity>,
 )

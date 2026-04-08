@@ -61,6 +61,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
 import com.younesb.mydesignsystem.presentation.components.ExpressiveToggleButton
+import com.younesb.mydesignsystem.presentation.util.plus
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.R
@@ -74,7 +75,6 @@ import younesbouhouche.musicplayer.features.main.presentation.components.EmptyCo
 import younesbouhouche.musicplayer.features.main.presentation.components.ListItem
 import younesbouhouche.musicplayer.features.main.presentation.components.SongListItem
 import younesbouhouche.musicplayer.features.main.presentation.states.isEmpty
-import com.younesb.mydesignsystem.presentation.util.plus
 import younesbouhouche.musicplayer.features.main.presentation.util.searchBarIconButtonColors
 import younesbouhouche.musicplayer.features.main.presentation.viewmodel.SearchVM
 import younesbouhouche.musicplayer.features.settings.presentation.components.listItemShape
@@ -100,70 +100,79 @@ fun SearchScreen(
         }
     }
     LaunchedEffect(textFieldState.text) {
-        if (textFieldState.text.isEmpty())
+        if (textFieldState.text.isEmpty()) {
             viewModel.onAction(SearchAction.ClearQuery)
+        }
     }
     val inputField: @Composable (Boolean) -> Unit =
         @Composable {
             val color =
-                if (it)
+                if (it) {
                     MaterialTheme.colorScheme.onSurfaceVariant
-                else
+                } else {
                     MaterialTheme.colorScheme.tertiary
+                }
             SearchBarDefaults.InputField(
                 searchBarState = state,
                 textFieldState = textFieldState,
-                colors = SearchBarDefaults.inputFieldColors(
-                    unfocusedPlaceholderColor = color,
-                    focusedPlaceholderColor = color,
-                ),
-                leadingIcon = if (state.currentValue == SearchBarValue.Expanded) {
-                    {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            modifier = Modifier.padding(end = 8.dp)
-                        ) {
-                            ExpressiveIconButton(
-                                Icons.AutoMirrored.Default.ArrowBack,
-                                size = IconButtonDefaults.mediumIconSize,
-                                colors = searchBarIconButtonColors()
-                            ) {
-                                scope.launch {
-                                    state.animateToCollapsed()
-                                }
-                            }
-                        }
-                    }
-                } else null,
-                trailingIcon = if (state.currentValue == SearchBarValue.Expanded) {
-                    {
-                        AnimatedVisibility(
-                            visible = textFieldState.text.isNotEmpty(),
-                            enter = expandHorizontally(expandFrom = Alignment.End),
-                            exit = shrinkHorizontally(shrinkTowards = Alignment.End),
-                        ) {
+                colors =
+                    SearchBarDefaults.inputFieldColors(
+                        unfocusedPlaceholderColor = color,
+                        focusedPlaceholderColor = color,
+                    ),
+                leadingIcon =
+                    if (state.currentValue == SearchBarValue.Expanded) {
+                        {
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                modifier = Modifier.padding(horizontal = 4.dp)
+                                modifier = Modifier.padding(end = 8.dp),
                             ) {
                                 ExpressiveIconButton(
-                                    Icons.Default.Clear,
+                                    Icons.AutoMirrored.Default.ArrowBack,
                                     size = IconButtonDefaults.mediumIconSize,
-                                    colors = searchBarIconButtonColors()
+                                    colors = searchBarIconButtonColors(),
                                 ) {
-                                    textFieldState.clearText()
-                                }
-                                ExpressiveIconButton(
-                                    Icons.Default.Search,
-                                    size = IconButtonDefaults.mediumIconSize,
-                                    colors = IconButtonDefaults.filledTonalIconButtonColors()
-                                ) {
-                                    viewModel.onAction(SearchAction.UpdateQuery("${textFieldState.text}"))
+                                    scope.launch {
+                                        state.animateToCollapsed()
+                                    }
                                 }
                             }
                         }
-                    }
-                } else null,
+                    } else {
+                        null
+                    },
+                trailingIcon =
+                    if (state.currentValue == SearchBarValue.Expanded) {
+                        {
+                            AnimatedVisibility(
+                                visible = textFieldState.text.isNotEmpty(),
+                                enter = expandHorizontally(expandFrom = Alignment.End),
+                                exit = shrinkHorizontally(shrinkTowards = Alignment.End),
+                            ) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                ) {
+                                    ExpressiveIconButton(
+                                        Icons.Default.Clear,
+                                        size = IconButtonDefaults.mediumIconSize,
+                                        colors = searchBarIconButtonColors(),
+                                    ) {
+                                        textFieldState.clearText()
+                                    }
+                                    ExpressiveIconButton(
+                                        Icons.Default.Search,
+                                        size = IconButtonDefaults.mediumIconSize,
+                                        colors = IconButtonDefaults.filledTonalIconButtonColors(),
+                                    ) {
+                                        viewModel.onAction(SearchAction.UpdateQuery("${textFieldState.text}"))
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        null
+                    },
                 onSearch = {
                     viewModel.onAction(SearchAction.UpdateQuery("${textFieldState.text}"))
                 },
@@ -181,25 +190,28 @@ fun SearchScreen(
         inputField = {
             inputField(false)
         },
-        colors = SearchBarDefaults.appBarWithSearchColors(
-            appBarContainerColor = Color.Transparent,
-            searchBarColors = SearchBarDefaults.colors(
-                MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = .6f)
-            )
-        ),
+        colors =
+            SearchBarDefaults.appBarWithSearchColors(
+                appBarContainerColor = Color.Transparent,
+                searchBarColors =
+                    SearchBarDefaults.colors(
+                        MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = .6f),
+                    ),
+            ),
         contentPadding = PaddingValues(8.dp, 8.dp),
         actions = {
             ExpressiveIconButton(
                 Icons.Outlined.Settings,
                 size = IconButtonDefaults.mediumIconSize,
-                colors = IconButtonDefaults.filledTonalIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                ),
-                onClick = navigateToSettings
+                colors =
+                    IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    ),
+                onClick = navigateToSettings,
             )
-        }
+        },
     )
-    if (state.currentValue == SearchBarValue.Expanded)
+    if (state.currentValue == SearchBarValue.Expanded) {
         ExpandedFullScreenSearchBar(
             state = state,
             inputField = {
@@ -213,7 +225,7 @@ fun SearchScreen(
                 LazyRow(
                     contentPadding = PaddingValues(12.dp, 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     items(SearchFilter.entries, { it.name }) {
                         ExpressiveToggleButton(
@@ -223,10 +235,10 @@ fun SearchScreen(
                             },
                             icon = it.icon,
                             outlined = true,
-                            size = 40.dp
+                            size = 40.dp,
                         ) { _ ->
                             viewModel.onAction(
-                                SearchAction.ToggleFilter(it)
+                                SearchAction.ToggleFilter(it),
                             )
                         }
                     }
@@ -235,18 +247,19 @@ fun SearchScreen(
                     searchState.query.isEmpty(),
                     icon = Icons.Default.Search,
                     text = stringResource(R.string.search_start_prompt),
-                    modifier = Modifier.fillMaxSize().weight(1f)
+                    modifier = Modifier.fillMaxSize().weight(1f),
                 ) {
                     EmptyContainer(
                         searchState.isEmpty,
                         icon = Icons.Default.AllInbox,
-                        text = stringResource(R.string.search_no_results)
+                        text = stringResource(R.string.search_no_results),
                     ) {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = WindowInsets.navigationBars.asPaddingValues() +
+                            contentPadding =
+                                WindowInsets.navigationBars.asPaddingValues() +
                                     PaddingValues(bottom = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
+                            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top),
                         ) {
                             resultHolder(
                                 label = R.string.files,
@@ -259,17 +272,18 @@ fun SearchScreen(
                             ) { index, file ->
                                 SongListItem(
                                     song = file,
-                                    modifier = Modifier
-                                        .padding(horizontal = 12.dp)
-                                        .animateItem(),
+                                    modifier =
+                                        Modifier
+                                            .padding(horizontal = 12.dp)
+                                            .animateItem(),
                                     shape = expandableListItem(index, searchState.result.files.size),
                                     onLongClick = {
                                         onShowBottomSheet(file)
-                                    }
+                                    },
                                 ) {
                                     viewModel.play(
                                         searchState.result.files.map { it.id },
-                                        index
+                                        index,
                                     )
                                 }
                             }
@@ -279,25 +293,27 @@ fun SearchScreen(
                                 expanded = searchState.albumsExpanded,
                                 onExpandedChange = {
                                     viewModel.onAction(SearchAction.UpdateResultExpanded(albums = it))
-                                }
+                                },
                             ) { index, album ->
                                 ListItem(
                                     headline = album.name,
-                                    supporting = pluralStringResource(
-                                        R.plurals.item_s,
-                                        album.songs.size,
-                                        album.songs.size
-                                    ),
+                                    supporting =
+                                        pluralStringResource(
+                                            R.plurals.item_s,
+                                            album.songs.size,
+                                            album.songs.size,
+                                        ),
                                     shape = expandableListItem(index, searchState.result.albums.size),
                                     background = MaterialTheme.colorScheme.surface,
                                     cover = album.cover,
                                     icon = Icons.Default.Album,
-                                    modifier = Modifier
-                                        .padding(horizontal = 12.dp)
-                                        .animateItem(),
+                                    modifier =
+                                        Modifier
+                                            .padding(horizontal = 12.dp)
+                                            .animateItem(),
                                     onClick = {
                                         onAlbumClick(album)
-                                    }
+                                    },
                                 )
                             }
                             resultHolder(
@@ -306,25 +322,27 @@ fun SearchScreen(
                                 expanded = searchState.artistsExpanded,
                                 onExpandedChange = {
                                     viewModel.onAction(SearchAction.UpdateResultExpanded(artists = it))
-                                }
+                                },
                             ) { index, artist ->
                                 ListItem(
                                     headline = artist.name,
-                                    supporting = pluralStringResource(
-                                        R.plurals.item_s,
-                                        artist.songs.size,
-                                        artist.songs.size
-                                    ),
+                                    supporting =
+                                        pluralStringResource(
+                                            R.plurals.item_s,
+                                            artist.songs.size,
+                                            artist.songs.size,
+                                        ),
                                     shape = expandableListItem(index, searchState.result.artists.size),
                                     background = MaterialTheme.colorScheme.surface,
                                     cover = artist.getPicture(),
                                     icon = Icons.Default.Person,
-                                    modifier = Modifier
-                                        .padding(horizontal = 12.dp)
-                                        .animateItem(),
+                                    modifier =
+                                        Modifier
+                                            .padding(horizontal = 12.dp)
+                                            .animateItem(),
                                     onClick = {
                                         onArtistClick(artist)
-                                    }
+                                    },
                                 )
                             }
                             resultHolder(
@@ -333,25 +351,27 @@ fun SearchScreen(
                                 expanded = searchState.playlistsExpanded,
                                 onExpandedChange = {
                                     viewModel.onAction(SearchAction.UpdateResultExpanded(playlists = it))
-                                }
+                                },
                             ) { index, playlist ->
                                 ListItem(
                                     headline = playlist.name,
-                                    supporting = pluralStringResource(
-                                        R.plurals.item_s,
-                                        playlist.songs.size,
-                                        playlist.songs.size
-                                    ),
+                                    supporting =
+                                        pluralStringResource(
+                                            R.plurals.item_s,
+                                            playlist.songs.size,
+                                            playlist.songs.size,
+                                        ),
                                     shape = expandableListItem(index, searchState.result.playlists.size),
                                     background = MaterialTheme.colorScheme.surface,
                                     cover = playlist.image,
                                     icon = Icons.Default.Person,
-                                    modifier = Modifier
-                                        .padding(horizontal = 12.dp)
-                                        .animateItem(),
+                                    modifier =
+                                        Modifier
+                                            .padding(horizontal = 12.dp)
+                                            .animateItem(),
                                     onClick = {
                                         onPlaylistClick(playlist)
-                                    }
+                                    },
                                 )
                             }
                         }
@@ -359,13 +379,16 @@ fun SearchScreen(
                 }
             }
         }
+    }
 }
 
-
 @Composable
-fun expandableListItem(index: Int, itemsCount: Int) = listItemShape(
+fun expandableListItem(
+    index: Int,
+    itemsCount: Int,
+) = listItemShape(
     index = index,
-    itemsCount = if (itemsCount > 3) itemsCount + 1 else itemsCount
+    itemsCount = if (itemsCount > 3) itemsCount + 1 else itemsCount,
 )
 
 inline fun <T> LazyListScope.resultHolder(
@@ -394,23 +417,25 @@ inline fun <T> LazyListScope.resultHolder(
         itemsIndexed(
             items.filterIndexed { index, _ -> (expanded) or (index < 3) },
             itemKey,
-            itemContent = itemContent
+            itemContent = itemContent,
         )
-        if (items.size > 3)
+        if (items.size > 3) {
             item {
                 Button(
                     { onExpandedChange(!expanded) },
                     shape = listItemShape(1, 2),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor =
-                            expandButtonBackground.takeIf { it != Color.Unspecified }
-                                ?: MaterialTheme.colorScheme.surface,
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    ),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor =
+                                expandButtonBackground.takeIf { it != Color.Unspecified }
+                                    ?: MaterialTheme.colorScheme.surface,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
                     contentPadding = PaddingValues(vertical = 16.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
                 ) {
                     Icon(
                         if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
@@ -418,9 +443,10 @@ inline fun <T> LazyListScope.resultHolder(
                     )
                     Spacer(Modifier.width(ButtonDefaults.IconSpacing))
                     Text(
-                        stringResource(if (expanded) R.string.show_less else R.string.show_more)
+                        stringResource(if (expanded) R.string.show_less else R.string.show_more),
                     )
                 }
             }
+        }
     }
 }

@@ -17,36 +17,40 @@ import org.koin.androidx.workmanager.dsl.workerOf
 import org.koin.dsl.module
 import timber.log.Timber
 import younesbouhouche.musicplayer.BuildConfig
-import younesbouhouche.musicplayer.core.data.worker.MusicLibraryWorker
 import younesbouhouche.musicplayer.core.data.util.constructUrl
+import younesbouhouche.musicplayer.core.data.worker.MusicLibraryWorker
 
-val appModule = module {
-    single<HttpClient> {
-        HttpClient {
-            defaultRequest {
-                header(HttpHeaders.Accept, ContentType.Application.Json)
-                url(constructUrl(BuildConfig.BASE_URL))
-                contentType(ContentType.Application.Json)
-                accept(ContentType.Application.Json)
-            }
-            install(Logging) {
-                level = LogLevel.ALL
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        Timber.tag("HttpClient").i(message)
-                    }
+val appModule =
+    module {
+        single<HttpClient> {
+            HttpClient {
+                defaultRequest {
+                    header(HttpHeaders.Accept, ContentType.Application.Json)
+                    url(constructUrl(BuildConfig.BASE_URL))
+                    contentType(ContentType.Application.Json)
+                    accept(ContentType.Application.Json)
+                }
+                install(Logging) {
+                    level = LogLevel.ALL
+                    logger =
+                        object : Logger {
+                            override fun log(message: String) {
+                                Timber.tag("HttpClient").i(message)
+                            }
+                        }
+                }
+                install(ContentNegotiation) {
+                    json(
+                        Json {
+                            prettyPrint = true
+                            isLenient = true
+                            ignoreUnknownKeys = true
+                            encodeDefaults = true
+                        },
+                    )
                 }
             }
-            install(ContentNegotiation) {
-                json(Json {
-                    prettyPrint = true
-                    isLenient = true
-                    ignoreUnknownKeys = true
-                    encodeDefaults = true
-                })
-            }
         }
+        includes(databaseModule, repoModule, viewModelModule, utilsModule, useCaseModule)
+        workerOf(::MusicLibraryWorker)
     }
-    includes(databaseModule, repoModule, viewModelModule, utilsModule, useCaseModule)
-    workerOf(::MusicLibraryWorker)
-}

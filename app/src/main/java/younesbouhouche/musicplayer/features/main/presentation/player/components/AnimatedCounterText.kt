@@ -5,7 +5,6 @@ import androidx.compose.animation.SizeTransform
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,7 +12,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import younesbouhouche.musicplayer.features.main.presentation.util.intUpDownTransSpec
-
 
 @Composable
 fun AnimatedCounterText(
@@ -25,12 +23,13 @@ fun AnimatedCounterText(
 ) {
     Row(
         modifier,
-        horizontalArrangement = when (textAlign) {
-            TextAlign.Start -> Arrangement.Start
-            TextAlign.End -> Arrangement.End
-            TextAlign.Center -> Arrangement.Center
-            else -> Arrangement.Start
-        }
+        horizontalArrangement =
+            when (textAlign) {
+                TextAlign.Start -> Arrangement.Start
+                TextAlign.End -> Arrangement.End
+                TextAlign.Center -> Arrangement.Center
+                else -> Arrangement.Start
+            },
     ) {
         text.forEach { char ->
             if (char.isDigit()) {

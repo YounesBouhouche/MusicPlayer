@@ -15,31 +15,41 @@ import younesbouhouche.musicplayer.features.main.presentation.util.saveUriImageT
 
 class PlaylistRepositoryImpl(
     val dao: PlaylistDao,
-    val context: Context
-): PlaylistRepository {
-    override suspend fun createPlaylist(name: String, imageUri: Uri?) {
+    val context: Context,
+) : PlaylistRepository {
+    override suspend fun createPlaylist(
+        name: String,
+        imageUri: Uri?,
+    ) {
         val id = dao.upsertPlaylist(PlaylistEntity(name = name))
         changePlaylistImage(id, imageUri)
     }
 
     override suspend fun setPlaylistSongs(
         playlistId: Long,
-        songIds: List<Long>
+        songIds: List<Long>,
     ) {
         dao.setPlaylistSongs(playlistId, songIds)
     }
 
-    override suspend fun renamePlaylist(playlistId: Long, newName: String) {
+    override suspend fun renamePlaylist(
+        playlistId: Long,
+        newName: String,
+    ) {
         dao.renamePlaylist(playlistId, newName)
     }
 
-    override suspend fun changePlaylistImage(playlistId: Long, imageUri: Uri?) {
+    override suspend fun changePlaylistImage(
+        playlistId: Long,
+        imageUri: Uri?,
+    ) {
         val fileName = "pl_$playlistId.jpg"
-        val saved = imageUri?.let {
-            withContext(Dispatchers.IO) {
-                saveUriImageToInternalStorage(context, it, fileName) != null
-            }
-        } == true
+        val saved =
+            imageUri?.let {
+                withContext(Dispatchers.IO) {
+                    saveUriImageToInternalStorage(context, it, fileName) != null
+                }
+            } == true
         dao.updatePlaylistImage(playlistId, fileName.takeIf { saved })
     }
 
@@ -50,25 +60,27 @@ class PlaylistRepositoryImpl(
     override suspend fun addSongsToPlaylist(
         playlistId: Long,
         ids: List<Long>,
-        startPosition: Int?
+        startPosition: Int?,
     ) {
         val list = dao.getPlaylist(playlistId).songs.map { it.id }
         val newItems = ids - list.toSet()
-        val newList = if (startPosition != null) {
-            val mutableList = list.toMutableList()
-            mutableList.addAll(startPosition, newItems)
-            mutableList.toList()
-        } else {
-            list + newItems
-        }
+        val newList =
+            if (startPosition != null) {
+                val mutableList = list.toMutableList()
+                mutableList.addAll(startPosition, newItems)
+                mutableList.toList()
+            } else {
+                list + newItems
+            }
         setPlaylistSongs(playlistId, newList)
     }
 
-    override suspend fun removeSongFromPlaylist(playlistId: Long, songId: Long) {
+    override suspend fun removeSongFromPlaylist(
+        playlistId: Long,
+        songId: Long,
+    ) {
         dao.deletePlaylistSong(playlistId, songId)
     }
 
-    override fun getPlaylists(): Flow<List<Playlist>> {
-        return dao.getPlaylists().map { flow -> flow.map { it.toPlaylist() } }
-    }
+    override fun getPlaylists(): Flow<List<Playlist>> = dao.getPlaylists().map { flow -> flow.map { it.toPlaylist() } }
 }

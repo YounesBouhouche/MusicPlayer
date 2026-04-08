@@ -12,7 +12,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.toArgb
 import org.koin.compose.koinInject
-import younesbouhouche.musicplayer.core.data.datastore.PreferencesDataStore
 import younesbouhouche.musicplayer.core.data.datastore.SettingsPreference
 import younesbouhouche.musicplayer.core.domain.models.preferences.Theme
 import younesbouhouche.musicplayer.core.domain.repositories.PreferencesRepository
@@ -21,19 +20,26 @@ import younesbouhouche.musicplayer.core.domain.repositories.PreferencesRepositor
 fun ComponentActivity.SetSystemBarColors() {
     val repository = koinInject<PreferencesRepository>()
     val theme by repository.get(SettingsPreference.ThemeMode).collectAsState(Theme.SYSTEM)
-    val isDark = when(theme) {
-        Theme.DARK -> true
-        Theme.LIGHT -> false
-        Theme.SYSTEM -> isSystemInDarkTheme()
-    }
+    val isDark =
+        when (theme) {
+            Theme.DARK -> true
+            Theme.LIGHT -> false
+            Theme.SYSTEM -> isSystemInDarkTheme()
+        }
     val scrim = MaterialTheme.colorScheme.scrim
     DisposableEffect(isDark) {
         val statusBarStyle =
-            if (isDark) SystemBarStyle.dark(scrim.copy(alpha = 0f).toArgb())
-            else SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+            if (isDark) {
+                SystemBarStyle.dark(scrim.copy(alpha = 0f).toArgb())
+            } else {
+                SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+            }
         val navigationBarStyle =
-            if (isDark) SystemBarStyle.dark(Color.TRANSPARENT)
-            else SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+            if (isDark) {
+                SystemBarStyle.dark(Color.TRANSPARENT)
+            } else {
+                SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+            }
         enableEdgeToEdge(statusBarStyle = statusBarStyle, navigationBarStyle = navigationBarStyle)
         onDispose { }
     }

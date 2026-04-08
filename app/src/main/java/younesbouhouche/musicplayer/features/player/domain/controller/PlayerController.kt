@@ -20,27 +20,27 @@ class PlayerController(
     val playerStateManager: PlayerStateManager,
     val repository: MusicRepository,
     val queueRepository: QueueRepository,
-    val context: Context
+    val context: Context,
 ) {
     val playerState = playerStateManager.playerState
 
     @OptIn(UnstableApi::class)
     suspend fun handleEvent(event: PlayerEvent) {
         val player = playerManager.initialize()
-        when(event) {
+        when (event) {
             is PlayerEvent.AddToQueue -> {
-
             }
             is PlayerEvent.Backward -> {
                 player.seekBack()
             }
             PlayerEvent.CycleRepeatMode -> {
-                val repeatMode = when (player.repeatMode) {
-                    Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
-                    Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
-                    Player.REPEAT_MODE_ONE -> Player.REPEAT_MODE_OFF
-                    else -> Player.REPEAT_MODE_OFF
-                }
+                val repeatMode =
+                    when (player.repeatMode) {
+                        Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+                        Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+                        Player.REPEAT_MODE_ONE -> Player.REPEAT_MODE_OFF
+                        else -> Player.REPEAT_MODE_OFF
+                    }
                 player.repeatMode = repeatMode
                 playerStateManager.updateState {
                     it.copy(repeatMode = repeatMode)
@@ -62,18 +62,20 @@ class PlayerController(
                 player.pause()
             }
             PlayerEvent.PauseResume -> {
-                if (player.isPlaying) player.pause()
-                else player.play()
+                if (player.isPlaying) {
+                    player.pause()
+                } else {
+                    player.play()
+                }
             }
             is PlayerEvent.Play -> {
                 playerManager.play(
                     event.tracks,
                     event.index,
-                    shuffleMode = event.shuffle
+                    shuffleMode = event.shuffle,
                 )
             }
             is PlayerEvent.PlayNext -> {
-
             }
             PlayerEvent.Previous -> {
                 player.seekToPrevious()
@@ -125,9 +127,11 @@ class PlayerController(
                 player.moveMediaItem(event.from, event.to)
                 withContext(Dispatchers.IO) {
                     queueRepository.swapPositions(event.from, event.to)
-                    queueRepository.setCurrentIndex(withContext(Dispatchers.Main) {
-                        player.currentMediaItemIndex
-                    })
+                    queueRepository.setCurrentIndex(
+                        withContext(Dispatchers.Main) {
+                            player.currentMediaItemIndex
+                        },
+                    )
                 }
             }
             PlayerEvent.ToggleShuffle -> {

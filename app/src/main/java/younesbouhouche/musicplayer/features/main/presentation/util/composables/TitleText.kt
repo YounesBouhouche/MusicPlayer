@@ -17,15 +17,16 @@ import androidx.compose.ui.unit.dp
 fun TitleText(
     text: String,
     modifier: Modifier = Modifier,
-    background: Color = MaterialTheme.colorScheme.surface.copy(.8f)
+    background: Color = MaterialTheme.colorScheme.surface.copy(.8f),
 ) = Text(
     text = text,
     style = MaterialTheme.typography.titleLarge,
     fontWeight = FontWeight.Medium,
     maxLines = 1,
     overflow = TextOverflow.Ellipsis,
-    modifier = modifier
-        .clip(RoundedCornerShape(100))
-        .background(background)
-        .padding(vertical = 10.dp, horizontal = 20.dp)
+    modifier =
+        modifier
+            .clip(RoundedCornerShape(100))
+            .background(background)
+            .padding(vertical = 10.dp, horizontal = 20.dp),
 )

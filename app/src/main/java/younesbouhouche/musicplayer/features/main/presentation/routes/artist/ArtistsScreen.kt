@@ -23,16 +23,16 @@ import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.features.main.presentation.components.GridScreen
 import younesbouhouche.musicplayer.features.main.presentation.components.ListItem
 import younesbouhouche.musicplayer.features.main.presentation.components.PictureCard
+import younesbouhouche.musicplayer.features.main.presentation.routes.artist.ArtistsViewModel
 import younesbouhouche.musicplayer.features.main.presentation.util.ListsSortType
 import younesbouhouche.musicplayer.features.main.presentation.util.SortBottomSheet
-import younesbouhouche.musicplayer.features.main.presentation.routes.artist.ArtistsViewModel
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ArtistsScreen(
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
-    onClick: (Artist) -> Unit
+    onClick: (Artist) -> Unit,
 ) {
     val viewModel = koinViewModel<ArtistsViewModel>()
     val artists by viewModel.artists.collectAsStateWithLifecycle()
@@ -47,14 +47,15 @@ fun ArtistsScreen(
         {
             ListItem(
                 headline = it.name,
-                supporting = pluralStringResource(
-                    R.plurals.item_s,
-                    it.songs.size,
-                    it.songs.size
-                ),
+                supporting =
+                    pluralStringResource(
+                        R.plurals.item_s,
+                        it.songs.size,
+                        it.songs.size,
+                    ),
                 cover = it.getPicture(),
                 icon = Icons.Default.Person,
-                modifier = Modifier.animateItem()
+                modifier = Modifier.animateItem(),
             ) {
                 onClick(it)
             }
@@ -66,16 +67,16 @@ fun ArtistsScreen(
                 {
                     onClick(artist)
                 },
-                Modifier.animateItem()
+                Modifier.animateItem(),
             ) {
                 Column(
                     Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom),
                 ) {
                     Text(
                         artist.name,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }

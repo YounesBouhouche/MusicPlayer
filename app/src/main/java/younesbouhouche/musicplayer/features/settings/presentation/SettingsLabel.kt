@@ -40,21 +40,23 @@ fun LazyListScope.settingsLabel(text: @Composable () -> String) =
         )
     }
 
-fun LazyListScope.settingsLabel(text: @Composable () -> String, trailing: @Composable () -> String) =
-    item {
-        ProvideTextStyle(
-            MaterialTheme.typography.bodySmall.copy(
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+fun LazyListScope.settingsLabel(
+    text: @Composable () -> String,
+    trailing: @Composable () -> String,
+) = item {
+    ProvideTextStyle(
+        MaterialTheme.typography.bodySmall.copy(
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        ),
+    ) {
+        Row(
+            Modifier.padding(16.dp).fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Row(
-                Modifier.padding(16.dp).fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text().uppercase())
-                Text(trailing())
-            }
+            Text(text().uppercase())
+            Text(trailing())
         }
     }
+}

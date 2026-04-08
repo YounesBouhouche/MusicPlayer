@@ -42,13 +42,14 @@ fun ListItem(
     trailingContent: (@Composable RowScope.() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    Row(modifier
-        .clip(shape)
-        .background(background)
-        .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-        .padding(12.dp),
+    Row(
+        modifier
+            .clip(shape)
+            .background(background)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .padding(12.dp),
         horizontalArrangement = horizontalArrangement,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         leadingContent?.invoke(this)
         Box(Modifier.weight(1f)) {
@@ -60,10 +61,11 @@ fun ListItem(
                 Icons.Default.MoreVert,
                 widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow,
                 size = IconButtonDefaults.mediumIconSize,
-                colors = IconButtonDefaults.filledTonalIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                ),
-                onClick = it
+                colors =
+                    IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    ),
+                onClick = it,
             )
         }
     }
@@ -99,23 +101,23 @@ fun ListItem(
         )
         leadingContent?.invoke(this)
     },
-    trailingContent = trailingContent
+    trailingContent = trailingContent,
 ) {
     Column(
         Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
     ) {
         Text(
             headline,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
         )
         Text(
             supporting,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
         )
     }
 }

@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import younesbouhouche.musicplayer.features.settings.presentation.util.Checked
 import younesbouhouche.musicplayer.features.settings.presentation.util.SettingData
 
-
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SettingsItem(
@@ -69,80 +68,85 @@ fun SettingsItem(
         modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(background)
+            .background(background),
     ) {
         Row(
-            Modifier.fillMaxWidth()
+            Modifier
+                .fillMaxWidth()
                 .alpha(alpha)
                 .clickable(
                     interactionSource = interactionSource,
                     indication = LocalIndication.current,
                     role = role,
                     onClick = onClick,
-                    enabled = enabled
-                )
-                .padding(16.dp),
+                    enabled = enabled,
+                ).padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
         ) {
             leadingContent?.invoke()
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
                     text = headline,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 supporting?.let {
                     Text(
                         text = it,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
-            if (separator and (trailingContent != null))
+            if (separator and (trailingContent != null)) {
                 VerticalDivider(Modifier.fillMaxHeight(.5f), 2.dp)
+            }
             trailingContent?.invoke() ?: checked?.let {
-                if (it.radio)
+                if (it.radio) {
                     RadioButton(
                         it.checked,
                         { it.onCheckedChange(null) },
-                        interactionSource = interactionSource
+                        interactionSource = interactionSource,
                     )
-                else if (useCheckbox)
+                } else if (useCheckbox) {
                     Checkbox(
                         it.checked,
                         it.onCheckedChange,
-                        interactionSource = interactionSource
+                        interactionSource = interactionSource,
                     )
-                else
+                } else {
                     Switch(
                         it.checked,
                         it.onCheckedChange,
                         interactionSource = interactionSource,
                         thumbContent = {
                             Icon(
-                                if (it.checked) Icons.Default.Check
-                                else Icons.Default.Close,
+                                if (it.checked) {
+                                    Icons.Default.Check
+                                } else {
+                                    Icons.Default.Close
+                                },
                                 null,
-                                Modifier.size(SwitchDefaults.IconSize)
+                                Modifier.size(SwitchDefaults.IconSize),
                             )
-                        }
+                        },
                     )
+                }
             }
             if ((trailingContent == null) && (checked == null)) {
                 VerticalDivider(Modifier.fillMaxHeight(.5f), 2.dp)
-    //            ExpressiveIconButton(
-    //                Icons.Default.ChevronRight,
-    //                size = IconButtonDefaults.smallIconSize,
-    //                onClick = onClick,
-    //                colors = IconButtonDefaults.iconButtonColors(
-    //                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-    //                )
-    //            )
+                //            ExpressiveIconButton(
+                //                Icons.Default.ChevronRight,
+                //                size = IconButtonDefaults.smallIconSize,
+                //                onClick = onClick,
+                //                colors = IconButtonDefaults.iconButtonColors(
+                //                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                //                )
+                //            )
             }
         }
         bottomContent?.invoke()
@@ -182,31 +186,34 @@ fun SettingsItem(
     onClick,
     separator,
     useCheckbox = useCheckbox,
-    leadingContent = icon?.let {
-        {
-            val icon = @Composable {
-                Icon(
-                    imageVector = it,
-                    contentDescription = null,
-                    tint = iconTint,
-                    modifier = Modifier.size(if (large) 32.dp else 24.dp)
-                )
-            }
-            iconBackground?.let {
-                Box(Modifier.clip(CircleShape)
-                    .background(iconBackground)
-                    .size(if (large) 60.dp else 48.dp),
-                    contentAlignment = Alignment.Center
-                ) {
+    leadingContent =
+        icon?.let {
+            {
+                val icon = @Composable {
+                    Icon(
+                        imageVector = it,
+                        contentDescription = null,
+                        tint = iconTint,
+                        modifier = Modifier.size(if (large) 32.dp else 24.dp),
+                    )
+                }
+                iconBackground?.let {
+                    Box(
+                        Modifier
+                            .clip(CircleShape)
+                            .background(iconBackground)
+                            .size(if (large) 60.dp else 48.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        icon()
+                    }
+                } ?: Row(Modifier.padding(horizontal = 8.dp)) {
                     icon()
                 }
-            } ?: Row(Modifier.padding(horizontal = 8.dp)) {
-                icon()
             }
-        }
-    },
+        },
     trailingContent,
-    bottomContent
+    bottomContent,
 )
 
 @Composable

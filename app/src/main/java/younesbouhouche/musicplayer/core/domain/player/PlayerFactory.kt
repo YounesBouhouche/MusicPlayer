@@ -21,7 +21,7 @@ import younesbouhouche.musicplayer.core.domain.repositories.QueueRepository
 class PlayerFactory(
     private val context: Context,
     private val queueRepository: QueueRepository,
-    preferencesRepository: PreferencesRepository
+    preferencesRepository: PreferencesRepository,
 ) {
     private var exoPlayer: Player? = null
     private val skipSilence = preferencesRepository.get(SettingsPreference.SkipSilence)
@@ -31,31 +31,37 @@ class PlayerFactory(
 
     @OptIn(UnstableApi::class)
     private suspend fun createNewPlayer(): ExoPlayer {
-        val audioAttributes = AudioAttributes.Builder()
-            .setUsage(C.USAGE_MEDIA)
-            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-            .build()
+        val audioAttributes =
+            AudioAttributes
+                .Builder()
+                .setUsage(C.USAGE_MEDIA)
+                .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+                .build()
 
-        val trackSelector = DefaultTrackSelector(context).apply {
-            setParameters(buildUponParameters())
-        }
+        val trackSelector =
+            DefaultTrackSelector(context).apply {
+                setParameters(buildUponParameters())
+            }
 
-        val loadControl = DefaultLoadControl.Builder()
-            .setBufferDurationsMs(
-                30_000,
-                120_000,
-                15_000,
-                5_000
-            )
-            .build()
+        val loadControl =
+            DefaultLoadControl
+                .Builder()
+                .setBufferDurationsMs(
+                    30_000,
+                    120_000,
+                    15_000,
+                    5_000,
+                ).build()
 
-        return ExoPlayer.Builder(context)
+        return ExoPlayer
+            .Builder(context)
             .setAudioAttributes(audioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
             .setTrackSelector(trackSelector)
             .setSkipSilenceEnabled(skipSilence.first())
             .setLoadControl(loadControl)
-            .build().apply {
+            .build()
+            .apply {
                 playWhenReady = false
             }
     }

@@ -17,7 +17,11 @@ object LocaleUtils {
      * @param locale The desired locale
      * @return The localized string in the specified locale
      */
-    fun getStringInLocale(context: Context, @StringRes stringId: Int, locale: Locale): String {
+    fun getStringInLocale(
+        context: Context,
+        @StringRes stringId: Int,
+        locale: Locale,
+    ): String {
         val configuration = Configuration(context.resources.configuration)
         configuration.setLocale(locale)
 
@@ -33,11 +37,16 @@ object LocaleUtils {
      * @param languageTag The language tag (e.g. "en", "fr", "ar")
      * @return The localized string in the specified locale
      */
-    fun getStringInLanguage(context: Context, @StringRes stringId: Int, languageTag: String): String {
-        val locale = when (languageTag) {
-            "system" -> Locale.getDefault()
-            else -> Locale.forLanguageTag(languageTag)
-        }
+    fun getStringInLanguage(
+        context: Context,
+        @StringRes stringId: Int,
+        languageTag: String,
+    ): String {
+        val locale =
+            when (languageTag) {
+                "system" -> Locale.getDefault()
+                else -> Locale.forLanguageTag(languageTag)
+            }
         return getStringInLocale(context, stringId, locale)
     }
 }

@@ -40,7 +40,7 @@ fun SongsListContainer(
     subtitle: String,
     list: List<Song>,
     onPlay: (songIds: List<Long>, startIndex: Int, shuffle: Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     ListContainer(
         title = title,
@@ -53,12 +53,12 @@ fun SongsListContainer(
                         onClick = {
                             onPlay(list.map { it.id }, 0, false)
                         },
-                        Modifier.height(46.dp)
+                        Modifier.height(46.dp),
                     ) {
                         Icon(
                             Icons.Default.PlayArrow,
                             null,
-                            modifier = Modifier.size(SplitButtonDefaults.LeadingIconSize)
+                            modifier = Modifier.size(SplitButtonDefaults.LeadingIconSize),
                         )
                         Spacer(Modifier.width(ButtonDefaults.ExtraSmallIconSpacing))
                         Text("Play")
@@ -69,13 +69,13 @@ fun SongsListContainer(
                         onClick = {
                             onPlay(list.map { it.id }, 0, true)
                         },
-                        Modifier.height(46.dp)
+                        Modifier.height(46.dp),
                     ) {
                         Icon(Icons.Default.Shuffle, null)
                     }
-                }
+                },
             )
-        }
+        },
     ) {
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -86,7 +86,7 @@ fun SongsListContainer(
                     onPlay(
                         list.map { it.id },
                         list.indexOf(song),
-                        false
+                        false,
                     )
                 }
             }
@@ -103,29 +103,29 @@ fun SongItem(
     Surface(
         modifier = modifier.widthIn(max = 240.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = MaterialTheme.shapes.extraLarge
+        shape = MaterialTheme.shapes.extraLarge,
     ) {
         Row(
             Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Image(
                 song.coverUri,
                 Icons.Default.MusicNote,
                 Modifier.size(50.dp),
-                background = MaterialTheme.colorScheme.surfaceVariant
+                background = MaterialTheme.colorScheme.surfaceVariant,
             )
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
                     song.title,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
                     song.artist,

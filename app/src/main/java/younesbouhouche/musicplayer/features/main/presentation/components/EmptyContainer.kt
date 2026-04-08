@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialShapes
@@ -46,39 +45,43 @@ fun EmptyContainer(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     content: @Composable () -> Unit,
 ) {
-    val angle by rememberInfiniteTransition().animateFloat(0f, 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(20000, easing = { it }),
-            repeatMode = RepeatMode.Restart
-        )
+    val angle by rememberInfiniteTransition().animateFloat(
+        0f,
+        360f,
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(20000, easing = { it }),
+                repeatMode = RepeatMode.Restart,
+            ),
     )
     AnimatedContent(
         isEmpty,
         modifier,
-        { materialSharedAxisZ(true) }
+        { materialSharedAxisZ(true) },
     ) {
         if (it) {
             Column(
                 Modifier.padding(16.dp).padding(contentPadding),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically)
+                verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
             ) {
                 Box(
                     Modifier
-                        .clip(MaterialShapes.Cookie12Sided.toShape(
-                            angle.roundToInt())
-                        )
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                        .clip(
+                            MaterialShapes.Cookie12Sided.toShape(
+                                angle.roundToInt(),
+                            ),
+                        ).background(MaterialTheme.colorScheme.surfaceContainer)
                         .height(220.dp)
                         .aspectRatio(1f, true)
                         .weight(1f, false),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         icon,
                         null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.fillMaxSize(.4f)
+                        modifier = Modifier.fillMaxSize(.4f),
                     )
                 }
                 Text(

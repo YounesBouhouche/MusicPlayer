@@ -23,12 +23,12 @@ import younesbouhouche.musicplayer.core.domain.models.Artist
 fun ArtistCard(
     artist: Artist,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
             artist.getPicture(),
@@ -36,14 +36,14 @@ fun ArtistCard(
             Modifier.size(100.dp),
             shape = CircleShape,
             background = MaterialTheme.colorScheme.surfaceVariant,
-            onClick = onClick
+            onClick = onClick,
         )
         Text(
             artist.name,
             style = MaterialTheme.typography.bodyMedium,
             maxLines = 1,
             modifier = Modifier.width(100.dp).padding(horizontal = 8.dp),
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

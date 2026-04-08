@@ -19,41 +19,41 @@ enum class TopLevelRoutes(
     val unselectedIcon: ImageVector,
     val selectedIcon: ImageVector,
     val destination: MainNavRoute,
-    val index: Int
+    val index: Int,
 ) {
     Home(
         R.string.home,
         Icons.Outlined.Home,
         Icons.Default.Home,
         MainNavRoute.Home,
-        0
+        0,
     ),
     Albums(
         R.string.albums,
         Icons.Outlined.Album,
         Icons.Default.Album,
         MainNavRoute.Albums,
-        1
+        1,
     ),
     Artists(
         R.string.artists,
         Icons.Outlined.Person,
         Icons.Default.Person,
         MainNavRoute.Artists,
-        2
+        2,
     ),
     Playlists(
         R.string.playlists,
         Icons.AutoMirrored.Outlined.PlaylistPlay,
         Icons.AutoMirrored.Default.PlaylistPlay,
         MainNavRoute.Playlists,
-        3
+        3,
     ),
     Library(
         R.string.library,
         Icons.Outlined.LibraryMusic,
         Icons.Default.LibraryMusic,
         MainNavRoute.Library,
-        4
+        4,
     ),
 }

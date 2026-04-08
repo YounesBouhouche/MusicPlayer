@@ -2,7 +2,11 @@ package younesbouhouche.musicplayer.features.glance.presentation.util
 
 import android.graphics.BitmapFactory
 
-fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+fun calculateInSampleSize(
+    options: BitmapFactory.Options,
+    reqWidth: Int,
+    reqHeight: Int,
+): Int {
     // Raw height and width of image
     val height = options.outHeight
     val width = options.outWidth

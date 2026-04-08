@@ -52,14 +52,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.younesb.mydesignsystem.presentation.components.ExpressiveButton
+import com.younesb.mydesignsystem.presentation.util.plus
 import soup.compose.material.motion.animation.materialSharedAxisZ
 import younesbouhouche.musicplayer.R
-import com.younesb.mydesignsystem.presentation.components.ExpressiveButton
 import younesbouhouche.musicplayer.features.main.domain.events.TimerType
 import younesbouhouche.musicplayer.features.main.presentation.player.components.AnimatedCounterText
 import younesbouhouche.musicplayer.features.main.presentation.util.containerClip
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
-import com.younesb.mydesignsystem.presentation.util.plus
 import younesbouhouche.musicplayer.features.main.presentation.util.timerString
 import younesbouhouche.musicplayer.features.main.presentation.util.toLocaleTimeString
 import java.time.LocalDateTime
@@ -71,7 +71,7 @@ fun TimerSheet(
     onDismissRequest: () -> Unit,
     timer: TimerType,
     onSetTimer: (TimerType) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val state = rememberModalBottomSheetState(true)
     if (visible) {
@@ -81,19 +81,22 @@ fun TimerSheet(
             modifier = modifier,
             sheetState = state,
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            dragHandle = { BottomSheetDefaults.DragHandle(
-                color = MaterialTheme.colorScheme.primary
-            ) },
+            dragHandle = {
+                BottomSheetDefaults.DragHandle(
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            },
             contentWindowInsets = {
                 BottomSheetDefaults.modalWindowInsets.exclude(WindowInsets.navigationBars)
-            }
+            },
         ) {
-            if (running)
+            if (running) {
                 RunningTimerContent(timer, onDismissRequest) {
                     onSetTimer(TimerType.Disabled)
                 }
-            else
+            } else {
                 SelectTimerContent(timer, onDismissRequest, onSetTimer)
+            }
         }
     }
 }
@@ -109,33 +112,33 @@ internal fun RunningTimerContent(
         Modifier.fillMaxWidth(),
         contentPadding = WindowInsets.navigationBars.asPaddingValues() + PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
             Column(
                 Modifier.padding(vertical = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = when(timer) {
-                        TimerType.Disabled -> ""
-                        is TimerType.Duration -> "Player will stop after"
-                        is TimerType.End -> "Tracks to play before stopping:"
-                        is TimerType.Time -> "Player will stop at"
-                    },
+                    text =
+                        when (timer) {
+                            TimerType.Disabled -> ""
+                            is TimerType.Duration -> "Player will stop after"
+                            is TimerType.End -> "Tracks to play before stopping:"
+                            is TimerType.Time -> "Player will stop at"
+                        },
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 ProvideTextStyle(
                     MaterialTheme.typography.displayLarge.copy(
                         color = MaterialTheme.colorScheme.primary,
-                        textAlign = TextAlign.Center
-                    )
+                        textAlign = TextAlign.Center,
+                    ),
                 ) {
-                    when(timer) {
+                    when (timer) {
                         TimerType.Disabled -> {
-
                         }
                         is TimerType.Duration -> {
                             AnimatedCounterText(
@@ -151,11 +154,12 @@ internal fun RunningTimerContent(
                             Column(
                                 Modifier.fillMaxWidth(),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 Text(text = timer.getTargetDate().toLocaleTimeString())
-                                if (timer.tomorrow)
+                                if (timer.tomorrow) {
                                     Text(text = "(tomorrow)", style = MaterialTheme.typography.bodyMedium)
+                                }
                             }
                         }
                     }
@@ -165,19 +169,22 @@ internal fun RunningTimerContent(
         item {
             Row(
                 Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 repeat(2) {
                     val (res, onClick) =
-                        if (it == 0) R.string.cancel to onDismissRequest
-                        else R.string.stop to {
-                            onStopTimer()
-                            onDismissRequest()
+                        if (it == 0) {
+                            R.string.cancel to onDismissRequest
+                        } else {
+                            R.string.stop to {
+                                onStopTimer()
+                                onDismissRequest()
+                            }
                         }
                     val interactionSource = remember { MutableInteractionSource() }
                     val pressed by interactionSource.collectIsPressedAsState()
                     val weight by animateFloatAsState(
-                        if (pressed) 1.4f else 1f
+                        if (pressed) 1.4f else 1f,
                     )
                     ExpressiveButton(
                         stringResource(res),
@@ -198,91 +205,97 @@ internal fun RunningTimerContent(
 internal fun SelectTimerContent(
     timer: TimerType,
     onDismissRequest: () -> Unit,
-    onSetTimer: (TimerType) -> Unit
+    onSetTimer: (TimerType) -> Unit,
 ) {
     var selected by remember { mutableStateOf(timer) }
     LazyColumn(
         Modifier.fillMaxWidth(),
         contentPadding = WindowInsets.navigationBars.asPaddingValues() + PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
-            Row(Modifier
-                .clip(RoundedCornerShape(100))
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(16.dp)
-                .fillMaxWidth(),
+            Row(
+                Modifier
+                    .clip(RoundedCornerShape(100))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .padding(16.dp)
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     stringResource(R.string.sleep_timer),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(start = 4.dp)
+                    modifier = Modifier.padding(start = 4.dp),
                 )
                 Switch(
                     selected != TimerType.Disabled,
                     {
                         selected = if (it) TimerType.Duration(60 * 1000) else TimerType.Disabled
-                    }
+                    },
                 )
             }
         }
         item {
             Row(
                 Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 repeat(3) { index ->
-                    val checked = when (index) {
-                        0 -> selected is TimerType.Duration
-                        1 -> selected is TimerType.Time
-                        else -> selected is TimerType.End
-                    }
-                    val res = when (index) {
-                        0 -> R.string.duration
-                        1 -> R.string.time
-                        else -> R.string.end
-                    }
+                    val checked =
+                        when (index) {
+                            0 -> selected is TimerType.Duration
+                            1 -> selected is TimerType.Time
+                            else -> selected is TimerType.End
+                        }
+                    val res =
+                        when (index) {
+                            0 -> R.string.duration
+                            1 -> R.string.time
+                            else -> R.string.end
+                        }
                     val interactionSource = remember { MutableInteractionSource() }
                     val pressed by interactionSource.collectIsPressedAsState()
                     val weight by animateFloatAsState(
-                        if (pressed) 1.4f else 1f
+                        if (pressed) 1.4f else 1f,
                     )
                     ToggleButton(
                         checked,
                         {
-                            selected = when (index) {
-                                0 -> TimerType.Duration(60 * 1000)
-                                1 ->
-                                    TimerType.Time(
-                                        LocalDateTime.now().hour,
-                                        LocalDateTime.now().minute + 1,
-                                        false
-                                    )
-                                else -> TimerType.End(1)
-                            }
+                            selected =
+                                when (index) {
+                                    0 -> TimerType.Duration(60 * 1000)
+                                    1 ->
+                                        TimerType.Time(
+                                            LocalDateTime.now().hour,
+                                            LocalDateTime.now().minute + 1,
+                                            false,
+                                        )
+                                    else -> TimerType.End(1)
+                                }
                         },
                         Modifier
                             .weight(weight)
                             .height(ButtonDefaults.MediumContainerHeight),
-                        shapes = when(index) {
-                            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                            1 -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                            else -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        },
-                        colors = ToggleButtonDefaults.toggleButtonColors(
-                            checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
+                        shapes =
+                            when (index) {
+                                0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                                1 -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                                else -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                            },
+                        colors =
+                            ToggleButtonDefaults.toggleButtonColors(
+                                checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            ),
                         interactionSource = interactionSource,
                         enabled = selected != TimerType.Disabled,
-                        contentPadding = ButtonDefaults.contentPaddingFor(ButtonDefaults.MediumContainerHeight)
+                        contentPadding = ButtonDefaults.contentPaddingFor(ButtonDefaults.MediumContainerHeight),
                     ) {
                         Text(stringResource(res))
                     }
@@ -293,33 +306,36 @@ internal fun SelectTimerContent(
             AnimatedVisibility(selected != TimerType.Disabled) {
                 Column(
                     Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Surface(
                         Modifier.containerClip(
-                            shape = expressiveRectShape(
-                                0,
-                                if (selected is TimerType.Time) 1 else 2
-                            )
-                        )
+                            shape =
+                                expressiveRectShape(
+                                    0,
+                                    if (selected is TimerType.Time) 1 else 2,
+                                ),
+                        ),
                     ) {
                         AnimatedContent(
                             selected.javaClass,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            transitionSpec = { materialSharedAxisZ(true) }
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                            transitionSpec = { materialSharedAxisZ(true) },
                         ) { selectedTimer ->
-                            when(selectedTimer) {
+                            when (selectedTimer) {
                                 TimerType.Duration::class.java -> {
                                     DurationPicker(
                                         duration = (selected as? TimerType.Duration)?.ms ?: 0L,
                                         onDurationChange = {
                                             selected = TimerType.Duration(it)
                                         },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp)
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
                                     )
                                 }
                                 TimerType.End::class.java -> {
@@ -328,9 +344,10 @@ internal fun SelectTimerContent(
                                         onTracksChange = {
                                             selected = TimerType.End(it)
                                         },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp)
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
                                     )
                                 }
                                 TimerType.Time::class.java -> {
@@ -340,13 +357,13 @@ internal fun SelectTimerContent(
                                         onTimeChange = { hour, minute ->
                                             selected = TimerType.Time(hour, minute)
                                         },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp)
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
                                     )
                                 }
                                 else -> {
-
                                 }
                             }
                         }
@@ -359,10 +376,10 @@ internal fun SelectTimerContent(
                         ) {
                             AnimatedContent(
                                 selected.javaClass,
-                                transitionSpec = { materialSharedAxisZ(true) }
+                                transitionSpec = { materialSharedAxisZ(true) },
                             ) {
                                 Text(
-                                    when(it) {
+                                    when (it) {
                                         TimerType.Duration::class.java -> {
                                             val duration = (selected as? TimerType.Duration)?.ms ?: 0L
                                             pluralStringResource(
@@ -384,7 +401,7 @@ internal fun SelectTimerContent(
                                     color = MaterialTheme.colorScheme.primary,
                                     style = MaterialTheme.typography.titleMedium,
                                     textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(24.dp)
+                                    modifier = Modifier.padding(24.dp),
                                 )
                             }
                         }
@@ -395,19 +412,22 @@ internal fun SelectTimerContent(
         item {
             Row(
                 Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 repeat(2) {
                     val (res, onClick) =
-                        if (it == 0) R.string.cancel to onDismissRequest
-                        else R.string.ok to {
-                            onSetTimer(selected)
-                            onDismissRequest()
+                        if (it == 0) {
+                            R.string.cancel to onDismissRequest
+                        } else {
+                            R.string.ok to {
+                                onSetTimer(selected)
+                                onDismissRequest()
+                            }
                         }
                     val interactionSource = remember { MutableInteractionSource() }
                     val pressed by interactionSource.collectIsPressedAsState()
                     val weight by animateFloatAsState(
-                        if (pressed) 1.4f else 1f
+                        if (pressed) 1.4f else 1f,
                     )
                     ExpressiveButton(
                         stringResource(res),
@@ -427,7 +447,7 @@ internal fun SelectTimerContent(
 fun DurationPicker(
     duration: Long,
     onDurationChange: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val max = 120 * 60 * 1000L // 2 hours
     val min = 1 * 60 * 1000L // 1 minute
@@ -435,11 +455,11 @@ fun DurationPicker(
         value = if (duration < min) 0f else duration.toFloat() / max,
         {
             onDurationChange(
-                (it * (max - min) + min).toLong()
+                (it * (max - min) + min).toLong(),
             )
         },
         modifier = modifier.fillMaxWidth(),
-        steps = 23
+        steps = 23,
     )
 }
 
@@ -447,7 +467,7 @@ fun DurationPicker(
 fun EndPicker(
     tracks: Int,
     onTracksChange: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val max = 10
     val min = 1
@@ -457,7 +477,7 @@ fun EndPicker(
             onTracksChange((it * (max - min) + min).toInt())
         },
         modifier = modifier.fillMaxWidth(),
-        steps = 9
+        steps = 9,
     )
 }
 
@@ -467,7 +487,7 @@ fun TimePicker(
     hour: Int,
     minute: Int,
     onTimeChange: (Int, Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val state = rememberTimePickerState(hour, minute)
     LaunchedEffect(state.hour, state.minute) {
@@ -475,7 +495,7 @@ fun TimePicker(
     }
     TimePicker(
         state,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     )
 }
 
@@ -490,7 +510,7 @@ private fun TimerSheetPreview() {
             timer = timer,
             onSetTimer = {
                 timer = it
-            }
+            },
         )
     }
 }

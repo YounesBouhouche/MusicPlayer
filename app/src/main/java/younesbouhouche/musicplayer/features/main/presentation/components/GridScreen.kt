@@ -34,7 +34,7 @@ import younesbouhouche.musicplayer.features.main.presentation.util.SortState
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun<T, S> GridScreen(
+fun <T, S> GridScreen(
     items: List<T>,
     sortState: SortState<S>,
     onExpandSortSheet: () -> Unit,
@@ -55,7 +55,7 @@ fun<T, S> GridScreen(
     val sortButton = @Composable {
         Row(
             Modifier.padding(vertical = 16.dp, horizontal = 8.dp).fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
         ) {
             ExpressiveIconButton(
                 icon = Icons.AutoMirrored.Filled.Sort,
@@ -70,7 +70,7 @@ fun<T, S> GridScreen(
             LazyColumn(
                 Modifier.fillMaxSize().padding(horizontal = 8.dp).then(modifier),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = contentPadding
+                contentPadding = contentPadding,
             ) {
                 item {
                     sortButton()
@@ -85,7 +85,7 @@ fun<T, S> GridScreen(
                 Modifier.fillMaxSize().padding(horizontal = 8.dp).then(modifier),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = contentPadding
+                contentPadding = contentPadding,
             ) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     sortButton()

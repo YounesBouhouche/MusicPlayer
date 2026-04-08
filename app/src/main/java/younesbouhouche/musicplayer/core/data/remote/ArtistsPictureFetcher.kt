@@ -14,28 +14,28 @@ import younesbouhouche.musicplayer.features.main.domain.models.DeezerResponse
 class ArtistsPictureFetcher(
     val client: HttpClient,
 ) {
-    suspend operator fun invoke(
-        artists: List<ArtistEntity>,
-    ): List<ArtistEntity> {
+    suspend operator fun invoke(artists: List<ArtistEntity>): List<ArtistEntity> {
         return artists.map { artist ->
             if (artist.name == "<unknown>") {
                 return@map artist
             }
-            (safeCall<DeezerResponse, HttpResponse>(
-                { body() },
-                { status.value }
-            ) {
-                client.get(constructUrl("search/artist/")) {
-                    url {
-                        parameters.append("q", artist.name)
-                        parameters.append("limit", "1")
+            (
+                safeCall<DeezerResponse, HttpResponse>(
+                    { body() },
+                    { status.value },
+                ) {
+                    client.get(constructUrl("search/artist/")) {
+                        url {
+                            parameters.append("q", artist.name)
+                            parameters.append("limit", "1")
+                        }
                     }
-                }
-            }.map {
-                artist.copy(
-                    picture = it.data.firstOrNull()?.pictureXl
-                )
-            } as? Result.Success)?.data ?: artist
+                }.map {
+                    artist.copy(
+                        picture = it.data.firstOrNull()?.pictureXl,
+                    )
+                } as? Result.Success
+            )?.data ?: artist
         }
     }
 }

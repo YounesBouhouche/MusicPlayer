@@ -29,7 +29,7 @@ class MediaSessionManager(
     private val context: Context,
     private val playerManager: PlayerManager,
     private val pendingIntent: PendingIntent,
-    private val customCommands: List<CommandButton>
+    private val customCommands: List<CommandButton>,
 ) {
     private var mediaSession: MediaSession? = null
     private lateinit var controllerFuture: ListenableFuture<MediaController>
@@ -60,20 +60,27 @@ class MediaSessionManager(
         controllerFuture.addListener({
             val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
             scope.launch(Dispatchers.Main) {
-                playerManager.restoreSessionState(withContext(Dispatchers.IO) {
-                    controllerFuture.get()
-                })
+                playerManager.restoreSessionState(
+                    withContext(Dispatchers.IO) {
+                        controllerFuture.get()
+                    },
+                )
             }
         }, ContextCompat.getMainExecutor(context))
     }
 
     @OptIn(UnstableApi::class)
-    fun createSession(context: Context, player: Player) {
-        MediaSession.Builder(context, player)
+    fun createSession(
+        context: Context,
+        player: Player,
+    ) {
+        MediaSession
+            .Builder(context, player)
             .setId("MusicPlayerMediaPlayerService")
             .setSessionActivity(pendingIntent)
             .setCustomLayout(customCommands)
-            .build().also {
+            .build()
+            .also {
                 mediaSession = it
             }
     }
@@ -85,9 +92,8 @@ class MediaSessionManager(
      */
     fun setSession(session: MediaSession) {
         // Release any existing session first
-        //mediaSession?.release()
+        // mediaSession?.release()
         mediaSession = session
-
     }
 
     fun release() {

@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import younesbouhouche.musicplayer.core.domain.models.preferences.Theme
 
-class PreferencesDataStore(private val context: Context) {
+class PreferencesDataStore(
+    private val context: Context,
+) {
     companion object {
         private val Context.dataStore by preferencesDataStore(name = "settings")
     }
@@ -27,11 +29,10 @@ class PreferencesDataStore(private val context: Context) {
 
     suspend fun <T, R> set(
         key: SettingsPreference<T, R>,
-        value: R
+        value: R,
     ) {
         key.setData(context.dataStore, value)
     }
 
     fun <T, R> get(key: SettingsPreference<T, R>) = key.getDataFlow(context.dataStore)
-
 }

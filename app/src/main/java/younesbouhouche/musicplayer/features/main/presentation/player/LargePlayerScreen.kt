@@ -31,7 +31,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
-import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -45,7 +44,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,8 +60,8 @@ import younesbouhouche.musicplayer.core.presentation.theme.AppTheme
 import younesbouhouche.musicplayer.features.main.domain.events.TimerType
 import younesbouhouche.musicplayer.features.main.presentation.player.components.ActionBar
 import younesbouhouche.musicplayer.features.main.presentation.player.components.Carousel
-import younesbouhouche.musicplayer.features.main.presentation.player.sheets.QueueSheet
 import younesbouhouche.musicplayer.features.main.presentation.player.sheets.PlaybackParamsSheet
+import younesbouhouche.musicplayer.features.main.presentation.player.sheets.QueueSheet
 import younesbouhouche.musicplayer.features.main.presentation.player.sheets.TimerSheet
 import younesbouhouche.musicplayer.features.main.presentation.util.timeString
 import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
@@ -91,47 +89,55 @@ fun LargePlayerScreen(
     var sliderValue by remember { mutableFloatStateOf(0f) }
     var dragging by remember { mutableStateOf(false) }
     val waveHeight by animateDpAsState(
-        if (playerState.playState == PlayState.PLAYING) SliderDefaults.WaveHeight
-        else 0.dp
+        if (playerState.playState == PlayState.PLAYING) {
+            SliderDefaults.WaveHeight
+        } else {
+            0.dp
+        },
     )
-    Column(modifier
-        .systemBarsPadding()
-        .padding(24.dp, 8.dp, 24.dp, 8.dp),
+    Column(
+        modifier
+            .systemBarsPadding()
+            .padding(24.dp, 8.dp, 24.dp, 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp),
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
             ExpressiveIconButton(
                 Icons.Default.ExpandMore,
                 size = IconButtonDefaults.mediumIconSize,
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(.3f),
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
+                colors =
+                    IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surface.copy(.3f),
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ),
                 modifier = Modifier.size(50.dp),
                 onClick = onCollapse,
-                enabled = enabled
+                enabled = enabled,
             )
             Text(
                 stringResource(R.string.now_playing),
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
             ExpressiveIconButton(
                 Icons.AutoMirrored.Filled.QueueMusic,
                 size = IconButtonDefaults.mediumIconSize,
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(.3f),
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
+                colors =
+                    IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surface.copy(.3f),
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ),
                 modifier = Modifier.size(50.dp),
-                enabled = enabled
+                enabled = enabled,
             ) {
                 queueSheetVisible = true
             }
@@ -140,18 +146,20 @@ fun LargePlayerScreen(
             queue,
             enabled,
             Modifier.weight(1f),
-            onPlayerEvent
+            onPlayerEvent,
         )
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Row(Modifier.fillMaxWidth(),
+            Row(
+                Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 AnimatedContent(
                     queue.currentIndex,
@@ -160,8 +168,9 @@ fun LargePlayerScreen(
                         materialSharedAxisX(forward = initialState < targetState, 100)
                     },
                 ) { currentIndex ->
-                    Column(Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    Column(
+                        Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Text(
                             queue.songs.getOrNull(currentIndex)?.title ?: "No song playing",
@@ -179,15 +188,19 @@ fun LargePlayerScreen(
                 }
                 ExpressiveIconButton(
                     icon =
-                        if (currentItem?.isFavorite == true) Icons.Default.Favorite
-                        else Icons.Default.FavoriteBorder,
+                        if (currentItem?.isFavorite == true) {
+                            Icons.Default.Favorite
+                        } else {
+                            Icons.Default.FavoriteBorder
+                        },
                     size = IconButtonDefaults.largeIconSize,
                     modifier = Modifier.size(72.dp),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        contentColor = MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    enabled = enabled
+                    colors =
+                        IconButtonDefaults.iconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            contentColor = MaterialTheme.colorScheme.primaryContainer,
+                        ),
+                    enabled = enabled,
                 ) {
                     currentItem?.let {
                         onSetFavorite(it.id, !it.isFavorite)
@@ -198,7 +211,7 @@ fun LargePlayerScreen(
                 Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp, bottom = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 WavySlider(
                     value =
@@ -216,32 +229,39 @@ fun LargePlayerScreen(
                         onPlayerEvent(PlayerEvent.SeekTime((sliderValue * (currentItem?.duration ?: 0)).roundToLong()))
                     },
                     waveHeight = waveHeight,
-                    colors = SliderDefaults.colors(
-                        activeTrackColor = MaterialTheme.colorScheme.primary,
-                        inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(.3f),
-                        thumbColor = MaterialTheme.colorScheme.primary,
-                        activeTickColor = MaterialTheme.colorScheme.primary,
-                        inactiveTickColor = MaterialTheme.colorScheme.onSurface.copy(.3f),
-                    )
+                    colors =
+                        SliderDefaults.colors(
+                            activeTrackColor = MaterialTheme.colorScheme.primary,
+                            inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(.3f),
+                            thumbColor = MaterialTheme.colorScheme.primary,
+                            activeTickColor = MaterialTheme.colorScheme.primary,
+                            inactiveTickColor = MaterialTheme.colorScheme.onSurface.copy(.3f),
+                        ),
                 )
-                Row(Modifier.fillMaxWidth(),
+                Row(
+                    Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
                     ProvideTextStyle(MaterialTheme.typography.labelMedium) {
                         val color by animateColorAsState(
-                            if (dragging) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onPrimaryContainer
+                            if (dragging) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            },
                         )
                         Text(
-                            if (dragging)
+                            if (dragging) {
                                 (sliderValue * (currentItem?.duration ?: 0L)).roundToLong().timeString
-                            else playerState.time.timeString,
-                            color = color
+                            } else {
+                                playerState.time.timeString
+                            },
+                            color = color,
                         )
                         Text(
                             (currentItem?.duration ?: 0).timeString,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                     }
                 }
@@ -256,58 +276,68 @@ fun LargePlayerScreen(
                     val interactionSource = remember { MutableInteractionSource() }
                     val pressed by interactionSource.collectIsPressedAsState()
                     val weight by animateFloatAsState(
-                        if (pressed) 1.4f else 1f
+                        if (pressed) 1.4f else 1f,
                     )
                     val contentColor =
-                        if (it == 1) MaterialTheme.colorScheme.onPrimary
-                        else  MaterialTheme.colorScheme.onPrimaryContainer
+                        if (it == 1) {
+                            MaterialTheme.colorScheme.onPrimary
+                        } else {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        }
                     val containerColor =
-                        if (it == 1) MaterialTheme.colorScheme.primary
-                        else  MaterialTheme.colorScheme.surface.copy(alpha = .4f)
+                        if (it == 1) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.surface.copy(alpha = .4f)
+                        }
                     val icon = @Composable {
-                        when(it) {
+                        when (it) {
                             0 ->
                                 Icon(
                                     Icons.Default.SkipPrevious,
                                     null,
-                                    Modifier.size(iconSize)
+                                    Modifier.size(iconSize),
                                 )
                             1 ->
                                 Image(
                                     rememberAnimatedVectorPainter(
                                         AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause_animation),
-                                        playerState.playState == PlayState.PLAYING
+                                        playerState.playState == PlayState.PLAYING,
                                     ),
                                     null,
                                     Modifier.size(iconSize),
-                                    colorFilter = ColorFilter.tint(contentColor)
+                                    colorFilter = ColorFilter.tint(contentColor),
                                 )
                             else ->
                                 Icon(
                                     Icons.Default.SkipNext,
                                     null,
-                                    Modifier.size(iconSize)
+                                    Modifier.size(iconSize),
                                 )
                         }
                     }
                     ExpressiveIconButton(
                         icon,
-                        modifier = Modifier
-                            .height(100.dp)
-                            .weight(weight),
+                        modifier =
+                            Modifier
+                                .height(100.dp)
+                                .weight(weight),
                         size = iconSize,
                         interactionSource = interactionSource,
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = containerColor,
-                            contentColor = contentColor,
-                        ),
-                        enabled = enabled
+                        colors =
+                            IconButtonDefaults.iconButtonColors(
+                                containerColor = containerColor,
+                                contentColor = contentColor,
+                            ),
+                        enabled = enabled,
                     ) {
-                        onPlayerEvent(when(it) {
-                            0 -> PlayerEvent.Previous
-                            1 -> PlayerEvent.PauseResume
-                            else -> PlayerEvent.Next
-                        })
+                        onPlayerEvent(
+                            when (it) {
+                                0 -> PlayerEvent.Previous
+                                1 -> PlayerEvent.PauseResume
+                                else -> PlayerEvent.Next
+                            },
+                        )
                     }
                 }
             }
@@ -325,9 +355,10 @@ fun LargePlayerScreen(
                 playbackParamsSheetVisible = true
             },
             onPlayerEvent,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 4.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp),
         )
     }
     TimerSheet(
@@ -338,7 +369,7 @@ fun LargePlayerScreen(
         playerState.timer,
         {
             onPlayerEvent(PlayerEvent.SetTimer(it))
-        }
+        },
     )
     PlaybackParamsSheet(
         playbackParamsSheetVisible,
@@ -363,7 +394,7 @@ fun LargePlayerScreen(
             queue,
             onPlayerEvent,
             onSaveQueue,
-            onAddToPlaylist
+            onAddToPlaylist,
         )
     }
 }
@@ -378,20 +409,23 @@ private fun LargePlayerPreview() {
         ) {
             LargePlayerScreen(
                 enabled = true,
-                queue = Queue(
-                    currentIndex = 0,
-                    songs = List(10) {
-                        Song.Builder()
-                            .id(it.toLong())
-                            .title("Song Title $it")
-                            .artist("Artist Name")
-                            .album("Album Name")
-                            .duration(240000L)
-                            .path("/storage/emulated/0/Music/song$it.mp3")
-                            .isFavorite(it % 2 == 0)
-                            .build()
-                    }
-                ),
+                queue =
+                    Queue(
+                        currentIndex = 0,
+                        songs =
+                            List(10) {
+                                Song
+                                    .Builder()
+                                    .id(it.toLong())
+                                    .title("Song Title $it")
+                                    .artist("Artist Name")
+                                    .album("Album Name")
+                                    .duration(240000L)
+                                    .path("/storage/emulated/0/Music/song$it.mp3")
+                                    .isFavorite(it % 2 == 0)
+                                    .build()
+                            },
+                    ),
                 playerState =
                     PlayerState(
                         playState = PlayState.PLAYING,
@@ -399,12 +433,12 @@ private fun LargePlayerPreview() {
                         loading = false,
                         shuffle = true,
                         repeatMode = Player.REPEAT_MODE_ALL,
-                        timer = TimerType.Disabled
+                        timer = TimerType.Disabled,
                     ),
                 onCollapse = {},
                 currentItem = null,
                 onSetFavorite = { _, _ -> },
-                onPlayerEvent = {}
+                onPlayerEvent = {},
             )
         }
     }

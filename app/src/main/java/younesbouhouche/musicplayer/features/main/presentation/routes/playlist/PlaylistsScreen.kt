@@ -25,7 +25,6 @@ import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,10 +40,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import younesbouhouche.musicplayer.R
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
 import com.younesb.mydesignsystem.presentation.components.Image
 import org.koin.compose.viewmodel.koinViewModel
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.core.domain.models.getPictureRequest
 import younesbouhouche.musicplayer.features.main.presentation.components.EmptyContainer
@@ -60,16 +59,17 @@ fun PlaylistsScreen(
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
     onCreatePlaylist: () -> Unit = {},
-    onClick: (Playlist) -> Unit
+    onClick: (Playlist) -> Unit,
 ) {
     val viewModel = koinViewModel<PlaylistsViewModel>()
     val playlists by viewModel.playlists.collectAsStateWithLifecycle()
     val sortState by viewModel.sortState.collectAsStateWithLifecycle()
     var expanded by remember { mutableStateOf(false) }
-    val menu = listOf(
-        Triple(R.string.create_playlist, Icons.Default.Add, onCreatePlaylist),
-        Triple(R.string.import_playlist, Icons.Default.FileDownload, viewModel::importPlaylist),
-    )
+    val menu =
+        listOf(
+            Triple(R.string.create_playlist, Icons.Default.Add, onCreatePlaylist),
+            Triple(R.string.import_playlist, Icons.Default.FileDownload, viewModel::importPlaylist),
+        )
     Scaffold(
         modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(bottom = bottomPadding),
@@ -82,10 +82,11 @@ fun PlaylistsScreen(
                         expanded,
                         { expanded = !expanded },
                         containerSize = ToggleFloatingActionButtonDefaults.containerSizeMedium(),
-                        containerColor = ToggleFloatingActionButtonDefaults.containerColor(
-                            MaterialTheme.colorScheme.tertiaryContainer,
-                            MaterialTheme.colorScheme.tertiary
-                        )
+                        containerColor =
+                            ToggleFloatingActionButtonDefaults.containerColor(
+                                MaterialTheme.colorScheme.tertiaryContainer,
+                                MaterialTheme.colorScheme.tertiary,
+                            ),
                     ) {
                         val imageVector by remember {
                             derivedStateOf {
@@ -98,15 +99,16 @@ fun PlaylistsScreen(
                             Modifier.animateIcon(
                                 { checkedProgress },
                                 size = ToggleFloatingActionButtonDefaults.iconSizeMedium(),
-                                color = ToggleFloatingActionButtonDefaults.iconColor(
-                                    MaterialTheme.colorScheme.tertiary,
-                                    MaterialTheme.colorScheme.tertiaryContainer
-                                )
+                                color =
+                                    ToggleFloatingActionButtonDefaults.iconColor(
+                                        MaterialTheme.colorScheme.tertiary,
+                                        MaterialTheme.colorScheme.tertiaryContainer,
+                                    ),
                             ),
                         )
                     }
                 },
-                modifier = Modifier.offset(x = 16.dp, y = 24.dp)
+                modifier = Modifier.offset(x = 16.dp, y = 24.dp),
             ) {
                 menu.forEach { (text, icon, action) ->
                     FloatingActionButtonMenuItem(
@@ -121,14 +123,14 @@ fun PlaylistsScreen(
                     )
                 }
             }
-        }
+        },
     ) { paddingValues ->
         EmptyContainer(
             playlists.isEmpty(),
             Icons.AutoMirrored.Filled.PlaylistPlay,
             stringResource(R.string.empty_playlists_text),
             contentPadding = paddingValues,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
             GridScreen(
                 playlists,
@@ -151,33 +153,34 @@ fun PlaylistsScreen(
                             ExpressiveIconButton(
                                 Icons.Default.PlayArrow,
                                 size = IconButtonDefaults.mediumIconSize,
-                                colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                                )
+                                colors =
+                                    IconButtonDefaults.filledTonalIconButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                    ),
                             ) {
                                 viewModel.play(playlist.songs.map { it.id })
                             }
-                        }
+                        },
                     ) {
                         Column(
                             Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
+                            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
                         ) {
                             Text(
                                 playlist.name,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
                             )
                             Text(
                                 pluralStringResource(
                                     R.plurals.item_s,
                                     playlist.songs.size,
-                                    playlist.songs.size
+                                    playlist.songs.size,
                                 ),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodySmall,
                             )
                         }
                     }
@@ -190,16 +193,16 @@ fun PlaylistsScreen(
                             onClick(playlist)
                         },
                         Modifier.animateItem(),
-                        alternatives = playlist.songs.map { it.coverUri }
+                        alternatives = playlist.songs.map { it.coverUri },
                     ) {
                         Column(
                             Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
+                            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom),
                         ) {
                             Text(
                                 playlist.name,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
                             )
                         }
                     }
@@ -208,7 +211,7 @@ fun PlaylistsScreen(
                     .fillMaxSize()
                     .padding(),
                 { it.id },
-                paddingValues
+                paddingValues,
             )
         }
     }

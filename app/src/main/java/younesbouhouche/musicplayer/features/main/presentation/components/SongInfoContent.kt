@@ -72,40 +72,42 @@ fun SongInfoContent(
     onAddToPlaylist: () -> Unit = {},
     onEditMetadata: () -> Unit = {},
 ) {
-    val viewModel: SongInfoViewModel = koinViewModel(
-        parameters = { parametersOf(trackId) }
-    )
+    val viewModel: SongInfoViewModel =
+        koinViewModel(
+            parameters = { parametersOf(trackId) },
+        )
     val context = LocalContext.current
     val song by viewModel.song.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val clipboard = LocalClipboard.current
     song?.let { song ->
-        val data = listOf(
+        val data =
             listOf(
-                Triple(R.string.artist, Icons.Default.Person, song.artist),
-                Triple(R.string.album, Icons.Default.Album, song.album),
-            ),
-            listOf(Triple(R.string.duration, Icons.Default.Timer, song.duration.timeString)),
-            listOf(
-                Triple(R.string.genre, Icons.Default.Category, song.genre),
-                Triple(R.string.composer, Icons.Default.Person, song.composer),
-            ),
-            listOf(Triple(R.string.file_path, Icons.AutoMirrored.Filled.InsertDriveFile, song.path)),
-        )
+                listOf(
+                    Triple(R.string.artist, Icons.Default.Person, song.artist),
+                    Triple(R.string.album, Icons.Default.Album, song.album),
+                ),
+                listOf(Triple(R.string.duration, Icons.Default.Timer, song.duration.timeString)),
+                listOf(
+                    Triple(R.string.genre, Icons.Default.Category, song.genre),
+                    Triple(R.string.composer, Icons.Default.Person, song.composer),
+                ),
+                listOf(Triple(R.string.file_path, Icons.AutoMirrored.Filled.InsertDriveFile, song.path)),
+            )
         Column(
             Modifier.fillMaxWidth().padding(vertical = 16.dp, horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             Row(
                 Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Image(
                     song.coverUri,
                     Icons.Default.MusicNote,
                     Modifier.size(120.dp),
-                    shape = MaterialShapes.Cookie12Sided.toShape()
+                    shape = MaterialShapes.Cookie12Sided.toShape(),
                 )
                 Text(
                     song.title,
@@ -113,30 +115,40 @@ fun SongInfoContent(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
                 ExpressiveIconButton(
                     Icons.Default.Edit,
                     colors = IconButtonDefaults.filledTonalIconButtonColors(),
                     onClick = onEditMetadata,
                     size = IconButtonDefaults.largeIconSize,
-                    widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow
+                    widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow,
                 )
             }
-            Row(Modifier.fillMaxWidth(),
+            Row(
+                Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 repeat(2) { index ->
                     val (res, icon) =
-                        if (index == 0) R.string.play to Icons.Default.PlayArrow
-                        else R.string.add_to_queue to Icons.Default.AddToQueue
+                        if (index == 0) {
+                            R.string.play to Icons.Default.PlayArrow
+                        } else {
+                            R.string.add_to_queue to Icons.Default.AddToQueue
+                        }
                     val containerColor =
-                        if (index == 0) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.tertiary
+                        if (index == 0) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.tertiary
+                        }
                     val onClick =
-                        if (index == 0) viewModel::play
-                        else viewModel::addToQueue
+                        if (index == 0) {
+                            viewModel::play
+                        } else {
+                            viewModel::addToQueue
+                        }
                     val interactionSource = remember { MutableInteractionSource() }
                     val pressed by interactionSource.collectIsPressedAsState()
                     val weight by animateFloatAsState(if (pressed) 1.4f else 1f)
@@ -146,66 +158,76 @@ fun SongInfoContent(
                         text = stringResource(res),
                         modifier = Modifier.weight(weight).fillMaxWidth(),
                         size = ButtonDefaults.MediumContainerHeight,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = containerColor,
-                            contentColor = contentColorFor(containerColor)
-                        ),
-                        interactionSource = interactionSource
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = containerColor,
+                                contentColor = contentColorFor(containerColor),
+                            ),
+                        interactionSource = interactionSource,
                     )
                 }
             }
-            Row(Modifier.fillMaxWidth(),
+            Row(
+                Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 repeat(3) { index ->
-                    val icon = when (index) {
-                        0 -> if (song.isFavorite) Icons.Default.Favorite
-                        else Icons.Default.FavoriteBorder
-                        1 -> Icons.AutoMirrored.Filled.PlaylistAdd
-                        else -> Icons.Default.Share
-                    }
-                    val color = when (index) {
-                        0 -> MaterialTheme.colorScheme.secondaryContainer
-                        1 -> MaterialTheme.colorScheme.surfaceContainer
-                        else -> MaterialTheme.colorScheme.surfaceVariant
-                    }
+                    val icon =
+                        when (index) {
+                            0 ->
+                                if (song.isFavorite) {
+                                    Icons.Default.Favorite
+                                } else {
+                                    Icons.Default.FavoriteBorder
+                                }
+                            1 -> Icons.AutoMirrored.Filled.PlaylistAdd
+                            else -> Icons.Default.Share
+                        }
+                    val color =
+                        when (index) {
+                            0 -> MaterialTheme.colorScheme.secondaryContainer
+                            1 -> MaterialTheme.colorScheme.surfaceContainer
+                            else -> MaterialTheme.colorScheme.surfaceVariant
+                        }
                     val interactionSource = remember { MutableInteractionSource() }
                     val pressed by interactionSource.collectIsPressedAsState()
                     val weight by animateFloatAsState(if (pressed) 1.4f else 1f)
                     ExpressiveIconButton(
                         onClick = {
-                            when(index) {
+                            when (index) {
                                 0 -> viewModel.toggleFavorite()
                                 1 -> onAddToPlaylist()
-                                2 -> context.shareFile(
-                                    File(song.path),
-                                    "audio/*"
-                                )
+                                2 ->
+                                    context.shareFile(
+                                        File(song.path),
+                                        "audio/*",
+                                    )
                             }
                         },
                         icon = icon,
                         modifier = Modifier.weight(weight).height(80.dp),
                         size = IconButtonDefaults.largeIconSize,
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = color,
-                            contentColor = contentColorFor(color)
-                        ),
-                        interactionSource = interactionSource
+                        colors =
+                            IconButtonDefaults.iconButtonColors(
+                                containerColor = color,
+                                contentColor = contentColorFor(color),
+                            ),
+                        interactionSource = interactionSource,
                     )
                 }
             }
             Column(
                 Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 data.forEachIndexed { index, line ->
                     Row(
                         Modifier.fillMaxWidth().clip(
-                            expressiveRectShape(index,data.size)
+                            expressiveRectShape(index, data.size),
                         ),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         line.forEach { (res, icon, value) ->
                             val text = stringResource(res)
@@ -215,37 +237,35 @@ fun SongInfoContent(
                                     .containerClip(
                                         MaterialTheme.colorScheme.surfaceContainerLowest,
                                         MaterialTheme.shapes.medium,
-                                    )
-                                    .clickable {
+                                    ).clickable {
                                         scope.launch {
                                             clipboard.setClipEntry(
                                                 ClipEntry(
-                                                    ClipData.newPlainText(text, value)
-                                                )
+                                                    ClipData.newPlainText(text, value),
+                                                ),
                                             )
                                         }
-                                    }
-                                    .padding(16.dp)
+                                    }.padding(16.dp)
                                     .fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
                             ) {
                                 Icon(icon, null, Modifier.size(30.dp))
                                 Column(
                                     Modifier.fillMaxWidth(),
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    verticalArrangement = Arrangement.spacedBy(4.dp),
                                 ) {
                                     Text(
                                         text,
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                     Text(
                                         value?.takeIf { it.isNotBlank() }
                                             ?: stringResource(R.string.unknown),
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
-                                        style = MaterialTheme.typography.bodyLarge
+                                        style = MaterialTheme.typography.bodyLarge,
                                     )
                                 }
                             }

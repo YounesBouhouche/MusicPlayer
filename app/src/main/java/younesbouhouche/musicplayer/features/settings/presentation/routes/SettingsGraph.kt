@@ -4,7 +4,9 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class SettingsGraph(val ordinal: Int = 0): NavKey {
+sealed class SettingsGraph(
+    val ordinal: Int = 0,
+) : NavKey {
     @Serializable
     data object SettingsMain : SettingsGraph(), NavKey
 
@@ -24,13 +26,14 @@ sealed class SettingsGraph(val ordinal: Int = 0): NavKey {
     data object AboutSettings : SettingsGraph(1), NavKey
 
     companion object {
-        val allRoutes = listOf(
-            SettingsMain,
-            ThemeSettings,
-            LanguageSettings,
-            PlayerSettings,
-            PlaybackSettings,
-            AboutSettings
-        )
+        val allRoutes =
+            listOf(
+                SettingsMain,
+                ThemeSettings,
+                LanguageSettings,
+                PlayerSettings,
+                PlaybackSettings,
+                AboutSettings,
+            )
     }
 }

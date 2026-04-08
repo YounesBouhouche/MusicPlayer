@@ -8,25 +8,29 @@ import timber.log.Timber
 import younesbouhouche.musicplayer.features.main.util.toFileUri
 import java.io.File
 
-
-fun Context.getCoverContentUri(coverPath: String): Uri? {
-    return try {
+fun Context.getCoverContentUri(coverPath: String): Uri? =
+    try {
         val file = File(coverPath)
         if (file.exists()) {
             FileProvider.getUriForFile(
                 this,
                 "$packageName.fileprovider",
-                file
+                file,
             )
-        } else null
+        } else {
+            null
+        }
     } catch (e: Exception) {
         Timber.tag("MediaRepository").e(e, "Error creating content URI for: $coverPath")
         null
     }
-}
 
 fun Context.getCoverUri(coverPath: String): Uri? {
     if (coverPath.isEmpty()) return null
     val file = File(coverPath)
-    return if (file.exists()) { file.absolutePath.toFileUri().toUri() } else null
+    return if (file.exists()) {
+        file.absolutePath.toFileUri().toUri()
+    } else {
+        null
+    }
 }

@@ -49,18 +49,20 @@ fun BoxScope.NavigationWithPlayer(
     val scope = rememberCoroutineScope()
     val navBarHeight = navBarHeight
     val density = LocalDensity.current
-    val state = rememberSaveable(inputs = arrayOf(), saver = AnchoredDraggableState.Saver()) {
-        AnchoredDraggableState(
-            initialValue = ViewState.SMALL,
-            anchors =
-                DraggableAnchors {
-                    ViewState.SMALL at with(density) {
-                        viewHeight - (174.dp + navBarHeight).toPx()
-                    }
-                    ViewState.LARGE at 0f
-                }
-        )
-    }
+    val state =
+        rememberSaveable(inputs = arrayOf(), saver = AnchoredDraggableState.Saver()) {
+            AnchoredDraggableState(
+                initialValue = ViewState.SMALL,
+                anchors =
+                    DraggableAnchors {
+                        ViewState.SMALL at
+                            with(density) {
+                                viewHeight - (174.dp + navBarHeight).toPx()
+                            }
+                        ViewState.LARGE at 0f
+                    },
+            )
+        }
     val progress by remember {
         derivedStateOf {
             when (state.settledValue) {
@@ -69,29 +71,33 @@ fun BoxScope.NavigationWithPlayer(
             }
         }
     }
-    val offset = with(density) {
-        ((viewHeight - (176.dp + navBarHeight).roundToPx()) * (1f - progress)).roundToInt()
-    }
-    val navigationBarOffset = with(density) {
-        (progress * (112.dp + navBarHeight).toPx()).roundToInt()
-    }
+    val offset =
+        with(density) {
+            ((viewHeight - (176.dp + navBarHeight).roundToPx()) * (1f - progress)).roundToInt()
+        }
+    val navigationBarOffset =
+        with(density) {
+            (progress * (112.dp + navBarHeight).toPx()).roundToInt()
+        }
     val swipeState = rememberSwipeToDismissBoxState()
     LaunchedEffect(key1 = viewHeight) {
         state.updateAnchors(
             DraggableAnchors {
-                ViewState.SMALL at with(density) {
-                    viewHeight - (192.dp + navBarHeight).toPx()
-                }
+                ViewState.SMALL at
+                    with(density) {
+                        viewHeight - (192.dp + navBarHeight).toPx()
+                    }
                 ViewState.LARGE at 0f
             },
         )
         state.snapTo(ViewState.SMALL)
     }
     LaunchedEffect(playerState.playState) {
-        if (playerState.playState == PlayState.STOP)
+        if (playerState.playState == PlayState.STOP) {
             state.animateTo(ViewState.SMALL)
-        else
+        } else {
             swipeState.snapTo(SwipeToDismissBoxValue.Settled)
+        }
     }
     AnimatedVisibility(
         playerState.playState != PlayState.STOP,
@@ -109,14 +115,14 @@ fun BoxScope.NavigationWithPlayer(
             state,
             onAction = viewModel::onUiAction,
             onSetFavorite = viewModel::setFavorite,
-            onPlayerEvent = viewModel::onPlayerEvent
+            onPlayerEvent = viewModel::onPlayerEvent,
         )
     }
     NavBar(
         route,
         playerState.playState != PlayState.STOP,
         Modifier.align(Alignment.BottomCenter).offset { IntOffset(0, navigationBarOffset) },
-        navigate = navigate
+        navigate = navigate,
     )
     BackHandler(state.currentValue == ViewState.LARGE) {
         scope.launch {

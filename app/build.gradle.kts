@@ -88,7 +88,6 @@ configure<ApplicationExtension> {
     }
 }
 
-
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_21)
@@ -101,7 +100,7 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
-//tasks.getByPath("preBuild").dependsOn("ktlintFormat")
+// tasks.getByPath("preBuild").dependsOn("ktlintFormat")
 
 dependencies {
     implementation(libs.material.kolor)
@@ -168,4 +167,3 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.dotsindicator)
 }
-

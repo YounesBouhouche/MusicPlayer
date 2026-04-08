@@ -23,16 +23,15 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.TextAlign
 import androidx.glance.unit.ColorProvider
 import kotlinx.coroutines.launch
+import younesbouhouche.musicplayer.MainActivity
 import younesbouhouche.musicplayer.R
+import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.features.glance.presentation.util.MyImage
 import younesbouhouche.musicplayer.features.glance.presentation.util.RowIconButton
 import younesbouhouche.musicplayer.features.glance.presentation.util.WidgetText
-import younesbouhouche.musicplayer.MainActivity
-import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.features.player.domain.models.PlayState
 import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
-
 
 @SuppressLint("RestrictedApi")
 @Composable
@@ -41,28 +40,31 @@ fun LargeWidgetContent(
     state: PlayerState,
     onEvent: suspend (PlayerEvent) -> Unit,
     opacity: Float,
-    modifier: GlanceModifier = GlanceModifier
+    modifier: GlanceModifier = GlanceModifier,
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val background = GlanceTheme.colors.background.getColor(context).copy(alpha = opacity)
+    val background =
+        GlanceTheme.colors.background
+            .getColor(context)
+            .copy(alpha = opacity)
     Scaffold(
         modifier.clickable(actionStartActivity<MainActivity>()),
-        backgroundColor = ColorProvider(background)
+        backgroundColor = ColorProvider(background),
     ) {
         Column(
             GlanceModifier.padding(8.dp).fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            MyImage(/*card?.cover*/null, size = 120.dp, opacity = opacity)
+            MyImage(null, size = 120.dp, opacity = opacity)
             Spacer(GlanceModifier.height(16.dp))
             WidgetText(
                 card?.title ?: "No track",
                 fontWeight = FontWeight.Bold,
                 fontSize = 20f,
                 textAlign = TextAlign.Center,
-                modifier = GlanceModifier.fillMaxWidth()
+                modifier = GlanceModifier.fillMaxWidth(),
             )
             Spacer(GlanceModifier.height(6.dp))
             WidgetText(
@@ -71,13 +73,13 @@ fun LargeWidgetContent(
                 fontSize = 16f,
                 textAlign = TextAlign.Center,
                 color = GlanceTheme.colors.onSurfaceVariant,
-                modifier = GlanceModifier.fillMaxWidth()
+                modifier = GlanceModifier.fillMaxWidth(),
             )
             Spacer(GlanceModifier.height(16.dp))
             Row(
                 GlanceModifier.padding(8.dp).fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 RowIconButton(
                     icon = R.drawable.baseline_skip_previous_24,
@@ -92,11 +94,14 @@ fun LargeWidgetContent(
                 Spacer(GlanceModifier.width(6.dp))
                 RowIconButton(
                     icon =
-                        if (state.playState == PlayState.PLAYING) R.drawable.pause_icon
-                        else R.drawable.play_icon,
+                        if (state.playState == PlayState.PLAYING) {
+                            R.drawable.pause_icon
+                        } else {
+                            R.drawable.play_icon
+                        },
                     size = 60.dp,
                     containerColor = GlanceTheme.colors.primary,
-                    contentColor = GlanceTheme.colors.onPrimary
+                    contentColor = GlanceTheme.colors.onPrimary,
                 ) {
                     scope.launch {
                         onEvent(PlayerEvent.PauseResume)
@@ -107,7 +112,7 @@ fun LargeWidgetContent(
                     icon = R.drawable.baseline_skip_next_24,
                     size = 60.dp,
                     containerColor = GlanceTheme.colors.tertiary,
-                    contentColor = GlanceTheme.colors.onTertiary
+                    contentColor = GlanceTheme.colors.onTertiary,
                 ) {
                     scope.launch {
                         onEvent(PlayerEvent.Next)

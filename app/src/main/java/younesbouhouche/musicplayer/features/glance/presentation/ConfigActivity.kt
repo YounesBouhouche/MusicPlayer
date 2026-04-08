@@ -43,23 +43,24 @@ import androidx.glance.appwidget.updateAll
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import younesbouhouche.musicplayer.R
-import younesbouhouche.musicplayer.features.main.presentation.util.composables.SetSystemBarColors
 import younesbouhouche.musicplayer.core.data.datastore.SettingsPreference
 import younesbouhouche.musicplayer.core.domain.repositories.PreferencesRepository
-import younesbouhouche.musicplayer.features.settings.presentation.settingsLabel
 import younesbouhouche.musicplayer.core.presentation.theme.AppTheme
+import younesbouhouche.musicplayer.features.main.presentation.util.composables.SetSystemBarColors
+import younesbouhouche.musicplayer.features.settings.presentation.settingsLabel
 import kotlin.math.roundToInt
 
 class ConfigActivity : ComponentActivity() {
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
     private lateinit var glanceId: GlanceId
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         appWidgetId = intent?.extras?.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
-            AppWidgetManager.INVALID_APPWIDGET_ID
+            AppWidgetManager.INVALID_APPWIDGET_ID,
         ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
         if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish()
@@ -69,7 +70,8 @@ class ConfigActivity : ComponentActivity() {
         setContent {
             val repository = koinInject<PreferencesRepository>()
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-            val opacity by repository.get(SettingsPreference.Opacity(appWidgetId))
+            val opacity by repository
+                .get(SettingsPreference.Opacity(appWidgetId))
                 .collectAsState(1f)
             var selectedOpacity by remember { mutableFloatStateOf(1f) }
             val scope = rememberCoroutineScope()
@@ -111,19 +113,19 @@ class ConfigActivity : ComponentActivity() {
                                     scope.launch {
                                         repository.set(
                                             SettingsPreference.Opacity(appWidgetId),
-                                            selectedOpacity
+                                            selectedOpacity,
                                         )
                                         MyAppWidget().updateAll(this@ConfigActivity)
                                         val resultValue =
                                             Intent().putExtra(
                                                 AppWidgetManager.EXTRA_APPWIDGET_ID,
-                                                appWidgetId
+                                                appWidgetId,
                                             )
                                         setResult(RESULT_OK, resultValue)
                                         finish()
                                     }
                                 },
-                                Modifier.fillMaxWidth()
+                                Modifier.fillMaxWidth(),
                             ) {
                                 Text(stringResource(R.string.ok))
                             }
@@ -134,7 +136,7 @@ class ConfigActivity : ComponentActivity() {
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = paddingValues,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         settingsLabel({ stringResource(R.string.transparency) }) {
                             "${(selectedOpacity * 100).roundToInt()}%"
@@ -143,14 +145,14 @@ class ConfigActivity : ComponentActivity() {
                             Slider(
                                 value = selectedOpacity,
                                 onValueChange = { selectedOpacity = it },
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                             )
                         }
                         settingsLabel {
                             stringResource(R.string.preview)
                         }
                         item {
-                            //LargeWidgetContent(null, PlayerState(), {}, selectedOpacity)
+                            // LargeWidgetContent(null, PlayerState(), {}, selectedOpacity)
                         }
                     }
                 }

@@ -14,8 +14,8 @@ fun Long.toReadableFileSize(): String {
     return String.format(Locale.getDefault(), "%d %s", value, suffixes[exp])
 }
 
-fun Long.getSizeRange(): Range<Long> {
-    return when (this) {
+fun Long.getSizeRange(): Range<Long> =
+    when (this) {
         in 0L..10_240L -> Range(0L, 10_240L) // 0B - 10KB
         in 10_241L..102_400L -> Range(10_241L, 102_400L) // 10KB - 100KB
         in 102_401L..1_048_576L -> Range(102_401L, 1_048_576L) // 100KB - 1MB
@@ -24,7 +24,6 @@ fun Long.getSizeRange(): Range<Long> {
         in 104_857_601L..1_073_741_824L -> Range(104_857_601L, 1_073_741_824L) // 100MB - 1GB
         else -> Range(1_073_741_825L, Long.MAX_VALUE) // > 1GB
     }
-}
 
 fun Range<Long>.toReadableDurationString(): String {
     val lower = this.lower.toReadableFileSize()

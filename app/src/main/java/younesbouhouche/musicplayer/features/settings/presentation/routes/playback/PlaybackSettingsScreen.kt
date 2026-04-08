@@ -29,52 +29,58 @@ fun PlaybackSettingsScreen(modifier: Modifier = Modifier) {
     val skipSilence by viewModel.skipSilence.collectAsState()
     val rememberSpeed by viewModel.rememberSpeed.collectAsState()
     val rememberPitch by viewModel.rememberPitch.collectAsState()
-    val settings = listOf(
-        Category(
-            name = R.string.playback,
-            items = listOf(
-                SettingData(
-                    headline = R.string.skip_silence,
-                    supporting = R.string.skip_silence_description,
-                    icon = Icons.Default.MusicOff,
-                    checked = Checked(false, skipSilence) {
-                        viewModel.saveSettings(skipSilence = it)
-                    },
-                ) {
-                    viewModel.saveSettings(skipSilence = !skipSilence)
-                }
+    val settings =
+        listOf(
+            Category(
+                name = R.string.playback,
+                items =
+                    listOf(
+                        SettingData(
+                            headline = R.string.skip_silence,
+                            supporting = R.string.skip_silence_description,
+                            icon = Icons.Default.MusicOff,
+                            checked =
+                                Checked(false, skipSilence) {
+                                    viewModel.saveSettings(skipSilence = it)
+                                },
+                        ) {
+                            viewModel.saveSettings(skipSilence = !skipSilence)
+                        },
+                    ),
             ),
-        ),
-        Category(
-            name = R.string.parameters,
-            items = listOf(
-                SettingData(
-                    headline = R.string.keep_speed,
-                    supporting = R.string.keep_speed_desc,
-                    icon = Icons.Default.Speed,
-                    checked = Checked(false, rememberSpeed) {
-                        viewModel.saveSettings(rememberSpeed = it)
-                    },
-                ) {
-                    viewModel.saveSettings(rememberSpeed = !rememberSpeed)
-                },
-                SettingData(
-                    headline = R.string.keep_pitch,
-                    supporting = R.string.keep_pitch_desc,
-                    icon = Icons.Default.RecordVoiceOver,
-                    checked = Checked(false, rememberPitch) {
-                        viewModel.saveSettings(rememberPitch = it)
-                    },
-                ) {
-                    viewModel.saveSettings(rememberPitch = !rememberPitch)
-                },
+            Category(
+                name = R.string.parameters,
+                items =
+                    listOf(
+                        SettingData(
+                            headline = R.string.keep_speed,
+                            supporting = R.string.keep_speed_desc,
+                            icon = Icons.Default.Speed,
+                            checked =
+                                Checked(false, rememberSpeed) {
+                                    viewModel.saveSettings(rememberSpeed = it)
+                                },
+                        ) {
+                            viewModel.saveSettings(rememberSpeed = !rememberSpeed)
+                        },
+                        SettingData(
+                            headline = R.string.keep_pitch,
+                            supporting = R.string.keep_pitch_desc,
+                            icon = Icons.Default.RecordVoiceOver,
+                            checked =
+                                Checked(false, rememberPitch) {
+                                    viewModel.saveSettings(rememberPitch = it)
+                                },
+                        ) {
+                            viewModel.saveSettings(rememberPitch = !rememberPitch)
+                        },
+                    ),
             ),
         )
-    )
     SettingsScreen(
         title = stringResource(R.string.playback),
         icon = Icons.Default.Speed,
-        modifier = modifier
+        modifier = modifier,
     ) {
         items(settings) {
             SettingsList(it.name) {

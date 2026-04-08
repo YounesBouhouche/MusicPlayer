@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.features.main.presentation.routes.metadata_editor
+package younesbouhouche.musicplayer.features.main.presentation.routes.metadataeditor
 
 import android.net.Uri
 
@@ -13,5 +13,5 @@ data class UiState(
     val composer: String = "",
     val albumArtist: String = "",
     val lyrics: String = "",
-    val image: Uri? = null
+    val image: Uri? = null,
 )

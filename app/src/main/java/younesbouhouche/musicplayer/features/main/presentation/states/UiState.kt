@@ -48,5 +48,5 @@ data class UiState(
     val showSpeed: Boolean = true,
     val showPitch: Boolean = true,
     val showTimer: Boolean = true,
-    val showLyrics: Boolean = true
+    val showLyrics: Boolean = true,
 )

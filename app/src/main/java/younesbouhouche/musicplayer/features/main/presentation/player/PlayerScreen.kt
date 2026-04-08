@@ -1,11 +1,6 @@
 package younesbouhouche.musicplayer.features.main.presentation.player
 
-import androidx.activity.compose.PredictiveBackHandler
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.gestures.AnchoredDraggableState
@@ -64,63 +59,74 @@ fun PlayerScreen(
     modifier: Modifier = Modifier,
     onAction: (UiAction) -> Unit,
     onSetFavorite: (Long, Boolean) -> Unit,
-    onPlayerEvent: (PlayerEvent) -> Unit = {}
+    onPlayerEvent: (PlayerEvent) -> Unit = {},
 ) {
     val density = LocalDensity.current
-    val height = with(density) {
-        80.dp + ((viewHeight - 80.dp.toPx().roundToInt()) * progress).toDp()
-    }
-    val viewHeightDp = with(density) {
-        viewHeight.toDp()
-    }
+    val height =
+        with(density) {
+            80.dp + ((viewHeight - 80.dp.toPx().roundToInt()) * progress).toDp()
+        }
+    val viewHeightDp =
+        with(density) {
+            viewHeight.toDp()
+        }
     val largeCorner = 32.dp * (1f - progress)
     val smallCorner by animateDpAsState(
-        if (swipeState.currentValue != SwipeToDismissBoxValue.Settled) 32.dp
-        else 8.dp * (1f - progress),
-        animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec()
+        if (swipeState.currentValue != SwipeToDismissBoxValue.Settled) {
+            32.dp
+        } else {
+            8.dp * (1f - progress)
+        },
+        animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec(),
     )
     val palette = rememberPaletteState()
     val scope = rememberCoroutineScope()
-    val shape = RoundedCornerShape(
-        topStart = largeCorner,
-        topEnd = largeCorner,
-        bottomStart = smallCorner,
-        bottomEnd = smallCorner
-    )
+    val shape =
+        RoundedCornerShape(
+            topStart = largeCorner,
+            topEnd = largeCorner,
+            bottomStart = smallCorner,
+            bottomEnd = smallCorner,
+        )
     val hapticFeedback = LocalHapticFeedback.current
     LaunchedEffect(swipeState.currentValue) {
-        if (swipeState.currentValue != SwipeToDismissBoxValue.Settled)
+        if (swipeState.currentValue != SwipeToDismissBoxValue.Settled) {
             hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+        }
     }
     AppTheme(palette) {
         SwipeToDismissBox(
             state = swipeState,
             backgroundContent = {},
             onDismiss = {
-                if (it != SwipeToDismissBoxValue.Settled)
+                if (it != SwipeToDismissBoxValue.Settled) {
                     onPlayerEvent(PlayerEvent.Stop)
-            },
-            modifier = modifier.fillMaxWidth()
-                .padding(12.dp * (1f - progress))
-                .height(height)
-                .offset {
-                    IntOffset(0, offset)
                 }
-                .anchoredDraggable(
-                    dragState,
-                    Orientation.Vertical,
-                    flingBehavior = AnchoredDraggableDefaults.flingBehavior(
-                        state = dragState,
-                        animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec(),
-                        positionalThreshold = { it * .5f }
+            },
+            modifier =
+                modifier
+                    .fillMaxWidth()
+                    .padding(12.dp * (1f - progress))
+                    .height(height)
+                    .offset {
+                        IntOffset(0, offset)
+                    }.anchoredDraggable(
+                        dragState,
+                        Orientation.Vertical,
+                        flingBehavior =
+                            AnchoredDraggableDefaults.flingBehavior(
+                                state = dragState,
+                                animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec(),
+                                positionalThreshold = { it * .5f },
+                            ),
                     ),
-                ),
         ) {
             Box(
-                Modifier.shadow(8.dp, shape)
+                Modifier
+                    .shadow(8.dp, shape)
                     .clip(shape)
                     .background(MaterialTheme.colorScheme.primaryContainer)
-                    .fillMaxSize()
+                    .fillMaxSize(),
             ) {
                 SmallPlayerScreen(
                     queue,
@@ -136,7 +142,7 @@ fun PlayerScreen(
                                 palette.generate(image)
                             }
                         } ?: palette.reset()
-                    }
+                    },
                 ) {
                     scope.launch {
                         dragState.animateTo(ViewState.LARGE)

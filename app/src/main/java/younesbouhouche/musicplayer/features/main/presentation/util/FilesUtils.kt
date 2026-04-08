@@ -39,7 +39,10 @@ fun saveUriImageToInternalStorage(
     }
 }
 
-fun Context.createTempFile(name: String, content: String): File {
+fun Context.createTempFile(
+    name: String,
+    content: String,
+): File {
     val tempFile = File.createTempFile(name, null, cacheDir)
     FileOutputStream(tempFile).use {
         it.write(content.toByteArray())
@@ -47,12 +50,16 @@ fun Context.createTempFile(name: String, content: String): File {
     return tempFile
 }
 
-fun Context.shareFile(file: File, fileType: String) {
-    val fileUri = FileProvider.getUriForFile(
-        this,
-        "${packageName}.fileprovider",
-        file
-    )
+fun Context.shareFile(
+    file: File,
+    fileType: String,
+) {
+    val fileUri =
+        FileProvider.getUriForFile(
+            this,
+            "$packageName.fileprovider",
+            file,
+        )
     startActivity(
         Intent.createChooser(
             Intent(Intent.ACTION_SEND).apply {

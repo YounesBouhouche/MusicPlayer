@@ -10,18 +10,19 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import younesbouhouche.musicplayer.core.domain.repositories.MusicRepository
 import younesbouhouche.musicplayer.core.domain.repositories.PlaylistRepository
-import younesbouhouche.musicplayer.features.main.presentation.SearchFilter
 import younesbouhouche.musicplayer.core.presentation.util.stateInVM
 import younesbouhouche.musicplayer.features.main.domain.events.SearchAction
+import younesbouhouche.musicplayer.features.main.presentation.SearchFilter
 import younesbouhouche.musicplayer.features.main.presentation.states.SearchState
 import younesbouhouche.musicplayer.features.main.presentation.util.search
 
 class SearchVM(
     val mainViewModel: MainViewModel,
     mediaRepository: MusicRepository,
-    playlistRepository: PlaylistRepository
-): ViewModel() {
+    playlistRepository: PlaylistRepository,
+) : ViewModel() {
     private fun <T> Flow<T>.stateInVM(initialValue: T) = stateInVM(initialValue, viewModelScope)
+
     private val _files = mediaRepository.getSongsList().stateInVM(emptyList())
     private val _artists = mediaRepository.getArtists().stateInVM(emptyList())
     private val _albums = mediaRepository.getAlbums().stateInVM(emptyList())
@@ -29,45 +30,54 @@ class SearchVM(
     private val _searchState = MutableStateFlow(SearchState())
     private val _searchQuery = _searchState.map { it.query }
     private val _searchFilters = _searchState.map { it.result.filters }
-    val searchState = combine(_searchQuery, _searchFilters, _playlists) { _, filters, playlists ->
-        val files = _files.first()
-        val state = _searchState.first()
-        val artists = _artists.first()
-        val albums = _albums.first()
-        val result =
-            if (state.query.isNotBlank()) {
-                val filesResult =
-                    if (SearchFilter.FILES in filters)
-                        files.filter { it.search(state.query) }
-                    else emptyList()
-                val artistsResult =
-                    if (SearchFilter.ARTISTS in filters)
-                        artists.filter { it.search(state.query) }
-                    else emptyList()
-                val albumsResult =
-                    if (SearchFilter.ALBUMS in filters)
-                        albums.filter { it.search(state.query) }
-                    else emptyList()
-                val playlistsResult =
-                    if (SearchFilter.PLAYLISTS in filters)
-                        playlists.filter { it.search(state.query) }
-                    else emptyList()
-                state.result.copy(
-                    files = filesResult,
-                    artists = artistsResult,
-                    albums = albumsResult,
-                    playlists = playlistsResult
-                )
-            } else {
-                state.result.copy(
-                    files = emptyList(),
-                    artists = emptyList(),
-                    albums = emptyList(),
-                    playlists = emptyList()
-                )
-            }
-        state.copy(result = result)
-    }.stateInVM(SearchState())
+    val searchState =
+        combine(_searchQuery, _searchFilters, _playlists) { _, filters, playlists ->
+            val files = _files.first()
+            val state = _searchState.first()
+            val artists = _artists.first()
+            val albums = _albums.first()
+            val result =
+                if (state.query.isNotBlank()) {
+                    val filesResult =
+                        if (SearchFilter.FILES in filters) {
+                            files.filter { it.search(state.query) }
+                        } else {
+                            emptyList()
+                        }
+                    val artistsResult =
+                        if (SearchFilter.ARTISTS in filters) {
+                            artists.filter { it.search(state.query) }
+                        } else {
+                            emptyList()
+                        }
+                    val albumsResult =
+                        if (SearchFilter.ALBUMS in filters) {
+                            albums.filter { it.search(state.query) }
+                        } else {
+                            emptyList()
+                        }
+                    val playlistsResult =
+                        if (SearchFilter.PLAYLISTS in filters) {
+                            playlists.filter { it.search(state.query) }
+                        } else {
+                            emptyList()
+                        }
+                    state.result.copy(
+                        files = filesResult,
+                        artists = artistsResult,
+                        albums = albumsResult,
+                        playlists = playlistsResult,
+                    )
+                } else {
+                    state.result.copy(
+                        files = emptyList(),
+                        artists = emptyList(),
+                        albums = emptyList(),
+                        playlists = emptyList(),
+                    )
+                }
+            state.copy(result = result)
+        }.stateInVM(SearchState())
 
     fun play(
         tracks: List<Long>,
@@ -104,7 +114,7 @@ class SearchVM(
                         filesExpanded = event.files ?: state.filesExpanded,
                         artistsExpanded = event.artists ?: state.artistsExpanded,
                         albumsExpanded = event.albums ?: state.albumsExpanded,
-                        playlistsExpanded = event.playlists ?: state.playlistsExpanded
+                        playlistsExpanded = event.playlists ?: state.playlistsExpanded,
                     )
                 }
             }

@@ -42,7 +42,6 @@ fun Context.getAppVersion(): String =
         }
     ).versionName ?: "Unknown"
 
-
 fun Activity.setLanguage(language: Language) {
     runOnUiThread {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -57,7 +56,7 @@ fun Activity.setLanguage(language: Language) {
                 )
         } else {
             AppCompatDelegate.setApplicationLocales(
-                LocaleListCompat.forLanguageTags(language.tag)
+                LocaleListCompat.forLanguageTags(language.tag),
             )
         }
     }

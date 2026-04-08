@@ -13,22 +13,14 @@ import androidx.core.net.toUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
-import org.jaudiotagger.audio.AudioFile
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
 import timber.log.Timber
-import younesbouhouche.musicplayer.core.data.database.dao.AlbumsDao
-import younesbouhouche.musicplayer.core.data.database.dao.ArtistsDao
-import younesbouhouche.musicplayer.core.data.database.dao.SongsDao
 import younesbouhouche.musicplayer.core.data.database.entities.AlbumEntity
 import younesbouhouche.musicplayer.core.data.database.entities.ArtistEntity
 import younesbouhouche.musicplayer.core.data.database.entities.SongEntity
 import younesbouhouche.musicplayer.core.data.ext.getCoverUri
-import younesbouhouche.musicplayer.core.domain.models.Song
-import younesbouhouche.musicplayer.features.main.domain.models.LoadingState
 import younesbouhouche.musicplayer.features.main.util.toFileUri
 import java.io.File
 import java.nio.file.Files
@@ -37,11 +29,13 @@ import kotlin.collections.plusAssign
 
 private const val TAG = "MediaStoreScanner"
 
-class MediaStoreScanner(private val context: Context) {
+class MediaStoreScanner(
+    private val context: Context,
+) {
     data class MediaLibrary(
         val songs: List<SongEntity>,
         val albums: List<AlbumEntity>,
-        val artists: List<ArtistEntity>
+        val artists: List<ArtistEntity>,
     )
 
     suspend fun scanMediaLibrary(): MediaLibrary {
@@ -49,29 +43,30 @@ class MediaStoreScanner(private val context: Context) {
         val albums = mutableListOf<AlbumEntity>()
         val artists = mutableListOf<ArtistEntity>()
         withContext(Dispatchers.IO) {
-            val cursor = context.contentResolver.query(
-                MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL),
-                arrayOf(
-                    MediaStore.Audio.Media._ID,
-                    MediaStore.Audio.Media.DISPLAY_NAME,
-                    MediaStore.Audio.Media.DURATION,
-                    MediaStore.Audio.Media.TITLE,
-                    MediaStore.Audio.Media.ALBUM_ID,
-                    MediaStore.Audio.Media.ALBUM,
-                    MediaStore.Audio.Media.ARTIST,
-                    MediaStore.Audio.Media.ALBUM_ARTIST,
-                    MediaStore.Audio.Media.DATA,
-                    MediaStore.Audio.Media.COMPOSER,
-                    MediaStore.Audio.Media.GENRE,
-                    MediaStore.Audio.Media.SIZE,
-                    MediaStore.Audio.Media.YEAR,
-                    MediaStore.Audio.Media.TRACK,
-                    MediaStore.Audio.Media.CD_TRACK_NUMBER,
-                ),
-                MediaStore.Audio.Media.IS_MUSIC + "!= 0",
-                null,
-                MediaStore.Audio.Media.IS_MUSIC + "!= 0",
-            )
+            val cursor =
+                context.contentResolver.query(
+                    MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL),
+                    arrayOf(
+                        MediaStore.Audio.Media._ID,
+                        MediaStore.Audio.Media.DISPLAY_NAME,
+                        MediaStore.Audio.Media.DURATION,
+                        MediaStore.Audio.Media.TITLE,
+                        MediaStore.Audio.Media.ALBUM_ID,
+                        MediaStore.Audio.Media.ALBUM,
+                        MediaStore.Audio.Media.ARTIST,
+                        MediaStore.Audio.Media.ALBUM_ARTIST,
+                        MediaStore.Audio.Media.DATA,
+                        MediaStore.Audio.Media.COMPOSER,
+                        MediaStore.Audio.Media.GENRE,
+                        MediaStore.Audio.Media.SIZE,
+                        MediaStore.Audio.Media.YEAR,
+                        MediaStore.Audio.Media.TRACK,
+                        MediaStore.Audio.Media.CD_TRACK_NUMBER,
+                    ),
+                    MediaStore.Audio.Media.IS_MUSIC + "!= 0",
+                    null,
+                    MediaStore.Audio.Media.IS_MUSIC + "!= 0",
+                )
             cursor?.use { crs ->
                 val idColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
                 val fileNameColumn = crs.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
@@ -105,35 +100,42 @@ class MediaStoreScanner(private val context: Context) {
                     val year = crs.getStringOrNull(yearColumn)?.toIntOrNull()
                     val trackNumber = crs.getStringOrNull(trackColumn)?.toIntOrNull()
                     val discNumber = crs.getStringOrNull(discColumn)?.toIntOrNull()
-                    val contentUri: Uri = ContentUris.withAppendedId(
-                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-                    val lyrics = try {
-                        AudioFileIO.read(path.toFileUri().toUri().toFile())
-                            .tag
-                            .getFirst(FieldKey.LYRICS)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        null
-                    }
-                    songs += SongEntity.Builder()
-                        .contentUri(contentUri)
-                        .id(id)
-                        .fileName(fileName)
-                        .title(title)
-                        .artist(artist)
-                        .album(album)
-                        .albumArtist(albumArtist)
-                        .path(path)
-                        .date(date)
-                        .duration(duration)
-                        .composer(composer)
-                        .genre(genre)
-                        .lyrics(lyrics)
-                        .size(size)
-                        .year(year)
-                        .trackNumber(trackNumber)
-                        .discNumber(discNumber)
-                        .build()
+                    val contentUri: Uri =
+                        ContentUris.withAppendedId(
+                            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                            id,
+                        )
+                    val lyrics =
+                        try {
+                            AudioFileIO
+                                .read(path.toFileUri().toUri().toFile())
+                                .tag
+                                .getFirst(FieldKey.LYRICS)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            null
+                        }
+                    songs +=
+                        SongEntity
+                            .Builder()
+                            .contentUri(contentUri)
+                            .id(id)
+                            .fileName(fileName)
+                            .title(title)
+                            .artist(artist)
+                            .album(album)
+                            .albumArtist(albumArtist)
+                            .path(path)
+                            .date(date)
+                            .duration(duration)
+                            .composer(composer)
+                            .genre(genre)
+                            .lyrics(lyrics)
+                            .size(size)
+                            .year(year)
+                            .trackNumber(trackNumber)
+                            .discNumber(discNumber)
+                            .build()
 
                     processedCount++
                 }
@@ -141,96 +143,101 @@ class MediaStoreScanner(private val context: Context) {
             cursor?.close()
         }
         withContext(Dispatchers.Default) {
-            artists += songs.groupBy {
-                it.artist
-            }.map { (artistName, songsInArtist) ->
-                val firstSongWithCover = songsInArtist.firstOrNull {
-                    it.coverUri != null
-                }
-                ArtistEntity(
-                    name = artistName,
-                    coverUri = firstSongWithCover?.coverUri
-                )
-            }
+            artists +=
+                songs
+                    .groupBy {
+                        it.artist
+                    }.map { (artistName, songsInArtist) ->
+                        val firstSongWithCover =
+                            songsInArtist.firstOrNull {
+                                it.coverUri != null
+                            }
+                        ArtistEntity(
+                            name = artistName,
+                            coverUri = firstSongWithCover?.coverUri,
+                        )
+                    }
         }
 
         return MediaLibrary(
             songs = songs,
             albums = albums,
-            artists = artists
+            artists = artists,
         )
     }
 
-    suspend fun fetchSongsCover(
-        songs: List<SongEntity>,
-    ): List<SongEntity> {
-        return withContext(Dispatchers.IO) {
+    suspend fun fetchSongsCover(songs: List<SongEntity>): List<SongEntity> =
+        withContext(Dispatchers.IO) {
             try {
-                val coversDir = File(
-                    context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                    "covers"
-                )
+                val coversDir =
+                    File(
+                        context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                        "covers",
+                    )
                 if (!coversDir.exists()) {
                     coversDir.mkdirs()
                 }
-                val results = songs.map { song ->
-                    async {
-                        try {
-                            // Check if cover is already cached
-                            val result = if (song.coverPath.isNotEmpty()) {
-                                val cachedFile = File(song.coverPath)
-                                if (cachedFile.exists()) {
-                                    val coverUri = context.getCoverUri(song.coverPath)
-                                    song.copy(coverUri = coverUri)
-                                } else {
-                                    // Fetch cover using MediaMetadataRetriever
-                                    val retriever = MediaMetadataRetriever()
-                                    retriever.setDataSource(context, song.contentUri)
-                                    val embeddedPicture = retriever.embeddedPicture
-                                    retriever.release()
+                val results =
+                    songs
+                        .map { song ->
+                            async {
+                                try {
+                                    // Check if cover is already cached
+                                    val result =
+                                        if (song.coverPath.isNotEmpty()) {
+                                            val cachedFile = File(song.coverPath)
+                                            if (cachedFile.exists()) {
+                                                val coverUri = context.getCoverUri(song.coverPath)
+                                                song.copy(coverUri = coverUri)
+                                            } else {
+                                                // Fetch cover using MediaMetadataRetriever
+                                                val retriever = MediaMetadataRetriever()
+                                                retriever.setDataSource(context, song.contentUri)
+                                                val embeddedPicture = retriever.embeddedPicture
+                                                retriever.release()
 
-                                    if (embeddedPicture != null) {
-                                        // Cache the cover to file
-                                        val coverFile = File(coversDir, "cover_${song.id}.jpg")
-                                        coverFile.writeBytes(embeddedPicture)
+                                                if (embeddedPicture != null) {
+                                                    // Cache the cover to file
+                                                    val coverFile = File(coversDir, "cover_${song.id}.jpg")
+                                                    coverFile.writeBytes(embeddedPicture)
 
-                                        val coverUri = context.getCoverUri(coverFile.absolutePath)
-                                        song.copy(
-                                            coverPath = coverFile.absolutePath,
-                                            coverUri = coverUri
-                                        )
-                                    } else {
-                                        song
-                                    }
-                                }
-                            } else {
-                                // Fetch cover using MediaMetadataRetriever
-                                val retriever = MediaMetadataRetriever()
-                                retriever.setDataSource(context, song.contentUri)
-                                val embeddedPicture = retriever.embeddedPicture
-                                retriever.release()
+                                                    val coverUri = context.getCoverUri(coverFile.absolutePath)
+                                                    song.copy(
+                                                        coverPath = coverFile.absolutePath,
+                                                        coverUri = coverUri,
+                                                    )
+                                                } else {
+                                                    song
+                                                }
+                                            }
+                                        } else {
+                                            // Fetch cover using MediaMetadataRetriever
+                                            val retriever = MediaMetadataRetriever()
+                                            retriever.setDataSource(context, song.contentUri)
+                                            val embeddedPicture = retriever.embeddedPicture
+                                            retriever.release()
 
-                                if (embeddedPicture != null) {
-                                    // Cache the cover to file
-                                    val coverFile = File(coversDir, "cover_${song.id}.jpg")
-                                    coverFile.writeBytes(embeddedPicture)
+                                            if (embeddedPicture != null) {
+                                                // Cache the cover to file
+                                                val coverFile = File(coversDir, "cover_${song.id}.jpg")
+                                                coverFile.writeBytes(embeddedPicture)
 
-                                    val coverUri = context.getCoverUri(coverFile.absolutePath)
-                                    song.copy(
-                                        coverPath = coverFile.absolutePath,
-                                        coverUri = coverUri
-                                    )
-                                } else {
+                                                val coverUri = context.getCoverUri(coverFile.absolutePath)
+                                                song.copy(
+                                                    coverPath = coverFile.absolutePath,
+                                                    coverUri = coverUri,
+                                                )
+                                            } else {
+                                                song
+                                            }
+                                        }
+                                    result
+                                } catch (e: Exception) {
+                                    Timber.tag(TAG).e("Error fetching cover for song ${song.id}: ${e.message}")
                                     song
                                 }
                             }
-                            result
-                        } catch (e: Exception) {
-                            Timber.tag(TAG).e("Error fetching cover for song ${song.id}: ${e.message}")
-                            song
-                        }
-                    }
-                }.awaitAll()
+                        }.awaitAll()
 
                 results
             } catch (e: Exception) {
@@ -238,17 +245,19 @@ class MediaStoreScanner(private val context: Context) {
                 songs
             }
         }
-    }
 
-    fun fetchAlbums(songs: List<SongEntity>) = songs.groupBy {
-        it.album
-    }.map { (albumName, songsInAlbum) ->
-        val firstSongWithCover = songsInAlbum.firstOrNull {
-            it.coverUri != null
-        }
-        AlbumEntity(
-            name = albumName,
-            cover = firstSongWithCover?.coverUri
-        )
-    }
+    fun fetchAlbums(songs: List<SongEntity>) =
+        songs
+            .groupBy {
+                it.album
+            }.map { (albumName, songsInAlbum) ->
+                val firstSongWithCover =
+                    songsInAlbum.firstOrNull {
+                        it.coverUri != null
+                    }
+                AlbumEntity(
+                    name = albumName,
+                    cover = firstSongWithCover?.coverUri,
+                )
+            }
 }

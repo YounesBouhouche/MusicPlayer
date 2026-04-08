@@ -7,23 +7,41 @@ import younesbouhouche.musicplayer.core.data.datastore.SettingsPreference
 import younesbouhouche.musicplayer.core.domain.repositories.PreferencesRepository
 import younesbouhouche.musicplayer.core.presentation.util.stateInVM
 
-class PlayerSettingsViewModel(val repository: PreferencesRepository): ViewModel() {
-    val matchPictureColors = repository.get(SettingsPreference.MatchPictureColors)
-        .stateInVM(false, viewModelScope)
-    val showVolumeSlider = repository.get(SettingsPreference.ShowVolumeSlider)
-        .stateInVM(false, viewModelScope)
-    val showRepeatButton = repository.get(SettingsPreference.ShowRepeat)
-        .stateInVM(false, viewModelScope)
-    val showShuffleButton = repository.get(SettingsPreference.ShowShuffle)
-        .stateInVM(false, viewModelScope)
-    val showSpeedButton = repository.get(SettingsPreference.ShowSpeed)
-        .stateInVM(false, viewModelScope)
-    val showPitchButton = repository.get(SettingsPreference.ShowPitch)
-        .stateInVM(false, viewModelScope)
-    val showTimerButton = repository.get(SettingsPreference.ShowTimer)
-        .stateInVM(false, viewModelScope)
-    val showLyricsButton = repository.get(SettingsPreference.ShowLyrics)
-        .stateInVM(false, viewModelScope)
+class PlayerSettingsViewModel(
+    val repository: PreferencesRepository,
+) : ViewModel() {
+    val matchPictureColors =
+        repository
+            .get(SettingsPreference.MatchPictureColors)
+            .stateInVM(false, viewModelScope)
+    val showVolumeSlider =
+        repository
+            .get(SettingsPreference.ShowVolumeSlider)
+            .stateInVM(false, viewModelScope)
+    val showRepeatButton =
+        repository
+            .get(SettingsPreference.ShowRepeat)
+            .stateInVM(false, viewModelScope)
+    val showShuffleButton =
+        repository
+            .get(SettingsPreference.ShowShuffle)
+            .stateInVM(false, viewModelScope)
+    val showSpeedButton =
+        repository
+            .get(SettingsPreference.ShowSpeed)
+            .stateInVM(false, viewModelScope)
+    val showPitchButton =
+        repository
+            .get(SettingsPreference.ShowPitch)
+            .stateInVM(false, viewModelScope)
+    val showTimerButton =
+        repository
+            .get(SettingsPreference.ShowTimer)
+            .stateInVM(false, viewModelScope)
+    val showLyricsButton =
+        repository
+            .get(SettingsPreference.ShowLyrics)
+            .stateInVM(false, viewModelScope)
 
     fun saveSettings(
         matchPictureColors: Boolean? = null,

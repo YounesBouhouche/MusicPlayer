@@ -9,4 +9,3 @@ fun <T> Flow<T>.stateInVM(
     initialValue: T,
     scope: CoroutineScope,
 ) = stateIn(scope, SharingStarted.WhileSubscribed(5000L), initialValue)
-

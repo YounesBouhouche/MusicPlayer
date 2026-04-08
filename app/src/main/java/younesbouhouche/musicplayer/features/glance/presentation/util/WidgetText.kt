@@ -18,17 +18,18 @@ fun WidgetText(
     fontWeight: FontWeight = FontWeight.Normal,
     fontSize: Float? = null,
     textAlign: TextAlign = TextAlign.Start,
-    color: ColorProvider = GlanceTheme.colors.onBackground
+    color: ColorProvider = GlanceTheme.colors.onBackground,
 ) {
     Text(
         text,
         modifier,
-        style = defaultTextStyle.copy(
-            color = color,
-            fontWeight = fontWeight,
-            fontSize = fontSize?.let { TextUnit(fontSize, TextUnitType.Sp) },
-            textAlign = textAlign,
-        ),
+        style =
+            defaultTextStyle.copy(
+                color = color,
+                fontWeight = fontWeight,
+                fontSize = fontSize?.let { TextUnit(fontSize, TextUnitType.Sp) },
+                textAlign = textAlign,
+            ),
         maxLines = 1,
     )
 }

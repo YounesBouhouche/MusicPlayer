@@ -30,7 +30,7 @@ data class Data(
     @SerialName("tracklist")
     val tracklist: String,
     @SerialName("type")
-    val type: String
+    val type: String,
 )
 
 @Serializable

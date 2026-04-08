@@ -18,10 +18,9 @@ fun String.getGroupingKey(): String {
     }
 }
 
-fun String.toFileUri(): String {
-    return if (this.startsWith("file://")) {
+fun String.toFileUri(): String =
+    if (this.startsWith("file://")) {
         this
     } else {
         "file://$this"
     }
-}

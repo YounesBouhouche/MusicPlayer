@@ -13,15 +13,15 @@ import androidx.room.Index
             entity = QueueEntity::class,
             parentColumns = ["id"],
             childColumns = ["queueId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE,
         ),
         ForeignKey(
             entity = SongEntity::class,
             parentColumns = ["id"],
             childColumns = ["songId"],
             onDelete = ForeignKey.CASCADE,
-            deferred = false
-        )
+            deferred = false,
+        ),
     ],
 )
 data class QueueSongCrossRef(

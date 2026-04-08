@@ -8,13 +8,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 @Composable
 fun <T> NavHostController.getRoute(
     routesList: List<T>,
-    routeMapper: (T) -> String = { it?.javaClass?.kotlin?.qualifiedName ?: "" }
+    routeMapper: (T) -> String = { it?.javaClass?.kotlin?.qualifiedName ?: "" },
 ): T? = currentBackStackEntryAsState().value?.getRoute(routesList, routeMapper)
 
 fun <T> NavBackStackEntry.getRoute(
     routesList: List<T>,
-    routeMapper: (T) -> String = { it?.javaClass?.kotlin?.qualifiedName ?: "" }
-): T?  {
+    routeMapper: (T) -> String = { it?.javaClass?.kotlin?.qualifiedName ?: "" },
+): T? {
     val currentRoute = destination.route ?: return null
     return routesList.find { routeMapper(it) == currentRoute }
 }

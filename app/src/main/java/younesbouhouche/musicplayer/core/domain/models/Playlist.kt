@@ -5,7 +5,6 @@ import androidx.compose.ui.platform.LocalContext
 import coil.request.ImageRequest
 import java.io.File
 
-
 data class Playlist(
     val id: Long = 0,
     val name: String = "",
@@ -22,14 +21,17 @@ data class Playlist(
         }
         return builder.toString()
     }
+
     fun search(query: String) = name.lowercase().contains(query.lowercase())
 }
 
 @Composable
-fun Playlist.getPictureRequest() = with(LocalContext.current) {
-    image?.let { File(filesDir, it) }?.let {
-        ImageRequest.Builder(this)
-            .data(it)
-            .build()
+fun Playlist.getPictureRequest() =
+    with(LocalContext.current) {
+        image?.let { File(filesDir, it) }?.let {
+            ImageRequest
+                .Builder(this)
+                .data(it)
+                .build()
+        }
     }
-}

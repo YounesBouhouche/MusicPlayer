@@ -42,11 +42,10 @@ import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
 import com.younesb.mydesignsystem.presentation.components.Image
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Song
+import younesbouhouche.musicplayer.features.main.presentation.util.timeString
 import younesbouhouche.musicplayer.features.player.domain.models.PlayState
 import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
-import younesbouhouche.musicplayer.features.main.presentation.util.timeString
 import kotlin.math.roundToLong
-
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -74,7 +73,7 @@ fun DialogContent(
                     icon = Icons.Default.MusicNote,
                     shape = MaterialTheme.shapes.large,
                     background = MaterialTheme.colorScheme.surfaceContainer,
-                    modifier = Modifier.size(120.dp)
+                    modifier = Modifier.size(120.dp),
                 )
                 Column(
                     Modifier
@@ -102,20 +101,21 @@ fun DialogContent(
                         Icon(
                             rememberAnimatedVectorPainter(
                                 AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause_animation),
-                                state.playState == PlayState.PLAYING
+                                state.playState == PlayState.PLAYING,
                             ),
                             null,
-                            Modifier.size(IconButtonDefaults.largeIconSize)
+                            Modifier.size(IconButtonDefaults.largeIconSize),
                         )
                     },
                     loading = state.loading,
                     onClick = pauseResume,
                     size = IconButtonDefaults.largeIconSize,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                    )
+                    colors =
+                        IconButtonDefaults.iconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
                 )
             }
             Column(
@@ -163,15 +163,15 @@ fun DialogContent(
                                 )
                             },
                             value =
-                            if (dragging or state.loading) {
-                                value
-                            } else if (card == null) {
-                                0f
-                            } else if (card.duration == 0L) {
-                                0f
-                            } else {
-                                state.time / card.duration.toFloat()
-                            },
+                                if (dragging or state.loading) {
+                                    value
+                                } else if (card == null) {
+                                    0f
+                                } else if (card.duration == 0L) {
+                                    0f
+                                } else {
+                                    state.time / card.duration.toFloat()
+                                },
                             onValueChange = {
                                 dragging = true
                                 value = it
@@ -192,7 +192,8 @@ fun DialogContent(
 @Composable
 private fun DialogContentPreview() {
     DialogContent(
-        Song.Builder()
+        Song
+            .Builder()
             .id(1L)
             .title("Song Title")
             .artist("Artist Name")
@@ -200,6 +201,6 @@ private fun DialogContentPreview() {
             .build(),
         PlayerState(),
         {},
-        {}
+        {},
     )
 }

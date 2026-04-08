@@ -1,9 +1,6 @@
 package younesbouhouche.musicplayer.features.main.presentation.navigation
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -33,10 +30,11 @@ import younesbouhouche.musicplayer.features.main.presentation.util.intUpDownTran
 @Composable
 fun LoadingBar(
     state: LoadingState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier.statusBarsPadding()
+        modifier
+            .statusBarsPadding()
             .padding(8.dp)
             .padding(bottom = 12.dp)
             .clip(MaterialTheme.shapes.extraLarge)
@@ -44,7 +42,7 @@ fun LoadingBar(
             .padding(16.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         CircularWavyProgressIndicator(
             progress = {
@@ -68,7 +66,7 @@ fun LoadingBar(
         ) { step ->
             Text(
                 stringResource(
-                    when(step) {
+                    when (step) {
                         0 -> R.string.loading_files
                         1 -> R.string.loading_thumbnails
                         2 -> R.string.loading_artists
@@ -78,7 +76,7 @@ fun LoadingBar(
                     state.progressMax,
                 ),
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
         }
     }

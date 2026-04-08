@@ -62,18 +62,19 @@ fun SongListItem(
     onClick: () -> Unit = { },
 ) {
     val scale by animateFloatAsState(
-        if (dragging) 1.05f else 1f
+        if (dragging) 1.05f else 1f,
     )
     val shadow by animateDpAsState(
-        if (dragging) 16.dp else 0.dp
+        if (dragging) 16.dp else 0.dp,
     )
     val angle by rememberInfiniteTransition().animateFloat(
         initialValue = 0f,
         targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(10000, easing = { it }),
-            repeatMode = RepeatMode.Restart
-        ),
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(10000, easing = { it }),
+                repeatMode = RepeatMode.Restart,
+            ),
     )
     val itemShape = if (active) RoundedCornerShape(100) else shape
     val state = rememberSwipeToDismissBoxState { .5f }
@@ -82,27 +83,34 @@ fun SongListItem(
         backgroundContent = {
             if (onDismiss != null) {
                 val background by animateColorAsState(
-                    if (state.progress < 1f) MaterialTheme.colorScheme.error
-                    else MaterialTheme.colorScheme.surfaceVariant
+                    if (state.progress < 1f) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    },
                 )
                 val tint by animateColorAsState(
-                    if (state.progress < 1f) MaterialTheme.colorScheme.onError
-                    else MaterialTheme.colorScheme.onSurfaceVariant
+                    if (state.progress < 1f) {
+                        MaterialTheme.colorScheme.onError
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
                 )
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
                     Box(
-                        Modifier.clip(itemShape).background(background)
-                            .fillMaxWidth(1f) //state.progress
+                        Modifier
+                            .clip(itemShape)
+                            .background(background)
+                            .fillMaxWidth(1f) // state.progress
                             .fillMaxHeight()
-                            .padding(start = 8.dp)
-                        ,
+                            .padding(start = 8.dp),
                         contentAlignment = Alignment.CenterEnd,
                     ) {
                         Icon(
                             Icons.Default.Delete,
                             null,
                             Modifier.size(24.dp).offset(x = -(24.dp)),
-                            tint = tint
+                            tint = tint,
                         )
                     }
                 }
@@ -114,7 +122,7 @@ fun SongListItem(
         modifier = modifier.scale(scale).shadow(shadow, shape),
         enableDismissFromStartToEnd = false,
         enableDismissFromEndToStart = onDismiss != null,
-        gesturesEnabled = onDismiss != null
+        gesturesEnabled = onDismiss != null,
     ) {
         ListItem(
             onClick,
@@ -122,9 +130,13 @@ fun SongListItem(
             onLongClick,
             shape = itemShape,
             background =
-                if (active) MaterialTheme.colorScheme.primaryContainer.copy(.4f)
-                    .compositeOver(MaterialTheme.colorScheme.surfaceContainerLow)
-                else MaterialTheme.colorScheme.surfaceContainerLow,
+                if (active) {
+                    MaterialTheme.colorScheme.primaryContainer
+                        .copy(.4f)
+                        .compositeOver(MaterialTheme.colorScheme.surfaceContainerLow)
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainerLow
+                },
             leadingContent = {
                 leadingContent?.invoke(this)
                 Image(
@@ -132,37 +144,50 @@ fun SongListItem(
                     icon = Icons.Default.MusicNote,
                     modifier = Modifier.size(58.dp),
                     iconTint =
-                        if (active) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                        if (active) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
                     shape =
-                        if (active) MaterialShapes.Cookie9Sided.toShape(angle.roundToInt())
-                        else MaterialTheme.shapes.large,
+                        if (active) {
+                            MaterialShapes.Cookie9Sided.toShape(angle.roundToInt())
+                        } else {
+                            MaterialTheme.shapes.large
+                        },
                     background =
-                        if (active) MaterialTheme.colorScheme.onPrimaryContainer.copy(0.1f)
-                        else MaterialTheme.colorScheme.surface.copy(0.5f)
-                    ,
+                        if (active) {
+                            MaterialTheme.colorScheme.onPrimaryContainer.copy(0.1f)
+                        } else {
+                            MaterialTheme.colorScheme.surface.copy(0.5f)
+                        },
                 )
             },
             trailingContent = {
-                if (active)
+                if (active) {
                     PlaybackAnimation(
                         Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary,
                     )
+                }
                 trailingContent(this)
-            }
+            },
         ) {
             Column(
                 Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
                     song.title,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
-                    color = if (active) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onSurface
+                    color =
+                        if (active) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
                 )
                 Row(Modifier.fillMaxWidth()) {
                     Text(
@@ -171,8 +196,11 @@ fun SongListItem(
                         maxLines = 1,
                         overflow = TextOverflow.MiddleEllipsis,
                         color =
-                            if (active) MaterialTheme.colorScheme.primary.copy(0.7f)
-                            else MaterialTheme.colorScheme.onSurfaceVariant
+                            if (active) {
+                                MaterialTheme.colorScheme.primary.copy(0.7f)
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                     )
                 }
             }

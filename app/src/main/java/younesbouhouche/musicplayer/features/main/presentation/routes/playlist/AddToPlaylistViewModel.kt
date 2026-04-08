@@ -7,14 +7,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.core.presentation.util.stateInVM
-import younesbouhouche.musicplayer.features.main.domain.use_cases.AddToPlaylistsUseCase
-import younesbouhouche.musicplayer.features.main.domain.use_cases.CreatePlaylistUseCase
-import younesbouhouche.musicplayer.features.main.domain.use_cases.GetPlaylistsUseCase
+import younesbouhouche.musicplayer.features.main.domain.usecases.AddToPlaylistsUseCase
+import younesbouhouche.musicplayer.features.main.domain.usecases.GetPlaylistsUseCase
 
 class AddToPlaylistViewModel(
     private val addToPlaylistUseCase: AddToPlaylistsUseCase,
-    getPlaylistsUseCase: GetPlaylistsUseCase
-): ViewModel() {
+    getPlaylistsUseCase: GetPlaylistsUseCase,
+) : ViewModel() {
     private val _selected = MutableStateFlow(emptySet<Long>())
     val selected = _selected.asStateFlow()
 
@@ -25,10 +24,14 @@ class AddToPlaylistViewModel(
     }
 
     fun onToggleSelection(id: Long) {
-        _selected.value = _selected.value.toMutableSet().apply {
-            if (contains(id)) remove(id)
-            else add(id)
-        }
+        _selected.value =
+            _selected.value.toMutableSet().apply {
+                if (contains(id)) {
+                    remove(id)
+                } else {
+                    add(id)
+                }
+            }
     }
 
     fun addToPlaylists(ids: List<Long>) {

@@ -50,8 +50,7 @@ fun Dialog(
                     .background(
                         MaterialTheme.colorScheme.background,
                         RoundedCornerShape(24.dp),
-                    )
-                    .clip(RoundedCornerShape(24.dp))
+                    ).clip(RoundedCornerShape(24.dp))
                     .clipToBounds()
                     .fillMaxWidth(0.9f)
                     .widthIn(min = 280.dp, max = 560.dp),
@@ -93,7 +92,7 @@ fun Dialog(
                         cancelListener = cancelListener,
                         cancelText = cancelText,
                         okListener = okListener,
-                        neutral = neutral
+                        neutral = neutral,
                     )
                 }
             }

@@ -5,23 +5,29 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.core.data.datastore.SettingsPreference
-import younesbouhouche.musicplayer.core.presentation.util.stateInVM
 import younesbouhouche.musicplayer.core.domain.repositories.PreferencesRepository
+import younesbouhouche.musicplayer.core.presentation.util.stateInVM
 
 class PlaybackSettingsViewModel(
-    private val repository: PreferencesRepository
-): ViewModel() {
-    val skipSilence = repository.get(SettingsPreference.SkipSilence)
-        .stateInVM(false, viewModelScope)
-    val rememberSpeed = repository.get(SettingsPreference.RememberSpeed)
-        .stateInVM(false, viewModelScope)
-    val rememberPitch = repository.get(SettingsPreference.RememberPitch)
-        .stateInVM(false, viewModelScope)
+    private val repository: PreferencesRepository,
+) : ViewModel() {
+    val skipSilence =
+        repository
+            .get(SettingsPreference.SkipSilence)
+            .stateInVM(false, viewModelScope)
+    val rememberSpeed =
+        repository
+            .get(SettingsPreference.RememberSpeed)
+            .stateInVM(false, viewModelScope)
+    val rememberPitch =
+        repository
+            .get(SettingsPreference.RememberPitch)
+            .stateInVM(false, viewModelScope)
 
     fun saveSettings(
         skipSilence: Boolean? = null,
-        rememberSpeed: Boolean?  = null,
-        rememberPitch: Boolean?  = null,
+        rememberSpeed: Boolean? = null,
+        rememberPitch: Boolean? = null,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             skipSilence?.let {

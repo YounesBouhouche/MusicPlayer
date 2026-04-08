@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Album
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +20,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Album
-import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.features.main.presentation.components.GridScreen
 import younesbouhouche.musicplayer.features.main.presentation.components.ListItem
 import younesbouhouche.musicplayer.features.main.presentation.components.PictureCard
@@ -33,7 +31,7 @@ import younesbouhouche.musicplayer.features.main.presentation.util.SortBottomShe
 fun AlbumsScreen(
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
-    onClick: (Album) -> Unit
+    onClick: (Album) -> Unit,
 ) {
     val viewModel = koinViewModel<AlbumsViewModel>()
     val albums by viewModel.albums.collectAsStateWithLifecycle()
@@ -48,14 +46,15 @@ fun AlbumsScreen(
         {
             ListItem(
                 headline = it.name,
-                supporting = pluralStringResource(
-                    R.plurals.item_s,
-                    it.songs.size,
-                    it.songs.size
-                ),
+                supporting =
+                    pluralStringResource(
+                        R.plurals.item_s,
+                        it.songs.size,
+                        it.songs.size,
+                    ),
                 cover = it.cover,
                 icon = Icons.Default.Album,
-                modifier = Modifier.animateItem()
+                modifier = Modifier.animateItem(),
             ) {
                 onClick(it)
             }
@@ -68,16 +67,16 @@ fun AlbumsScreen(
                     onClick(albums)
                 },
                 Modifier.animateItem(),
-                alternatives = albums.songs.map { it.coverUri }
+                alternatives = albums.songs.map { it.coverUri },
             ) {
                 Column(
                     Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom),
                 ) {
                     Text(
                         albums.name,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }

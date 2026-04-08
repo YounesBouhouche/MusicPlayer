@@ -5,13 +5,24 @@ import younesbouhouche.musicplayer.core.domain.models.Queue
 
 interface QueueRepository {
     fun observeQueue(): Flow<Queue?>
-    suspend fun getQueue(): Queue?
-    suspend fun createQueue(queue: List<Long>)
-    suspend fun setCurrentIndex(index: Int)
-    suspend fun clearQueue()
-    suspend fun updatePosition(songId: Long, position: Int)
 
-    suspend fun swapPositions(from: Int, to: Int) {
+    suspend fun getQueue(): Queue?
+
+    suspend fun createQueue(queue: List<Long>)
+
+    suspend fun setCurrentIndex(index: Int)
+
+    suspend fun clearQueue()
+
+    suspend fun updatePosition(
+        songId: Long,
+        position: Int,
+    )
+
+    suspend fun swapPositions(
+        from: Int,
+        to: Int,
+    ) {
         println("Swapping positions from $from to $to")
         val queue = getQueue() ?: return
         val songFrom = queue.songs.getOrNull(from)?.id ?: return
@@ -22,6 +33,11 @@ interface QueueRepository {
     }
 
     suspend fun remove(songId: Long)
+
     suspend fun removeAt(index: Int)
-    suspend fun add(songId: Long, position: Int)
+
+    suspend fun add(
+        songId: Long,
+        position: Int,
+    )
 }

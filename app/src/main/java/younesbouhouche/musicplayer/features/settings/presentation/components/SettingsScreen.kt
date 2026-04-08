@@ -54,7 +54,7 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = paddingValues + PaddingValues(12.dp, 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             item {
                 SettingsScreenIcon(

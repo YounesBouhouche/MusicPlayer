@@ -31,7 +31,7 @@ fun IconButton(
     iconSize: Dp = size / 3,
     @SuppressLint("RestrictedApi") containerColor: ColorProvider = ColorProvider(Color.Transparent),
     contentColor: ColorProvider = GlanceTheme.colors.onSurface,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val context = LocalContext.current
     Box(
@@ -40,17 +40,16 @@ fun IconButton(
             .cornerRadius(size)
             .background(containerColor)
             .height(size),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Image(
             ImageProvider(Icon.createWithResource(context, icon)),
             "",
             GlanceModifier.size(iconSize),
-            colorFilter = ColorFilter.tint(contentColor)
+            colorFilter = ColorFilter.tint(contentColor),
         )
     }
 }
-
 
 @Composable
 fun RowScope.RowIconButton(
@@ -61,7 +60,7 @@ fun RowScope.RowIconButton(
     iconSize: Dp = size / 3,
     @SuppressLint("RestrictedApi") containerColor: ColorProvider = ColorProvider(Color.Transparent),
     contentColor: ColorProvider = GlanceTheme.colors.onSurface,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) = IconButton(
     icon,
     size,
@@ -69,5 +68,5 @@ fun RowScope.RowIconButton(
     iconSize,
     containerColor,
     contentColor,
-    onClick
+    onClick,
 )

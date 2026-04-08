@@ -51,12 +51,12 @@ import com.mohamedrejeb.compose.dnd.reorder.ReorderContainer
 import com.mohamedrejeb.compose.dnd.reorder.ReorderableItem
 import com.mohamedrejeb.compose.dnd.reorder.rememberReorderState
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
+import com.younesb.mydesignsystem.presentation.util.plus
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Queue
 import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.features.main.presentation.components.SongListItem
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
-import com.younesb.mydesignsystem.presentation.util.plus
 import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -68,7 +68,7 @@ fun QueueSheet(
     onPlayerEvent: (PlayerEvent) -> Unit,
     onSaveQueue: () -> Unit,
     onAddToPlaylist: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val reorderState = rememberReorderState<Song>(true)
     val state = rememberModalBottomSheetState(true)
@@ -87,16 +87,19 @@ fun QueueSheet(
             modifier = modifier,
             sheetState = state,
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            dragHandle = { BottomSheetDefaults.DragHandle(
-                color = MaterialTheme.colorScheme.primary
-            ) },
+            dragHandle = {
+                BottomSheetDefaults.DragHandle(
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            },
             contentWindowInsets = {
                 BottomSheetDefaults.modalWindowInsets.exclude(WindowInsets.navigationBars)
-            }
+            },
         ) {
             Box(Modifier.fillMaxSize()) {
                 Scaffold(
-                    Modifier.fillMaxSize()
+                    Modifier
+                        .fillMaxSize()
                         .nestedScroll(scrollBehavior.nestedScrollConnection)
                         .floatingToolbarVerticalNestedScroll(
                             expanded = expanded,
@@ -113,21 +116,22 @@ fun QueueSheet(
                                 )
                             },
                             expandedHeight = 80.dp,
-                            colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            ),
-                            scrollBehavior = scrollBehavior
+                            colors =
+                                TopAppBarDefaults.topAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                ),
+                            scrollBehavior = scrollBehavior,
                         )
                     },
                     contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ) { paddingValues ->
                     ReorderContainer(reorderState) {
                         LazyColumn(
                             Modifier.fillMaxSize(),
                             contentPadding = paddingValues + PaddingValues(24.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             itemsIndexed(reorderedQueue, { _, it -> it.id }) { index, item ->
                                 ReorderableItem(
@@ -141,12 +145,13 @@ fun QueueSheet(
                                     onDrop = {
                                         val from = queue.songs.indexOf(it.data)
                                         val to = queue.songs.indexOf(item)
-                                        reorderedQueue = reorderedQueue.toMutableList().apply {
-                                            add(to, removeAt(from))
-                                        }
+                                        reorderedQueue =
+                                            reorderedQueue.toMutableList().apply {
+                                                add(to, removeAt(from))
+                                            }
                                         onPlayerEvent(PlayerEvent.Swap(from, to))
                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
-                                    }
+                                    },
                                 ) {
                                     SongListItem(
                                         item,
@@ -154,7 +159,7 @@ fun QueueSheet(
                                         shape = expressiveRectShape(index, queue.songs.size),
                                         onDismiss = {
                                             onPlayerEvent(PlayerEvent.Remove(index))
-                                        }
+                                        },
                                     ) {
                                         onPlayerEvent(PlayerEvent.Seek(index))
                                     }
@@ -171,18 +176,18 @@ fun QueueSheet(
                         FloatingToolbarDefaults.VibrantFloatingActionButton(onAddToPlaylist) {
                             Icon(Icons.AutoMirrored.Filled.PlaylistAdd, null)
                         }
-                    }
+                    },
                 ) {
                     ExpressiveIconButton(
                         Icons.Default.ClearAll,
-                        size = IconButtonDefaults.mediumIconSize
+                        size = IconButtonDefaults.mediumIconSize,
                     ) {
                         onPlayerEvent(PlayerEvent.Stop)
                     }
                     ExpressiveIconButton(
                         Icons.Default.Save,
                         size = IconButtonDefaults.mediumIconSize,
-                        onClick = onSaveQueue
+                        onClick = onSaveQueue,
                     )
                 }
             }

@@ -3,7 +3,6 @@ package younesbouhouche.musicplayer.core.data.database.entities
 import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.Relation
 
 @Entity
 data class SongEntity(
@@ -27,7 +26,7 @@ data class SongEntity(
     val lyrics: String?,
     var cover: ByteArray?,
     var coverUri: Uri?,
-    var coverPath: String
+    var coverPath: String,
 ) {
     class Builder {
         private var id: Long = 0
@@ -52,48 +51,74 @@ data class SongEntity(
         private var coverPath: String = ""
 
         fun id(id: Long) = apply { this.id = id }
-        fun contentUri(contentUri: Uri) = apply { this.contentUri = contentUri }
-        fun fileName(fileName: String) = apply { this.fileName = fileName }
-        fun title(title: String) = apply { this.title = title }
-        fun artist(artist: String) = apply { this.artist = artist }
-        fun album(album: String) = apply { this.album = album }
-        fun albumArtist(albumArtist: String) = apply { this.albumArtist = albumArtist }
-        fun duration(duration: Long) = apply { this.duration = duration }
-        fun path(path: String) = apply { this.path = path }
-        fun date(date: Long) = apply { this.date = date }
-        fun size(size: Long) = apply { this.size = size }
-        fun trackNumber(trackNumber: Int?) = apply { this.trackNumber = trackNumber }
-        fun discNumber(discNumber: Int?) = apply { this.discNumber = discNumber }
-        fun year(year: Int?) = apply { this.year = year }
-        fun composer(composer: String?) = apply { this.composer = composer }
-        fun genre(genre: String?) = apply { this.genre = genre }
-        fun lyrics(lyrics: String?) = apply { this.lyrics = lyrics }
-        fun cover(cover: ByteArray?) { this.cover = cover }
-        fun coverUri(coverUri: Uri?) { this.coverUri = coverUri }
-        fun coverPath(coverPath: String) { this.coverPath = coverPath }
 
-        fun build() = SongEntity(
-            id = id,
-            contentUri = contentUri,
-            fileName = fileName,
-            title = title,
-            artist = artist,
-            album = album,
-            albumArtist = albumArtist,
-            duration = duration,
-            path = path,
-            date = date,
-            size = size,
-            trackNumber = trackNumber,
-            discNumber = discNumber,
-            year = year,
-            composer = composer,
-            genre = genre,
-            lyrics = lyrics,
-            cover = cover,
-            coverUri = coverUri,
-            coverPath = coverPath,
-        )
+        fun contentUri(contentUri: Uri) = apply { this.contentUri = contentUri }
+
+        fun fileName(fileName: String) = apply { this.fileName = fileName }
+
+        fun title(title: String) = apply { this.title = title }
+
+        fun artist(artist: String) = apply { this.artist = artist }
+
+        fun album(album: String) = apply { this.album = album }
+
+        fun albumArtist(albumArtist: String) = apply { this.albumArtist = albumArtist }
+
+        fun duration(duration: Long) = apply { this.duration = duration }
+
+        fun path(path: String) = apply { this.path = path }
+
+        fun date(date: Long) = apply { this.date = date }
+
+        fun size(size: Long) = apply { this.size = size }
+
+        fun trackNumber(trackNumber: Int?) = apply { this.trackNumber = trackNumber }
+
+        fun discNumber(discNumber: Int?) = apply { this.discNumber = discNumber }
+
+        fun year(year: Int?) = apply { this.year = year }
+
+        fun composer(composer: String?) = apply { this.composer = composer }
+
+        fun genre(genre: String?) = apply { this.genre = genre }
+
+        fun lyrics(lyrics: String?) = apply { this.lyrics = lyrics }
+
+        fun cover(cover: ByteArray?) {
+            this.cover = cover
+        }
+
+        fun coverUri(coverUri: Uri?) {
+            this.coverUri = coverUri
+        }
+
+        fun coverPath(coverPath: String) {
+            this.coverPath = coverPath
+        }
+
+        fun build() =
+            SongEntity(
+                id = id,
+                contentUri = contentUri,
+                fileName = fileName,
+                title = title,
+                artist = artist,
+                album = album,
+                albumArtist = albumArtist,
+                duration = duration,
+                path = path,
+                date = date,
+                size = size,
+                trackNumber = trackNumber,
+                discNumber = discNumber,
+                year = year,
+                composer = composer,
+                genre = genre,
+                lyrics = lyrics,
+                cover = cover,
+                coverUri = coverUri,
+                coverPath = coverPath,
+            )
     }
 
     override fun equals(other: Any?): Boolean {

@@ -50,24 +50,25 @@ fun AddToPlaylistContent(
     val viewModel = koinViewModel<AddToPlaylistViewModel>()
     val playlists by viewModel.playlists.collectAsStateWithLifecycle()
     val selected by viewModel.selected.collectAsStateWithLifecycle()
-    val createPlaylistButton: @Composable () -> Unit = remember {
-        @Composable {
-            ExpressiveButton(
-                stringResource(R.string.create_playlist),
-                ButtonDefaults.MediumContainerHeight,
-                onClick = onCreatePlaylist,
-                icon = Icons.Default.Add,
-                colors = ButtonDefaults.filledTonalButtonColors()
-            )
+    val createPlaylistButton: @Composable () -> Unit =
+        remember {
+            @Composable {
+                ExpressiveButton(
+                    stringResource(R.string.create_playlist),
+                    ButtonDefaults.MediumContainerHeight,
+                    onClick = onCreatePlaylist,
+                    icon = Icons.Default.Add,
+                    colors = ButtonDefaults.filledTonalButtonColors(),
+                )
+            }
         }
-    }
     LaunchedEffect(Unit) {
         viewModel.onClearSelection()
     }
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.navigationBarsPadding().padding(16.dp)
+        modifier = Modifier.navigationBarsPadding().padding(16.dp),
     ) {
         TitleText(stringResource(R.string.add_to_playlist))
         EmptyContainer(
@@ -76,31 +77,34 @@ fun AddToPlaylistContent(
             text = stringResource(R.string.no_playlists),
             trailingContent = {
                 createPlaylistButton()
-            }
+            },
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 playlists.forEachIndexed { index, playlist ->
                     val playlistSelected = playlist.id in selected
-                    val imageShape = expressiveRectShape(
-                        0,
-                        1,
-                        MaterialTheme.shapes.medium,
-                        MaterialTheme.shapes.medium,
-                        selected = playlistSelected
-                    )
+                    val imageShape =
+                        expressiveRectShape(
+                            0,
+                            1,
+                            MaterialTheme.shapes.medium,
+                            MaterialTheme.shapes.medium,
+                            selected = playlistSelected,
+                        )
                     val background =
-                        if (playlistSelected)
+                        if (playlistSelected) {
                             MaterialTheme.colorScheme.primaryContainer
-                        else
+                        } else {
                             MaterialTheme.colorScheme.surfaceContainerHigh
+                        }
                     val color =
-                        if (playlistSelected)
+                        if (playlistSelected) {
                             MaterialTheme.colorScheme.primary
-                        else
+                        } else {
                             MaterialTheme.colorScheme.onSurface
+                        }
                     ListItem(
                         background = background,
                         leadingContent = {
@@ -110,9 +114,10 @@ fun AddToPlaylistContent(
                                 Modifier.size(60.dp),
                                 shape = imageShape,
                                 iconTint = color,
-                                background = MaterialTheme.colorScheme.surface.copy(
-                                    alpha = .5f
-                                )
+                                background =
+                                    MaterialTheme.colorScheme.surface.copy(
+                                        alpha = .5f,
+                                    ),
                             )
                         },
                         trailingContent = {
@@ -120,19 +125,20 @@ fun AddToPlaylistContent(
                                 playlist.id in selected,
                                 {
                                     viewModel.onToggleSelection(playlist.id)
-                                }
+                                },
                             )
                         },
                         onClick = {
                             viewModel.onToggleSelection(playlist.id)
                         },
-                        shape = expressiveRectShape(
-                            index,
-                            playlists.size,
-                            MaterialTheme.shapes.small,
-                            MaterialTheme.shapes.large,
-                            selected = playlistSelected
-                        ),
+                        shape =
+                            expressiveRectShape(
+                                index,
+                                playlists.size,
+                                MaterialTheme.shapes.small,
+                                MaterialTheme.shapes.large,
+                                selected = playlistSelected,
+                            ),
                     ) {
                         Text(
                             playlist.name,
@@ -140,7 +146,7 @@ fun AddToPlaylistContent(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             color = color,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
                         )
                     }
                 }
@@ -151,19 +157,22 @@ fun AddToPlaylistContent(
         }
         Row(
             Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             repeat(2) {
                 val (res, onClick) =
-                    if (it == 0) R.string.cancel to onDismissRequest
-                    else R.string.ok to {
-                        viewModel.addToPlaylists(ids)
-                        onDismissRequest()
+                    if (it == 0) {
+                        R.string.cancel to onDismissRequest
+                    } else {
+                        R.string.ok to {
+                            viewModel.addToPlaylists(ids)
+                            onDismissRequest()
+                        }
                     }
                 val interactionSource = remember { MutableInteractionSource() }
                 val pressed by interactionSource.collectIsPressedAsState()
                 val weight by animateFloatAsState(
-                    if (pressed) 1.4f else 1f
+                    if (pressed) 1.4f else 1f,
                 )
                 ExpressiveButton(
                     stringResource(res),
@@ -171,7 +180,7 @@ fun AddToPlaylistContent(
                     Modifier.weight(weight),
                     onClick = onClick,
                     outlined = it == 0,
-                    interactionSource = interactionSource
+                    interactionSource = interactionSource,
                 )
             }
         }

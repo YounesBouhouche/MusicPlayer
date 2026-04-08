@@ -11,5 +11,5 @@ import androidx.compose.ui.graphics.Shape
 @Composable
 fun Modifier.containerClip(
     background: Color = MaterialTheme.colorScheme.surface,
-    shape: Shape = expressiveRectShape(0, 2)
+    shape: Shape = expressiveRectShape(0, 2),
 ) = this.clip(shape).background(background)

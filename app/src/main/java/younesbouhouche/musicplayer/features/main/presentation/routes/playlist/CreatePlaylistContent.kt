@@ -44,24 +44,27 @@ fun CreatePlaylistContent(
             shape = MaterialShapes.Cookie4Sided.toShape(),
             fraction = .3f,
             background = MaterialTheme.colorScheme.tertiaryContainer,
-            iconTint = MaterialTheme.colorScheme.onTertiaryContainer
+            iconTint = MaterialTheme.colorScheme.onTertiaryContainer,
         )
         TextField(
             value = name,
             onValueChange = viewModel::onNameChange,
             label = stringResource(R.string.playlist_name),
-            modifier = Modifier.focusRequester(focusRequester)
+            modifier = Modifier.focusRequester(focusRequester),
         )
         ButtonsRow(
             count = 2,
             icon = { null },
             text = {
                 stringResource(
-                    if (it == 0) R.string.cancel
-                    else R.string.create
+                    if (it == 0) {
+                        R.string.cancel
+                    } else {
+                        R.string.create
+                    },
                 )
             },
-            outlined = { it == 0 }
+            outlined = { it == 0 },
         ) {
             if (it == 0) {
                 onDismissRequest()

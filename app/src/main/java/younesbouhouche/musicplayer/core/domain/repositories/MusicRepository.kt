@@ -6,14 +6,16 @@ import younesbouhouche.musicplayer.core.domain.models.Album
 import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.core.domain.models.Song
-import younesbouhouche.musicplayer.features.main.domain.models.LoadingState
 
 interface MusicRepository {
     suspend fun refreshMusicLibrary(force: Boolean = false)
 
     fun getLoadingState(): StateFlow<Boolean>
 
-    suspend fun setFavoriteSong(songId: Long, isFavorite: Boolean)
+    suspend fun setFavoriteSong(
+        songId: Long,
+        isFavorite: Boolean,
+    )
 
     suspend fun addSongToPlayHistory(songId: Long)
 
@@ -32,6 +34,7 @@ interface MusicRepository {
     fun getLastAddedSongs(): Flow<List<Song>>
 
     fun getRecentAlbums(): Flow<List<Album>>
+
     fun getRecentArtists(): Flow<List<Artist>>
 
     fun getAlbums(): Flow<List<Album>>

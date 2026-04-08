@@ -24,9 +24,10 @@ fun AlbumScreen(
     bottomPadding: Dp = 0.dp,
     onShowBottomSheet: (Song) -> Unit = {},
 ) {
-    val viewModel: AlbumViewModel = koinViewModel (
-        parameters = { parametersOf(album) }
-    )
+    val viewModel: AlbumViewModel =
+        koinViewModel(
+            parameters = { parametersOf(album) },
+        )
     val album by viewModel.album.collectAsStateWithLifecycle()
     val sortState by viewModel.sortState.collectAsStateWithLifecycle()
     ListScreen(
@@ -41,6 +42,6 @@ fun AlbumScreen(
         sortState = sortState,
         onSortStateChange = viewModel::setSortState,
         onShowBottomSheet = onShowBottomSheet,
-        contentPadding = PaddingValues(bottom = bottomPadding)
+        contentPadding = PaddingValues(bottom = bottomPadding),
     )
 }

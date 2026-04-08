@@ -16,8 +16,9 @@ import com.google.common.collect.ImmutableList
 import younesbouhouche.musicplayer.R
 
 @UnstableApi
-class CustomMediaNotificationProvider(context: Context) : DefaultMediaNotificationProvider(context) {
-
+class CustomMediaNotificationProvider(
+    context: Context,
+) : DefaultMediaNotificationProvider(context) {
     companion object {
         const val NOTIFICATION_ID = 1
         const val CHANNEL_ID = "music_playback_channel"
@@ -28,14 +29,15 @@ class CustomMediaNotificationProvider(context: Context) : DefaultMediaNotificati
     }
 
     private fun createNotificationChannel(context: Context) {
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            "Music Playback",
-            NotificationManager.IMPORTANCE_LOW
-        ).apply {
-            description = "Shows currently playing music"
-            setShowBadge(false)
-        }
+        val channel =
+            NotificationChannel(
+                CHANNEL_ID,
+                "Music Playback",
+                NotificationManager.IMPORTANCE_LOW,
+            ).apply {
+                description = "Shows currently playing music"
+                setShowBadge(false)
+            }
         val notificationManager = context.getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(channel)
     }
@@ -45,46 +47,53 @@ class CustomMediaNotificationProvider(context: Context) : DefaultMediaNotificati
         service.startForeground(NOTIFICATION_ID, notification)
     }
 
-    private fun createPlaceholderNotification(context: Context): Notification {
-        return NotificationCompat.Builder(context, CHANNEL_ID)
+    private fun createPlaceholderNotification(context: Context): Notification =
+        NotificationCompat
+            .Builder(context, CHANNEL_ID)
             .setContentTitle("Music Player")
             .setContentText("Loading...")
             .setSmallIcon(R.drawable.monochrome)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
             .build()
-    }
 
     override fun getMediaButtons(
         session: MediaSession,
         playerCommands: Player.Commands,
         mediaButtonPreferences: ImmutableList<CommandButton>,
-        showPauseButton: Boolean
+        showPauseButton: Boolean,
     ): ImmutableList<CommandButton> {
-        val playPauseButton = mediaButtonPreferences.find { button ->
-            button.sessionCommand == null &&
-            (button.iconResId == androidx.media3.session.R.drawable.media3_icon_play ||
-             button.iconResId == androidx.media3.session.R.drawable.media3_icon_pause)
-        }
+        val playPauseButton =
+            mediaButtonPreferences.find { button ->
+                button.sessionCommand == null &&
+                    (
+                        button.iconResId == androidx.media3.session.R.drawable.media3_icon_play ||
+                            button.iconResId == androidx.media3.session.R.drawable.media3_icon_pause
+                    )
+            }
 
-        val previousButton = mediaButtonPreferences.find { button ->
-            button.sessionCommand == null &&
-            button.iconResId == androidx.media3.session.R.drawable.media3_icon_previous
-        }
+        val previousButton =
+            mediaButtonPreferences.find { button ->
+                button.sessionCommand == null &&
+                    button.iconResId == androidx.media3.session.R.drawable.media3_icon_previous
+            }
 
-        val nextButton = mediaButtonPreferences.find { button ->
-            button.sessionCommand == null &&
-            button.iconResId == androidx.media3.session.R.drawable.media3_icon_next
-        }
+        val nextButton =
+            mediaButtonPreferences.find { button ->
+                button.sessionCommand == null &&
+                    button.iconResId == androidx.media3.session.R.drawable.media3_icon_next
+            }
 
-        return ImmutableList.builder<CommandButton>().apply {
-            if (previousButton != null) add(previousButton)
-            if (playPauseButton != null) add(playPauseButton)
-            if (nextButton != null) add(nextButton)
-            add(NotificationCustomCmdButton.REWIND_10S.commandButton)
-            add(NotificationCustomCmdButton.FORWARD_10S.commandButton)
-            add(NotificationCustomCmdButton.LOOP.commandButton)
-        }.build()
+        return ImmutableList
+            .builder<CommandButton>()
+            .apply {
+                if (previousButton != null) add(previousButton)
+                if (playPauseButton != null) add(playPauseButton)
+                if (nextButton != null) add(nextButton)
+                add(NotificationCustomCmdButton.REWIND_10S.commandButton)
+                add(NotificationCustomCmdButton.FORWARD_10S.commandButton)
+                add(NotificationCustomCmdButton.LOOP.commandButton)
+            }.build()
     }
 
     override fun addNotificationActions(
@@ -94,18 +103,19 @@ class CustomMediaNotificationProvider(context: Context) : DefaultMediaNotificati
         actionFactory: MediaNotification.ActionFactory,
     ): IntArray {
         // Simply use our getMediaButtons implementation directly
-        val buttons = getMediaButtons(
-            mediaSession,
-            mediaSession.player.availableCommands,
-            mediaButtons,
-            !mediaSession.player.isPlaying
-        )
+        val buttons =
+            getMediaButtons(
+                mediaSession,
+                mediaSession.player.availableCommands,
+                mediaButtons,
+                !mediaSession.player.isPlaying,
+            )
 
         return super.addNotificationActions(
             mediaSession,
             buttons,
             builder,
-            actionFactory
+            actionFactory,
         )
     }
 }

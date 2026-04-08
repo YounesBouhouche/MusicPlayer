@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -45,26 +44,27 @@ fun AlbumCard(
         modifier = modifier.fillMaxWidth().aspectRatio(1f),
         shape = shape,
         color = MaterialTheme.colorScheme.surfaceVariant,
-        onClick = onClick
+        onClick = onClick,
     ) {
         Box(Modifier.fillMaxSize()) {
             Image(
                 album.cover,
                 Icons.Default.Album,
                 Modifier.blur(radiusX = 4.dp, radiusY = 4.dp).fillMaxSize(),
-                background = MaterialTheme.colorScheme.surfaceVariant
+                background = MaterialTheme.colorScheme.surfaceVariant,
             )
             Column(
-                modifier = Modifier
-                    .alpha(opacity)
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
-                        )
-                    )
-                    .fillMaxSize().padding(12.dp),
+                modifier =
+                    Modifier
+                        .alpha(opacity)
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
+                            ),
+                        ).fillMaxSize()
+                        .padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom),
-                horizontalAlignment = Alignment.End
+                horizontalAlignment = Alignment.End,
             ) {
                 Text(
                     album.name,
@@ -72,7 +72,7 @@ fun AlbumCard(
                     maxLines = 1,
                     color = Color.White,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 ExpressiveIconButton(
                     icon = Icons.Default.PlayArrow,
@@ -80,7 +80,7 @@ fun AlbumCard(
                     modifier = Modifier.padding(8.dp),
                     colors = IconButtonDefaults.filledIconButtonColors(),
                     size = IconButtonDefaults.mediumIconSize,
-                    widthOption = IconButtonDefaults.IconButtonWidthOption.Wide
+                    widthOption = IconButtonDefaults.IconButtonWidthOption.Wide,
                 )
             }
         }

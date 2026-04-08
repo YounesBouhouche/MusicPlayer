@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.core.presentation.theme.AppTheme
 
-
 class DialogActivity : ComponentActivity() {
     private lateinit var viewModel: DialogVM
 

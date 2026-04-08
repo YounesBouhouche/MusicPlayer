@@ -20,11 +20,13 @@ interface QueueDao {
     fun observeQueue(): Flow<QueueEntity?>
 
     @Transaction
-    @Query("""
+    @Query(
+        """
         SELECT SongEntity.* from queue_song_cross_ref
         INNER JOIN SongEntity ON queue_song_cross_ref.songId = SongEntity.id
         WHERE queue_song_cross_ref.queueId = 0 ORDER BY queue_song_cross_ref.position ASC
-        """)
+        """,
+    )
     fun observeQueueList(): Flow<List<SongEntity>>
 
     @Transaction
@@ -48,26 +50,31 @@ interface QueueDao {
         clearQueue()
         deleteQueue()
         createQueue()
-        insertQueueItems(items.mapIndexed { index, item ->
-            QueueSongCrossRef(
-                songId = item,
-                queueId = 0,
-                position = index
-            )
-        })
+        insertQueueItems(
+            items.mapIndexed { index, item ->
+                QueueSongCrossRef(
+                    songId = item,
+                    queueId = 0,
+                    position = index,
+                )
+            },
+        )
     }
 
     @Upsert
     suspend fun upsertQueueItem(ref: QueueSongCrossRef)
 
     @Transaction
-    suspend fun addItem(songId: Long, position: Int) {
+    suspend fun addItem(
+        songId: Long,
+        position: Int,
+    ) {
         upsertQueueItem(
             QueueSongCrossRef(
                 songId = songId,
                 queueId = 0,
-                position = position
-            )
+                position = position,
+            ),
         )
     }
 
@@ -78,7 +85,10 @@ interface QueueDao {
     suspend fun removeAt(position: Int)
 
     @Query("UPDATE queue_song_cross_ref SET position = :newPosition WHERE songId = :songId AND queueId = 0")
-    suspend fun updatePosition(songId: Long, newPosition: Int)
+    suspend fun updatePosition(
+        songId: Long,
+        newPosition: Int,
+    )
 
     @Query("UPDATE QueueEntity SET currentIndex = :currentIndex WHERE id = 0")
     suspend fun updateCurrentIndex(currentIndex: Int)

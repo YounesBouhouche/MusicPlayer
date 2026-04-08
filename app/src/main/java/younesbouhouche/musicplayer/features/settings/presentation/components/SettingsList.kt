@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
-
 @Composable
 fun SettingsList(
     name: Int?,
@@ -24,7 +23,7 @@ fun SettingsList(
                 text = stringResource(it),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp)
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp),
             )
         }
         content()

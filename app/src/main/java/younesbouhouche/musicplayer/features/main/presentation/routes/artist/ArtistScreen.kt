@@ -24,9 +24,10 @@ fun ArtistScreen(
     bottomPadding: Dp = 0.dp,
     onShowBottomSheet: (Song) -> Unit = {},
 ) {
-    val viewModel: ArtistViewModel = koinViewModel (
-        parameters = { parametersOf(artist) }
-    )
+    val viewModel: ArtistViewModel =
+        koinViewModel(
+            parameters = { parametersOf(artist) },
+        )
     val artist by viewModel.artist.collectAsStateWithLifecycle()
     val sortState by viewModel.sortState.collectAsStateWithLifecycle()
     ListScreen(
@@ -41,6 +42,6 @@ fun ArtistScreen(
         sortState = sortState,
         onSortStateChange = viewModel::setSortState,
         onShowBottomSheet = onShowBottomSheet,
-        contentPadding = PaddingValues(bottom = bottomPadding)
+        contentPadding = PaddingValues(bottom = bottomPadding),
     )
 }

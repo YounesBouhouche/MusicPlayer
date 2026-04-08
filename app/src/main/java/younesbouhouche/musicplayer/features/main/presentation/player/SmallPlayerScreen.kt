@@ -67,38 +67,41 @@ fun SmallPlayerScreen(
     val angle by rememberInfiniteTransition().animateFloat(
         initialValue = 0f,
         targetValue = if (state.playState == PlayState.PLAYING) 360f else 0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(10000, easing = { it }),
-            repeatMode = RepeatMode.Restart
-        ),
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(10000, easing = { it }),
+                repeatMode = RepeatMode.Restart,
+            ),
     )
     val songProgress by remember(queue.currentIndex, state.time) {
         derivedStateOf {
             file?.duration?.let { duration ->
                 if (duration > 0) {
                     state.time.toFloat() / duration
-                } else 0f
+                } else {
+                    0f
+                }
             } ?: 0f
         }
     }
     val animatedProgress by animateFloatAsState(
         songProgress,
-        ProgressIndicatorDefaults.ProgressAnimationSpec
+        ProgressIndicatorDefaults.ProgressAnimationSpec,
     )
     val progressIndicatorColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.3f)
-    Row(modifier
-        .drawBehind {
-            drawRect(
-                color = progressIndicatorColor.copy(alpha = 0.4f),
-                size = this.size.copy(width = size.width * animatedProgress),
-                alpha = 0.5f
-            )
-        }
-        .clickable(onClick = onExpand, enabled = enabled)
-        .fillMaxWidth()
-        .padding(12.dp),
+    Row(
+        modifier
+            .drawBehind {
+                drawRect(
+                    color = progressIndicatorColor.copy(alpha = 0.4f),
+                    size = this.size.copy(width = size.width * animatedProgress),
+                    alpha = 0.5f,
+                )
+            }.clickable(onClick = onExpand, enabled = enabled)
+            .fillMaxWidth()
+            .padding(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
             model = file?.coverPath,
@@ -112,7 +115,7 @@ fun SmallPlayerScreen(
             },
             onError = {
                 onImageLoad(null)
-            }
+            },
         )
         AnimatedContent(
             queue.currentIndex,
@@ -123,20 +126,20 @@ fun SmallPlayerScreen(
         ) { index ->
             Column(
                 Modifier.padding(vertical = 4.dp).fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     queue.songs.getOrNull(index)?.title ?: "No song playing",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
                 Text(
                     queue.songs.getOrNull(index)?.artist ?: "Unknown artist",
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.7f)
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.7f),
                 )
             }
         }
@@ -146,30 +149,32 @@ fun SmallPlayerScreen(
                     Image(
                         rememberAnimatedVectorPainter(
                             AnimatedImageVector.animatedVectorResource(R.drawable.play_to_pause_animation),
-                            state.playState == PlayState.PLAYING
+                            state.playState == PlayState.PLAYING,
                         ),
                         null,
                         Modifier.size(IconButtonDefaults.mediumIconSize),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primaryContainer)
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primaryContainer),
                     )
                 },
                 size = IconButtonDefaults.mediumIconSize,
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    contentColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-                enabled = enabled
+                colors =
+                    IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        contentColor = MaterialTheme.colorScheme.primaryContainer,
+                    ),
+                enabled = enabled,
             ) {
                 onPlayerEvent(PlayerEvent.PauseResume)
             }
             ExpressiveIconButton(
                 Icons.Default.SkipNext,
                 size = IconButtonDefaults.mediumIconSize,
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(.3f),
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                enabled = enabled
+                colors =
+                    IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surface.copy(.3f),
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ),
+                enabled = enabled,
             ) {
                 onPlayerEvent(PlayerEvent.Next)
             }

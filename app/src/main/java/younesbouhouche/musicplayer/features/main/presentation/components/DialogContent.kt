@@ -16,19 +16,19 @@ import androidx.compose.ui.unit.dp
 fun DialogContent(
     modifier: Modifier = Modifier,
     title: String? = null,
-    content: @Composable ColumnScope.() -> Unit = { }
+    content: @Composable ColumnScope.() -> Unit = { },
 ) {
     Column(
         modifier = modifier.padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         title?.let {
             Text(
                 text = it,
                 style = MaterialTheme.typography.headlineSmall,
                 color = AlertDialogDefaults.titleContentColor,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp),
             )
         }
         content()

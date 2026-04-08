@@ -22,43 +22,57 @@ import androidx.compose.ui.unit.dp
 import kotlin.collections.forEachIndexed
 
 @Composable
-fun <T>VerticalSegmentedButtons(
+fun <T> VerticalSegmentedButtons(
     items: List<T>,
     selected: T,
     onItemClick: (T) -> Unit,
     modifier: Modifier = Modifier,
-    itemContent: @Composable RowScope.(T, Boolean) -> Unit
+    itemContent: @Composable RowScope.(T, Boolean) -> Unit,
 ) {
     val colors = SegmentedButtonDefaults.colors()
-    Column(modifier.fillMaxWidth().clip(MaterialTheme.shapes.extraLarge).border(1.dp,
-        MaterialTheme.colorScheme.outline, MaterialTheme.shapes.extraLarge)) {
+    Column(
+        modifier.fillMaxWidth().clip(MaterialTheme.shapes.extraLarge).border(
+            1.dp,
+            MaterialTheme.colorScheme.outline,
+            MaterialTheme.shapes.extraLarge,
+        ),
+    ) {
         items.forEachIndexed { index, item ->
             val active = item == selected
             Surface(
                 color =
-                if (active) colors.activeContainerColor
-                else colors.inactiveContainerColor,
+                    if (active) {
+                        colors.activeContainerColor
+                    } else {
+                        colors.inactiveContainerColor
+                    },
                 contentColor =
-                if (active) colors.activeContentColor
-                else colors.inactiveContentColor
+                    if (active) {
+                        colors.activeContentColor
+                    } else {
+                        colors.inactiveContentColor
+                    },
             ) {
                 Row(
                     Modifier
                         .background(
-                            if (active) colors.activeContainerColor
-                            else colors.inactiveContainerColor
-                        )
-                        .fillMaxWidth()
+                            if (active) {
+                                colors.activeContainerColor
+                            } else {
+                                colors.inactiveContainerColor
+                            },
+                        ).fillMaxWidth()
                         .clickable {
                             onItemClick(item)
-                        }
-                        .padding(20.dp),
+                        }.padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
                 ) {
-                    ProvideTextStyle(MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.Medium
-                    )) {
+                    ProvideTextStyle(
+                        MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Medium,
+                        ),
+                    ) {
                         itemContent(item, active)
                     }
                 }

@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.core.presentation.util.stateInVM
-import younesbouhouche.musicplayer.features.main.domain.use_cases.GetPlaylistUseCase
-import younesbouhouche.musicplayer.features.main.domain.use_cases.SetPlaylistSongsUseCase
+import younesbouhouche.musicplayer.features.main.domain.usecases.GetPlaylistUseCase
+import younesbouhouche.musicplayer.features.main.domain.usecases.SetPlaylistSongsUseCase
 import younesbouhouche.musicplayer.features.main.presentation.util.PlaylistSortType
 import younesbouhouche.musicplayer.features.main.presentation.util.SortState
 import younesbouhouche.musicplayer.features.main.presentation.viewmodel.MainViewModel
@@ -20,19 +20,20 @@ class PlaylistViewModel(
     val mainViewModel: MainViewModel,
     getPlaylistUseCase: GetPlaylistUseCase,
     val setPlaylistSongsUseCase: SetPlaylistSongsUseCase,
-    playlistId: Long
-): ViewModel() {
+    playlistId: Long,
+) : ViewModel() {
     private val _sortState = MutableStateFlow(SortState(PlaylistSortType.Custom))
     val sortState = _sortState.asStateFlow()
     private val _playlist = getPlaylistUseCase(playlistId)
-    val playlist = combine(_playlist, _sortState) { playlist, sortState ->
-        playlist.copy(songs = playlist.songs.sortBy(sortState.sortType, sortState.ascending))
-    }.stateInVM(Playlist(id = playlistId), viewModelScope)
+    val playlist =
+        combine(_playlist, _sortState) { playlist, sortState ->
+            playlist.copy(songs = playlist.songs.sortBy(sortState.sortType, sortState.ascending))
+        }.stateInVM(Playlist(id = playlistId), viewModelScope)
 
     fun play(
         tracks: List<Long>,
         index: Int = 0,
-        shuffle: Boolean = false
+        shuffle: Boolean = false,
     ) = mainViewModel.play(tracks, index, shuffle)
 
     fun setSortState(sortState: SortState<PlaylistSortType>) {

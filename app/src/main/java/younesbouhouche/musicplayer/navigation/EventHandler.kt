@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import younesbouhouche.musicplayer.core.data.worker.MusicLibraryWorker
 import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.features.main.presentation.util.Event
 import younesbouhouche.musicplayer.features.main.presentation.util.composables.CollectEvents
@@ -17,7 +18,6 @@ import younesbouhouche.musicplayer.features.main.presentation.util.createTempFil
 import younesbouhouche.musicplayer.features.main.presentation.util.parsePlaylistFile
 import younesbouhouche.musicplayer.features.main.presentation.util.shareFile
 import younesbouhouche.musicplayer.features.permissions.presentation.Permissions
-import younesbouhouche.musicplayer.core.data.worker.MusicLibraryWorker
 
 @Composable
 fun EventHandler(
@@ -89,7 +89,7 @@ fun EventHandler(
                         arrayOf(
                             Permissions.AUDIO.permission,
                             Permissions.NOTIFICATIONS.permission,
-                        )
+                        ),
                     )
                 }
             }
@@ -101,9 +101,9 @@ fun EventHandler(
                 context.shareFile(
                     context.createTempFile(
                         "${event.playlist.name}.m3u",
-                        event.playlist.createM3UContent()
+                        event.playlist.createM3UContent(),
                     ),
-                    "audio/x-mpegurl"
+                    "audio/x-mpegurl",
                 )
             }
             Event.LaunchPlaylistDialog -> {
@@ -111,8 +111,8 @@ fun EventHandler(
                     arrayOf(
                         "audio/x-mpegurl",
                         "audio/x-scpls",
-                        "text/plain"
-                    )
+                        "text/plain",
+                    ),
                 )
             }
 
@@ -123,13 +123,15 @@ fun EventHandler(
             is Event.RequestWritePermission -> {
                 try {
                     val uris = listOf(event.uri)
-                    val intentSender = MediaStore.createWriteRequest(
-                        context.contentResolver,
-                        uris
-                    ).intentSender
+                    val intentSender =
+                        MediaStore
+                            .createWriteRequest(
+                                context.contentResolver,
+                                uris,
+                            ).intentSender
                     pendingWriteAction = event.onGranted
                     writePermissionLauncher.launch(
-                        IntentSenderRequest.Builder(intentSender).build()
+                        IntentSenderRequest.Builder(intentSender).build(),
                     )
                 } catch (e: Exception) {
                     e.printStackTrace()

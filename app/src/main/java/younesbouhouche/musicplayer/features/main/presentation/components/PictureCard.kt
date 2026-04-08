@@ -45,21 +45,22 @@ fun PictureCard(
     alternatives: List<Any?> = emptyList(),
     shape: Shape = MaterialTheme.shapes.extraLarge,
     contentPadding: PaddingValues = PaddingValues(16.dp),
-    content: @Composable BoxScope.() -> Unit
+    content: @Composable BoxScope.() -> Unit,
 ) {
     val palette = rememberPaletteState()
     val scope = rememberCoroutineScope()
     AppTheme(palette) {
         Card(
             shape = shape,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             modifier = modifier,
         ) {
             Box(
                 Modifier.fillMaxWidth().aspectRatio(1f),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 picture?.let {
                     Image(
@@ -76,14 +77,14 @@ fun PictureCard(
                         },
                         onError = {
                             palette.reset()
-                        }
+                        },
                     )
                 } ?: alternatives.takeIf { it.isNotEmpty() }?.let { alts ->
                     ImagesGrid(
                         images = alts,
                         icon = icon,
                         modifier = Modifier.fillMaxSize().padding(16.dp),
-                        itemIcon = Icons.Default.MusicNote
+                        itemIcon = Icons.Default.MusicNote,
                     )
                 } ?: Icon(
                     icon,
@@ -98,18 +99,17 @@ fun PictureCard(
                         .background(
                             Brush.verticalGradient(
                                 0f to Color.Transparent,
-                                .75f to MaterialTheme.colorScheme.secondaryContainer.copy(alpha = .8f)
-                            )
-                        )
-                        .padding(contentPadding),
+                                .75f to MaterialTheme.colorScheme.secondaryContainer.copy(alpha = .8f),
+                            ),
+                        ).padding(contentPadding),
                 ) {
                     ProvideTextStyle(
                         topAppBarTitleFont.copy(
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
                             fontWeight = FontWeight.Bold,
                             fontStyle = FontStyle.Italic,
-                            fontSize = 16.sp
-                        )
+                            fontSize = 16.sp,
+                        ),
                     ) {
                         content()
                     }
@@ -130,31 +130,33 @@ internal fun ImagesGrid(
 
     Box(modifier = modifier) {
         when (imgs.size) {
-            0 -> Icon(
-                icon,
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(.5f).align(Alignment.Center),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            1 -> Image(
-                imgs[0],
-                itemIcon,
-                Modifier.fillMaxSize()
-            )
+            0 ->
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(.5f).align(Alignment.Center),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            1 ->
+                Image(
+                    imgs[0],
+                    itemIcon,
+                    Modifier.fillMaxSize(),
+                )
             2 -> {
                 Image(
                     imgs[0],
                     itemIcon,
                     Modifier
                         .fillMaxSize(.65f)
-                        .align(Alignment.TopStart)
+                        .align(Alignment.TopStart),
                 )
                 Image(
                     imgs[1],
                     itemIcon,
                     Modifier
                         .fillMaxSize(.65f)
-                        .align(Alignment.BottomEnd)
+                        .align(Alignment.BottomEnd),
                 )
             }
             3 -> {
@@ -163,21 +165,21 @@ internal fun ImagesGrid(
                     itemIcon,
                     Modifier
                         .fillMaxSize(.6f)
-                        .align(Alignment.TopStart)
+                        .align(Alignment.TopStart),
                 )
                 Image(
                     imgs[1],
                     itemIcon,
                     Modifier
                         .fillMaxSize(.45f)
-                        .align(Alignment.TopEnd)
+                        .align(Alignment.TopEnd),
                 )
                 Image(
                     imgs[2],
                     itemIcon,
                     Modifier
                         .fillMaxSize(.45f)
-                        .align(Alignment.BottomCenter)
+                        .align(Alignment.BottomCenter),
                 )
             }
             else -> {
@@ -187,28 +189,28 @@ internal fun ImagesGrid(
                     itemIcon,
                     Modifier
                         .fillMaxSize(.48f)
-                        .align(Alignment.TopStart)
+                        .align(Alignment.TopStart),
                 )
                 Image(
                     imgs[1],
                     itemIcon,
                     Modifier
                         .fillMaxSize(.48f)
-                        .align(Alignment.TopEnd)
+                        .align(Alignment.TopEnd),
                 )
                 Image(
                     imgs[2],
                     itemIcon,
                     Modifier
                         .fillMaxSize(.48f)
-                        .align(Alignment.BottomStart)
+                        .align(Alignment.BottomStart),
                 )
                 Image(
                     imgs[3],
                     itemIcon,
                     Modifier
                         .fillMaxSize(.48f)
-                        .align(Alignment.BottomEnd)
+                        .align(Alignment.BottomEnd),
                 )
             }
         }

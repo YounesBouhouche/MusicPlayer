@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -41,9 +40,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.glance.appwidget.lazy.items
 import com.younesb.mydesignsystem.presentation.components.ToggleButtonsRow
+import com.younesb.mydesignsystem.presentation.util.plus
 import org.koin.compose.viewmodel.koinViewModel
 import younesbouhouche.musicplayer.R
-import com.younesb.mydesignsystem.presentation.util.plus
 import younesbouhouche.musicplayer.core.domain.models.preferences.ColorScheme
 import younesbouhouche.musicplayer.core.domain.models.preferences.Theme
 import younesbouhouche.musicplayer.features.settings.presentation.components.SettingsItem
@@ -56,101 +55,109 @@ import younesbouhouche.musicplayer.features.settings.presentation.util.SettingDa
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ThemeSettingsScreen(
-    modifier: Modifier = Modifier,
-) {
+fun ThemeSettingsScreen(modifier: Modifier = Modifier) {
     val viewModel = koinViewModel<ThemeViewModel>()
     val isCompatible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val theme by viewModel.theme.collectAsState()
-    val isDark = theme == Theme.DARK ||
+    val isDark =
+        theme == Theme.DARK ||
             ((theme == Theme.SYSTEM) && (isSystemInDarkTheme()))
     val colorTheme by viewModel.colorScheme.collectAsState()
     val extraDark by viewModel.extraDark.collectAsState()
     val dynamicColors by viewModel.dynamicColors.collectAsState()
     val context = LocalContext.current
-    val settings = listOf(
-        Category(
-            name = R.string.theme,
-            items =  listOf(
-                SettingData(
-                    headline = R.string.app_theme,
-                    bottomContent = {
-                        Row(
-                            Modifier.fillMaxWidth().padding(bottom = 12.dp)
-                        ) {
-                            ToggleButtonsRow(
-                                checked = { Theme.entries[it] == theme },
-                                count = Theme.entries.size,
-                                icon = {
-                                    Theme.entries[it].icon
-                                },
-                                text = {
-                                    stringResource(Theme.entries[it].label)
-                                },
-                                outlined = { true },
-                                modifier = Modifier.padding(horizontal = 12.dp),
-                                size = ButtonDefaults.ExtraSmallContainerHeight,
-                                expandedWeight = 1.4f,
-                                buttonContentPadding = PaddingValues(vertical = 12.dp)
-                            ) { it, _ ->
-                                viewModel.saveSettings(theme = Theme.entries[it])
-                            }
-                        }
-                    }
-                ),
-                SettingData(
-                    headline = R.string.black_theme,
-                    supporting = R.string.extra_dark_description,
-                    enabled = isDark,
-                    checked = Checked(false, extraDark) {
-                        viewModel.saveSettings(extraDark = it)
-                    }
-                ) {
-                    viewModel.saveSettings(extraDark = !extraDark)
-                },
-                SettingData(
-                    headline = R.string.color_palette,
-                    supporting = R.string.color_palette_desc,
-                    bottomContent = {
-                        LazyRow(
-                            Modifier.fillMaxWidth(),
-                            contentPadding = PaddingValues(
-                                bottom = 16.dp,
-                                start = 16.dp,
-                                end = 16.dp,
-                            ),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            if (isCompatible)
-                                item {
-                                    ColorPreview(
-                                        if (isDark) dynamicDarkColorScheme(context)
-                                        else dynamicLightColorScheme(context),
-                                        selected = dynamicColors,
-                                    ) {
-                                        viewModel.saveSettings(dynamic = true, color = null)
+    val settings =
+        listOf(
+            Category(
+                name = R.string.theme,
+                items =
+                    listOf(
+                        SettingData(
+                            headline = R.string.app_theme,
+                            bottomContent = {
+                                Row(
+                                    Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                                ) {
+                                    ToggleButtonsRow(
+                                        checked = { Theme.entries[it] == theme },
+                                        count = Theme.entries.size,
+                                        icon = {
+                                            Theme.entries[it].icon
+                                        },
+                                        text = {
+                                            stringResource(Theme.entries[it].label)
+                                        },
+                                        outlined = { true },
+                                        modifier = Modifier.padding(horizontal = 12.dp),
+                                        size = ButtonDefaults.ExtraSmallContainerHeight,
+                                        expandedWeight = 1.4f,
+                                        buttonContentPadding = PaddingValues(vertical = 12.dp),
+                                    ) { it, _ ->
+                                        viewModel.saveSettings(theme = Theme.entries[it])
                                     }
                                 }
-                            items(ColorScheme.entries) {
-                                ColorPreview(
-                                    it.scheme(isDark),
-                                    selected = !dynamicColors and (colorTheme == it),
+                            },
+                        ),
+                        SettingData(
+                            headline = R.string.black_theme,
+                            supporting = R.string.extra_dark_description,
+                            enabled = isDark,
+                            checked =
+                                Checked(false, extraDark) {
+                                    viewModel.saveSettings(extraDark = it)
+                                },
+                        ) {
+                            viewModel.saveSettings(extraDark = !extraDark)
+                        },
+                        SettingData(
+                            headline = R.string.color_palette,
+                            supporting = R.string.color_palette_desc,
+                            bottomContent = {
+                                LazyRow(
+                                    Modifier.fillMaxWidth(),
+                                    contentPadding =
+                                        PaddingValues(
+                                            bottom = 16.dp,
+                                            start = 16.dp,
+                                            end = 16.dp,
+                                        ),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 ) {
-                                    viewModel.saveSettings(
-                                        color = it, dynamic = false.takeIf { isCompatible }
-                                    )
+                                    if (isCompatible) {
+                                        item {
+                                            ColorPreview(
+                                                if (isDark) {
+                                                    dynamicDarkColorScheme(context)
+                                                } else {
+                                                    dynamicLightColorScheme(context)
+                                                },
+                                                selected = dynamicColors,
+                                            ) {
+                                                viewModel.saveSettings(dynamic = true, color = null)
+                                            }
+                                        }
+                                    }
+                                    items(ColorScheme.entries) {
+                                        ColorPreview(
+                                            it.scheme(isDark),
+                                            selected = !dynamicColors and (colorTheme == it),
+                                        ) {
+                                            viewModel.saveSettings(
+                                                color = it,
+                                                dynamic = false.takeIf { isCompatible },
+                                            )
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    }
-                )
-            )
-        ),
-    )
+                            },
+                        ),
+                    ),
+            ),
+        )
     SettingsScreen(
         title = stringResource(R.string.theme_settings),
         icon = Icons.Default.Palette,
-        modifier = modifier
+        modifier = modifier,
     ) {
         items(settings) {
             SettingsList(it.name) {
@@ -165,8 +172,6 @@ fun ThemeSettingsScreen(
     }
 }
 
-
-
 @Composable
 internal fun ColorPreview(
     scheme: androidx.compose.material3.ColorScheme,
@@ -177,7 +182,7 @@ internal fun ColorPreview(
     onClick: () -> Unit = {},
 ) {
     val color by animateColorAsState(
-        if (selected) borderColor else Color.Transparent
+        if (selected) borderColor else Color.Transparent,
     )
     Surface(
         modifier
@@ -186,47 +191,52 @@ internal fun ColorPreview(
             .clickable(onClick = onClick),
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainer,
-        border = BorderStroke(
-            2.dp,
-            if (selected) MaterialTheme.colorScheme.primary
-            else MaterialTheme.colorScheme.outline
-        ),
+        border =
+            BorderStroke(
+                2.dp,
+                if (selected) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.outline
+                },
+            ),
     ) {
         Box(
             Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Box(
-                modifier = Modifier
-                    .size(size / 1.5f)
-                    .border(3.dp, color, CircleShape)
-                    .padding(6.dp),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .size(size / 1.5f)
+                        .border(3.dp, color, CircleShape)
+                        .padding(6.dp),
+                contentAlignment = Alignment.Center,
             ) {
                 Column(
                     Modifier
                         .fillMaxSize()
-                        .clip(CircleShape)
+                        .clip(CircleShape),
                 ) {
                     repeat(2) { i ->
                         Row(
                             Modifier
                                 .fillMaxSize()
-                                .weight(1f)
+                                .weight(1f),
                         ) {
                             repeat(2) { j ->
                                 Surface(
                                     Modifier
                                         .fillMaxSize()
                                         .weight(1f),
-                                    color = when (i * 2 + j) {
-                                        0 -> scheme.primary
-                                        1 -> scheme.secondary
-                                        2 -> scheme.tertiary
-                                        else -> scheme.surface
-                                    }
+                                    color =
+                                        when (i * 2 + j) {
+                                            0 -> scheme.primary
+                                            1 -> scheme.secondary
+                                            2 -> scheme.tertiary
+                                            else -> scheme.surface
+                                        },
                                 ) {
-
                                 }
                             }
                         }

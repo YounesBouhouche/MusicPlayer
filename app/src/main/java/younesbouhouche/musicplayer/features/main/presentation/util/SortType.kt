@@ -19,7 +19,6 @@ import younesbouhouche.musicplayer.features.main.util.getSizeRange
 import younesbouhouche.musicplayer.features.main.util.toReadableDate
 import younesbouhouche.musicplayer.features.main.util.toReadableDurationString
 
-
 enum class SortType(
     val label: Int,
     val icon: ImageVector,
@@ -85,5 +84,5 @@ enum class SortType(
         Icons.Default.Numbers,
         { it.sortedBy { item -> item.discNumber ?: 0 } },
         { item -> item.discNumber?.toString() ?: "Unknown" },
-    );
+    ),
 }

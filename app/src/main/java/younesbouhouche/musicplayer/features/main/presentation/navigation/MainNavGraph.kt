@@ -20,7 +20,7 @@ import younesbouhouche.musicplayer.features.main.presentation.routes.artist.Arti
 import younesbouhouche.musicplayer.features.main.presentation.routes.artist.ArtistsScreen
 import younesbouhouche.musicplayer.features.main.presentation.routes.home.HomeRoute
 import younesbouhouche.musicplayer.features.main.presentation.routes.library.LibraryScreen
-import younesbouhouche.musicplayer.features.main.presentation.routes.metadata_editor.MetadataEditorScreen
+import younesbouhouche.musicplayer.features.main.presentation.routes.metadataeditor.MetadataEditorScreen
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.AddToPlaylistContent
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.CreatePlaylistContent
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.PlaylistScreen
@@ -41,125 +41,126 @@ fun MainNavGraph(
         modifier = modifier,
         transitionSpec = {
             materialSharedAxisYIn(true, 100) togetherWith
-                    materialSharedAxisYOut(false, 100)
+                materialSharedAxisYOut(false, 100)
         },
         popTransitionSpec = {
             materialSharedAxisYIn(true, 100) togetherWith
-                    materialSharedAxisYOut(false, 100)
+                materialSharedAxisYOut(false, 100)
         },
         predictivePopTransitionSpec = {
             materialSharedAxisYIn(true, 100) togetherWith
-                    materialSharedAxisYOut(false, 100)
+                materialSharedAxisYOut(false, 100)
         },
         sceneStrategies = sceneStrategy,
-        entries = navigationState.toEntries(
-            entryProvider {
-                entry<MainNavRoute.Home> {
-                    HomeRoute(
-                        bottomPadding = bottomPadding,
-                        onArtistClick = { artist ->
-                            navigator.navigate(MainNavRoute.Artist(artist.name))
-                        },
-                        modifier = screenModifier,
-                        navigateTo = navigator::navigate
-                    )
-                }
-                entry<MainNavRoute.Albums> {
-                    AlbumsScreen(
-                        bottomPadding = bottomPadding,
-                        modifier = screenModifier
-                    ) { album ->
-                        navigator.navigate(MainNavRoute.Album(album.name))
+        entries =
+            navigationState.toEntries(
+                entryProvider {
+                    entry<MainNavRoute.Home> {
+                        HomeRoute(
+                            bottomPadding = bottomPadding,
+                            onArtistClick = { artist ->
+                                navigator.navigate(MainNavRoute.Artist(artist.name))
+                            },
+                            modifier = screenModifier,
+                            navigateTo = navigator::navigate,
+                        )
                     }
-                }
-                entry<MainNavRoute.Album> { album ->
-                    AlbumScreen(
-                        album.name,
-                        bottomPadding = bottomPadding
-                    ) {
-                        navigator.navigate(MainNavRoute.SongInfo(it.id))
-                    }
-                }
-                entry<MainNavRoute.Artists> {
-                    ArtistsScreen(
-                        bottomPadding = bottomPadding,
-                        modifier = screenModifier
-                    ) { album ->
-                        navigator.navigate(MainNavRoute.Artist(album.name))
-                    }
-                }
-                entry<MainNavRoute.Artist> { artist ->
-                    ArtistScreen(
-                        artist.name,
-                        bottomPadding = bottomPadding
-                    ) {
-                        navigator.navigate(MainNavRoute.SongInfo(it.id))
-                    }
-                }
-                entry<MainNavRoute.Playlists> {
-                    PlaylistsScreen(
-                        bottomPadding = bottomPadding,
-                        modifier = screenModifier,
-                        onCreatePlaylist = {
-                            navigator.navigate(MainNavRoute.CreatePlaylist)
+                    entry<MainNavRoute.Albums> {
+                        AlbumsScreen(
+                            bottomPadding = bottomPadding,
+                            modifier = screenModifier,
+                        ) { album ->
+                            navigator.navigate(MainNavRoute.Album(album.name))
                         }
-                    ) { playlist ->
-                        navigator.navigate(MainNavRoute.Playlist(playlist.id))
                     }
-                }
-                entry<MainNavRoute.Playlist> { playlist ->
-                    PlaylistScreen(
-                        playlist.id,
-                        bottomPadding = bottomPadding
-                    ) {
-                        navigator.navigate(MainNavRoute.SongInfo(it.id))
-                    }
-                }
-                entry<MainNavRoute.CreatePlaylist> (
-                    metadata = SceneStrategy.dialog()
-                ) {
-                    CreatePlaylistContent {
-                        navigator.goBack()
-                    }
-                }
-                entry<MainNavRoute.AddToPlaylist> (
-                    metadata = SceneStrategy.bottomSheet()
-                ) {
-                    AddToPlaylistContent(
-                        it.ids,
-                        { navigator.navigate(MainNavRoute.CreatePlaylist) }
-                    ) {
-                        navigator.goBack()
-                    }
-                }
-                entry<MainNavRoute.Library> {
-                    LibraryScreen(
-                        bottomPadding = bottomPadding,
-                        modifier = screenModifier,
-                    ) {
-                        navigator.navigate(MainNavRoute.SongInfo(it))
-                    }
-                }
-                entry<MainNavRoute.SongInfo> (
-                    metadata = SceneStrategy.bottomSheet()
-                ) {
-                    SongInfoContent(
-                        it.songId,
-                        onAddToPlaylist = {
-                            navigator.navigate(MainNavRoute.AddToPlaylist(listOf(it.songId)))
+                    entry<MainNavRoute.Album> { album ->
+                        AlbumScreen(
+                            album.name,
+                            bottomPadding = bottomPadding,
+                        ) {
+                            navigator.navigate(MainNavRoute.SongInfo(it.id))
                         }
-                    ) {
-                        navigator.goBack()
-                        navigator.navigate(MainNavRoute.MetadataEditor(it.songId))
                     }
-                }
-                entry<MainNavRoute.MetadataEditor>(
-                    metadata = SceneStrategy.fullScreenDialog()
-                ) {
-                    MetadataEditorScreen(it.songId, onBack = navigator::goBack)
-                }
-            }
-        ),
+                    entry<MainNavRoute.Artists> {
+                        ArtistsScreen(
+                            bottomPadding = bottomPadding,
+                            modifier = screenModifier,
+                        ) { album ->
+                            navigator.navigate(MainNavRoute.Artist(album.name))
+                        }
+                    }
+                    entry<MainNavRoute.Artist> { artist ->
+                        ArtistScreen(
+                            artist.name,
+                            bottomPadding = bottomPadding,
+                        ) {
+                            navigator.navigate(MainNavRoute.SongInfo(it.id))
+                        }
+                    }
+                    entry<MainNavRoute.Playlists> {
+                        PlaylistsScreen(
+                            bottomPadding = bottomPadding,
+                            modifier = screenModifier,
+                            onCreatePlaylist = {
+                                navigator.navigate(MainNavRoute.CreatePlaylist)
+                            },
+                        ) { playlist ->
+                            navigator.navigate(MainNavRoute.Playlist(playlist.id))
+                        }
+                    }
+                    entry<MainNavRoute.Playlist> { playlist ->
+                        PlaylistScreen(
+                            playlist.id,
+                            bottomPadding = bottomPadding,
+                        ) {
+                            navigator.navigate(MainNavRoute.SongInfo(it.id))
+                        }
+                    }
+                    entry<MainNavRoute.CreatePlaylist> (
+                        metadata = SceneStrategy.dialog(),
+                    ) {
+                        CreatePlaylistContent {
+                            navigator.goBack()
+                        }
+                    }
+                    entry<MainNavRoute.AddToPlaylist> (
+                        metadata = SceneStrategy.bottomSheet(),
+                    ) {
+                        AddToPlaylistContent(
+                            it.ids,
+                            { navigator.navigate(MainNavRoute.CreatePlaylist) },
+                        ) {
+                            navigator.goBack()
+                        }
+                    }
+                    entry<MainNavRoute.Library> {
+                        LibraryScreen(
+                            bottomPadding = bottomPadding,
+                            modifier = screenModifier,
+                        ) {
+                            navigator.navigate(MainNavRoute.SongInfo(it))
+                        }
+                    }
+                    entry<MainNavRoute.SongInfo> (
+                        metadata = SceneStrategy.bottomSheet(),
+                    ) {
+                        SongInfoContent(
+                            it.songId,
+                            onAddToPlaylist = {
+                                navigator.navigate(MainNavRoute.AddToPlaylist(listOf(it.songId)))
+                            },
+                        ) {
+                            navigator.goBack()
+                            navigator.navigate(MainNavRoute.MetadataEditor(it.songId))
+                        }
+                    }
+                    entry<MainNavRoute.MetadataEditor>(
+                        metadata = SceneStrategy.fullScreenDialog(),
+                    ) {
+                        MetadataEditorScreen(it.songId, onBack = navigator::goBack)
+                    }
+                },
+            ),
         onBack = navigator::goBack,
     )
 }

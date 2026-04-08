@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import younesbouhouche.musicplayer.core.data.database.dao.AlbumsDao
 import younesbouhouche.musicplayer.core.data.database.dao.ArtistsDao
 import younesbouhouche.musicplayer.core.data.database.dao.PlayHistoryDao
@@ -30,7 +29,6 @@ import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.core.domain.models.Playlist
 import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.core.domain.repositories.MusicRepository
-import younesbouhouche.musicplayer.features.main.domain.models.LoadingState
 
 class MusicRepositoryImpl(
     val songsDao: SongsDao,
@@ -39,8 +37,8 @@ class MusicRepositoryImpl(
     val playlistDao: PlaylistDao,
     val playHistoryDao: PlayHistoryDao,
     val mediaStoreScanner: MediaStoreScanner,
-    val artistsPictureFetcher: ArtistsPictureFetcher
-): MusicRepository {
+    val artistsPictureFetcher: ArtistsPictureFetcher,
+) : MusicRepository {
     private val _loadingState = MutableStateFlow(false)
     private val _songsState = MutableStateFlow<List<Song>>(emptyList())
     private val _albumsState = MutableStateFlow<List<Album>>(emptyList())
@@ -57,16 +55,18 @@ class MusicRepositoryImpl(
 
         coroutineScope {
             _loadingState.value = true
-            val library = async {
-                mediaStoreScanner.scanMediaLibrary()
-            }
+            val library =
+                async {
+                    mediaStoreScanner.scanMediaLibrary()
+                }
 
             launch(Dispatchers.Default) {
                 launch {
                     _songsState.value = library.await().songs.map { it.toSong() }
-                    val songsWithCovers = async(Dispatchers.Default) {
-                        mediaStoreScanner.fetchSongsCover(library.await().songs)
-                    }
+                    val songsWithCovers =
+                        async(Dispatchers.Default) {
+                            mediaStoreScanner.fetchSongsCover(library.await().songs)
+                        }
                     launch(Dispatchers.Default) {
                         _songsState.value = songsWithCovers.await().map { it.toSong() }
                     }
@@ -74,9 +74,10 @@ class MusicRepositoryImpl(
                         songsDao.clearSongs()
                         songsDao.upsertSongs(songsWithCovers.await())
                     }
-                    val albums = async {
-                        mediaStoreScanner.fetchAlbums(songsWithCovers.await())
-                    }
+                    val albums =
+                        async {
+                            mediaStoreScanner.fetchAlbums(songsWithCovers.await())
+                        }
                     launch(Dispatchers.Default) {
                         _albumsState.value = albums.await().map { it.toAlbum() }
                     }
@@ -89,9 +90,10 @@ class MusicRepositoryImpl(
                     launch(Dispatchers.Default) {
                         _artistsState.value = library.await().artists.map { it.toArtist() }
                     }
-                    val artistsWithPictures = async(Dispatchers.Default) {
-                        artistsPictureFetcher(library.await().artists)
-                    }
+                    val artistsWithPictures =
+                        async(Dispatchers.Default) {
+                            artistsPictureFetcher(library.await().artists)
+                        }
                     launch(Dispatchers.Default) {
                         _artistsState.value = artistsWithPictures.await().map { it.toArtist() }
                     }
@@ -101,9 +103,10 @@ class MusicRepositoryImpl(
             }
 
             launch {
-                val playlists = async(Dispatchers.Default) {
-                    playlistDao.getPlaylists()
-                }
+                val playlists =
+                    async(Dispatchers.Default) {
+                        playlistDao.getPlaylists()
+                    }
                 _playlistsState.value = playlists.await().first().map { it.toPlaylist() }
             }
         }.invokeOnCompletion {
@@ -113,7 +116,10 @@ class MusicRepositoryImpl(
 
     override fun getLoadingState(): StateFlow<Boolean> = state
 
-    override suspend fun setFavoriteSong(songId: Long, isFavorite: Boolean) {
+    override suspend fun setFavoriteSong(
+        songId: Long,
+        isFavorite: Boolean,
+    ) {
         songsDao.setSongFavoriteStatus(songId, isFavorite)
         _songsState.update { songs ->
             songs.map { song ->
@@ -139,83 +145,67 @@ class MusicRepositoryImpl(
         }
     }
 
-    override fun getSongsList(): Flow<List<Song>> {
-        return _songsState.asStateFlow()
-    }
+    override fun getSongsList(): Flow<List<Song>> = _songsState.asStateFlow()
 
-    override fun observeSong(id: Long): Flow<Song?> {
-        return _songsState.map { songs -> songs.firstOrNull { it.id == id } }
-    }
+    override fun observeSong(id: Long): Flow<Song?> = _songsState.map { songs -> songs.firstOrNull { it.id == id } }
 
-    override suspend fun getSong(id: Long): Song? {
-        return _songsState.value.firstOrNull { it.id == id }
-    }
+    override suspend fun getSong(id: Long): Song? = _songsState.value.firstOrNull { it.id == id }
 
     override suspend fun getSongs(ids: List<Long>): List<Song> {
         val songsMap = _songsState.value.associateBy { it.id }
         return ids.mapNotNull { id -> songsMap[id] }
     }
 
-    override fun getRecentlyPlayedSongs(): Flow<List<Song>> {
-        return _songsState.map { songs ->
+    override fun getRecentlyPlayedSongs(): Flow<List<Song>> =
+        _songsState.map { songs ->
             songs.sortedByDescending { it.playHistory.size }
         }
-    }
 
-    override fun getLastAddedSongs(): Flow<List<Song>> {
-        return _songsState.map { songs ->
+    override fun getLastAddedSongs(): Flow<List<Song>> =
+        _songsState.map { songs ->
             songs.sortedByDescending { it.date }
         }
-    }
 
-    override fun getRecentAlbums(): Flow<List<Album>> {
-        return getRecentlyPlayedSongs().map { songs ->
+    override fun getRecentAlbums(): Flow<List<Album>> =
+        getRecentlyPlayedSongs().map { songs ->
             val albumsByName = _albumsState.value.associateBy { it.name }
             val albumPlayCounts = songs.groupingBy { it.album }.eachCount()
-            albumPlayCounts.entries.sortedByDescending { it.value }.mapNotNull { entry ->
-                albumsByName[entry.key]
-            }.take(5)
+            albumPlayCounts.entries
+                .sortedByDescending { it.value }
+                .mapNotNull { entry ->
+                    albumsByName[entry.key]
+                }.take(5)
         }
-    }
 
-    override fun getRecentArtists(): Flow<List<Artist>> {
-        return getRecentlyPlayedSongs().map { songs ->
+    override fun getRecentArtists(): Flow<List<Artist>> =
+        getRecentlyPlayedSongs().map { songs ->
             val artistsByName = _artistsState.value.associateBy { it.name }
-            songs.mapNotNull { song -> artistsByName[song.artist] }
+            songs
+                .mapNotNull { song -> artistsByName[song.artist] }
                 .distinctBy { it.name }
                 .take(5)
         }
-    }
 
-    override fun getAlbums(): Flow<List<Album>> {
-        return _albumsState.asStateFlow()
-    }
+    override fun getAlbums(): Flow<List<Album>> = _albumsState.asStateFlow()
 
-    override fun getArtists(): Flow<List<Artist>> {
-        return _artistsState.asStateFlow()
-    }
+    override fun getArtists(): Flow<List<Artist>> = _artistsState.asStateFlow()
 
-    override fun getPlaylists(): Flow<List<Playlist>> {
-        return _playlistsState.asStateFlow()
-    }
+    override fun getPlaylists(): Flow<List<Playlist>> = _playlistsState.asStateFlow()
 
-    override suspend fun getAlbum(name: String): Album {
-        return _albumsState.value.firstOrNull { it.name == name }?.copy(
-            songs = _songsState.value.filter { it.album == name }
+    override suspend fun getAlbum(name: String): Album =
+        _albumsState.value.firstOrNull { it.name == name }?.copy(
+            songs = _songsState.value.filter { it.album == name },
         ) ?: throw NoSuchElementException("Album '$name' not found")
-    }
 
-    override suspend fun getArtist(name: String): Artist {
-        return _artistsState.value.firstOrNull { it.name == name }?.copy(
-            songs = _songsState.value.filter { it.artist == name }
+    override suspend fun getArtist(name: String): Artist =
+        _artistsState.value.firstOrNull { it.name == name }?.copy(
+            songs = _songsState.value.filter { it.artist == name },
         ) ?: throw NoSuchElementException("Artist '$name' not found")
-    }
 
-    override fun getPlaylist(id: Long): Flow<Playlist> {
-        return _playlistsState.mapNotNull { playlists ->
+    override fun getPlaylist(id: Long): Flow<Playlist> =
+        _playlistsState.mapNotNull { playlists ->
             playlists.firstOrNull { it.id == id }
         }
-    }
 
     private suspend fun getFromCache() {
         _songsState.value = songsDao.getSongs().first().map { it.toSong() }

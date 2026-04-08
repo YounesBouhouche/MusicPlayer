@@ -35,11 +35,13 @@ class MainActivity : ComponentActivity() {
                 drawable.start()
 
                 // Remove splash screen after animation completes
-                drawable.registerAnimationCallback(object : Animatable2.AnimationCallback() {
-                    override fun onAnimationEnd(drawable: android.graphics.drawable.Drawable?) {
-                        splashScreenView.remove()
-                    }
-                })
+                drawable.registerAnimationCallback(
+                    object : Animatable2.AnimationCallback() {
+                        override fun onAnimationEnd(drawable: android.graphics.drawable.Drawable?) {
+                            splashScreenView.remove()
+                        }
+                    },
+                )
             } else {
                 // If not an AnimatedVectorDrawable, remove immediately
                 splashScreenView.remove()

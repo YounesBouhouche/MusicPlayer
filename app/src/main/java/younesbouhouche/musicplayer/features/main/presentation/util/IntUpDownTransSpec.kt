@@ -10,25 +10,24 @@ import androidx.compose.animation.togetherWith
 
 val intUpDownTransSpec: AnimatedContentTransitionScope<Int>.() -> ContentTransform = {
     (
-            if (targetState > initialState) {
-                slideInVertically { height -> height } + fadeIn() togetherWith
-                        slideOutVertically { height -> -height } + fadeOut()
-            } else {
-                slideInVertically { height -> -height } + fadeIn() togetherWith
-                        slideOutVertically { height -> height } + fadeOut()
-            }
+        if (targetState > initialState) {
+            slideInVertically { height -> height } + fadeIn() togetherWith
+                slideOutVertically { height -> -height } + fadeOut()
+        } else {
+            slideInVertically { height -> -height } + fadeIn() togetherWith
+                slideOutVertically { height -> height } + fadeOut()
+        }
     )
 }
 
-
 val floatUpDownTransSpec: AnimatedContentTransitionScope<Float>.() -> ContentTransform = {
     (
-            if (targetState > initialState) {
-                slideInVertically { height -> height } + fadeIn() togetherWith
-                        slideOutVertically { height -> -height } + fadeOut()
-            } else {
-                slideInVertically { height -> -height } + fadeIn() togetherWith
-                        slideOutVertically { height -> height } + fadeOut()
-            }
-            )
+        if (targetState > initialState) {
+            slideInVertically { height -> height } + fadeIn() togetherWith
+                slideOutVertically { height -> -height } + fadeOut()
+        } else {
+            slideInVertically { height -> -height } + fadeIn() togetherWith
+                slideOutVertically { height -> height } + fadeOut()
+        }
+    )
 }

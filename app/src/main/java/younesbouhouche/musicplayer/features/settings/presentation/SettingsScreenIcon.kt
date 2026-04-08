@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SettingsScreenIcon(
     icon: ImageVector,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val view = LocalView.current
 
@@ -43,33 +43,35 @@ fun SettingsScreenIcon(
     val appearanceScale by animateFloatAsState(
         targetValue = if (hasAppeared) 1f else 0f,
         animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec(),
-        label = "settingsIconAppearanceScale"
+        label = "settingsIconAppearanceScale",
     )
     val appearanceRotation by animateFloatAsState(
         targetValue = if (hasAppeared) 0f else -180f,
         animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec(),
-        label = "settingsIconAppearanceRotation"
+        label = "settingsIconAppearanceRotation",
     )
 
     var angle by remember { mutableIntStateOf(0) }
     val animatedAngle by animateIntAsState(targetValue = angle, label = "settingsIconTapRotation")
 
     Surface(
-        modifier = modifier
-            .size(140.dp)
-            .graphicsLayer {
-                scaleX = appearanceScale
-                scaleY = appearanceScale
-                rotationZ = appearanceRotation
-            },
+        modifier =
+            modifier
+                .size(140.dp)
+                .graphicsLayer {
+                    scaleX = appearanceScale
+                    scaleY = appearanceScale
+                    rotationZ = appearanceRotation
+                },
         color = MaterialTheme.colorScheme.secondaryContainer,
-        shape = MaterialShapes.Cookie12Sided.toShape(animatedAngle)
+        shape = MaterialShapes.Cookie12Sided.toShape(animatedAngle),
     ) {
         Box(
-            modifier = Modifier.fillMaxSize().clickable {
-                angle += 30
-                view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-            },
+            modifier =
+                Modifier.fillMaxSize().clickable {
+                    angle += 30
+                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                },
             contentAlignment = Alignment.Center,
         ) {
             Icon(

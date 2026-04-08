@@ -34,7 +34,9 @@ import younesbouhouche.musicplayer.core.domain.repositories.QueueRepository
 import younesbouhouche.musicplayer.features.player.domain.models.PlayState
 
 @OptIn(UnstableApi::class)
-class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
+class MediaPlayerService :
+    MediaSessionService(),
+    MediaSession.Callback {
     private val playerFactory by inject<PlayerFactory>()
     private val playerManager by inject<PlayerManager>()
     private val stateManager by inject<PlayerStateManager>()
@@ -47,8 +49,7 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
-        sessionManager.getSession()
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = sessionManager.getSession()
 
     override fun onCreate() {
         super.onCreate()
@@ -60,18 +61,24 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
             withContext(Dispatchers.Main) {
                 val player = playerManager.initialize()
                 commandHandler = CustomCommandHandler(player)
-                player.addListener(object : Player.Listener {
-                    override fun onAvailableCommandsChanged(commands: Player.Commands) {
-                        sessionManager.updateCustomLayout(notificationCustomCmdButtons)
-                    }
-                })
+                player.addListener(
+                    object : Player.Listener {
+                        override fun onAvailableCommandsChanged(commands: Player.Commands) {
+                            sessionManager.updateCustomLayout(notificationCustomCmdButtons)
+                        }
+                    },
+                )
                 sessionManager.createSession(this@MediaPlayerService, player)
                 setMediaNotificationProvider(notificationProvider)
             }
         }
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         if (sessionManager.getSession() == null) {
             notificationProvider.ensureForeground(this)
         }
@@ -100,23 +107,30 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
         session: MediaSession,
         controller: MediaSession.ControllerInfo,
     ): ConnectionResult {
-        val customSessionCommands = ImmutableList.builder<SessionCommand>().apply {
-            NotificationCustomCmdButton.entries.forEach { button ->
-                button.commandButton.sessionCommand?.let { cmd ->
-                    add(cmd)
-                }
-            }
-        }.build()
+        val customSessionCommands =
+            ImmutableList
+                .builder<SessionCommand>()
+                .apply {
+                    NotificationCustomCmdButton.entries.forEach { button ->
+                        button.commandButton.sessionCommand?.let { cmd ->
+                            add(cmd)
+                        }
+                    }
+                }.build()
 
         if (session.isMediaNotificationController(controller)) {
-            val sessionCommands = ConnectionResult.DEFAULT_SESSION_COMMANDS.buildUpon()
-                .addSessionCommands(customSessionCommands)
-                .build()
+            val sessionCommands =
+                ConnectionResult.DEFAULT_SESSION_COMMANDS
+                    .buildUpon()
+                    .addSessionCommands(customSessionCommands)
+                    .build()
 
-            val playerCommands = ConnectionResult.DEFAULT_PLAYER_COMMANDS.buildUpon()
-                .add(COMMAND_SET_REPEAT_MODE)
-                .add(COMMAND_SET_SHUFFLE_MODE)
-                .build()
+            val playerCommands =
+                ConnectionResult.DEFAULT_PLAYER_COMMANDS
+                    .buildUpon()
+                    .add(COMMAND_SET_REPEAT_MODE)
+                    .add(COMMAND_SET_SHUFFLE_MODE)
+                    .build()
 
             return AcceptedResultBuilder(session)
                 .setMediaButtonPreferences(notificationCustomCmdButtons)
@@ -127,11 +141,11 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
 
         return AcceptedResultBuilder(session)
             .setAvailableSessionCommands(
-                ConnectionResult.DEFAULT_SESSION_COMMANDS.buildUpon()
+                ConnectionResult.DEFAULT_SESSION_COMMANDS
+                    .buildUpon()
                     .addSessionCommands(customSessionCommands)
-                    .build()
-            )
-            .build()
+                    .build(),
+            ).build()
     }
 
     override fun onPostConnect(
@@ -147,14 +161,15 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
     override fun onPlaybackResumption(
         mediaSession: MediaSession,
         controller: MediaSession.ControllerInfo,
-        isForPlayback: Boolean
+        isForPlayback: Boolean,
     ): ListenableFuture<MediaItemsWithStartPosition> {
         val settable = SettableFuture.create<MediaItemsWithStartPosition>()
         serviceScope.launch {
             try {
-                val queue = withContext(Dispatchers.IO) {
-                    queueRepository.getQueue()
-                }
+                val queue =
+                    withContext(Dispatchers.IO) {
+                        queueRepository.getQueue()
+                    }
                 if (queue?.songs?.isEmpty() != false) {
                     settable.set(MediaItemsWithStartPosition(emptyList(), 0, 0))
                     return@launch
@@ -163,11 +178,12 @@ class MediaPlayerService : MediaSessionService(), MediaSession.Callback {
                 val position = stateManager.playerState.value.time
                 val isPlaying = stateManager.playerState.value.playState == PlayState.PLAYING
                 val mediaItems = queue.songs.map { MediaItem.fromUri(it.contentUri) }
-                val resumptionPlaylist = MediaItemsWithStartPosition(
-                    mediaItems,
-                    currentIndex,
-                    position
-                )
+                val resumptionPlaylist =
+                    MediaItemsWithStartPosition(
+                        mediaItems,
+                        currentIndex,
+                        position,
+                    )
 
                 settable.set(resumptionPlaylist)
                 withContext(Dispatchers.Main) {

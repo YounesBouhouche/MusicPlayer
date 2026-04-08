@@ -74,23 +74,23 @@ import androidx.compose.ui.unit.dp
 import com.kmpalette.rememberPaletteState
 import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
 import com.younesb.mydesignsystem.presentation.components.Image
+import com.younesb.mydesignsystem.presentation.util.plus
 import kotlinx.coroutines.launch
 import soup.compose.material.motion.animation.materialSharedAxisZIn
 import soup.compose.material.motion.animation.materialSharedAxisZOut
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Song
+import younesbouhouche.musicplayer.core.presentation.theme.AppTheme
 import younesbouhouche.musicplayer.features.main.presentation.util.SortBottomSheet
 import younesbouhouche.musicplayer.features.main.presentation.util.SortState
 import younesbouhouche.musicplayer.features.main.presentation.util.SortType
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
-import com.younesb.mydesignsystem.presentation.util.plus
 import younesbouhouche.musicplayer.features.main.presentation.util.search
 import younesbouhouche.musicplayer.features.main.presentation.util.topAppBarIconButtonColors
-import younesbouhouche.musicplayer.core.presentation.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun <T>ListScreen(
+fun <T> ListScreen(
     title: String,
     items: List<Song>,
     cover: Any?,
@@ -115,11 +115,11 @@ fun <T>ListScreen(
             modifier = Modifier.animateItem(),
             onLongClick = {
                 onShowBottomSheet(card)
-            }
+            },
         ) {
             onPlay(items, index, false)
         }
-    }
+    },
 ) {
     val palette = rememberPaletteState()
     val scope = rememberCoroutineScope()
@@ -127,16 +127,21 @@ fun <T>ListScreen(
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current
     var searchMode by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
-    val filteredItems = remember(query, items, searchMode) {
-        if (query.isEmpty() or !searchMode) items
-        else items.filter { it.search(query) }
-    }
+    val filteredItems =
+        remember(query, items, searchMode) {
+            if (query.isEmpty() or !searchMode) {
+                items
+            } else {
+                items.filter { it.search(query) }
+            }
+        }
     val interactionSource = remember { MutableInteractionSource() }
     val focused by interactionSource.collectIsFocusedAsState()
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(searchMode) {
-        if (searchMode)
+        if (searchMode) {
             focusRequester.requestFocus()
+        }
     }
     BackHandler(searchMode) {
         searchMode = false
@@ -156,33 +161,37 @@ fun <T>ListScreen(
                             BasicTextField(
                                 query,
                                 onValueChange = { query = it },
-                                modifier = Modifier
-                                    .height(SearchBarDefaults.InputFieldHeight)
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp)
-                                    .focusRequester(focusRequester),
+                                modifier =
+                                    Modifier
+                                        .height(SearchBarDefaults.InputFieldHeight)
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp)
+                                        .focusRequester(focusRequester),
                                 interactionSource = interactionSource,
-                                textStyle = MaterialTheme.typography.bodyLarge.copy(
-                                    color = MaterialTheme.colorScheme.onSurface
-                                ),
-                                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary)
+                                textStyle =
+                                    MaterialTheme.typography.bodyLarge.copy(
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                    ),
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                             ) {
                                 Surface(
-                                    Modifier.height(SearchBarDefaults.InputFieldHeight)
+                                    Modifier
+                                        .height(SearchBarDefaults.InputFieldHeight)
                                         .fillMaxWidth(),
                                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                    shape = RoundedCornerShape(100)
+                                    shape = RoundedCornerShape(100),
                                 ) {
                                     ProvideTextStyle(MaterialTheme.typography.bodyLarge) {
-                                        Box(Modifier.fillMaxSize().padding(horizontal = 20.dp),
-                                            contentAlignment = Alignment.CenterStart
-                                        )  {
+                                        Box(
+                                            Modifier.fillMaxSize().padding(horizontal = 20.dp),
+                                            contentAlignment = Alignment.CenterStart,
+                                        ) {
                                             if (query.isEmpty() and !focused) {
                                                 Text(
                                                     stringResource(R.string.search),
                                                     modifier = Modifier.fillMaxWidth(),
                                                     textAlign = TextAlign.Center,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 )
                                             }
                                             it()
@@ -197,7 +206,7 @@ fun <T>ListScreen(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             size = IconButtonDefaults.mediumIconSize,
                             colors = topAppBarIconButtonColors(),
-                            widthOption = IconButtonDefaults.IconButtonWidthOption.Wide
+                            widthOption = IconButtonDefaults.IconButtonWidthOption.Wide,
                         ) {
                             backDispatcher?.onBackPressedDispatcher?.onBackPressed()
                         }
@@ -209,20 +218,20 @@ fun <T>ListScreen(
                                     Icons.Default.Close,
                                     size = IconButtonDefaults.mediumIconSize,
                                     colors = topAppBarIconButtonColors(),
-                                    widthOption = IconButtonDefaults.IconButtonWidthOption.Wide
+                                    widthOption = IconButtonDefaults.IconButtonWidthOption.Wide,
                                 ) {
                                     searchMode = false
                                 }
                             } else {
                                 Row(
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                                 ) {
                                     actions()
                                     ExpressiveIconButton(
                                         Icons.Default.Search,
                                         size = IconButtonDefaults.mediumIconSize,
                                         colors = topAppBarIconButtonColors(),
-                                        widthOption = IconButtonDefaults.IconButtonWidthOption.Wide
+                                        widthOption = IconButtonDefaults.IconButtonWidthOption.Wide,
                                     ) {
                                         searchMode = true
                                         query = ""
@@ -231,7 +240,7 @@ fun <T>ListScreen(
                                         Icons.AutoMirrored.Filled.Sort,
                                         size = IconButtonDefaults.mediumIconSize,
                                         colors = topAppBarIconButtonColors(),
-                                        widthOption = IconButtonDefaults.IconButtonWidthOption.Wide
+                                        widthOption = IconButtonDefaults.IconButtonWidthOption.Wide,
                                     ) {
                                         onSortStateChange(sortState.copy(expanded = true))
                                     }
@@ -240,7 +249,7 @@ fun <T>ListScreen(
                         }
                     },
                     scrollBehavior = scrollBehavior,
-                    contentPadding = PaddingValues(8.dp)
+                    contentPadding = PaddingValues(8.dp),
                 )
             },
         ) { paddingValues ->
@@ -248,18 +257,18 @@ fun <T>ListScreen(
                 modifier = Modifier.fillMaxSize(),
                 state = listState,
                 contentPadding = paddingValues + contentPadding + PaddingValues(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                if (!searchMode or query.isEmpty())
+                if (!searchMode or query.isEmpty()) {
                     item {
                         Column(
                             Modifier.padding(top = 16.dp, bottom = 32.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Row(
                                 Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
                             ) {
                                 Image(
                                     cover,
@@ -272,18 +281,19 @@ fun <T>ListScreen(
                                                 palette.generate(bitmap.asImageBitmap())
                                             }
                                         } ?: palette.reset()
-                                    }
+                                    },
                                 )
                                 Column(
                                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(1f),
                                 ) {
                                     repeat(2) {
                                         val colors =
-                                            if (it == 0)
+                                            if (it == 0) {
                                                 IconButtonDefaults.filledIconButtonColors()
-                                            else
+                                            } else {
                                                 IconButtonDefaults.filledTonalIconButtonColors()
+                                            }
                                         val icon = if (it == 0) Icons.Default.PlayArrow else Icons.Default.Shuffle
                                         val interactionSource = remember { MutableInteractionSource() }
                                         val pressed by interactionSource.collectIsPressedAsState()
@@ -293,15 +303,15 @@ fun <T>ListScreen(
                                         ExpressiveIconButton(
                                             icon = icon,
                                             size = IconButtonDefaults.mediumIconSize,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(
-                                                    start = if (it == 1) space else 0.dp,
-                                                    end = if (it == 0) space else 0.dp,
-                                                )
-                                                .height(80.dp),
+                                            modifier =
+                                                Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(
+                                                        start = if (it == 1) space else 0.dp,
+                                                        end = if (it == 0) space else 0.dp,
+                                                    ).height(80.dp),
                                             colors = colors,
-                                            interactionSource = interactionSource
+                                            interactionSource = interactionSource,
                                         ) {
                                             onPlay(items, 0, it == 1)
                                         }
@@ -330,6 +340,7 @@ fun <T>ListScreen(
                             )
                         }
                     }
+                }
                 itemsIndexed(filteredItems, { _, it -> it.id }) { index, item ->
                     itemContent(filteredItems, index, item)
                 }
@@ -340,11 +351,10 @@ fun <T>ListScreen(
             options,
             iconCallback,
             textCallback,
-            onSortStateChange
+            onSortStateChange,
         )
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -382,7 +392,7 @@ fun ListScreen(
     actions,
     contentPadding,
     onShowBottomSheet,
-    onPlay
+    onPlay,
 )
 
 @Preview
@@ -396,6 +406,6 @@ private fun ListScreenPreview() {
         icon = Icons.Default.PlayArrow,
         sortState = SortState(sortType = SortType.Filename),
         onSortStateChange = {},
-        onPlay = { _, _, _ -> }
+        onPlay = { _, _, _ -> },
     )
 }

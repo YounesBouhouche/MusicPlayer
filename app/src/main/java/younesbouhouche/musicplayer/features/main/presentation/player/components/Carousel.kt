@@ -41,12 +41,13 @@ fun Carousel(
     modifier: Modifier = Modifier,
     onPlayerEvent: (PlayerEvent) -> Unit,
 ) {
-    val carouselState = rememberCarouselState(
-        queue.currentIndex
-            .coerceIn(0, (queue.songs.size - 1).coerceAtLeast(0))
-    ) {
-        queue.songs.size
-    }
+    val carouselState =
+        rememberCarouselState(
+            queue.currentIndex
+                .coerceIn(0, (queue.songs.size - 1).coerceAtLeast(0)),
+        ) {
+            queue.songs.size
+        }
     LaunchedEffect(queue.currentIndex) {
         if (carouselState.currentItem != queue.currentIndex) {
             carouselState.animateScrollToItem(queue.currentIndex)
@@ -61,18 +62,20 @@ fun Carousel(
 //    }
     HorizontalCenteredHeroCarousel(
         state = carouselState,
-        modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures(
-                    onDragEnd = {
-                        println("Drag ended, current item: ${carouselState.currentItem}")
-                        if (carouselState.currentItem != queue.currentIndex)
-                            onPlayerEvent(PlayerEvent.Seek(carouselState.currentItem))
-                    }
-                ) { _, _ -> }
-            },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onDragEnd = {
+                            println("Drag ended, current item: ${carouselState.currentItem}")
+                            if (carouselState.currentItem != queue.currentIndex) {
+                                onPlayerEvent(PlayerEvent.Seek(carouselState.currentItem))
+                            }
+                        },
+                    ) { _, _ -> }
+                },
         contentPadding = PaddingValues(horizontal = 16.dp),
         itemSpacing = 8.dp,
         userScrollEnabled = enabled,
@@ -88,10 +91,11 @@ fun Carousel(
                     onPlayerEvent(PlayerEvent.Seek(page))
                 }
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .alpha(carouselItemDrawInfo.size / carouselItemDrawInfo.maxSize)
-                .aspectRatio(1f, true),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .alpha(carouselItemDrawInfo.size / carouselItemDrawInfo.maxSize)
+                    .aspectRatio(1f, true),
         )
     }
 }
@@ -105,13 +109,14 @@ private fun CarouselPreview() {
                 currentIndex = 0,
                 songs =
                     List(5) {
-                        Song.Builder()
+                        Song
+                            .Builder()
                             .id(it.toLong())
                             .title("Title $it")
                             .artist("Artist $it")
                             .build()
-                    }
-            )
+                    },
+            ),
         )
     }
     var triggered by remember {
@@ -121,9 +126,10 @@ private fun CarouselPreview() {
         Column {
             Carousel(
                 queue = queue,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f, true),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f, true),
                 enabled = true,
                 onPlayerEvent = {
                     if (it is PlayerEvent.Seek) {

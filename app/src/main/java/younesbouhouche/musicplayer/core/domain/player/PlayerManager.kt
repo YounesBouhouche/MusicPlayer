@@ -61,7 +61,7 @@ class PlayerManager(
                 it.copy(
                     time = controller.currentPosition,
                     playState =
-                    if (controller.isPlaying) PlayState.PLAYING else PlayState.PAUSED,
+                        if (controller.isPlaying) PlayState.PLAYING else PlayState.PAUSED,
                     repeatMode = controller.repeatMode,
                     shuffle = controller.shuffleModeEnabled,
                     speed = controller.playbackParameters.speed,
@@ -91,7 +91,7 @@ class PlayerManager(
                         stateManager.updateState {
                             it.copy(loading = playbackState == Player.STATE_BUFFERING)
                         }
-                        when(playbackState) {
+                        when (playbackState) {
                             Player.STATE_READY -> {
                                 stateManager.updateState {
                                     it.copy(playState = if (exoPlayer.isPlaying) PlayState.PLAYING else PlayState.PAUSED)
@@ -139,16 +139,16 @@ class PlayerManager(
                             stateManager.updateState {
                                 it.copy(
                                     speed = playbackParameters.speed,
-                                    pitch = playbackParameters.pitch
+                                    pitch = playbackParameters.pitch,
                                 )
                             }
                             preferencesRepository.set(
                                 SettingsPreference.Speed,
-                                if (rememberSpeed.first()) playbackParameters.speed else 1f
+                                if (rememberSpeed.first()) playbackParameters.speed else 1f,
                             )
                             preferencesRepository.set(
                                 SettingsPreference.Pitch,
-                                if (rememberPitch.first()) playbackParameters.pitch else 1f
+                                if (rememberPitch.first()) playbackParameters.pitch else 1f,
                             )
                         }
                     }
@@ -157,11 +157,12 @@ class PlayerManager(
                         super.onIsPlayingChanged(isPlaying)
                         stateManager.updateState {
                             it.copy(
-                                playState = when {
-                                    exoPlayer.playbackState == Player.STATE_IDLE -> PlayState.STOP
-                                    isPlaying -> PlayState.PLAYING
-                                    else -> PlayState.PAUSED
-                                }
+                                playState =
+                                    when {
+                                        exoPlayer.playbackState == Player.STATE_IDLE -> PlayState.STOP
+                                        isPlaying -> PlayState.PLAYING
+                                        else -> PlayState.PAUSED
+                                    },
                             )
                         }
                         scope.launch {
@@ -171,10 +172,11 @@ class PlayerManager(
 
                     override fun onMediaItemTransition(
                         mediaItem: MediaItem?,
-                        reason: Int
+                        reason: Int,
                     ) {
                         super.onMediaItemTransition(mediaItem, reason)
-                        Timber.tag("PlayerManager")
+                        Timber
+                            .tag("PlayerManager")
                             .d("onMediaItemTransition: ${mediaItem?.localConfiguration?.uri}")
                         scope.launch {
                             queueRepository.setCurrentIndex(currentMediaItemIndex)
@@ -192,9 +194,9 @@ class PlayerManager(
                         if (
                             (state.value.timer is TimerType.End) and
                             (
-                                    (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) or
-                                            (reason == Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT)
-                                    )
+                                (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) or
+                                    (reason == Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT)
+                            )
                         ) {
                             if ((state.value.timer as TimerType.End).tracks > 1) {
                                 stateManager.updateState {
@@ -252,7 +254,11 @@ class PlayerManager(
         }
     }
 
-    suspend fun seek(index: Int?, time: Long, skipIfSameIndex: Boolean = true) {
+    suspend fun seek(
+        index: Int?,
+        time: Long,
+        skipIfSameIndex: Boolean = true,
+    ) {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastSeekTime < seekLockDuration) {
             return
@@ -264,8 +270,9 @@ class PlayerManager(
         if (index != null) {
             queueRepository.setCurrentIndex(index)
             playerFactory.getPlayer().seekTo(index, time)
-        } else
+        } else {
             playerFactory.getPlayer().seekTo(time)
+        }
         stateManager.updateState {
             it.copy(time = time)
         }
@@ -277,28 +284,33 @@ class PlayerManager(
         index: Int = 0,
         time: Long = 0L,
         autoPlay: Boolean = true,
-        shuffleMode: Boolean = false
+        shuffleMode: Boolean = false,
     ) {
         println("PlayerManager.play: tracks=$tracks, index=$index, time=$time, autoPlay=$autoPlay, shuffleMode=$shuffleMode")
         playerFactory.getPlayer().let { player ->
             if (tracks.isEmpty()) return
-            val songs = withContext(Dispatchers.IO) {
-                musicRepository.getSongs(tracks)
-            }
+            val songs =
+                withContext(Dispatchers.IO) {
+                    musicRepository.getSongs(tracks)
+                }
             val list = if (shuffleMode) songs.shuffled() else songs
             player.setMediaItems(list.toMediaItems())
             player.seekTo(index, time)
             player.prepare()
             if (autoPlay) player.play()
             player.repeatMode =
-                if (rememberRepeat.first()) repeatMode.first()
-                else Player.REPEAT_MODE_OFF
-            if (rememberShuffle.first())
+                if (rememberRepeat.first()) {
+                    repeatMode.first()
+                } else {
+                    Player.REPEAT_MODE_OFF
+                }
+            if (rememberShuffle.first()) {
                 player.shuffleModeEnabled = shuffle.first()
+            }
             player.playbackParameters =
                 PlaybackParameters(
                     if (rememberSpeed.first()) speed.first() else 1f,
-                    if (rememberPitch.first()) pitch.first() else 1f
+                    if (rememberPitch.first()) pitch.first() else 1f,
                 )
             list.getOrNull(index)?.let {
                 musicRepository.addSongToPlayHistory(it.id)
@@ -328,7 +340,7 @@ class PlayerManager(
             it.copy(
                 playState = PlayState.STOP,
                 time = 0L,
-                timer = TimerType.Disabled
+                timer = TimerType.Disabled,
             )
         }
         withContext(Dispatchers.IO) {

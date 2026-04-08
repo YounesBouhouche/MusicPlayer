@@ -13,38 +13,44 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 import kotlinx.coroutines.launch
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
-import younesbouhouche.musicplayer.features.permissions.presentation.Permissions
 import younesbouhouche.musicplayer.core.data.worker.MusicLibraryWorker
+import younesbouhouche.musicplayer.features.permissions.presentation.Permissions
 import younesbouhouche.musicplayer.navigation.routes.Graph
 
 @Composable
 fun MainApp(modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
-    val initialRoute = remember {
-        if (Permissions.AUDIO.isGranted(context)) {
-            MusicLibraryWorker.launchWorkRequest(context)
-            Graph.Main
-        }
-        else Graph.Permissions
-    }
-
-    val backStack = rememberNavBackStack(
-        configuration = SavedStateConfiguration {
-            serializersModule = SerializersModule {
-                polymorphic(NavKey::class) {
-                    subclass(Graph.Permissions::class, Graph.Permissions.serializer())
-                    subclass(Graph.Main::class, Graph.Main.serializer())
-                    subclass(Graph.Settings::class, Graph.Settings.serializer())
-                }
+    val initialRoute =
+        remember {
+            if (Permissions.AUDIO.isGranted(context)) {
+                MusicLibraryWorker.launchWorkRequest(context)
+                Graph.Main
+            } else {
+                Graph.Permissions
             }
-        },
-        initialRoute
-    )
+        }
+
+    val backStack =
+        rememberNavBackStack(
+            configuration =
+                SavedStateConfiguration {
+                    serializersModule =
+                        SerializersModule {
+                            polymorphic(NavKey::class) {
+                                subclass(Graph.Permissions::class, Graph.Permissions.serializer())
+                                subclass(Graph.Main::class, Graph.Main.serializer())
+                                subclass(Graph.Settings::class, Graph.Settings.serializer())
+                            }
+                        }
+                },
+            initialRoute,
+        )
     val scope = rememberCoroutineScope()
-    val snackBarHostState = remember {
-        SnackbarHostState()
-    }
+    val snackBarHostState =
+        remember {
+            SnackbarHostState()
+        }
     EventHandler(
         onCreatePlaylist = { name, items ->
 //            mainVM.onPlaylistEvent(PlaylistEvent.CreateNew(name, items, null))
@@ -53,7 +59,7 @@ fun MainApp(modifier: Modifier = Modifier) {
             scope.launch {
                 snackBarHostState.showSnackbar(it)
             }
-        }
+        },
     ) {
         backStack.clear()
         backStack.add(Graph.Main)

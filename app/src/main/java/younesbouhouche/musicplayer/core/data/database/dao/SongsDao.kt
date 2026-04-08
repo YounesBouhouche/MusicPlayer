@@ -40,13 +40,15 @@ interface SongsDao {
     suspend fun upsertSongStatus(songStateEntity: SongStateEntity)
 
     @Transaction
-    suspend fun setSongFavoriteStatus(songId: Long, isFavorite: Boolean) =
-        upsertSongStatus(
-            SongStateEntity(
-                songId = songId,
-                isFavorite = isFavorite
-            )
-        )
+    suspend fun setSongFavoriteStatus(
+        songId: Long,
+        isFavorite: Boolean,
+    ) = upsertSongStatus(
+        SongStateEntity(
+            songId = songId,
+            isFavorite = isFavorite,
+        ),
+    )
 
     @Query("DELETE FROM SongEntity")
     suspend fun clearSongs()

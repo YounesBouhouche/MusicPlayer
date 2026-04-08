@@ -17,25 +17,32 @@ fun expressiveRectShape(
 ): Shape {
     val first = index <= 0
     val last = index >= count - 1
-    val shape = when {
-        selected -> RoundedCornerShape(100)
-        !first and !last -> smallShape
-        first and last -> largeShape
-        first ->
-            if (horizontal) largeShape.copy(
-                topEnd = smallShape.topEnd,
-                bottomEnd = smallShape.bottomEnd
-            )
-            else largeShape.copy(
-                bottomStart = smallShape.bottomStart,
-                bottomEnd = smallShape.bottomEnd
-            )
-        else ->
-            if (horizontal) largeShape.copy(
-                topStart = smallShape.topStart,
-                bottomStart = smallShape.bottomStart
-            )
-            else largeShape.copy(topStart = smallShape.topStart, topEnd = smallShape.topEnd)
-    }
+    val shape =
+        when {
+            selected -> RoundedCornerShape(100)
+            !first and !last -> smallShape
+            first and last -> largeShape
+            first ->
+                if (horizontal) {
+                    largeShape.copy(
+                        topEnd = smallShape.topEnd,
+                        bottomEnd = smallShape.bottomEnd,
+                    )
+                } else {
+                    largeShape.copy(
+                        bottomStart = smallShape.bottomStart,
+                        bottomEnd = smallShape.bottomEnd,
+                    )
+                }
+            else ->
+                if (horizontal) {
+                    largeShape.copy(
+                        topStart = smallShape.topStart,
+                        bottomStart = smallShape.bottomStart,
+                    )
+                } else {
+                    largeShape.copy(topStart = smallShape.topStart, topEnd = smallShape.topEnd)
+                }
+        }
     return shape
 }

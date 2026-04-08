@@ -23,13 +23,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.core.domain.models.Song
-import younesbouhouche.musicplayer.features.dialog.presentation.service.DialogService
 import younesbouhouche.musicplayer.features.dialog.domain.DialogRepo
+import younesbouhouche.musicplayer.features.dialog.presentation.service.DialogService
+import younesbouhouche.musicplayer.features.main.presentation.viewmodel.Task
 import younesbouhouche.musicplayer.features.player.domain.models.PlayState
 import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
-import younesbouhouche.musicplayer.features.main.presentation.viewmodel.Task
 
-class DialogRepoImpl(val context: Context): DialogRepo {
+class DialogRepoImpl(
+    val context: Context,
+) : DialogRepo {
     private val _card = MutableStateFlow<Song?>(null)
     private val _state = MutableStateFlow(PlayerState(loading = true))
 
@@ -54,11 +56,15 @@ class DialogRepoImpl(val context: Context): DialogRepo {
         context.startForegroundService(Intent(context, DialogService::class.java))
         controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
     }
+
     protected fun finalize() {
         context.contentResolver.unregisterContentObserver(observer)
     }
 
-    override fun play(uri: Uri, scope: CoroutineScope) {
+    override fun play(
+        uri: Uri,
+        scope: CoroutineScope,
+    ) {
         controllerFuture.addListener({
             player = controllerFuture.get()
             player.setMediaItem(MediaItem.fromUri(uri))
@@ -72,25 +78,29 @@ class DialogRepoImpl(val context: Context): DialogRepo {
                             it.copy(
                                 loading = playbackState == Player.STATE_BUFFERING,
                                 playState =
-                                    if (playbackState == Player.STATE_IDLE) PlayState.STOP
-                                    else it.playState
+                                    if (playbackState == Player.STATE_IDLE) {
+                                        PlayState.STOP
+                                    } else {
+                                        it.playState
+                                    },
                             )
                         }
                     }
 
                     override fun onIsPlayingChanged(isPlaying: Boolean) {
                         super.onIsPlayingChanged(isPlaying)
-                        if (player.playbackState != Player.STATE_IDLE)
+                        if (player.playbackState != Player.STATE_IDLE) {
                             _state.update {
                                 it.copy(
                                     playState =
-                                    if (isPlaying) {
-                                        PlayState.PLAYING
-                                    } else {
-                                        PlayState.PAUSED
-                                    },
+                                        if (isPlaying) {
+                                            PlayState.PLAYING
+                                        } else {
+                                            PlayState.PAUSED
+                                        },
                                 )
                             }
+                        }
                     }
                 },
             )
@@ -103,61 +113,63 @@ class DialogRepoImpl(val context: Context): DialogRepo {
             }
         }, ContextCompat.getMainExecutor(context))
 
-        val idFromUri = try {
-            ContentUris.parseId(uri)
-        } catch (_: Exception) {
-            -1L
-        }
+        val idFromUri =
+            try {
+                ContentUris.parseId(uri)
+            } catch (_: Exception) {
+                -1L
+            }
 
-        val cursor = if (idFromUri != -1L) {
-            context.contentResolver.query(
-                MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL),
-                arrayOf(
-                    MediaStore.Audio.Media._ID,
-                    MediaStore.Audio.Media.DISPLAY_NAME,
-                    MediaStore.Audio.Media.DURATION,
-                    MediaStore.Audio.Media.TITLE,
-                    MediaStore.Audio.Media.ALBUM_ID,
-                    MediaStore.Audio.Media.ALBUM,
-                    MediaStore.Audio.Media.ARTIST,
-                ),
-                "${MediaStore.Audio.Media._ID} = ?",
-                arrayOf(idFromUri.toString()),
-                null,
-            )
-        } else {
-            null
-        }
+        val cursor =
+            if (idFromUri != -1L) {
+                context.contentResolver.query(
+                    MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL),
+                    arrayOf(
+                        MediaStore.Audio.Media._ID,
+                        MediaStore.Audio.Media.DISPLAY_NAME,
+                        MediaStore.Audio.Media.DURATION,
+                        MediaStore.Audio.Media.TITLE,
+                        MediaStore.Audio.Media.ALBUM_ID,
+                        MediaStore.Audio.Media.ALBUM,
+                        MediaStore.Audio.Media.ARTIST,
+                    ),
+                    "${MediaStore.Audio.Media._ID} = ?",
+                    arrayOf(idFromUri.toString()),
+                    null,
+                )
+            } else {
+                null
+            }
 
         cursor?.use { crs ->
             if (crs.moveToFirst()) {
                 val idColumn = crs.getColumnIndex(MediaStore.Audio.Media._ID)
-            val durationColumn = crs.getColumnIndex(MediaStore.Audio.Media.DURATION)
-            val titleColumn = crs.getColumnIndex(MediaStore.Audio.Media.TITLE)
-            val artistColumn = crs.getColumnIndex(MediaStore.Audio.Media.ARTIST)
-            val albumIdColumn = crs.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)
-            val albumColumn = crs.getColumnIndex(MediaStore.Audio.Media.ALBUM)
-            val id = crs.getLong(idColumn)
-            val duration = crs.getLong(durationColumn)
-            val title = crs.getString(titleColumn)
-            val artist = crs.getString(artistColumn)
-            val albumId = crs.getLong(albumIdColumn)
-            val album = crs.getString(albumColumn)
-            val contentUri: Uri =
-                ContentUris.withAppendedId(
-                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    id,
-                )
-            _card.value =
-                Song
-                    .Builder()
-                    .contentUri(contentUri)
-                    .id(id)
-                    .title(title)
-                    .artist(artist)
-                    .album(album)
-                    .duration(duration)
-                    .build()
+                val durationColumn = crs.getColumnIndex(MediaStore.Audio.Media.DURATION)
+                val titleColumn = crs.getColumnIndex(MediaStore.Audio.Media.TITLE)
+                val artistColumn = crs.getColumnIndex(MediaStore.Audio.Media.ARTIST)
+                val albumIdColumn = crs.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)
+                val albumColumn = crs.getColumnIndex(MediaStore.Audio.Media.ALBUM)
+                val id = crs.getLong(idColumn)
+                val duration = crs.getLong(durationColumn)
+                val title = crs.getString(titleColumn)
+                val artist = crs.getString(artistColumn)
+                val albumId = crs.getLong(albumIdColumn)
+                val album = crs.getString(albumColumn)
+                val contentUri: Uri =
+                    ContentUris.withAppendedId(
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        id,
+                    )
+                _card.value =
+                    Song
+                        .Builder()
+                        .contentUri(contentUri)
+                        .id(id)
+                        .title(title)
+                        .artist(artist)
+                        .album(album)
+                        .duration(duration)
+                        .build()
             }
         }
         val cover =

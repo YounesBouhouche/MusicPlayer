@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PlaybackAnimation(
     modifier: Modifier = Modifier,
-    tint: Color = MaterialTheme.colorScheme.primary
+    tint: Color = MaterialTheme.colorScheme.primary,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "playback_animation")
 
@@ -26,52 +26,56 @@ fun PlaybackAnimation(
     val wave1 by infiniteTransition.animateFloat(
         initialValue = 0.3f,
         targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(600),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "wave1"
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(600),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "wave1",
     )
 
     val wave2 by infiniteTransition.animateFloat(
         initialValue = 0.2f,
         targetValue = 0.8f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(500, delayMillis = 100),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "wave2"
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(500, delayMillis = 100),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "wave2",
     )
 
     val wave3 by infiniteTransition.animateFloat(
         initialValue = 0.4f,
         targetValue = 0.9f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(700, delayMillis = 200),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "wave3"
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(700, delayMillis = 200),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "wave3",
     )
 
     val wave4 by infiniteTransition.animateFloat(
         initialValue = 0.25f,
         targetValue = 0.75f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(550, delayMillis = 300),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "wave4"
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(550, delayMillis = 300),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "wave4",
     )
 
     Canvas(
-        modifier = modifier.size(24.dp)
+        modifier = modifier.size(24.dp),
     ) {
         drawWaves(
             wave1 = wave1,
             wave2 = wave2,
             wave3 = wave3,
             wave4 = wave4,
-            color = tint
+            color = tint,
         )
     }
 }
@@ -81,7 +85,7 @@ private fun DrawScope.drawWaves(
     wave2: Float,
     wave3: Float,
     wave4: Float,
-    color: Color
+    color: Color,
 ) {
     val waveWidth = size.width / 7f
     val spacing = waveWidth * 0.5f
@@ -97,9 +101,15 @@ private fun DrawScope.drawWaves(
 
         drawRoundRect(
             color = color,
-            topLeft = androidx.compose.ui.geometry.Offset(x, y),
-            size = androidx.compose.ui.geometry.Size(waveWidth, barHeight),
-            cornerRadius = androidx.compose.ui.geometry.CornerRadius(waveWidth / 2f)
+            topLeft =
+                androidx.compose.ui.geometry
+                    .Offset(x, y),
+            size =
+                androidx.compose.ui.geometry
+                    .Size(waveWidth, barHeight),
+            cornerRadius =
+                androidx.compose.ui.geometry
+                    .CornerRadius(waveWidth / 2f),
         )
     }
 }

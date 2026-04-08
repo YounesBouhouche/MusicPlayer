@@ -30,15 +30,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Album
 import younesbouhouche.musicplayer.core.domain.models.Artist
 import younesbouhouche.musicplayer.core.domain.models.Song
-import younesbouhouche.musicplayer.features.main.presentation.components.ScreenHeader
 import younesbouhouche.musicplayer.features.main.presentation.navigation.MainNavRoute
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
@@ -52,14 +49,14 @@ fun HomeScreen(
     bottomPadding: Dp = 0.dp,
     onArtistClick: (Artist) -> Unit,
     navigateTo: (MainNavRoute) -> Unit,
-    play: (List<Long>, Int, Boolean) -> Unit
+    play: (List<Long>, Int, Boolean) -> Unit,
 ) {
     LazyColumn(
         Modifier
             .fillMaxSize()
             .then(modifier),
         verticalArrangement = Arrangement.spacedBy(32.dp),
-        contentPadding = PaddingValues(bottom = bottomPadding, top = 30.dp)
+        contentPadding = PaddingValues(bottom = bottomPadding, top = 30.dp),
     ) {
         item {
             ListContainer(
@@ -69,22 +66,23 @@ fun HomeScreen(
                     OutlinedButton(
                         onClick = {},
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-                        contentPadding = PaddingValues(16.dp, 10.dp)
+                        contentPadding = PaddingValues(16.dp, 10.dp),
                     ) {
                         Text("View All")
                         Spacer(Modifier.width(ButtonDefaults.IconSpacing))
                         Icon(Icons.AutoMirrored.Default.ArrowForward, null)
                     }
-                }
+                },
             ) {
                 Column(
                     Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
                 ) {
-                    val state = rememberCarouselState {
-                        albums.size
-                    }
+                    val state =
+                        rememberCarouselState {
+                            albums.size
+                        }
                     HorizontalCenteredHeroCarousel(
                         state = state,
                         itemSpacing = 8.dp,
@@ -99,7 +97,7 @@ fun HomeScreen(
                         AlbumCard(
                             album,
                             rememberMaskShape(MaterialTheme.shapes.extraLarge),
-                            opacity = opacity
+                            opacity = opacity,
                         ) {
                             navigateTo(MainNavRoute.Album(album.name))
                         }
@@ -114,7 +112,7 @@ fun HomeScreen(
                 subtitle = "Your most recent additions to the library",
                 list = lastAdded,
                 onPlay = play,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         }
         item {
@@ -125,13 +123,13 @@ fun HomeScreen(
                     OutlinedButton(
                         onClick = {},
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-                        contentPadding = PaddingValues(16.dp, 10.dp)
+                        contentPadding = PaddingValues(16.dp, 10.dp),
                     ) {
                         Text("View All")
                         Spacer(Modifier.width(ButtonDefaults.IconSpacing))
                         Icon(Icons.AutoMirrored.Default.ArrowForward, null)
                     }
-                }
+                },
             ) {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -151,7 +149,7 @@ fun HomeScreen(
                 subtitle = "Your listening history",
                 list = history,
                 onPlay = play,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
@@ -162,14 +160,17 @@ fun HomeScreen(
 private fun HomeScreenPreview() {
     val artists = List(10) { Artist("Artist $it") }
     val albums = List(10) { Album("Album $it") }
-    val songs = List(5) { Song(
-        it.toLong(),
-        Uri.EMPTY,
-        "Song $it",
-        "Song $it",
-        "Artist $it",
-        "Album $it",
-    ) }
+    val songs =
+        List(5) {
+            Song(
+                it.toLong(),
+                Uri.EMPTY,
+                "Song $it",
+                "Song $it",
+                "Artist $it",
+                "Album $it",
+            )
+        }
 
     Surface(Modifier.fillMaxSize()) {
         HomeScreen(
@@ -180,7 +181,7 @@ private fun HomeScreenPreview() {
             onArtistClick = {},
             navigateTo = {},
             play = { _, _, _ -> },
-            bottomPadding = 40.dp
+            bottomPadding = 40.dp,
         )
     }
 }

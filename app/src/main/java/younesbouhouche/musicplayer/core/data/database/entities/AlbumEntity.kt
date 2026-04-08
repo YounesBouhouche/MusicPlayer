@@ -8,5 +8,5 @@ import androidx.room.PrimaryKey
 data class AlbumEntity(
     @PrimaryKey(autoGenerate = false)
     val name: String = "",
-    val cover: Uri? = null
+    val cover: Uri? = null,
 )

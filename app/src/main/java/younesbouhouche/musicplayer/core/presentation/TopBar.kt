@@ -36,16 +36,17 @@ fun TopBar(
             Icons.AutoMirrored.Default.ArrowBack,
             size = IconButtonDefaults.mediumIconSize,
             widthOption = IconButtonDefaults.IconButtonWidthOption.Wide,
-            colors = IconButtonDefaults.filledTonalIconButtonColors()
+            colors = IconButtonDefaults.filledTonalIconButtonColors(),
         ) {
             backDispatcher?.onBackPressedDispatcher?.onBackPressed()
         }
     },
     actions: @Composable RowScope.() -> Unit = {},
-    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(
-        containerColor = MaterialTheme.colorScheme.background,
-        scrolledContainerColor = MaterialTheme.colorScheme.background
-    ),
+    colors: TopAppBarColors =
+        TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            scrolledContainerColor = MaterialTheme.colorScheme.background,
+        ),
     spacing: Dp = 8.dp,
     contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp),
     scrollBehavior: TopAppBarScrollBehavior? = null,
@@ -74,6 +75,6 @@ private fun TopBarPreview() {
     TopBar(
         title = {
             Text("Settings")
-        }
+        },
     )
 }

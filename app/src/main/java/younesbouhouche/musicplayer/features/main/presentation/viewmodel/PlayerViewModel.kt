@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import younesbouhouche.musicplayer.core.presentation.util.stateInVM
 import younesbouhouche.musicplayer.features.main.domain.events.UiAction
-import younesbouhouche.musicplayer.features.main.domain.use_cases.GetPlayerStateUseCase
-import younesbouhouche.musicplayer.features.main.domain.use_cases.GetQueueUseCase
-import younesbouhouche.musicplayer.features.main.domain.use_cases.ObserveSongUseCase
-import younesbouhouche.musicplayer.features.main.domain.use_cases.HandlePlayerEventUseCase
-import younesbouhouche.musicplayer.features.main.domain.use_cases.SetFavoriteUseCase
+import younesbouhouche.musicplayer.features.main.domain.usecases.GetPlayerStateUseCase
+import younesbouhouche.musicplayer.features.main.domain.usecases.GetQueueUseCase
+import younesbouhouche.musicplayer.features.main.domain.usecases.HandlePlayerEventUseCase
+import younesbouhouche.musicplayer.features.main.domain.usecases.ObserveSongUseCase
+import younesbouhouche.musicplayer.features.main.domain.usecases.SetFavoriteUseCase
 import younesbouhouche.musicplayer.features.player.domain.events.PlayerEvent
 import younesbouhouche.musicplayer.features.player.domain.events.PlayerEventBus
 import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
@@ -23,17 +23,20 @@ class PlayerViewModel(
     getPlayerStateUseCase: GetPlayerStateUseCase,
     getQueueUseCase: GetQueueUseCase,
     observeSongUseCase: ObserveSongUseCase,
-    val setFavoriteUseCase: SetFavoriteUseCase
-): ViewModel() {
+    val setFavoriteUseCase: SetFavoriteUseCase,
+) : ViewModel() {
     val playerState = getPlayerStateUseCase().stateInVM(PlayerState(), viewModelScope)
 
     private val _queue = getQueueUseCase()
     val queue = _queue.stateInVM(null, viewModelScope)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val currentItem = _queue.filter { it?.getCurrentItem() != null }.flatMapLatest {
-        observeSongUseCase(it!!.getCurrentItem()!!.id)
-    }.stateInVM(null, viewModelScope)
+    val currentItem =
+        _queue
+            .filter { it?.getCurrentItem() != null }
+            .flatMapLatest {
+                observeSongUseCase(it!!.getCurrentItem()!!.id)
+            }.stateInVM(null, viewModelScope)
 
     init {
         viewModelScope.launch {
@@ -51,7 +54,6 @@ class PlayerViewModel(
     }
 
     fun onUiAction(action: UiAction) {
-
     }
 
     fun onPlayerEvent(event: PlayerEvent) {
@@ -60,7 +62,10 @@ class PlayerViewModel(
         }
     }
 
-    fun setFavorite(songId: Long, isFavorite: Boolean) {
+    fun setFavorite(
+        songId: Long,
+        isFavorite: Boolean,
+    ) {
         viewModelScope.launch {
             println("Set favorite: $songId to $isFavorite")
             setFavoriteUseCase(songId, isFavorite)

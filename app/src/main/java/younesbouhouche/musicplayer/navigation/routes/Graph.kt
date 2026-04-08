@@ -4,7 +4,9 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class Graph(val ordinal: Int): NavKey {
+sealed class Graph(
+    val ordinal: Int,
+) : NavKey {
     @Serializable
     data object Permissions : NavKey, Graph(0)
 

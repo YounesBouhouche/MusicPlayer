@@ -29,42 +29,48 @@ import younesbouhouche.musicplayer.features.settings.presentation.util.findActiv
 
 @Composable
 fun SettingsNavGraph(modifier: Modifier = Modifier) {
-    val backStack = rememberNavBackStack(configuration = SavedStateConfiguration {
-        serializersModule = SerializersModule {
-            polymorphic(NavKey::class) {
-                subclass(
-                    SettingsGraph.SettingsMain::class,
-                    SettingsGraph.SettingsMain.serializer()
-                )
-                subclass(
-                    SettingsGraph.ThemeSettings::class,
-                    SettingsGraph.ThemeSettings.serializer()
-                )
-                subclass(
-                    SettingsGraph.PlayerSettings::class,
-                    SettingsGraph.PlayerSettings.serializer()
-                )
-                subclass(
-                    SettingsGraph.PlaybackSettings::class,
-                    SettingsGraph.PlaybackSettings.serializer()
-                )
-                subclass(
-                    SettingsGraph.LanguageSettings::class,
-                    SettingsGraph.LanguageSettings.serializer()
-                )
-                subclass(
-                    SettingsGraph.AboutSettings::class,
-                    SettingsGraph.AboutSettings.serializer()
-                )
-            }
-        }
-    }, SettingsGraph.SettingsMain)
+    val backStack =
+        rememberNavBackStack(
+            configuration =
+                SavedStateConfiguration {
+                    serializersModule =
+                        SerializersModule {
+                            polymorphic(NavKey::class) {
+                                subclass(
+                                    SettingsGraph.SettingsMain::class,
+                                    SettingsGraph.SettingsMain.serializer(),
+                                )
+                                subclass(
+                                    SettingsGraph.ThemeSettings::class,
+                                    SettingsGraph.ThemeSettings.serializer(),
+                                )
+                                subclass(
+                                    SettingsGraph.PlayerSettings::class,
+                                    SettingsGraph.PlayerSettings.serializer(),
+                                )
+                                subclass(
+                                    SettingsGraph.PlaybackSettings::class,
+                                    SettingsGraph.PlaybackSettings.serializer(),
+                                )
+                                subclass(
+                                    SettingsGraph.LanguageSettings::class,
+                                    SettingsGraph.LanguageSettings.serializer(),
+                                )
+                                subclass(
+                                    SettingsGraph.AboutSettings::class,
+                                    SettingsGraph.AboutSettings.serializer(),
+                                )
+                            }
+                        }
+                },
+            SettingsGraph.SettingsMain,
+        )
     val context = LocalContext.current
     val activity = context.findActivity()!!
     val width = LocalView.current.width
     Surface(
         modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        color = MaterialTheme.colorScheme.background,
     ) {
         NavDisplay(
             backStack = backStack,
@@ -73,24 +79,24 @@ fun SettingsNavGraph(modifier: Modifier = Modifier) {
                 val targetKey = targetState.key as? SettingsGraph
                 val forward = (initialKey?.ordinal ?: 0) < (targetKey?.ordinal ?: 1)
                 materialSharedAxisXIn(forward, width / 2) togetherWith
-                        materialSharedAxisXOut(forward, width / 2)
+                    materialSharedAxisXOut(forward, width / 2)
             },
             popTransitionSpec = {
                 val initialKey = initialState.key as? SettingsGraph
                 val targetKey = targetState.key as? SettingsGraph
                 val forward = (initialKey?.ordinal ?: 0) > (targetKey?.ordinal ?: 1)
                 materialSharedAxisXIn(forward, width / 2) togetherWith
-                        materialSharedAxisXOut(forward, width / 2)
+                    materialSharedAxisXOut(forward, width / 2)
             },
             predictivePopTransitionSpec = {
                 val initialKey = initialState.key as? SettingsGraph
                 val targetKey = targetState.key as? SettingsGraph
                 val forward = (initialKey?.ordinal ?: 0) > (targetKey?.ordinal ?: 1)
                 materialSharedAxisXIn(forward, width / 2) togetherWith
-                        materialSharedAxisXOut(forward, width / 2)
+                    materialSharedAxisXOut(forward, width / 2)
             },
         ) { key ->
-            when(key) {
+            when (key) {
                 is SettingsGraph.SettingsMain -> {
                     NavEntry(key) {
                         SettingsPage(Modifier.fillMaxSize()) {

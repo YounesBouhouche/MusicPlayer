@@ -15,23 +15,29 @@ import androidx.glance.appwidget.provideContent
 import kotlinx.coroutines.flow.map
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
-import younesbouhouche.musicplayer.features.player.domain.models.PlayState
-import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
 import younesbouhouche.musicplayer.core.data.datastore.SettingsPreference
+import younesbouhouche.musicplayer.core.domain.player.PlayerStateManager
 import younesbouhouche.musicplayer.core.domain.repositories.PreferencesRepository
 import younesbouhouche.musicplayer.core.domain.repositories.QueueRepository
-import younesbouhouche.musicplayer.features.main.domain.use_cases.HandlePlayerEventUseCase
+import younesbouhouche.musicplayer.features.main.domain.usecases.HandlePlayerEventUseCase
+import younesbouhouche.musicplayer.features.player.domain.models.PlayState
+import younesbouhouche.musicplayer.features.player.domain.models.PlayerState
 
-class MyAppWidget : GlanceAppWidget(), KoinComponent {
+class MyAppWidget :
+    GlanceAppWidget(),
+    KoinComponent {
     companion object {
         private val SMALL = DpSize(250.dp, 10.dp)
         private val MEDIUM = DpSize(250.dp, 150.dp)
         private val LARGE = DpSize(250.dp, 250.dp)
     }
+
     override val sizeMode = SizeMode.Responsive(setOf(SMALL, MEDIUM, LARGE))
 
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
+    override suspend fun provideGlance(
+        context: Context,
+        id: GlanceId,
+    ) {
         val stateManager by inject<PlayerStateManager>()
         val handlePlayerEventUseCase by inject<HandlePlayerEventUseCase>()
         val queueRepository by inject<QueueRepository>()
@@ -39,39 +45,47 @@ class MyAppWidget : GlanceAppWidget(), KoinComponent {
         val initial = queueRepository.getQueue()?.getCurrentItem()
         provideContent {
             GlanceTheme {
-                val appWidgetId = LocalGlanceId.current.toString().filter { it.isDigit() }.toInt()
-                val opacity by settingsRepository.get(SettingsPreference.Opacity(appWidgetId))
+                val appWidgetId =
+                    LocalGlanceId.current
+                        .toString()
+                        .filter { it.isDigit() }
+                        .toInt()
+                val opacity by settingsRepository
+                    .get(SettingsPreference.Opacity(appWidgetId))
                     .collectAsState(1f)
                 val state = stateManager.playerState.collectAsState(PlayerState()).value
-                val item by queueRepository.observeQueue().map { it?.getCurrentItem() }
+                val item by queueRepository
+                    .observeQueue()
+                    .map { it?.getCurrentItem() }
                     .collectAsState(initial)
-                val currentItem = item?.takeIf {
-                    state.playState != PlayState.STOP
-                }
+                val currentItem =
+                    item?.takeIf {
+                        state.playState != PlayState.STOP
+                    }
                 val size = LocalSize.current
-                if (size.height > MEDIUM.height)
+                if (size.height > MEDIUM.height) {
                     LargeWidgetContent(
                         currentItem,
                         state,
                         { handlePlayerEventUseCase(it) },
-                        opacity
+                        opacity,
                     )
-                else if (size.height > SMALL.height)
+                } else if (size.height > SMALL.height) {
                     MediumWidgetContent(
                         currentItem,
                         state,
                         { handlePlayerEventUseCase(it) },
-                        opacity
+                        opacity,
                     )
-                else
+                } else {
                     SmallWidgetContent(
                         currentItem,
                         state,
                         { handlePlayerEventUseCase(it) },
-                        opacity
+                        opacity,
                     )
+                }
             }
         }
     }
 }
-

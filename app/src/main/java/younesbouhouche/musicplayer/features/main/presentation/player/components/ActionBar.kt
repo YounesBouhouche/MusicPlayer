@@ -48,7 +48,7 @@ fun ActionBar(
     showTimerSheet: () -> Unit,
     showSpeedSheet: () -> Unit,
     onPlayerEvent: (PlayerEvent) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier,
@@ -63,33 +63,39 @@ fun ActionBar(
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             repeat(4) {
-                val icon = when(it) {
-                    0 ->
-                        if (shuffle) Icons.Default.ShuffleOn
-                        else Icons.Default.Shuffle
-                    1 -> when(repeatMode) {
-                        Player.REPEAT_MODE_ALL -> Icons.Default.RepeatOn
-                        Player.REPEAT_MODE_ONE -> Icons.Default.RepeatOneOn
-                        else -> Icons.Default.Repeat
+                val icon =
+                    when (it) {
+                        0 ->
+                            if (shuffle) {
+                                Icons.Default.ShuffleOn
+                            } else {
+                                Icons.Default.Shuffle
+                            }
+                        1 ->
+                            when (repeatMode) {
+                                Player.REPEAT_MODE_ALL -> Icons.Default.RepeatOn
+                                Player.REPEAT_MODE_ONE -> Icons.Default.RepeatOneOn
+                                else -> Icons.Default.Repeat
+                            }
+                        2 -> Icons.Default.Timer
+                        else -> Icons.Default.Speed
                     }
-                    2 -> Icons.Default.Timer
-                    else -> Icons.Default.Speed
-                }
-                val active = when(it) {
-                    0 -> shuffle
-                    1 -> repeatMode != Player.REPEAT_MODE_OFF
-                    2 -> timer != TimerType.Disabled
-                    else -> (speed != 1f) or (pitch != 1f)
-                }
+                val active =
+                    when (it) {
+                        0 -> shuffle
+                        1 -> repeatMode != Player.REPEAT_MODE_OFF
+                        2 -> timer != TimerType.Disabled
+                        else -> (speed != 1f) or (pitch != 1f)
+                    }
                 val interactionSource = remember { MutableInteractionSource() }
                 val pressed by interactionSource.collectIsPressedAsState()
                 val weight by animateFloatAsState(
-                    if (pressed) 1.4f else 1f
+                    if (pressed) 1.4f else 1f,
                 )
                 ToggleButton(
                     checked = active,
                     onCheckedChange = { _ ->
-                        when(it) {
+                        when (it) {
                             0 -> onPlayerEvent(PlayerEvent.ToggleShuffle)
                             1 -> onPlayerEvent(PlayerEvent.CycleRepeatMode)
                             2 -> showTimerSheet()
@@ -97,20 +103,25 @@ fun ActionBar(
                         }
                     },
                     shapes =
-                        if (it == 0)
+                        if (it == 0) {
                             ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        else if (it < 3)
+                        } else if (it < 3) {
                             ButtonGroupDefaults.connectedMiddleButtonShapes()
-                        else ButtonGroupDefaults.connectedTrailingButtonShapes(),
-                    modifier = Modifier
-                        .heightIn(ButtonDefaults.MediumContainerHeight)
-                        .semantics { role = Role.Checkbox }
-                        .weight(weight),
-                    contentPadding = ButtonDefaults
-                        .contentPaddingFor(ButtonDefaults.MediumContainerHeight),
-                    colors = ToggleButtonDefaults.toggleButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary.copy(.1f)
-                    ),
+                        } else {
+                            ButtonGroupDefaults.connectedTrailingButtonShapes()
+                        },
+                    modifier =
+                        Modifier
+                            .heightIn(ButtonDefaults.MediumContainerHeight)
+                            .semantics { role = Role.Checkbox }
+                            .weight(weight),
+                    contentPadding =
+                        ButtonDefaults
+                            .contentPaddingFor(ButtonDefaults.MediumContainerHeight),
+                    colors =
+                        ToggleButtonDefaults.toggleButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary.copy(.1f),
+                        ),
                     interactionSource = interactionSource,
                 ) {
                     Icon(icon, null)

@@ -8,7 +8,10 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import younesbouhouche.musicplayer.R
 
-enum class SearchFilter(val label: Int, val icon: ImageVector) {
+enum class SearchFilter(
+    val label: Int,
+    val icon: ImageVector,
+) {
     FILES(label = R.string.files, icon = Icons.Default.MusicNote),
     ARTISTS(label = R.string.artists, icon = Icons.Default.Person),
     ALBUMS(label = R.string.albums, icon = Icons.Default.Album),

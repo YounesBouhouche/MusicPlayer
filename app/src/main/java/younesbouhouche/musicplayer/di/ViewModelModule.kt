@@ -10,7 +10,7 @@ import younesbouhouche.musicplayer.features.main.presentation.routes.artist.Arti
 import younesbouhouche.musicplayer.features.main.presentation.routes.artist.ArtistsViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.home.HomeViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.library.LibraryViewModel
-import younesbouhouche.musicplayer.features.main.presentation.routes.metadata_editor.MetadataEditorViewModel
+import younesbouhouche.musicplayer.features.main.presentation.routes.metadataeditor.MetadataEditorViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.AddToPlaylistViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.CreatePlaylistViewModel
 import younesbouhouche.musicplayer.features.main.presentation.routes.playlist.PlaylistViewModel
@@ -25,49 +25,50 @@ import younesbouhouche.musicplayer.features.settings.presentation.routes.playbac
 import younesbouhouche.musicplayer.features.settings.presentation.routes.player.PlayerSettingsViewModel
 import younesbouhouche.musicplayer.features.settings.presentation.routes.theme.ThemeViewModel
 
-val viewModelModule = module {
-    viewModelOf(::MainViewModel)
-    viewModelOf(::ThemeViewModel)
-    viewModelOf(::LanguageViewModel)
-    viewModelOf(::PlayerSettingsViewModel)
-    viewModelOf(::PlaybackSettingsViewModel)
-    viewModelOf(::SearchVM)
-    viewModelOf(::PermissionsViewModel)
-    singleOf(::MainViewModel)
-    viewModelOf(::HomeViewModel)
-    viewModelOf(::AlbumsViewModel)
-    viewModel { (albumName: String) ->
-        AlbumViewModel(get(), get(), albumName)
+val viewModelModule =
+    module {
+        viewModelOf(::MainViewModel)
+        viewModelOf(::ThemeViewModel)
+        viewModelOf(::LanguageViewModel)
+        viewModelOf(::PlayerSettingsViewModel)
+        viewModelOf(::PlaybackSettingsViewModel)
+        viewModelOf(::SearchVM)
+        viewModelOf(::PermissionsViewModel)
+        singleOf(::MainViewModel)
+        viewModelOf(::HomeViewModel)
+        viewModelOf(::AlbumsViewModel)
+        viewModel { (albumName: String) ->
+            AlbumViewModel(get(), get(), albumName)
+        }
+        viewModelOf(::ArtistsViewModel)
+        viewModel { (artistName: String) ->
+            ArtistViewModel(get(), get(), artistName)
+        }
+        viewModelOf(::PlaylistsViewModel)
+        viewModel { (playlistId: Long) ->
+            PlaylistViewModel(
+                get(),
+                get(),
+                get(),
+                playlistId,
+            )
+        }
+        viewModelOf(::CreatePlaylistViewModel)
+        viewModelOf(::AddToPlaylistViewModel)
+        viewModelOf(::LibraryViewModel)
+        viewModel { (songId: Long) ->
+            SongInfoViewModel(
+                get(),
+                get(),
+                get(),
+                songId,
+            )
+        }
+        viewModel { (songId: Long) ->
+            MetadataEditorViewModel(
+                songId,
+                get(),
+            )
+        }
+        viewModelOf(::PlayerViewModel)
     }
-    viewModelOf(::ArtistsViewModel)
-    viewModel { (artistName: String) ->
-        ArtistViewModel(get(), get(), artistName)
-    }
-    viewModelOf(::PlaylistsViewModel)
-    viewModel { (playlistId: Long) ->
-        PlaylistViewModel(
-            get(),
-            get(),
-            get(),
-            playlistId
-        )
-    }
-    viewModelOf(::CreatePlaylistViewModel)
-    viewModelOf(::AddToPlaylistViewModel)
-    viewModelOf(::LibraryViewModel)
-    viewModel { (songId: Long) ->
-        SongInfoViewModel(
-            get(),
-            get(),
-            get(),
-            songId
-        )
-    }
-    viewModel { (songId: Long) ->
-        MetadataEditorViewModel(
-            songId,
-            get()
-        )
-    }
-    viewModelOf(::PlayerViewModel)
-}

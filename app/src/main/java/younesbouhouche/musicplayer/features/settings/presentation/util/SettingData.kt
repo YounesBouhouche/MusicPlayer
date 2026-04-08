@@ -22,5 +22,5 @@ data class SettingData(
 data class Checked(
     val radio: Boolean = false,
     val checked: Boolean,
-    val onCheckedChange: (Boolean?) -> Unit
+    val onCheckedChange: (Boolean?) -> Unit,
 )

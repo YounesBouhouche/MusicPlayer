@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 
 class Task {
     private var job: Job? = null
+
     // dedicated scope so launched coroutines are tied to a controllable Job
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 

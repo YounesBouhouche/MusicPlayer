@@ -13,21 +13,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun Header(
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier,
-    trailingContent: @Composable (() -> Unit)? = null
+    trailingContent: @Composable (() -> Unit)? = null,
 ) {
     Row(
-        modifier = modifier
-            .padding(20.dp)
-            .fillMaxWidth(),
+        modifier =
+            modifier
+                .padding(20.dp)
+                .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(18.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.fillMaxWidth().weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(

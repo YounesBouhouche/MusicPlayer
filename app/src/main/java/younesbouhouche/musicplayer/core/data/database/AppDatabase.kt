@@ -33,9 +33,9 @@ import younesbouhouche.musicplayer.core.data.database.entities.SongStateEntity
         PlaylistSongCrossRef::class,
         PlayHistSongCrossRef::class,
         QueueSongCrossRef::class,
-               ],
+    ],
     version = 1,
-    exportSchema = true
+    exportSchema = true,
 )
 @TypeConverters(
     UriConverter::class,

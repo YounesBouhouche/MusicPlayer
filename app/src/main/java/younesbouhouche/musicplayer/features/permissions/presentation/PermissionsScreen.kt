@@ -40,7 +40,7 @@ fun PermissionsScreen(modifier: Modifier = Modifier) {
         Column(
             Modifier.weight(1f).padding(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 stringResource(R.string.permission_required),
@@ -53,37 +53,40 @@ fun PermissionsScreen(modifier: Modifier = Modifier) {
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        Row(Modifier
-            .clip(expressiveRectShape(
-                0,
-                2,
-                RoundedCornerShape(0),
-                MaterialTheme.shapes.extraLarge
-            ))
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .navigationBarsPadding()
-            .padding(16.dp)
-            .fillMaxWidth(),
+        Row(
+            Modifier
+                .clip(
+                    expressiveRectShape(
+                        0,
+                        2,
+                        RoundedCornerShape(0),
+                        MaterialTheme.shapes.extraLarge,
+                    ),
+                ).background(MaterialTheme.colorScheme.surfaceContainer)
+                .navigationBarsPadding()
+                .padding(16.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
                 stringResource(R.string.let_s_get_started),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
             ExpressiveIconButton(
                 Icons.AutoMirrored.Filled.ArrowForward,
                 size = IconButtonDefaults.largeIconSize,
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                )
+                colors =
+                    IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
             ) {
                 scope.launch(Dispatchers.Main) {
                     EventBus.sendEvent(Event.Initiate)

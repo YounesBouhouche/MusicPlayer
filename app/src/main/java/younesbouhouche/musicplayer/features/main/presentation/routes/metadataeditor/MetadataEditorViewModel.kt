@@ -1,4 +1,4 @@
-package younesbouhouche.musicplayer.features.main.presentation.routes.metadata_editor
+package younesbouhouche.musicplayer.features.main.presentation.routes.metadataeditor
 
 import androidx.core.net.toFile
 import androidx.core.net.toUri
@@ -16,16 +16,15 @@ import org.jaudiotagger.audio.exceptions.CannotWriteException
 import org.jaudiotagger.tag.FieldKey
 import org.jaudiotagger.tag.images.ArtworkFactory
 import younesbouhouche.musicplayer.core.domain.models.Song
-import younesbouhouche.musicplayer.features.main.domain.use_cases.GetSongUseCase
+import younesbouhouche.musicplayer.features.main.domain.usecases.GetSongUseCase
 import younesbouhouche.musicplayer.features.main.presentation.util.Event
 import younesbouhouche.musicplayer.features.main.presentation.util.sendEvent
 import younesbouhouche.musicplayer.features.main.util.toFileUri
 
-
 class MetadataEditorViewModel(
     songId: Long,
     getSongUseCase: GetSongUseCase,
-): ViewModel() {
+) : ViewModel() {
     val song = MutableStateFlow<Resource<Song, Error>>(Resource.Idle)
 
     private var initialState = UiState()
@@ -36,19 +35,20 @@ class MetadataEditorViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             song.value = Resource.Loading
             song.value = getSongUseCase(songId)?.let { song ->
-                initialState = state.updateAndGet {
-                    it.copy(
-                        title = song.title,
-                        artist = song.artist,
-                        album = song.album,
-                        trackNumber = song.trackNumber?.toString() ?: "",
-                        discNumber = song.discNumber?.toString() ?: "",
-                        year = song.year?.toString() ?: "",
-                        genre = song.genre ?: "",
-                        composer = song.composer ?: "",
-                        image = song.coverUri,
-                    )
-                }
+                initialState =
+                    state.updateAndGet {
+                        it.copy(
+                            title = song.title,
+                            artist = song.artist,
+                            album = song.album,
+                            trackNumber = song.trackNumber?.toString() ?: "",
+                            discNumber = song.discNumber?.toString() ?: "",
+                            year = song.year?.toString() ?: "",
+                            genre = song.genre ?: "",
+                            composer = song.composer ?: "",
+                            image = song.coverUri,
+                        )
+                    }
                 Resource.Success(song)
             } ?: Resource.Error(object : Error {})
         }
@@ -64,19 +64,26 @@ class MetadataEditorViewModel(
         (song.value as? Resource.Success)?.data?.let { song ->
             val writeMetadata = {
                 try {
-                    val f = AudioFileIO.read(song.path.toFileUri().toUri().toFile())
+                    val f =
+                        AudioFileIO.read(
+                            song.path
+                                .toFileUri()
+                                .toUri()
+                                .toFile(),
+                        )
                     val tag = f.getTag()
-                    val fields = mapOf(
-                        FieldKey.TITLE to state.value.title,
-                        FieldKey.ALBUM to state.value.album,
-                        FieldKey.ARTIST to state.value.artist,
-                        FieldKey.ALBUM_ARTIST to state.value.albumArtist,
-                        FieldKey.TRACK to state.value.trackNumber,
-                        FieldKey.DISC_NO to state.value.discNumber,
-                        FieldKey.COMPOSER to state.value.composer,
-                        FieldKey.GENRE to state.value.genre,
-                        FieldKey.YEAR to state.value.year
-                    )
+                    val fields =
+                        mapOf(
+                            FieldKey.TITLE to state.value.title,
+                            FieldKey.ALBUM to state.value.album,
+                            FieldKey.ARTIST to state.value.artist,
+                            FieldKey.ALBUM_ARTIST to state.value.albumArtist,
+                            FieldKey.TRACK to state.value.trackNumber,
+                            FieldKey.DISC_NO to state.value.discNumber,
+                            FieldKey.COMPOSER to state.value.composer,
+                            FieldKey.GENRE to state.value.genre,
+                            FieldKey.YEAR to state.value.year,
+                        )
                     fields.forEach { (key, value) ->
                         try {
                             tag.setField(key, value)

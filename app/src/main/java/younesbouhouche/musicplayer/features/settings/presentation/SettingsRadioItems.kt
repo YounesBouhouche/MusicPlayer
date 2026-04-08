@@ -29,11 +29,17 @@ fun <T> LazyListScope.settingsRadioItems(
 ) {
     itemsIndexed(items) { index, item ->
         val topShape =
-            if (index == 0) MaterialTheme.shapes.large
-            else MaterialTheme.shapes.extraSmall
+            if (index == 0) {
+                MaterialTheme.shapes.large
+            } else {
+                MaterialTheme.shapes.extraSmall
+            }
         val bottomShape =
-            if (index == items.size - 1) MaterialTheme.shapes.large
-            else MaterialTheme.shapes.extraSmall
+            if (index == items.size - 1) {
+                MaterialTheme.shapes.large
+            } else {
+                MaterialTheme.shapes.extraSmall
+            }
         if (index != 0) Spacer(Modifier.height(2.dp))
         Row(
             modifier =
@@ -46,13 +52,12 @@ fun <T> LazyListScope.settingsRadioItems(
                             topEnd = topShape.topEnd,
                             bottomStart = bottomShape.bottomStart,
                             bottomEnd = bottomShape.bottomEnd,
-                        )
-                    )
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                        ),
+                    ).background(MaterialTheme.colorScheme.surfaceContainer)
                     .clickable { onSelectedChange(index) }
                     .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             ProvideTextStyle(MaterialTheme.typography.bodyLarge) {
                 label(item)
@@ -61,10 +66,10 @@ fun <T> LazyListScope.settingsRadioItems(
                 selected = selected == index,
                 onClick = { onSelectedChange(index) },
                 colors =
-                RadioButtonDefaults.colors(
-                    selectedColor = MaterialTheme.colorScheme.primary,
-                    unselectedColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                ),
+                    RadioButtonDefaults.colors(
+                        selectedColor = MaterialTheme.colorScheme.primary,
+                        unselectedColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    ),
             )
         }
     }

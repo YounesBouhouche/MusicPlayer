@@ -35,7 +35,6 @@ fun HomeRoute(
         history = history,
         onArtistClick = onArtistClick,
         navigateTo = navigateTo,
-        play = homeViewModel::play
+        play = homeViewModel::play,
     )
 }
-

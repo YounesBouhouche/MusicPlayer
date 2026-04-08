@@ -1,13 +1,7 @@
 package younesbouhouche.musicplayer.features.main.presentation.navigation
 
-
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,15 +11,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.scene.OverlayScene
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.scene.SceneStrategyScope
-import younesbouhouche.musicplayer.di.dialogModule
 
 @OptIn(ExperimentalMaterial3Api::class)
 internal class BottomSheetScene<T : Any>(
@@ -36,14 +27,13 @@ internal class BottomSheetScene<T : Any>(
     private val modalBottomSheetProperties: ModalBottomSheetProperties,
     private val onBack: () -> Unit,
 ) : OverlayScene<T> {
-
     override val entries: List<NavEntry<T>> = listOf(entry)
 
     override val content: @Composable (() -> Unit) = {
         ModalBottomSheet(
             onDismissRequest = onBack,
             properties = modalBottomSheetProperties,
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         ) {
             entry.Content()
         }
@@ -58,28 +48,26 @@ internal class DialogScene<T : Any>(
     private val dialogProperties: DialogProperties,
     private val onBack: () -> Unit,
 ) : OverlayScene<T> {
-
     override val entries: List<NavEntry<T>> = listOf(entry)
 
     @OptIn(ExperimentalMaterial3Api::class)
     override val content: @Composable (() -> Unit) = {
         BasicAlertDialog(
             onDismissRequest = onBack,
-            properties = dialogProperties
+            properties = dialogProperties,
         ) {
             Surface(
                 shadowElevation = AlertDialogDefaults.TonalElevation,
                 shape = AlertDialogDefaults.shape,
                 color = AlertDialogDefaults.containerColor,
                 contentColor = AlertDialogDefaults.textContentColor,
-                modifier = Modifier.fillMaxWidth(.9f)
+                modifier = Modifier.fillMaxWidth(.9f),
             ) {
                 entry.Content()
             }
         }
     }
 }
-
 
 internal class FullScreenDialogScene<T : Any>(
     override val key: T,
@@ -88,7 +76,6 @@ internal class FullScreenDialogScene<T : Any>(
     private val entry: NavEntry<T>,
     private val onBack: () -> Unit,
 ) : OverlayScene<T> {
-
     override val entries: List<NavEntry<T>> = listOf(entry)
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -96,17 +83,17 @@ internal class FullScreenDialogScene<T : Any>(
         ModalBottomSheet(
             onDismissRequest = onBack,
             dragHandle = null,
-            sheetState = rememberModalBottomSheetState(
-                skipPartiallyExpanded = true,
-            ),
+            sheetState =
+                rememberModalBottomSheetState(
+                    skipPartiallyExpanded = true,
+                ),
             sheetGesturesEnabled = false,
-            contentWindowInsets = { WindowInsets() }
+            contentWindowInsets = { WindowInsets() },
         ) {
             entry.Content()
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 class SceneStrategy<T : Any> : SceneStrategy<T> {
@@ -124,7 +111,7 @@ class SceneStrategy<T : Any> : SceneStrategy<T> {
                     overlaidEntries = entries.dropLast(1),
                     entry = lastEntry,
                     modalBottomSheetProperties = bottomSheetProperties,
-                    onBack = onBack
+                    onBack = onBack,
                 )
             }
             dialogProperties != null -> {
@@ -135,7 +122,7 @@ class SceneStrategy<T : Any> : SceneStrategy<T> {
                     overlaidEntries = entries.dropLast(1),
                     entry = lastEntry,
                     dialogProperties = dialogProperties,
-                    onBack = onBack
+                    onBack = onBack,
                 )
             }
             isFullScreenDialog -> {
@@ -145,7 +132,7 @@ class SceneStrategy<T : Any> : SceneStrategy<T> {
                     previousEntries = entries.dropLast(1),
                     overlaidEntries = entries.dropLast(1),
                     entry = lastEntry,
-                    onBack = onBack
+                    onBack = onBack,
                 )
             }
             else -> null
@@ -154,17 +141,17 @@ class SceneStrategy<T : Any> : SceneStrategy<T> {
 
     companion object {
         @OptIn(ExperimentalMaterial3Api::class)
-        fun bottomSheet(
-            modalBottomSheetProperties: ModalBottomSheetProperties = ModalBottomSheetProperties()
-        ): Map<String, Any> = mapOf(BOTTOM_SHEET_KEY to modalBottomSheetProperties)
+        fun bottomSheet(modalBottomSheetProperties: ModalBottomSheetProperties = ModalBottomSheetProperties()): Map<String, Any> =
+            mapOf(BOTTOM_SHEET_KEY to modalBottomSheetProperties)
 
         @OptIn(ExperimentalMaterial3Api::class)
         fun dialog(
-            dialogProperties: DialogProperties = DialogProperties(
-                dismissOnBackPress = true,
-                dismissOnClickOutside = true,
-                usePlatformDefaultWidth = false
-            )
+            dialogProperties: DialogProperties =
+                DialogProperties(
+                    dismissOnBackPress = true,
+                    dismissOnClickOutside = true,
+                    usePlatformDefaultWidth = false,
+                ),
         ): Map<String, Any> = mapOf(DIALOG_KEY to dialogProperties)
 
         @OptIn(ExperimentalMaterial3Api::class)

@@ -60,9 +60,10 @@ fun PlaylistScreen(
     bottomPadding: Dp = 0.dp,
     onShowBottomSheet: (Song) -> Unit = {},
 ) {
-    val viewModel: PlaylistViewModel = koinViewModel(
-        parameters = { parametersOf(playlistId) }
-    )
+    val viewModel: PlaylistViewModel =
+        koinViewModel(
+            parameters = { parametersOf(playlistId) },
+        )
     val playlist by viewModel.playlist.collectAsStateWithLifecycle()
     val sortState by viewModel.sortState.collectAsStateWithLifecycle()
     val buttonSize = ButtonDefaults.MediumContainerHeight
@@ -101,9 +102,8 @@ fun PlaylistScreen(
                     ExpressiveIconButton(
                         Icons.Default.Edit,
                         size = IconButtonDefaults.mediumIconSize,
-                        colors = topAppBarIconButtonColors()
+                        colors = topAppBarIconButtonColors(),
                     ) {
-
                     }
                 },
                 onShowBottomSheet = onShowBottomSheet,
@@ -111,7 +111,7 @@ fun PlaylistScreen(
                 contentPadding = PaddingValues(bottom = bottomPadding + buttonSize + 16.dp),
                 onPlay = { songs, index, shuffle ->
                     viewModel.play(songs.map { it.id }, index, shuffle)
-                }
+                },
             ) { items, index, card ->
                 ReorderableItem(
                     state = reorderState,
@@ -161,9 +161,10 @@ fun PlaylistScreen(
                                 Icons.Default.MoreVert,
                                 widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow,
                                 size = IconButtonDefaults.mediumIconSize,
-                                colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                                )
+                                colors =
+                                    IconButtonDefaults.filledTonalIconButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                    ),
                             ) {
                                 onShowBottomSheet(card)
                             }
@@ -179,12 +180,12 @@ fun PlaylistScreen(
             buttonSize,
             Modifier.align(Alignment.BottomCenter).padding(bottom = bottomPadding),
             Icons.Default.Add,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-            )
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                ),
         ) {
-
         }
     }
 }

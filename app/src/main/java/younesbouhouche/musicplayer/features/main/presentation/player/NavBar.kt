@@ -47,27 +47,29 @@ fun NavBar(
     route: TopLevelRoutes?,
     playing: Boolean,
     modifier: Modifier = Modifier,
-    navigate: (MainNavRoute) -> Unit
+    navigate: (MainNavRoute) -> Unit,
 ) {
     val topRadius by animateDpAsState(
-        if (playing) 8.dp else 40.dp
+        if (playing) 8.dp else 40.dp,
     )
-    val shape = remember(topRadius) {
-        RoundedCornerShape(
-            topStart = topRadius,
-            topEnd = topRadius,
-            bottomEnd = 40.dp,
-            bottomStart = 40.dp
-        )
-    }
+    val shape =
+        remember(topRadius) {
+            RoundedCornerShape(
+                topStart = topRadius,
+                topEnd = topRadius,
+                bottomEnd = 40.dp,
+                bottomStart = 40.dp,
+            )
+        }
     Box(
-        modifier = modifier
-            .padding(12.dp)
-            .fillMaxWidth()
-            .height(80.dp)
-            .shadow(8.dp, shape)
-            .clip(shape)
-            .background(MaterialTheme.colorScheme.surfaceContainerLow)
+        modifier =
+            modifier
+                .padding(12.dp)
+                .fillMaxWidth()
+                .height(80.dp)
+                .shadow(8.dp, shape)
+                .clip(shape)
+                .background(MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Row(
             Modifier.fillMaxSize().padding(8.dp),
@@ -75,44 +77,51 @@ fun NavBar(
             TopLevelRoutes.entries.forEach { navRoute ->
                 val selected = route == navRoute
                 val color by animateColorAsState(
-                    if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
+                    if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
                 )
                 val weight by animateFloatAsState(
-                    if (selected) 2f else 1f
+                    if (selected) 2f else 1f,
                 )
                 Row(
-                    modifier = Modifier.height(64.dp)
-                        .weight(weight)
-                        .clip(RoundedCornerShape(100))
-                        .background(color).clickable {
-                            navigate(navRoute.destination)
-                        },
+                    modifier =
+                        Modifier
+                            .height(64.dp)
+                            .weight(weight)
+                            .clip(RoundedCornerShape(100))
+                            .background(color)
+                            .clickable {
+                                navigate(navRoute.destination)
+                            },
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
                 ) {
                     AnimatedContent(
                         targetState = selected,
                         transitionSpec = {
                             materialSharedAxisZ(true).using(
-                                SizeTransform(clip = false)
+                                SizeTransform(clip = false),
                             )
-                        }
+                        },
                     ) {
                         Icon(
                             imageVector = if (it) navRoute.selectedIcon else navRoute.unselectedIcon,
                             contentDescription = stringResource(id = navRoute.title),
-                            tint = if (it) MaterialTheme.colorScheme.onPrimary
-                            else MaterialTheme.colorScheme.onSurfaceVariant
+                            tint =
+                                if (it) {
+                                    MaterialTheme.colorScheme.onPrimary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                },
                         )
                     }
                     AnimatedContent(
                         targetState = selected,
                         transitionSpec = {
                             materialSharedAxisZ(true).using(
-                                SizeTransform(clip = false)
+                                SizeTransform(clip = false),
                             )
                         },
-                        contentAlignment = Alignment.CenterStart
+                        contentAlignment = Alignment.CenterStart,
                     ) { targetSelected ->
                         if (targetSelected) {
                             Text(
@@ -122,7 +131,7 @@ fun NavBar(
                                 fontWeight = FontWeight.Medium,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.padding(start = 8.dp)
+                                modifier = Modifier.padding(start = 8.dp),
                             )
                         }
                     }
@@ -146,7 +155,8 @@ private fun NavBarPreview() {
                 modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding(),
             ) { navRoute ->
                 route =
-                    TopLevelRoutes.entries.first { r -> r.destination == navRoute }
+                    TopLevelRoutes.entries
+                        .first { r -> r.destination == navRoute }
                         .takeIf { it != route }
             }
         }

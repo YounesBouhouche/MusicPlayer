@@ -21,11 +21,11 @@ import com.materialkolor.ktx.harmonize
 import org.koin.compose.koinInject
 import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.data.datastore.PreferencesDataStore
-import younesbouhouche.musicplayer.features.settings.presentation.routes.SettingsGraph
 import younesbouhouche.musicplayer.core.presentation.theme.BlueColors
 import younesbouhouche.musicplayer.core.presentation.theme.GreenColors
 import younesbouhouche.musicplayer.core.presentation.theme.PurpleColors
 import younesbouhouche.musicplayer.core.presentation.theme.RedColors
+import younesbouhouche.musicplayer.features.settings.presentation.routes.SettingsGraph
 
 data class Category(
     val name: Int? = null,
@@ -35,63 +35,68 @@ data class Category(
 )
 
 object Settings {
-    val general = listOf(
-        SettingData(
-            headline = R.string.language,
-            supporting = R.string.language_desc,
-            icon = Icons.Default.Language,
-            large = true,
-            navigateToRoute = SettingsGraph.LanguageSettings
+    val general =
+        listOf(
+            SettingData(
+                headline = R.string.language,
+                supporting = R.string.language_desc,
+                icon = Icons.Default.Language,
+                large = true,
+                navigateToRoute = SettingsGraph.LanguageSettings,
+            ),
         )
-    )
-    val appearance = listOf(
-        SettingData(
-            headline = R.string.theme,
-            supporting = R.string.theme_desc,
-            icon = Icons.Default.Palette,
-            large = true,
-            navigateToRoute = SettingsGraph.ThemeSettings
-        ),
-        SettingData(
-            headline = R.string.player,
-            supporting = R.string.customize_player_desc,
-            icon = Icons.Default.PlayCircleFilled,
-            large = true,
-            navigateToRoute = SettingsGraph.PlayerSettings
+    val appearance =
+        listOf(
+            SettingData(
+                headline = R.string.theme,
+                supporting = R.string.theme_desc,
+                icon = Icons.Default.Palette,
+                large = true,
+                navigateToRoute = SettingsGraph.ThemeSettings,
+            ),
+            SettingData(
+                headline = R.string.player,
+                supporting = R.string.customize_player_desc,
+                icon = Icons.Default.PlayCircleFilled,
+                large = true,
+                navigateToRoute = SettingsGraph.PlayerSettings,
+            ),
         )
-    )
-    val playback = listOf(
-        SettingData(
-            headline = R.string.playback,
-            supporting = R.string.playback_desc,
-            icon = Icons.Default.MusicNote,
-            large = true,
-            navigateToRoute = SettingsGraph.PlaybackSettings
+    val playback =
+        listOf(
+            SettingData(
+                headline = R.string.playback,
+                supporting = R.string.playback_desc,
+                icon = Icons.Default.MusicNote,
+                large = true,
+                navigateToRoute = SettingsGraph.PlaybackSettings,
+            ),
         )
-    )
-    val library = listOf(
-        SettingData(
-            headline = R.string.folders,
-            supporting = R.string.folders_desc,
-            icon = Icons.Default.FolderOpen,
-            large = true
-        ),
-        SettingData(
-            headline = R.string.storage,
-            supporting = R.string.storage_desc,
-            icon = Icons.Default.Storage,
-            large = true
+    val library =
+        listOf(
+            SettingData(
+                headline = R.string.folders,
+                supporting = R.string.folders_desc,
+                icon = Icons.Default.FolderOpen,
+                large = true,
+            ),
+            SettingData(
+                headline = R.string.storage,
+                supporting = R.string.storage_desc,
+                icon = Icons.Default.Storage,
+                large = true,
+            ),
         )
-    )
-    val about = listOf(
-        SettingData(
-            headline = R.string.about,
-            supporting = R.string.about_desc,
-            icon = Icons.Default.Info,
-            large = true,
-            navigateToRoute = SettingsGraph.AboutSettings
+    val about =
+        listOf(
+            SettingData(
+                headline = R.string.about,
+                supporting = R.string.about_desc,
+                icon = Icons.Default.Info,
+                large = true,
+                navigateToRoute = SettingsGraph.AboutSettings,
+            ),
         )
-    )
     private val blueColors: ColorScheme
         @Composable get() {
             val dataStore = koinInject<PreferencesDataStore>()
@@ -117,37 +122,37 @@ object Settings {
             return if (isDark) PurpleColors.darkScheme else PurpleColors.lightScheme
         }
     val categories
-    @Composable get() = listOf(
-        Category(
-            items = appearance,
-            iconTint = greenColors.onPrimary.harmonizeWithPrimary(),
-            iconBackground = greenColors.primary.harmonizeWithPrimary(),
-            ),
-        Category(
-            items = general,
-            iconTint = blueColors.onPrimary.harmonizeWithPrimary(),
-            iconBackground = blueColors.primary.harmonizeWithPrimary()
-        ),
-        Category(
-            items = playback,
-            iconTint = redColors.onPrimary.harmonizeWithPrimary(),
-            iconBackground = redColors.primary.harmonizeWithPrimary()
-            ),
+        @Composable get() =
+            listOf(
+                Category(
+                    items = appearance,
+                    iconTint = greenColors.onPrimary.harmonizeWithPrimary(),
+                    iconBackground = greenColors.primary.harmonizeWithPrimary(),
+                ),
+                Category(
+                    items = general,
+                    iconTint = blueColors.onPrimary.harmonizeWithPrimary(),
+                    iconBackground = blueColors.primary.harmonizeWithPrimary(),
+                ),
+                Category(
+                    items = playback,
+                    iconTint = redColors.onPrimary.harmonizeWithPrimary(),
+                    iconBackground = redColors.primary.harmonizeWithPrimary(),
+                ),
 //        Category(
 //            items = library,
 //            iconTint = purpleColors.onPrimary.harmonizeWithPrimary(),
 //            iconBackground = purpleColors.primary.harmonizeWithPrimary()
 //            ),
-        Category(
-            items = about,
-            iconTint = MaterialTheme.colorScheme.surfaceVariant,
-            iconBackground = MaterialTheme.colorScheme.onSurfaceVariant
+                Category(
+                    items = about,
+                    iconTint = MaterialTheme.colorScheme.surfaceVariant,
+                    iconBackground = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
             )
-    )
 }
 
 @Composable
 fun Color.harmonizeWithPrimary() = harmonize(MaterialTheme.colorScheme.primary)
 
-inline fun <reified T : Activity> Context.startActivity() =
-    startActivity(Intent(this, T::class.java))
+inline fun <reified T : Activity> Context.startActivity() = startActivity(Intent(this, T::class.java))

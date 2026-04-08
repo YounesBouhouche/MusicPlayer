@@ -7,11 +7,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import younesbouhouche.musicplayer.features.main.domain.use_cases.CreatePlaylistUseCase
+import younesbouhouche.musicplayer.features.main.domain.usecases.CreatePlaylistUseCase
 
 class CreatePlaylistViewModel(
-    private val createPlaylistUseCase: CreatePlaylistUseCase
-): ViewModel() {
+    private val createPlaylistUseCase: CreatePlaylistUseCase,
+) : ViewModel() {
     private val _name = MutableStateFlow("")
     val name = _name.asStateFlow()
     private val _uri = MutableStateFlow<Uri?>(null)

@@ -23,12 +23,12 @@ fun ScreenHeader(
 ) {
     Column(
         modifier.fillMaxWidth().height(200.dp).padding(20.dp),
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Row(
             Modifier.fillMaxWidth(),
             content = actions,
-            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End)
+            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
         )
         Text(
             title,
@@ -40,5 +40,4 @@ fun ScreenHeader(
 @Preview
 @Composable
 private fun ScreenHeaderPreview() {
-
 }

@@ -10,11 +10,12 @@ data class QueueWithSongs(
     @Relation(
         parentColumn = "id",
         entityColumn = "id",
-        associateBy = Junction(
-            value = QueueSongCrossRef::class,
-            parentColumn = "queueId",
-            entityColumn = "songId"
-        )
+        associateBy =
+            Junction(
+                value = QueueSongCrossRef::class,
+                parentColumn = "queueId",
+                entityColumn = "songId",
+            ),
     )
     val songs: List<SongEntity?>? = emptyList(),
 )

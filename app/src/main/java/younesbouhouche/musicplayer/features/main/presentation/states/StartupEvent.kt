@@ -7,5 +7,7 @@ sealed interface StartupEvent {
 
     data object PlayMostPlayed : StartupEvent
 
-    data class PlayPlaylist(val id: Int) : StartupEvent
+    data class PlayPlaylist(
+        val id: Int,
+    ) : StartupEvent
 }

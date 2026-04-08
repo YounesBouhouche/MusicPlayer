@@ -39,7 +39,9 @@ internal fun AppTheme(
             Theme.DARK -> true
         }
     val colorTheme by repository.get(SettingsPreference.ColorSchemeMode).collectAsState(initial = ColorScheme.BLUE)
-    val dynamicColor = repository.get(SettingsPreference.DynamicColor).collectAsState(initial = false).value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val dynamicColor =
+        repository.get(SettingsPreference.DynamicColor).collectAsState(initial = false).value &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val colorScheme =
         when {
             primary != null ->
@@ -47,8 +49,8 @@ internal fun AppTheme(
                     primary = primary,
                     secondary = secondary,
                     tertiary = tertiary,
-                    isDark =  isDark,
-                    isAmoled = extraDark
+                    isDark = isDark,
+                    isAmoled = extraDark,
                 )
             dynamicColor && isDark -> {
                 dynamicDarkColorScheme(LocalContext.current)
@@ -70,10 +72,9 @@ internal fun AppTheme(
         isDark = isDark,
         isAmoled = extraDark,
         typography = rubikTypography(MaterialTheme.typography),
-        content = content
+        content = content,
     )
 }
-
 
 @Composable
 internal fun AppTheme(
@@ -86,6 +87,6 @@ internal fun AppTheme(
         palette?.vibrantSwatch?.color ?: palette?.dominantSwatch?.color,
         palette?.dominantSwatch?.color,
         palette?.mutedSwatch?.color,
-        content
+        content,
     )
 }

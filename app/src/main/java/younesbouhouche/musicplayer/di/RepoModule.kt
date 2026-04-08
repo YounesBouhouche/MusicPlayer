@@ -13,21 +13,21 @@ import younesbouhouche.musicplayer.core.domain.repositories.QueueRepository
 import younesbouhouche.musicplayer.features.player.data.repository.PlayerRepositoryImpl
 import younesbouhouche.musicplayer.features.player.domain.repository.PlayerRepository
 
-
-val repoModule = module {
-    single<PreferencesRepository> { PreferencesRepositoryImpl(get()) }
-    single<MusicRepository> {
-        MusicRepositoryImpl(
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-        )
+val repoModule =
+    module {
+        single<PreferencesRepository> { PreferencesRepositoryImpl(get()) }
+        single<MusicRepository> {
+            MusicRepositoryImpl(
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+            )
+        }
+        single<PlaylistRepository> { PlaylistRepositoryImpl(get(), androidContext()) }
+        single<QueueRepository> { QueueRepositoryImpl(get()) }
+        single<PlayerRepository> { PlayerRepositoryImpl(get()) }
     }
-    single<PlaylistRepository> { PlaylistRepositoryImpl(get(), androidContext()) }
-    single<QueueRepository> { QueueRepositoryImpl(get()) }
-    single<PlayerRepository> { PlayerRepositoryImpl(get()) }
-}

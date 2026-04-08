@@ -57,18 +57,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
+import com.younesb.mydesignsystem.presentation.util.plus
 import my.nanihadesuka.compose.LazyColumnScrollbar
 import my.nanihadesuka.compose.ScrollbarSettings
-import younesbouhouche.musicplayer.R
-import com.younesb.mydesignsystem.presentation.components.ExpressiveIconButton
 import org.koin.compose.viewmodel.koinViewModel
+import younesbouhouche.musicplayer.R
 import younesbouhouche.musicplayer.core.domain.models.Song
 import younesbouhouche.musicplayer.features.main.presentation.components.EmptyContainer
 import younesbouhouche.musicplayer.features.main.presentation.components.SongListItem
 import younesbouhouche.musicplayer.features.main.presentation.util.SortBottomSheet
 import younesbouhouche.musicplayer.features.main.presentation.util.SortType
 import younesbouhouche.musicplayer.features.main.presentation.util.expressiveRectShape
-import com.younesb.mydesignsystem.presentation.util.plus
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -87,29 +87,31 @@ fun LibraryScreen(
         Row(
             Modifier.padding(16.dp).fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             repeat(2) { index ->
                 val selected = index == 0 == isFavoritesVisible
                 val colors =
-                    if (index == 0)
+                    if (index == 0) {
                         ToggleButtonDefaults.toggleButtonColors(
                             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                             checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
-                    else
+                    } else {
                         ToggleButtonDefaults.toggleButtonColors(
                             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             checkedContainerColor = MaterialTheme.colorScheme.errorContainer,
                             checkedContentColor = MaterialTheme.colorScheme.onErrorContainer,
                         )
-                val icon = when (index) {
-                    0 -> Icons.Default.LibraryMusic
-                    else -> Icons.Default.Favorite
-                }
+                    }
+                val icon =
+                    when (index) {
+                        0 -> Icons.Default.LibraryMusic
+                        else -> Icons.Default.Favorite
+                    }
                 val text = if (index == 0) R.string.all else R.string.favorites
                 val interactionSource = remember { MutableInteractionSource() }
                 val pressed by interactionSource.collectIsPressedAsState()
@@ -119,27 +121,32 @@ fun LibraryScreen(
                     onCheckedChange = {
                         isFavoritesVisible = index == 0
                     },
-                    modifier = Modifier
-                        .weight(weight)
-                        .height(ButtonDefaults.MediumContainerHeight),
+                    modifier =
+                        Modifier
+                            .weight(weight)
+                            .height(ButtonDefaults.MediumContainerHeight),
                     shapes =
-                        if (index == 0) ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        else ButtonGroupDefaults.connectedTrailingButtonShapes(),
-                    contentPadding = ButtonDefaults
-                        .contentPaddingFor(ButtonDefaults.MediumContainerHeight),
+                        if (index == 0) {
+                            ButtonGroupDefaults.connectedLeadingButtonShapes()
+                        } else {
+                            ButtonGroupDefaults.connectedTrailingButtonShapes()
+                        },
+                    contentPadding =
+                        ButtonDefaults
+                            .contentPaddingFor(ButtonDefaults.MediumContainerHeight),
                     interactionSource = interactionSource,
-                    colors = colors
+                    colors = colors,
                 ) {
                     Icon(
                         icon,
                         contentDescription = null,
-                        Modifier.size(ButtonDefaults.MediumIconSize)
+                        Modifier.size(ButtonDefaults.MediumIconSize),
                     )
                     Spacer(Modifier.width(ButtonDefaults.MediumIconSpacing))
                     Text(
                         stringResource(text),
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
@@ -158,13 +165,14 @@ fun LibraryScreen(
                 .weight(1f)
                 .fillMaxSize(),
             transitionSpec = {
-                if (initialState)
+                if (initialState) {
                     slideInHorizontally { it } + fadeIn() togetherWith
-                            slideOutHorizontally { -it } + fadeOut()
-                else
+                        slideOutHorizontally { -it } + fadeOut()
+                } else {
                     slideInHorizontally { -it } + fadeIn() togetherWith
-                            slideOutHorizontally { it } + fadeOut()
-            }
+                        slideOutHorizontally { it } + fadeOut()
+                }
+            },
         ) { favorite ->
             if (favorite) {
                 ItemsList(
@@ -177,7 +185,7 @@ fun LibraryScreen(
                         viewModel.play(listOf(it.id))
                     },
                     emptyIcon = Icons.Default.LibraryMusic,
-                    emptyText = stringResource(R.string.your_library_is_empty)
+                    emptyText = stringResource(R.string.your_library_is_empty),
                 )
             } else {
                 ItemsList(
@@ -190,7 +198,7 @@ fun LibraryScreen(
                         viewModel.play(listOf(it.id))
                     },
                     emptyIcon = Icons.Default.Favorite,
-                    emptyText = stringResource(R.string.empty_favorites_text)
+                    emptyText = stringResource(R.string.empty_favorites_text),
                 )
             }
         }
@@ -225,45 +233,55 @@ private fun ItemsList(
         emptyIcon,
         emptyText,
         modifier,
-        contentPadding = contentPadding
+        contentPadding = contentPadding,
     ) {
         LazyColumnScrollbar(
             state,
             modifier = Modifier.fillMaxSize(),
             indicatorContent = { index, isThumbSelected ->
-                val key = items.entries.fold(0 to "") { (count, result), (k, list) ->
-                    val newCount = count + list.size
-                    if (index < newCount && result.isEmpty()) newCount to k
-                    else newCount to result
-                }.second
-                if (isThumbSelected)
+                val key =
+                    items.entries
+                        .fold(0 to "") { (count, result), (k, list) ->
+                            val newCount = count + list.size
+                            if (index < newCount && result.isEmpty()) {
+                                newCount to k
+                            } else {
+                                newCount to result
+                            }
+                        }.second
+                if (isThumbSelected) {
                     Box(
-                        Modifier.offset(x = (-4).dp)
+                        Modifier
+                            .offset(x = (-4).dp)
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primary)
                             .size(48.dp),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Text(
                             key,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
+                }
             },
-            settings = ScrollbarSettings.Default.copy(
-                alwaysShowScrollbar = true,
-                thumbUnselectedColor = MaterialTheme.colorScheme.surfaceVariant,
-                thumbSelectedColor = MaterialTheme.colorScheme.primary,
-                thumbThickness = 8.dp
-            ),
+            settings =
+                ScrollbarSettings.Default.copy(
+                    alwaysShowScrollbar = true,
+                    thumbUnselectedColor = MaterialTheme.colorScheme.surfaceVariant,
+                    thumbSelectedColor = MaterialTheme.colorScheme.primary,
+                    thumbThickness = 8.dp,
+                ),
         ) {
             LazyColumn(
-                modifier = Modifier.clip(expressiveRectShape(0, 2))
-                    .fillMaxSize(),
+                modifier =
+                    Modifier
+                        .clip(expressiveRectShape(0, 2))
+                        .fillMaxSize(),
                 state = state,
                 contentPadding = contentPadding + PaddingValues(end = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 items.forEach { (key, list) ->
                     stickyHeader {
@@ -276,29 +294,30 @@ private fun ItemsList(
                                 .padding(16.dp),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                     itemsIndexed(list, { _, it -> it.id }) { index, it ->
                         SongListItem(
                             it,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                                .animateItem(
-
-                                ),
+                            modifier =
+                                Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .animateItem(),
                             shape = expressiveRectShape(index, list.size),
                             trailingContent = {
                                 ExpressiveIconButton(
                                     Icons.Default.MoreVert,
                                     widthOption = IconButtonDefaults.IconButtonWidthOption.Narrow,
                                     size = IconButtonDefaults.mediumIconSize,
-                                    colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                                    )
+                                    colors =
+                                        IconButtonDefaults.filledTonalIconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                        ),
                                 ) {
                                     onShowBottomSheet(it)
                                 }
-                            }
+                            },
                         ) {
                             onClick(it)
                         }
@@ -308,8 +327,3 @@ private fun ItemsList(
         }
     }
 }
-
-
-
-
-
