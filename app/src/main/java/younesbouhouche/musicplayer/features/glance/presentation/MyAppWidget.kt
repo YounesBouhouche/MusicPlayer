@@ -43,6 +43,7 @@ class MyAppWidget :
         val queueRepository by inject<QueueRepository>()
         val settingsRepository by inject<PreferencesRepository>()
         val initial = queueRepository.getQueue()?.getCurrentItem()
+        val itemFlow = queueRepository.observeQueue().map { it?.getCurrentItem() }
         provideContent {
             GlanceTheme {
                 val appWidgetId =
@@ -54,10 +55,7 @@ class MyAppWidget :
                     .get(SettingsPreference.Opacity(appWidgetId))
                     .collectAsState(1f)
                 val state = stateManager.playerState.collectAsState(PlayerState()).value
-                val item by queueRepository
-                    .observeQueue()
-                    .map { it?.getCurrentItem() }
-                    .collectAsState(initial)
+                val item by itemFlow.collectAsState(initial)
                 val currentItem =
                     item?.takeIf {
                         state.playState != PlayState.STOP
