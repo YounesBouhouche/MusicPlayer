@@ -61,7 +61,8 @@
     <string name="rename_playlist">Renommer la liste de lecture</string>
     <string name="sleep_timer">Minuterie de sommeil</string>
     <plurals name="minutes">
-        <item quantity="one">1 minute</item>
+        <item quantity="one">%d minute</item>
+        <item quantity="many">%d de minutes</item>
         <item quantity="other">%d minutes</item>
     </plurals>
     <string name="confirm_delete">Confirmer la suppression</string>
@@ -180,13 +181,13 @@
     <string name="last_played">Dernière lecture</string>
     <string name="shuffle">Aléatoire</string>
     <plurals name="item_s">
-        <item quantity="one">1 élément</item>
-        <item quantity="zero">Aucun élément</item>
+        <item quantity="one">%d élément</item>
+        <item quantity="many">%d des éléments</item>
         <item quantity="other">%d éléments</item>
     </plurals>
     <plurals name="track_s">
-        <item quantity="one">1 piste</item>
-        <item quantity="zero">aucune piste</item>
+        <item quantity="one">%d piste</item>
+        <item quantity="many">%d des pistes</item>
         <item quantity="other">%d pistes</item>
     </plurals>
     <string name="widget_description">Widget Lecteur de musique</string>
